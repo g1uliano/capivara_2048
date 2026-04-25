@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'core/theme/app_theme.dart';
 import 'presentation/screens/game/game_screen.dart';
 
 class CapivaraApp extends StatelessWidget {
@@ -6,10 +7,11 @@ class CapivaraApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       title: 'Capivara 2048',
       debugShowCheckedModeBanner: false,
-      home: GameScreen(),
+      theme: AppTheme.light(),
+      home: const GameScreen(),
     );
   }
 }
