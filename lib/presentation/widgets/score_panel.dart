@@ -16,7 +16,11 @@ class ScorePanel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(gameProvider);
+    final score = ref.watch(gameProvider.select((s) => s.score));
+    final highScore = ref.watch(gameProvider.select((s) => s.highScore));
+    final elapsedMs = ref.watch(gameProvider.select((s) => s.elapsedMs));
+    final isGameOver = ref.watch(gameProvider.select((s) => s.isGameOver));
+    final hasWon = ref.watch(gameProvider.select((s) => s.hasWon));
     final notifier = ref.read(gameProvider.notifier);
 
     return Padding(
@@ -28,7 +32,7 @@ class ScorePanel extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Pontuação: ${state.score}',
+                'Pontuação: $score',
                 style: GoogleFonts.nunito(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -36,7 +40,7 @@ class ScorePanel extends ConsumerWidget {
                 ),
               ),
               Text(
-                'Recorde: ${state.highScore}',
+                'Recorde: $highScore',
                 style: GoogleFonts.nunito(
                   fontSize: 14,
                   color: Colors.white70,
@@ -45,7 +49,7 @@ class ScorePanel extends ConsumerWidget {
             ],
           ),
           Text(
-            _formatTime(state.elapsedMs),
+            _formatTime(elapsedMs),
             style: GoogleFonts.fredoka(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -55,7 +59,7 @@ class ScorePanel extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.pause_rounded, color: Colors.white),
             iconSize: 32,
-            onPressed: state.isGameOver ? null : notifier.pause,
+            onPressed: (isGameOver || hasWon) ? null : notifier.pause,
           ),
         ],
       ),

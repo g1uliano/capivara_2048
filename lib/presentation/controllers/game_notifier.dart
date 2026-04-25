@@ -57,7 +57,7 @@ class GameNotifier extends StateNotifier<GameState> {
   }
 
   void pause() {
-    if (state.isGameOver) return;
+    if (state.isGameOver || state.hasWon) return;
     _stopTimer();
     state = state.copyWith(isPaused: true);
   }
@@ -65,7 +65,7 @@ class GameNotifier extends StateNotifier<GameState> {
   void resume() {
     if (!state.isPaused) return;
     state = state.copyWith(isPaused: false);
-    if (_timerStarted) _startTimer();
+    if (_timerStarted && !state.isGameOver && !state.hasWon) _startTimer();
   }
 
   void restart() {
