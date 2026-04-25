@@ -68,7 +68,8 @@ Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 1
 Sempre que lançar uma nova versão (merge + push):
 1. Atualizar `CHANGELOG.md` com a versão e as mudanças
 2. Atualizar `README.md` se necessário (roadmap, features, versão)
-3. Fazer merge em main e push
+3. Atualizar `CLAUDE.md` se houver informações relevantes (convenções novas, decisões de arquitetura, bugs conhecidos, etc.)
+4. Fazer merge em main e push
 
 ## Animais (referência rápida)
 
