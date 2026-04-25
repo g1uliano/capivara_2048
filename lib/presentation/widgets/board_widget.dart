@@ -28,9 +28,11 @@ class BoardWidget extends ConsumerWidget {
           Expanded(
             child: Row(
               children: List.generate(GameConstants.boardSize, (c) =>
-                Padding(
-                  padding: const EdgeInsets.all(GameConstants.tileSpacing / 2),
-                  child: TileWidget(tile: board[r][c], size: tileSize),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(GameConstants.tileSpacing / 2),
+                    child: TileWidget(tile: board[r][c], size: tileSize),
+                  ),
                 ),
               ),
             ),
