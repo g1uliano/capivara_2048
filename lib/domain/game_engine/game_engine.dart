@@ -67,11 +67,19 @@ class GameEngine {
     final newHighScore = max(state.highScore, newScore);
     final hasWon = _checkWin(unrotated);
 
+    int newMaxLevel = state.maxLevel;
+    for (final row in unrotated) {
+      for (final tile in row.whereType<Tile>()) {
+        if (tile.level > newMaxLevel) newMaxLevel = tile.level;
+      }
+    }
+
     var next = state.copyWith(
       board: unrotated,
       score: newScore,
       highScore: newHighScore,
       hasWon: hasWon,
+      maxLevel: newMaxLevel,
     );
 
     next = _spawnTile(next);

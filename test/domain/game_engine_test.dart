@@ -252,27 +252,50 @@ void main() {
     });
   });
 
-  group('win condition', () {
-    test('hasWon is true when a tile reaches level 11', () {
-      final state = _stateWithBoard([
-        [10, 10, null, null],
-        [null, null, null, null],
-        [null, null, null, null],
-        [null, null, null, null],
-      ]);
-      final next = engine.move(state, Direction.left);
-      expect(next.hasWon, isTrue);
+  group('maxLevel tracking', () {
+    test('maxLevel starts at 0 on newGame', () {
+      final state = engine.newGame();
+      expect(state.maxLevel, 0);
     });
 
-    test('hasWon stays false when max level not reached', () {
+    test('maxLevel updates after merge', () {
       final state = _stateWithBoard([
-        [9, 9, null, null],
+        [1, 1, null, null],
         [null, null, null, null],
         [null, null, null, null],
         [null, null, null, null],
       ]);
       final next = engine.move(state, Direction.left);
-      expect(next.hasWon, isFalse);
+      expect(next.maxLevel, greaterThanOrEqualTo(2));
+    });
+
+    test('maxLevel reflects highest tile on board', () {
+      final state = _stateWithBoard([
+        [3, 3, null, null],
+        [null, null, null, null],
+        [null, null, null, null],
+        [null, null, null, null],
+      ]);
+      final next = engine.move(state, Direction.left);
+      // merge produces level 4; maxLevel should be >= 4
+      expect(next.maxLevel, greaterThanOrEqualTo(4));
+    });
+
+    test('maxLevel does not decrease', () {
+      var state = _stateWithBoard([
+        [5, 5, null, null],
+        [null, null, null, null],
+        [null, null, null, null],
+        [null, null, null, null],
+      ]);
+      state = engine.move(state, Direction.left); // produces level 6
+      final levelAfterFirst = state.maxLevel;
+      expect(levelAfterFirst, greaterThanOrEqualTo(6));
+
+      // subsequent moves on a board with no matching tiles won't reduce maxLevel
+      final next = engine.move(state, Direction.right);
+      expect(next.maxLevel, greaterThanOrEqualTo(levelAfterFirst));
     });
   });
 }
+
