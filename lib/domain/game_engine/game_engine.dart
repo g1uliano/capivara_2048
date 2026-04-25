@@ -16,9 +16,7 @@ class GameEngine {
   final _uuid = const Uuid();
   final Random _random;
 
-  // [random] is injectable for deterministic testing. Production code should
-  // pass Random() explicitly; omitting it also produces a non-deterministic
-  // instance so tests that need determinism should inject a seeded Random.
+  // [random] is injectable for deterministic testing.
   GameEngine({Random? random}) : _random = random ?? Random();
 
   GameState newGame() {
@@ -57,7 +55,14 @@ class GameEngine {
       return state.copyWith(isGameOver: isOver);
     }
 
-    final unrotated = _unrotateBoard(newBoard, dir);
+    final rawUnrotated = _unrotateBoard(newBoard, dir);
+    final size = GameConstants.boardSize;
+    final unrotated = List.generate(size, (r) =>
+      List.generate(size, (c) {
+        final t = rawUnrotated[r][c];
+        return t != null ? t.copyWith(row: r, col: c) : null;
+      })
+    );
     final newScore = state.score + totalGained;
     final newHighScore = max(state.highScore, newScore);
     final hasWon = _checkWin(unrotated);
@@ -197,5 +202,5 @@ class GameEngine {
         row.any((t) => t != null && t.level >= GameConstants.maxLevel));
   }
 
-  int _valueForLevel(int level) => (1 << level); // 2^level
+  int _valueForLevel(int level) => (1 << level);
 }

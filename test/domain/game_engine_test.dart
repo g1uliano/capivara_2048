@@ -2,7 +2,7 @@ import 'package:capivara_2048/domain/game_engine/direction.dart';
 import 'package:capivara_2048/domain/game_engine/game_engine.dart';
 import 'package:capivara_2048/data/models/tile.dart';
 import 'package:capivara_2048/data/models/game_state.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 
 void main() {
   late GameEngine engine;
