@@ -19,7 +19,7 @@ class GameEngine {
   // [random] is injectable for deterministic testing. Production code should
   // pass Random() explicitly; omitting it also produces a non-deterministic
   // instance so tests that need determinism should inject a seeded Random.
-  GameEngine({Random? random}) : _random = random ?? Random(1);
+  GameEngine({Random? random}) : _random = random ?? Random();
 
   GameState newGame() {
     final board = List.generate(

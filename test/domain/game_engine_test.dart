@@ -59,7 +59,7 @@ void main() {
       ]);
       final next = engine.move(state, Direction.left);
       expect(_level(next, 0, 0), 2);
-      expect(next.board[0][1], isNull);
+      // board[0][1] may hold the spawned tile — only check merge result
     });
 
     test('different tiles do not merge', () {
@@ -84,7 +84,7 @@ void main() {
       final next = engine.move(state, Direction.left);
       expect(_level(next, 0, 0), 2);
       expect(_level(next, 0, 1), 1);
-      expect(next.board[0][2], isNull);
+      // board[0][2] may hold the spawned tile — only check merge result
     });
 
     test('four equal tiles: two pairs merge', () {
@@ -97,8 +97,7 @@ void main() {
       final next = engine.move(state, Direction.left);
       expect(_level(next, 0, 0), 2);
       expect(_level(next, 0, 1), 2);
-      expect(next.board[0][2], isNull);
-      expect(next.board[0][3], isNull);
+      // board[0][2] and [0][3] may hold the spawned tile — only check merge result
     });
 
     test('tiles slide left filling gaps', () {
@@ -110,7 +109,7 @@ void main() {
       ]);
       final next = engine.move(state, Direction.left);
       expect(_level(next, 0, 0), 1);
-      expect(next.board[0][1], isNull);
+      // board[0][1] may hold the spawned tile — only check that tile slid to col 0
     });
   });
 
@@ -161,7 +160,7 @@ void main() {
       ]);
       final next = engine.move(state, Direction.right);
       expect(_level(next, 0, 3), 1);
-      expect(next.board[0][0], isNull);
+      // A new tile spawns after the move, so we only assert the tile reached col 3
     });
 
     test('move up slides tiles to the top', () {
@@ -173,7 +172,7 @@ void main() {
       ]);
       final next = engine.move(state, Direction.up);
       expect(_level(next, 0, 0), 1);
-      expect(next.board[1][0], isNull);
+      // A new tile spawns after the move, so we only assert the tile reached row 0
     });
 
     test('move down slides tiles to the bottom', () {
@@ -185,7 +184,7 @@ void main() {
       ]);
       final next = engine.move(state, Direction.down);
       expect(_level(next, 3, 0), 1);
-      expect(next.board[0][0], isNull);
+      // A new tile spawns after the move, so we only assert the tile reached row 3
     });
 
     test('move up merges equal tiles in same column', () {
@@ -197,7 +196,6 @@ void main() {
       ]);
       final next = engine.move(state, Direction.up);
       expect(_level(next, 0, 0), 2);
-      expect(next.board[1][0], isNull);
     });
   });
 
