@@ -4,12 +4,14 @@ class Animal {
   final int level;
   final int value;
   final String name;
-  final Color tileColor;
+  final Color borderColor;
+  final String assetPath;
 
   const Animal({
     required this.level,
     required this.value,
     required this.name,
-    required this.tileColor,
+    required this.borderColor,
+    required this.assetPath,
   });
 }

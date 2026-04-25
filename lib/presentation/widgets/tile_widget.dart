@@ -26,7 +26,7 @@ class TileWidget extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: animal.tileColor,
+        color: animal.borderColor,
         borderRadius: BorderRadius.circular(8),
         boxShadow: const [
           BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2)),
