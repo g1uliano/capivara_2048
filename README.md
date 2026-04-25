@@ -31,6 +31,53 @@ Puzzle game multiplataforma inspirado no 2048 clássico, onde os números são s
 - Localização PT-BR e EN
 - Feedback háptico no merge
 
+## Como compilar e executar
+
+### Pré-requisitos
+
+- [Flutter SDK 3.x](https://docs.flutter.dev/get-started/install) instalado e no PATH
+- `flutter doctor` sem erros críticos
+
+### Instalação
+
+```bash
+git clone git@github.com:g1uliano/capivara_2048.git
+cd capivara_2048
+flutter pub get
+```
+
+### Executar
+
+```bash
+# Web (Chrome)
+flutter run -d chrome
+
+# Android (emulador ou dispositivo conectado)
+flutter run -d android
+
+# iOS (macOS com Xcode)
+flutter run -d ios
+```
+
+### Testes
+
+```bash
+flutter test
+```
+
+### Build de produção
+
+```bash
+# Web
+flutter build web
+
+# Android APK
+flutter build apk --release
+
+# iOS
+flutter build ios --release
+```
+
 ## Stack
 
 - **Flutter 3.x** (Dart) — iOS, Android, Web, Desktop
