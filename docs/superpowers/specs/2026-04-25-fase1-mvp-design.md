@@ -19,7 +19,7 @@ Entregar um jogo 2048 funcional em Flutter com:
 
 ## 2. Setup do projeto
 
-- `flutter create` com `--org work.cardoso` no diretório atual (`capivara_2048/`)
+- `flutter create` com `--org com.catraia` no diretório atual (`capivara_2048/`)
 - Plataformas-alvo iniciais: Android, iOS, Web
 - Dependências em `pubspec.yaml`:
   - `flutter_riverpod: ^2.x`
