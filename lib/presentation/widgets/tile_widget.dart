@@ -34,7 +34,7 @@ class TileWidget extends StatelessWidget {
       ),
       child: Center(
         child: Text(
-          '${tile!.level}',
+          '${1 << tile!.level}',
           style: TextStyle(
             fontSize: size * 0.35,
             fontWeight: FontWeight.bold,

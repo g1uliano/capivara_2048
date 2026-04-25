@@ -104,7 +104,7 @@ assets/
 
 ## Roadmap
 
-- **Fase 1** — MVP: game engine puro + tela básica *(em desenvolvimento)*
+- **Fase 1** — MVP: game engine puro + tela básica *(v0.1.1)*
 - **Fase 2** — Identidade visual: paleta, tipografia, animações
 - **Fase 3** — Arte final: ilustrações dos 11 animais
 - **Fase 4** — Áudio: sons e música

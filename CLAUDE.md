@@ -63,6 +63,13 @@ Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 1
 | 5 | Coleção e Desafio Diário |
 | 6 | Polimento, l10n, acessibilidade, lançamento |
 
+## Release checklist
+
+Sempre que lançar uma nova versão (merge + push):
+1. Atualizar `CHANGELOG.md` com a versão e as mudanças
+2. Atualizar `README.md` se necessário (roadmap, features, versão)
+3. Fazer merge em main e push
+
 ## Animais (referência rápida)
 
 Níveis 1–11: Tanajura → Lobo-guará → Sapo-cururu → Tucano → Arara-azul → Preguiça → Mico-leão-dourado → Boto-cor-de-rosa → Onça-pintada → Sucuri → **Capivara Lendária (2048)**.
