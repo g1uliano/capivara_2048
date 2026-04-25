@@ -1,0 +1,7 @@
+Estamos no projeto **Capivara 2048** (Flutter). Fases 2.1 e 2.2 concluídas — identidade visual base (AppTheme, Fredoka/Nunito), TileWidget redesenhado (fundo branco + borda colorida por animal + marca d'água), HostBanner com AnimatedSwitcher, cronômetro MM:SS, sistema de pausa completo (PauseOverlay + Continuar/Reiniciar/Menu). v0.2.0 lançada.
+
+Use `CAPIVARA_2048_DESIGN.md` como referência. Próximo passo: **Fase 2.3 — Sistema de Vidas**.
+
+O sistema de vidas deve incluir: `LivesState` persistido com Hive (máx 5 vidas, regeneração 1 vida a cada 30 min), consumo de 1 vida por partida iniciada, indicador de vidas na UI (corações), tela de "sem vidas" com timer de recarga visível e mock de anúncio recompensado (botão que simula ganhar 1 vida extra). Nenhum SDK de anúncio real — apenas o mock.
+
+Use o brainstorming skill para refinar o design antes de planejar. Antes de codar, confirme o plano em alto nível.
