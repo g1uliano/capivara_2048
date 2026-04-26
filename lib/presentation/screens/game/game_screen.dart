@@ -11,6 +11,7 @@ import '../../widgets/host_banner.dart';
 import '../../widgets/lives_indicator.dart';
 import '../../widgets/pause_overlay.dart';
 import '../../widgets/status_panel.dart';
+import '../no_lives_screen.dart';
 
 class GameScreen extends ConsumerWidget {
   const GameScreen({super.key});
@@ -24,7 +25,7 @@ class GameScreen extends ConsumerWidget {
     final hostAnimal = state.maxLevel > 0 ? animalForLevel(state.maxLevel) : null;
 
     ref.listen<GameState>(gameProvider, (prev, next) {
-      if (prev != null && !prev.isGameOver && next.isGameOver) {
+      if (prev != null && !prev.isGameOver && next.isGameOver && !next.hasWon) {
         ref.read(livesProvider.notifier).consume();
       }
     });
@@ -82,9 +83,9 @@ class GameScreen extends ConsumerWidget {
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: LivesIndicator(),
                   ),
-                  if (isGameOver) _buildOverlay('Game Over!', notifier),
+                  if (isGameOver) _buildOverlay('Game Over!', notifier, ref),
                   if (hasWon && !isGameOver)
-                    _buildOverlay('Capivara Lendária! 🎉', notifier),
+                    _buildOverlay('Capivara Lendária! 🎉', notifier, ref),
                 ],
               ),
               // Floating pause button — positioned below the header row
@@ -110,7 +111,7 @@ class GameScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildOverlay(String message, GameNotifier notifier) {
+  Widget _buildOverlay(String message, GameNotifier notifier, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -122,7 +123,15 @@ class GameScreen extends ConsumerWidget {
                   color: Colors.white)),
           const SizedBox(height: 8),
           ElevatedButton(
-            onPressed: () => notifier.restart(),
+            onPressed: () {
+              if (!ref.read(livesProvider.notifier).canPlay) {
+                Navigator.of(ref.context).pushReplacement(
+                  MaterialPageRoute(builder: (_) => const NoLivesScreen(midGame: false)),
+                );
+                return;
+              }
+              notifier.restart();
+            },
             child: const Text('Jogar de novo'),
           ),
         ],
