@@ -38,7 +38,7 @@ class InventoryItemButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               child: InkWell(
                 borderRadius: BorderRadius.circular(12),
-                onTap: enabled ? onPressed : null,
+                onTap: onPressed,
                 child: Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
