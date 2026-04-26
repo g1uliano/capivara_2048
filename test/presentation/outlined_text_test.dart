@@ -17,6 +17,7 @@ void main() {
 
     final textWidget = tester.widget<Text>(textFinders);
     expect(textWidget.style?.color, Colors.white);
+    expect(textWidget.style?.shadows?.length, greaterThan(0));
   });
 
   testWidgets('OutlinedText has no Stack widget', (tester) async {
