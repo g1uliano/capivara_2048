@@ -2,7 +2,7 @@
 
 > Documento de especificação para desenvolvimento. Pensado para ser alimentado em ferramentas como Claude Code para implementação iterativa.
 >
-> **Status atual:** Fase 2.1 e 2.2 concluídas ✅ — Identidade visual base (AppTheme, Fredoka/Nunito), TileWidget redesenhado (fundo branco + borda colorida por animal + slot para marca d'água), HostBanner com AnimatedSwitcher, cronômetro MM:SS, sistema de pausa completo (PauseOverlay + Continuar/Reiniciar/Menu). Próximo: **Fase 2.3** (sistema de vidas com Hive, regeneração automática, indicador na UI, consumo por partida, mock de anúncio recompensado).
+> **Status atual:** Fase 2.3 concluída ✅ — HomeScreen (novo jogo / continuar / ranking placeholder / sair), sistema de vidas com Hive (regen offline, mock-anúncio, limite 40/dia), LivesIndicator, HostArtwork com fallback, StatusPanel HH:MM:SS, pause flutuante, GameBackground com textura geométrica por animal. Próximo: **Fase 2.4** (inventário: Bomba + Desfazer).
 >
 > **Mudanças principais nesta versão:**
 > - Lista de animais atualizada (Tanajura, Lobo-guará, Sapo-cururu, Mico-leão-dourado, Sucuri)
@@ -480,6 +480,10 @@ users/{userId}/personalRecords
 
 ### 12.1 Mapa de telas (atualizado)
 ```
+main → HomeScreen → GameScreen
+           ↑               |
+           └── (menu/sair) ┘
+
 [Splash]
    ↓
 [Login/Cadastro]  (apenas primeira vez ou se quiser ranking global)
@@ -569,6 +573,10 @@ class Animal {
   final String soundPath;      // "assets/sounds/animals/capivara.mp3"
   final Color borderColor;     // contorno do tile
   final String? funFact;
+  final String? hostSvgPath;             // null → fallback pro tile assetPath
+  final double? hostAspectRatio;         // null → 1.0
+  final String? backgroundTexturePath;  // null → CustomPainter placeholder
+  final TexturePattern texturePattern;  // enum: dots, diagonal, grid, waves, blobs, scales, radial
 }
 ```
 
@@ -599,7 +607,18 @@ class GameState {
 }
 ```
 
-### 13.4 PlayerProfile
+### 13.4 LivesState (Hive, typeId: 1)
+| Campo | Tipo | Descrição |
+|---|---|---|
+| lives | int | vidas atuais (0–15) |
+| maxLives | int | 5 = cap regen padrão \| 15 = cap inventário \| -1 = ilimitado |
+| lastRegenAt | DateTime | timestamp da última vida por regen |
+| adWatchedToday | int | contador diário de anúncios mock |
+| adCounterResetAt | DateTime | próxima meia-noite local |
+| userId | String? | null = local; preenchido na Fase 3 |
+| lastSyncedAt | DateTime? | null = nunca sincronizado |
+
+### 13.5 PlayerProfile
 ```dart
 class PlayerProfile {
   final String userId;
@@ -620,7 +639,7 @@ class PersonalRecords {
 }
 ```
 
-### 13.5 ShopPackage
+### 13.6 ShopPackage
 ```dart
 class ShopPackage {
   final String id;            // "pkg_01" ... "pkg_06"
@@ -642,7 +661,7 @@ class RewardBundle {
 }
 ```
 
-### 13.6 ShareCode
+### 13.7 ShareCode
 ```dart
 class ShareCode {
   final String code;          // 8 chars alfanumérico
@@ -714,7 +733,7 @@ class ShareCode {
 - Atualizar anfitrião quando `highestLevelReached` aumenta
 - Animação de transição entre anfitriões
 
-#### 2.3 — Sistema de vidas (1 semana)
+#### 2.3 — HomeScreen, vidas, anfitrião refatorado, fundo dinâmico ✅
 - `LivesState` com Hive
 - Lógica de regeneração (1 vida / 30 min, cap 5 para regen, cap 15 para inventário)
 - Indicador de vidas na Home e na tela de jogo
