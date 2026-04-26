@@ -12,7 +12,6 @@ class GameOverModal extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final canPlay = ref.watch(livesProvider.select((s) => s.canPlay));
-    final notifier = ref.read(gameProvider.notifier);
 
     return Container(
       color: const Color(0xCC000000),
@@ -29,7 +28,7 @@ class GameOverModal extends ConsumerWidget {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: canPlay
-                  ? () => notifier.restart()
+                  ? () => ref.read(gameProvider.notifier).restart()
                   : () => Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
                           builder: (_) => const NoLivesScreen(midGame: false),

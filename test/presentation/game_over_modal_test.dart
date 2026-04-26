@@ -138,11 +138,7 @@ void main() {
     await tester.pump(Duration.zero); // one frame — don't settle (stream timer)
 
     // Navigator pushed a route to NoLivesScreen.
-    expect(
-      observer.pushedRoute?.settings.name ??
-          observer.pushedRoute.runtimeType.toString(),
-      isNotNull,
-    );
+    expect(observer.pushedRoute, isNotNull);
     // game state is untouched: restart() was NOT called.
     expect(container.read(gameProvider).score, 0);
   });
