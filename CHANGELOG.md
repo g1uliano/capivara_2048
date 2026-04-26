@@ -7,13 +7,20 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
-## [0.3.7] — 2026-04-26
+## [0.4.0] — 2026-04-26
 
 ### Added
-- SVG assets dos 11 animais integrados (`assets/images/animals/tile/` e `host/`)
-
-### Changed
-- Design doc atualizado com caminhos dos SVGs, status da Fase 2.3.6 e próximo passo (Fase 3)
+- **SVG watermarks nos tiles** — `SvgPicture.asset` com `Opacity(0.27)` e padding `size * 0.08`, substituindo `Image.asset` que era silenciosamente vazio
+- **Host artwork ativo** — `hostSvgPath` populado em todos os 11 animais, `HostArtwork` agora renderiza o SVG correto para cada animal
+- **Sagui no nível 5** — substitui Arara-azul; cor `#A0826D`, `scientificName`, `funFact`
+- **Campos `scientificName` e `funFact` no model `Animal`** — nullable, preparando para tela de Coleção (Fase 5)
+- **Tint escuro no PauseOverlay** — `Container(Colors.black.withOpacity(0.25))` garante legibilidade sobre tiles amarelos/dourados
+- **`OutlinedText` em todos os textos do PauseOverlay** — "Pausado", botões, "Reduzir efeitos visuais", "Debug"
+- **Ícone de pausa emoji** — `Text('⏸')` com 4 sombras diagonais substitui `Icon(Icons.pause...)`
+- **`svgPath` opcional em `InventoryItemButton`** — suporte a SVG com fallback para `IconData`; grayscale `ColorFiltered` existente cobre ambos
+- **4 SVGs de ícones de inventário** — `bomb_2.svg`, `bomb_3.svg`, `undo_1.svg`, `undo_3.svg` em `assets/icons/inventory/`
+- **Galeria de debug** — `AnimalsGalleryScreen` acessível via PauseOverlay → "Debug" (apenas em `kDebugMode`); mostra tile, host livre e host com fundo para todos os 11 animais
+- **Relatório de auditoria SVG** — `docs/svg_audit_2_3_7.md` (template; preencher após inspeção visual na galeria)
 
 ## [0.3.6] — 2026-04-26
 

@@ -52,7 +52,7 @@ lib/
 
 ## Fases do roadmap
 
-Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 3 (Arte final dos 11 animais)**.
+Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 2.3.7 concluída (v0.4.0) — próximo: Fase 2.3.8 (texturas + áudio)**.
 
 | Fase | Foco |
 |------|------|
@@ -73,4 +73,4 @@ Sempre que lançar uma nova versão (merge + push):
 
 ## Animais (referência rápida)
 
-Níveis 1–11: Tanajura → Lobo-guará → Sapo-cururu → Tucano → Arara-azul → Preguiça → Mico-leão-dourado → Boto-cor-de-rosa → Onça-pintada → Sucuri → **Capivara Lendária (2048)**.
+Níveis 1–11: Tanajura → Lobo-guará → Sapo-cururu → Tucano → **Sagui** → Preguiça → Mico-leão-dourado → Boto-cor-de-rosa → Onça-pintada → Sucuri → **Capivara Lendária (2048)**.
