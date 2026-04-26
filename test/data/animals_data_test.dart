@@ -31,4 +31,59 @@ void main() {
       expect(a.funFact, isNull);
     });
   });
+
+  group('animals list', () {
+    test('has exactly 11 animals', () {
+      expect(animals.length, 11);
+    });
+
+    test('level 5 is Sagui, not Arara-azul', () {
+      final level5 = animals.firstWhere((a) => a.level == 5);
+      expect(level5.name, 'Sagui');
+      expect(level5.scientificName, 'Callithrix penicillata');
+      expect(level5.borderColor.value, const Color(0xFFA0826D).value);
+      expect(level5.backgroundBaseColor.value, const Color(0xFFE0D2C5).value);
+    });
+
+    test('level 5 Sagui has fun fact', () {
+      final level5 = animals.firstWhere((a) => a.level == 5);
+      expect(level5.funFact, isNotNull);
+      expect(level5.funFact!.isNotEmpty, isTrue);
+    });
+
+    test('all animals have assetPath pointing to .svg files', () {
+      for (final animal in animals) {
+        expect(
+          animal.assetPath.endsWith('.svg'),
+          isTrue,
+          reason: '${animal.name} assetPath should end in .svg',
+        );
+      }
+    });
+
+    test('all animals have hostSvgPath set', () {
+      for (final animal in animals) {
+        expect(
+          animal.hostSvgPath,
+          isNotNull,
+          reason: '${animal.name} hostSvgPath should not be null',
+        );
+      }
+    });
+
+    test('all animals have hostAspectRatio set to 1.0', () {
+      for (final animal in animals) {
+        expect(
+          animal.hostAspectRatio,
+          1.0,
+          reason: '${animal.name} hostAspectRatio should be 1.0',
+        );
+      }
+    });
+
+    test('no animal is named Arara-azul', () {
+      final names = animals.map((a) => a.name).toList();
+      expect(names, isNot(contains('Arara-azul')));
+    });
+  });
 }
