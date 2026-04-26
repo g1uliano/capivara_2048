@@ -70,6 +70,7 @@ class LivesNotifier extends StateNotifier<LivesState> {
   }
 
   bool get canWatchAd => canWatchAdFor(state);
+  bool get canPlay => state.lives > 0;
 }
 
 final livesRepositoryProvider = Provider((_) => LivesRepository());

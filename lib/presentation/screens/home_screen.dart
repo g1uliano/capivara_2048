@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/constants/app_colors.dart';
 import '../../domain/lives/lives_notifier.dart';
 import '../controllers/game_notifier.dart';
 import '../widgets/lives_indicator.dart';
@@ -18,7 +19,7 @@ class HomeScreen extends ConsumerWidget {
     final hasSave = gameState.score > 0 || gameState.maxLevel > 0;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF3FA968),
+      backgroundColor: AppColors.primary,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
@@ -32,6 +33,7 @@ class HomeScreen extends ConsumerWidget {
               SvgPicture.asset(
                 'assets/images/home_ensemble.svg',
                 height: 220,
+                semanticsLabel: 'Animais da Amazônia',
               ),
               const SizedBox(height: 32),
               _HomeButton(
@@ -60,8 +62,7 @@ class HomeScreen extends ConsumerWidget {
   }
 
   void _startNew(BuildContext context, WidgetRef ref) {
-    final lives = ref.read(livesProvider).lives;
-    if (lives <= 0) {
+    if (!ref.read(livesProvider.notifier).canPlay) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const NoLivesScreen(midGame: false)),
@@ -97,7 +98,7 @@ class _HomeButton extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: secondary ? Colors.white24 : Colors.white,
-          foregroundColor: secondary ? Colors.white : const Color(0xFF3FA968),
+          foregroundColor: secondary ? Colors.white : AppColors.primary,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
