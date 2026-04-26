@@ -12,8 +12,16 @@ class LivesNotifier extends StateNotifier<LivesState> {
   }
 
   Future<void> _init() async {
-    final loaded = await _repo.load();
-    state = calcRegen(state: loaded, now: DateTime.now());
+    var loaded = await _repo.load();
+    loaded = calcRegen(state: loaded, now: DateTime.now());
+
+    final hasReset = await _repo.getMigrationFlag('lives_reset_v235');
+    if (!hasReset) {
+      loaded = loaded.copyWith(lives: loaded.maxLives);
+      await _repo.setMigrationFlag('lives_reset_v235');
+    }
+
+    state = loaded;
     await _repo.save(state);
     _ready.complete();
   }
