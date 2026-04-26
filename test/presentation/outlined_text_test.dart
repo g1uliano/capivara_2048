@@ -41,5 +41,19 @@ void main() {
       );
       expect(find.text('Tucano'), findsWidgets); // two Text widgets in the Stack
     });
+
+    testWidgets('renders with colored base style without asserting', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: OutlinedText(
+              text: 'Test',
+              style: TextStyle(fontSize: 16, color: Colors.amber),
+            ),
+          ),
+        ),
+      );
+      expect(find.text('Test'), findsWidgets);
+    });
   });
 }

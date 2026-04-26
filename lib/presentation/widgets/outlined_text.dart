@@ -26,6 +26,7 @@ class OutlinedText extends StatelessWidget {
         Text(
           text,
           style: baseStyle.copyWith(
+            color: null,
             foreground: Paint()
               ..style = PaintingStyle.stroke
               ..strokeWidth = strokeWidth
