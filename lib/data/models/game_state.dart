@@ -12,6 +12,8 @@ class GameState {
   final bool isPaused;
   final List<GameState> undoStack;
   final BombMode? bombMode;
+  // Transient — excluded from ==/hashCode; reset whenever bomb mode exits.
+  final List<(int, int)> selectedBombTiles;
 
   static const _bombSentinel = Object();
 
@@ -26,6 +28,7 @@ class GameState {
     this.isPaused = false,
     List<GameState>? undoStack,
     this.bombMode,
+    this.selectedBombTiles = const [],
   }) : undoStack = List.unmodifiable(undoStack ?? const []);
 
   GameState copyWith({
@@ -39,6 +42,7 @@ class GameState {
     bool? isPaused,
     List<GameState>? undoStack,
     Object? bombMode = _bombSentinel,
+    List<(int, int)>? selectedBombTiles,
   }) {
     return GameState(
       board: board ?? this.board,
@@ -51,6 +55,7 @@ class GameState {
       isPaused: isPaused ?? this.isPaused,
       undoStack: undoStack ?? this.undoStack,
       bombMode: bombMode == _bombSentinel ? this.bombMode : bombMode as BombMode?,
+      selectedBombTiles: selectedBombTiles ?? this.selectedBombTiles,
     );
   }
 }

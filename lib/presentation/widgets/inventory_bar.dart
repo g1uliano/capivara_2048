@@ -24,8 +24,7 @@ class InventoryBar extends ConsumerWidget {
             count: inventory.bomb2,
             onPressed: inventory.bomb2 > 0
                 ? () {
-                    ref.read(gameProvider.notifier).enterBombMode(BombMode.bomb2);
-                    ref.read(inventoryProvider.notifier).consume(ItemType.bomb2);
+                    ref.read(gameProvider.notifier).enterBombMode(BombMode.bomb2, ItemType.bomb2);
                   }
                 : null,
           ),
@@ -35,8 +34,7 @@ class InventoryBar extends ConsumerWidget {
             count: inventory.bomb3,
             onPressed: inventory.bomb3 > 0
                 ? () {
-                    ref.read(gameProvider.notifier).enterBombMode(BombMode.bomb3);
-                    ref.read(inventoryProvider.notifier).consume(ItemType.bomb3);
+                    ref.read(gameProvider.notifier).enterBombMode(BombMode.bomb3, ItemType.bomb3);
                   }
                 : null,
           ),

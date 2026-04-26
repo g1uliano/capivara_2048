@@ -2,15 +2,20 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/game_state.dart';
+import '../../data/models/item_type.dart';
 import '../../domain/game_engine/bomb_mode.dart';
 import '../../domain/game_engine/direction.dart';
 import '../../domain/game_engine/game_engine.dart';
+import '../../domain/inventory/inventory_notifier.dart';
 
 class GameNotifier extends StateNotifier<GameState> {
   final GameEngine _engine;
   Timer? _timer;
   bool _timerStarted = false;
   List<(int, int)> _bombSelection = [];
+  ItemType? _pendingBombItem;
+  // Called on confirm to deduct the item; null-safe so tests don't need Hive.
+  void Function(ItemType)? _consumeItem;
 
   GameNotifier(this._engine) : super(_engine.newGame());
 
@@ -88,9 +93,10 @@ class GameNotifier extends StateNotifier<GameState> {
     );
   }
 
-  void enterBombMode(BombMode mode) {
+  void enterBombMode(BombMode mode, ItemType itemType) {
     _bombSelection = [];
-    state = state.copyWith(bombMode: mode);
+    _pendingBombItem = itemType;
+    state = state.copyWith(bombMode: mode, selectedBombTiles: const []);
   }
 
   void selectBombTile(int row, int col) {
@@ -105,24 +111,42 @@ class GameNotifier extends StateNotifier<GameState> {
       _bombSelection = [..._bombSelection, pos];
       if (_bombSelection.length == maxTiles) {
         confirmBomb();
+        return;
       }
     }
+    // Emit updated selection so overlay rebuilds on intermediate selections
+    state = state.copyWith(
+      selectedBombTiles: List.unmodifiable(_bombSelection),
+    );
   }
 
   void confirmBomb() {
     final mode = state.bombMode;
-    if (mode == null || _bombSelection.isEmpty) return;
+    if (mode == null || _bombSelection.isEmpty) {
+      cancelBomb();
+      return;
+    }
     final newState = GameEngine.removeTiles(state, _bombSelection);
     _bombSelection = [];
-    state = newState.copyWith(bombMode: null);
+    final item = _pendingBombItem;
+    _pendingBombItem = null;
+    // Consume the item only after successful confirmation
+    if (item != null) _consumeItem?.call(item);
+    state = newState.copyWith(bombMode: null, selectedBombTiles: const []);
   }
 
   void cancelBomb() {
     _bombSelection = [];
-    state = state.copyWith(bombMode: null);
+    _pendingBombItem = null;
+    state = state.copyWith(bombMode: null, selectedBombTiles: const []);
   }
 
   List<(int, int)> get bombSelection => List.unmodifiable(_bombSelection);
+
+  /// Wired up by the provider factory; not called in unit tests.
+  void setConsumeCallback(void Function(ItemType) callback) {
+    _consumeItem = callback;
+  }
 
   @override
   void dispose() {
@@ -134,5 +158,11 @@ class GameNotifier extends StateNotifier<GameState> {
 final gameEngineProvider = Provider<GameEngine>((ref) => GameEngine());
 
 final gameProvider = StateNotifierProvider<GameNotifier, GameState>(
-  (ref) => GameNotifier(ref.read(gameEngineProvider)),
+  (ref) {
+    final notifier = GameNotifier(ref.read(gameEngineProvider));
+    notifier.setConsumeCallback(
+      (type) => ref.read(inventoryProvider.notifier).consume(type),
+    );
+    return notifier;
+  },
 );

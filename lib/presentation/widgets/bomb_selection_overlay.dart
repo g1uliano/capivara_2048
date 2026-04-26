@@ -15,7 +15,7 @@ class BombSelectionOverlay extends ConsumerWidget {
     if (mode == null) return const SizedBox.shrink();
 
     final maxTiles = mode == BombMode.bomb2 ? 2 : 3;
-    final selected = notifier.bombSelection;
+    final selected = state.selectedBombTiles;
     final board = state.board;
 
     // Board pixel size: tiles + gaps + padding
