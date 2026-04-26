@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/game_constants.dart';
+import '../../core/theme/text_styles.dart';
 import '../../data/animals_data.dart';
 import '../controllers/game_notifier.dart';
 import 'host_artwork.dart';
@@ -48,10 +49,8 @@ class _Placeholder extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           'Comece a jogar!',
-          style: GoogleFonts.nunito(
-            fontSize: 13,
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
+          style: outlinedWhiteTextStyle(
+            GoogleFonts.nunito(fontSize: 13, fontWeight: FontWeight.w600),
           ),
           textAlign: TextAlign.center,
         ),
@@ -74,10 +73,8 @@ class _AnimalHost extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           animal.name,
-          style: GoogleFonts.nunito(
-            fontSize: 13,
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
+          style: outlinedWhiteTextStyle(
+            GoogleFonts.nunito(fontSize: 13, fontWeight: FontWeight.w600),
           ),
           textAlign: TextAlign.center,
           overflow: TextOverflow.ellipsis,

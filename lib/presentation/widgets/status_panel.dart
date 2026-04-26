@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/game_constants.dart';
+import '../../core/theme/text_styles.dart';
 import '../controllers/game_notifier.dart';
 
 class StatusPanel extends ConsumerWidget {
@@ -30,24 +31,22 @@ class StatusPanel extends ConsumerWidget {
         children: [
           Text(
             _formatTime(elapsedMs),
-            style: GoogleFonts.fredoka(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+            style: outlinedWhiteTextStyle(
+              GoogleFonts.fredoka(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 2),
           Text(
             '$score',
-            style: GoogleFonts.fredoka(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+            style: outlinedWhiteTextStyle(
+              GoogleFonts.fredoka(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
           Text(
             'Recorde: $highScore',
-            style: GoogleFonts.nunito(fontSize: 11, color: Colors.white70),
+            style: outlinedWhiteTextStyle(
+              GoogleFonts.nunito(fontSize: 11),
+            ),
           ),
         ],
       ),
