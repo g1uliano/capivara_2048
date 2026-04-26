@@ -52,7 +52,7 @@ lib/
 
 ## Fases do roadmap
 
-Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 2.4 (Inventário: Bomba + Desfazer)**.
+Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 3 (Arte final dos 11 animais)**.
 
 | Fase | Foco |
 |------|------|

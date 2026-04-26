@@ -7,6 +7,21 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.3.6] — 2026-04-26
+
+### Added
+- **Inventory system** — Hive-persisted `Inventory` model with Bomb 2, Bomb 3, Undo 1, Undo 3 items
+- **InventoryBar widget** — 4 item buttons with grayscale when count == 0, red badge for count
+- **Undo 1 and Undo 3** — `undoStack` (max 3 snapshots) in `GameState`, undo action in `GameNotifier`
+- **Bomb 2/3** — `BombMode` enum, `BombSelectionOverlay` with reactive tile selection highlights, consume-on-confirm (not on tap)
+- **Frosted-glass PauseOverlay** — `BackdropFilter` blur + `AnimatedOpacity` fade-in, with "Reduzir efeitos visuais" toggle (SharedPreferences persisted)
+- **GameOverModal** — full implementation with lives check, `restart()` or navigate to `NoLivesScreen`
+
+### Changed
+- **Refactored GameScreen** to full Stack layout — all overlays as `Positioned.fill`, `Column` never has conditional children
+- **Fixed OutlinedText** — 8-shadow radial technique replaces Stack/stroke approach, better anti-aliasing
+- **Fixed HostBanner placeholder** — uses `outlinedWhiteTextStyle` consistently
+
 ## [0.3.5] — 2026-04-26
 
 ### Fixed
