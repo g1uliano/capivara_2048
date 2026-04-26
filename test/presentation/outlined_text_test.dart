@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:capivara_2048/core/theme/text_styles.dart';
+import 'package:capivara_2048/presentation/widgets/outlined_text.dart';
 
 void main() {
   group('outlinedWhiteTextStyle', () {
@@ -23,6 +24,22 @@ void main() {
       for (final shadow in result.shadows!) {
         expect(shadow.color, Colors.black);
       }
+    });
+  });
+
+  group('OutlinedText widget', () {
+    testWidgets('renders text content', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: OutlinedText(
+              text: 'Tucano',
+              style: TextStyle(fontSize: 16),
+            ),
+          ),
+        ),
+      );
+      expect(find.text('Tucano'), findsWidgets); // two Text widgets in the Stack
     });
   });
 }
