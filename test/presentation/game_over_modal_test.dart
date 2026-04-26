@@ -179,10 +179,13 @@ void main() {
       ),
     );
 
+    final stateBefore = container.read(gameProvider);
+
     await tester.tap(find.byType(ElevatedButton));
     await tester.pump();
 
-    final state = container.read(gameProvider);
-    expect(state.score, 0);
+    final stateAfter = container.read(gameProvider);
+    // restart() replaces the state object; identity must differ.
+    expect(identical(stateBefore, stateAfter), isFalse);
   });
 }
