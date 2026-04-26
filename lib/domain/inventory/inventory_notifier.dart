@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/inventory.dart';
 import '../../data/models/item_type.dart';
@@ -18,6 +19,7 @@ class InventoryNotifier extends StateNotifier<Inventory> {
   }
 
   Future<void> add(ItemType type, int amount) async {
+    assert(amount > 0, 'amount must be positive; use consume() to decrease');
     state = state.add(type, amount);
     await _repo.save(state);
   }
@@ -25,6 +27,7 @@ class InventoryNotifier extends StateNotifier<Inventory> {
   int count(ItemType type) => state.count(type);
 
   void addDebugItems() {
+    if (!kDebugMode) return;
     state = const Inventory(bomb2: 5, bomb3: 5, undo1: 5, undo3: 5);
   }
 }
