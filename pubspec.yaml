@@ -33,12 +33,17 @@ dependencies:
   flutter_riverpod: ^2.6.1
   uuid: ^4.5.1
   google_fonts: ^6.2.1
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  flutter_svg: ^2.0.10+1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
   test: ^1.25.0
+  build_runner: ^2.4.9
+  # hive_generator: incompatible with current SDK analyzer (needs <7.0.0, SDK uses ~10.x)
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -52,7 +57,10 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/animals/
+    - assets/images/animals/tile/
+    - assets/images/animals/host/
+    - assets/images/textures/
+    - assets/images/home_ensemble.svg
 
   # To add assets to your application, add an assets section, like this:
   # assets:
