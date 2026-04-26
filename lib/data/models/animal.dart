@@ -7,6 +7,7 @@ class Animal {
   final int value;
   final String name;
   final Color borderColor;
+  final Color backgroundBaseColor;
   final String assetPath;
   final String? hostSvgPath;
   final double? hostAspectRatio;
@@ -18,6 +19,7 @@ class Animal {
     required this.value,
     required this.name,
     required this.borderColor,
+    required this.backgroundBaseColor,
     required this.assetPath,
     required this.texturePattern,
     this.hostSvgPath,
