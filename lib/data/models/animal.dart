@@ -13,6 +13,8 @@ class Animal {
   final String? hostSvgPath;
   final double? hostAspectRatio;
   final String? backgroundTexturePath;
+  final String? scientificName;
+  final String? funFact;
 
   const Animal({
     required this.level,
@@ -25,5 +27,7 @@ class Animal {
     this.hostSvgPath,
     this.hostAspectRatio,
     this.backgroundTexturePath,
+    this.scientificName,
+    this.funFact,
   });
 }
