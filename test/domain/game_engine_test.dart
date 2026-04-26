@@ -252,6 +252,80 @@ void main() {
     });
   });
 
+  group('undoStack', () {
+    test('move pushes previous state onto undoStack', () {
+      final state = _stateWithBoard([
+        [1, null, null, null],
+        [null, null, null, null],
+        [null, null, null, null],
+        [null, null, null, null],
+      ]);
+      final after = engine.move(state, Direction.right);
+      // move changed something, undoStack should have 1 entry
+      expect(after.undoStack.length, 1);
+      expect(after.undoStack[0].score, state.score);
+    });
+
+    test('no-op move does not push to undoStack', () {
+      final state = _stateWithBoard([
+        [1, null, null, null],
+        [null, null, null, null],
+        [null, null, null, null],
+        [null, null, null, null],
+      ]);
+      final after = engine.move(state, Direction.left); // already leftmost
+      expect(after.undoStack.length, 0);
+    });
+
+    test('undoStack caps at 3', () {
+      GameState state = _stateWithBoard([
+        [1, null, null, null],
+        [null, null, null, null],
+        [null, null, null, null],
+        [null, null, null, null],
+      ]);
+      for (int i = 0; i < 6; i++) {
+        final next = engine.move(state, Direction.right);
+        if (next.board != state.board) state = next;
+        final next2 = engine.move(state, Direction.left);
+        if (next2.board != state.board) state = next2;
+      }
+      expect(state.undoStack.length, lessThanOrEqualTo(3));
+    });
+  });
+
+  group('removeTiles', () {
+    test('removeTiles clears specified positions', () {
+      final board = List.generate(
+          4, (r) => List.generate(4, (c) => Tile(id: 'id_$r$c', level: 2, row: r, col: c)));
+      final state = GameState(
+        board: board,
+        score: 0,
+        highScore: 0,
+        isGameOver: false,
+        hasWon: false,
+      );
+      final result = GameEngine.removeTiles(state, [(0, 0), (1, 1)]);
+      expect(result.board[0][0], isNull);
+      expect(result.board[1][1], isNull);
+      expect(result.board[0][1]?.level, 2); // untouched
+    });
+
+    test('removeTiles does not modify original state', () {
+      final board = List.generate(
+          4, (r) => List.generate(4, (c) => Tile(id: 'id_$r$c', level: 2, row: r, col: c)));
+      final state = GameState(
+        board: board,
+        score: 0,
+        highScore: 0,
+        isGameOver: false,
+        hasWon: false,
+      );
+      GameEngine.removeTiles(state, [(0, 0)]);
+      expect(state.board[0][0], isNotNull); // original unchanged
+    });
+  });
+
   group('maxLevel tracking', () {
     test('maxLevel starts at 0 on newGame', () {
       final state = engine.newGame();

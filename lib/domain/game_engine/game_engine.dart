@@ -74,17 +74,28 @@ class GameEngine {
       }
     }
 
+    final newUndoStack = [state, ...state.undoStack].take(3).toList();
+
     var next = state.copyWith(
       board: unrotated,
       score: newScore,
       highScore: newHighScore,
       hasWon: hasWon,
       maxLevel: newMaxLevel,
+      undoStack: newUndoStack,
     );
 
     next = _spawnTile(next);
     final isGameOver = _checkGameOver(next.board);
     return next.copyWith(isGameOver: isGameOver);
+  }
+
+  static GameState removeTiles(GameState state, List<(int, int)> positions) {
+    final board = state.board.map((row) => List<Tile?>.from(row)).toList();
+    for (final (r, c) in positions) {
+      board[r][c] = null;
+    }
+    return state.copyWith(board: board);
   }
 
   _MergeResult _compactAndMerge(List<Tile?> row) {

@@ -9,8 +9,9 @@ class GameState {
   final int maxLevel;
   final int elapsedMs;
   final bool isPaused;
+  final List<GameState> undoStack;
 
-  const GameState({
+  GameState({
     required this.board,
     required this.score,
     required this.highScore,
@@ -19,7 +20,8 @@ class GameState {
     this.maxLevel = 0,
     this.elapsedMs = 0,
     this.isPaused = false,
-  });
+    List<GameState>? undoStack,
+  }) : undoStack = List.unmodifiable(undoStack ?? const []);
 
   GameState copyWith({
     List<List<Tile?>>? board,
@@ -30,6 +32,7 @@ class GameState {
     int? maxLevel,
     int? elapsedMs,
     bool? isPaused,
+    List<GameState>? undoStack,
   }) {
     return GameState(
       board: board ?? this.board,
@@ -40,6 +43,7 @@ class GameState {
       maxLevel: maxLevel ?? this.maxLevel,
       elapsedMs: elapsedMs ?? this.elapsedMs,
       isPaused: isPaused ?? this.isPaused,
+      undoStack: undoStack ?? this.undoStack,
     );
   }
 }
