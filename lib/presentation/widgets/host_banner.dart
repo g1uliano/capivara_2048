@@ -33,28 +33,19 @@ class _Placeholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const SizedBox(
-          width: 64,
-          height: 64,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: Color(0xFFC9B79C),
-              borderRadius: BorderRadius.all(Radius.circular(12)),
-            ),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
+    return SizedBox(
+      width: 64,
+      height: 68,
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: Text(
           'Comece a jogar!',
           style: outlinedWhiteTextStyle(
-            GoogleFonts.nunito(fontSize: 13, fontWeight: FontWeight.w600),
+            GoogleFonts.nunito(fontSize: 11, fontWeight: FontWeight.w600),
           ),
           textAlign: TextAlign.center,
         ),
-      ],
+      ),
     );
   }
 }
