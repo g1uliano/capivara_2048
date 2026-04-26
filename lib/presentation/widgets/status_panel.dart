@@ -21,10 +21,9 @@ class StatusPanel extends ConsumerWidget {
     final score = ref.watch(gameProvider.select((s) => s.score));
     final highScore = ref.watch(gameProvider.select((s) => s.highScore));
     final elapsedMs = ref.watch(gameProvider.select((s) => s.elapsedMs));
-    final panelWidth = GameConstants.tileSize * 2 + GameConstants.tileSpacing;
 
     return SizedBox(
-      width: panelWidth,
+      width: GameConstants.twoCellWidth,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,

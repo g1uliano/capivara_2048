@@ -30,10 +30,10 @@ class GameScreen extends ConsumerWidget {
                       horizontal: 16, vertical: 8),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      HostBanner(),
-                      Spacer(),
-                      StatusPanel(),
+                    children: [
+                      const HostBanner(),
+                      const Spacer(),
+                      const StatusPanel(),
                     ],
                   ),
                 ),
@@ -70,9 +70,9 @@ class GameScreen extends ConsumerWidget {
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: LivesIndicator(),
                 ),
-                if (isGameOver) _buildOverlay('Game Over!', ref),
+                if (isGameOver) _buildOverlay('Game Over!', notifier),
                 if (hasWon && !isGameOver)
-                  _buildOverlay('Capivara Lendária! 🎉', ref),
+                  _buildOverlay('Capivara Lendária! 🎉', notifier),
               ],
             ),
             // Floating pause button — positioned below the header row
@@ -97,7 +97,7 @@ class GameScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildOverlay(String message, WidgetRef ref) {
+  Widget _buildOverlay(String message, GameNotifier notifier) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -109,7 +109,7 @@ class GameScreen extends ConsumerWidget {
                   color: Colors.white)),
           const SizedBox(height: 8),
           ElevatedButton(
-            onPressed: () => ref.read(gameProvider.notifier).restart(),
+            onPressed: () => notifier.restart(),
             child: const Text('Jogar de novo'),
           ),
         ],

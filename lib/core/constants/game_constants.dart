@@ -5,4 +5,5 @@ class GameConstants {
   static const double boardPadding = 12.0;
   static const int maxLevel = 11;
   static const double newTileLevel2Probability = 0.1;
+  static const double twoCellWidth = tileSize * 2 + tileSpacing;
 }

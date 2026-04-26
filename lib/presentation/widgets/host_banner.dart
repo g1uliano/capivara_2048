@@ -12,17 +12,15 @@ class HostBanner extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final maxLevel = ref.watch(gameProvider.select((s) => s.maxLevel));
-    // Width = 2 tiles + 1 inner gap
-    final bannerWidth = GameConstants.tileSize * 2 + GameConstants.tileSpacing;
 
     return SizedBox(
-      width: bannerWidth,
+      width: GameConstants.twoCellWidth,
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 400),
         transitionBuilder: (child, anim) =>
             FadeTransition(opacity: anim, child: child),
         child: maxLevel == 0
-            ? _Placeholder(key: const ValueKey('ph'), width: bannerWidth)
+            ? _Placeholder(key: const ValueKey('ph'))
             : _AnimalHost(key: ValueKey(maxLevel), level: maxLevel),
       ),
     );
@@ -30,8 +28,7 @@ class HostBanner extends ConsumerWidget {
 }
 
 class _Placeholder extends StatelessWidget {
-  final double width;
-  const _Placeholder({super.key, required this.width});
+  const _Placeholder({super.key});
 
   @override
   Widget build(BuildContext context) {
