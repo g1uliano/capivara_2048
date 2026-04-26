@@ -7,6 +7,14 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.3.7] — 2026-04-26
+
+### Added
+- SVG assets dos 11 animais integrados (`assets/images/animals/tile/` e `host/`)
+
+### Changed
+- Design doc atualizado com caminhos dos SVGs, status da Fase 2.3.6 e próximo passo (Fase 3)
+
 ## [0.3.6] — 2026-04-26
 
 ### Added
