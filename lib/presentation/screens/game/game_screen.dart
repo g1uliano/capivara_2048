@@ -7,11 +7,12 @@ import '../../../domain/lives/lives_notifier.dart';
 import '../../controllers/game_notifier.dart';
 import '../../widgets/board_widget.dart';
 import '../../widgets/game_background.dart';
+import '../../widgets/game_over_modal.dart';
 import '../../widgets/host_banner.dart';
+import '../../widgets/inventory_bar.dart';
 import '../../widgets/lives_indicator.dart';
 import '../../widgets/pause_overlay.dart';
 import '../../widgets/status_panel.dart';
-import '../no_lives_screen.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({super.key});
@@ -34,8 +35,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     final renderBox =
         _headerKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null) return;
-    final headerBottom = renderBox.localToGlobal(Offset.zero).dy +
-        renderBox.size.height;
+    final headerBottom =
+        renderBox.localToGlobal(Offset.zero).dy + renderBox.size.height;
     if (mounted) {
       setState(() => _pauseTop = headerBottom + 12);
     }
@@ -47,7 +48,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     final isGameOver = state.isGameOver;
     final hasWon = state.hasWon;
     final notifier = ref.read(gameProvider.notifier);
-    final hostAnimal = state.maxLevel > 0 ? animalForLevel(state.maxLevel) : null;
+    final hostAnimal =
+        state.maxLevel > 0 ? animalForLevel(state.maxLevel) : null;
 
     ref.listen<GameState>(gameProvider, (prev, next) {
       if (prev != null && !prev.isGameOver && next.isGameOver && !next.hasWon) {
@@ -80,7 +82,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onPanEnd: (details) {
-                      if (state.isPaused || isGameOver) return;
+                      if (state.isPaused || isGameOver || hasWon) return;
                       final v = details.velocity.pixelsPerSecond;
                       const threshold = 100.0;
                       if (v.dx.abs() > v.dy.abs()) {
@@ -97,24 +99,23 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                         }
                       }
                     },
-                    child: Stack(
-                      children: [
-                        const RepaintBoundary(child: BoardWidget()),
-                        if (state.isPaused) const PauseOverlay(),
-                      ],
-                    ),
+                    child: const RepaintBoundary(child: BoardWidget()),
                   ),
                   const Spacer(),
+                  const InventoryBar(),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: LivesIndicator(),
                   ),
-                  if (isGameOver) _buildOverlay('Game Over!', notifier),
-                  if (hasWon && !isGameOver)
-                    _buildOverlay('Capivara Lendária! 🎉', notifier),
                 ],
               ),
-              // Floating pause button — positioned dynamically below the header row
+              if (state.isPaused) const Positioned.fill(child: PauseOverlay()),
+              if (isGameOver)
+                const Positioned.fill(
+                    child: GameOverModal(message: 'Game Over!')),
+              if (hasWon && !isGameOver)
+                const Positioned.fill(
+                    child: GameOverModal(message: 'Capivara Lendária! 🎉')),
               if (!isGameOver && !hasWon)
                 Positioned(
                   top: _pauseTop,
@@ -127,40 +128,13 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       color: Colors.white,
                     ),
                     iconSize: 32,
-                    onPressed: state.isPaused ? notifier.resume : notifier.pause,
+                    onPressed:
+                        state.isPaused ? notifier.resume : notifier.pause,
                   ),
                 ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildOverlay(String message, GameNotifier notifier) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          Text(message,
-              style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white)),
-          const SizedBox(height: 8),
-          ElevatedButton(
-            onPressed: () {
-              if (!ref.read(livesProvider.notifier).canPlay) {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (_) => const NoLivesScreen(midGame: false)),
-                );
-                return;
-              }
-              notifier.restart();
-            },
-            child: const Text('Jogar de novo'),
-          ),
-        ],
       ),
     );
   }
