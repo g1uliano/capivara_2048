@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/providers/reduce_effects_provider.dart';
 import '../controllers/game_notifier.dart';
 import 'outlined_text.dart';
+import '../screens/debug/animals_gallery_screen.dart';
 
 class PauseOverlay extends ConsumerStatefulWidget {
   const PauseOverlay({super.key});
@@ -118,7 +119,11 @@ class _PauseOverlayState extends ConsumerState<PauseOverlay> {
               ),
               if (kDebugMode)
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const AnimalsGalleryScreen(),
+                    ),
+                  ),
                   child: OutlinedText(
                     text: 'Debug',
                     style: const TextStyle(color: Colors.white70),
