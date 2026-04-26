@@ -14,4 +14,16 @@ class LivesRepository {
     final box = await Hive.openBox<LivesState>(_boxName);
     await box.put(_key, state);
   }
+
+  static const _prefsBox = 'prefs';
+
+  Future<bool> getMigrationFlag(String key) async {
+    final box = await Hive.openBox<bool>(_prefsBox);
+    return box.get(key, defaultValue: false)!;
+  }
+
+  Future<void> setMigrationFlag(String key) async {
+    final box = await Hive.openBox<bool>(_prefsBox);
+    await box.put(key, true);
+  }
 }

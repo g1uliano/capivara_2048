@@ -89,6 +89,14 @@ void main() {
     });
   });
 
+  group('migration v235', () {
+    test('applyMigration sets lives to maxLives', () {
+      final s = _state(lives: 2, maxLives: 5);
+      final result = s.copyWith(lives: s.maxLives);
+      expect(result.lives, 5);
+    });
+  });
+
   group('rewardFromAd', () {
     test('increments lives and adWatchedToday', () {
       final s = _state(lives: 2, adWatchedToday: 5);
