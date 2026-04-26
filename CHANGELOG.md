@@ -7,6 +7,21 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.3.5] — 2026-04-26
+
+### Fixed
+- Vidas agora só são consumidas no game over (não ao iniciar nova partida)
+- Transição de cor de fundo entre animais sem flicker (TweenAnimationBuilder)
+- Botão de pause reposicionado dinamicamente abaixo do StatusPanel (GlobalKey)
+- Texto branco com contorno preto em StatusPanel e HostBanner para legibilidade
+
+### Changed
+- Cores de fundo dos animais agora são explícitas por animal (backgroundBaseColor)
+- Boto-cor-de-rosa exibe fundo rosa correto (#FBD0DD) em vez de bege derivado
+
+### Migration
+- Primeira abertura pós-update reseta vidas para 5 (goodwill adjustment)
+
 ## [0.3.0] — 2026-04-25
 
 ### Added
