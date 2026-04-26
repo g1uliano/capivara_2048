@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:capivara_2048/presentation/controllers/game_notifier.dart';
 import 'package:capivara_2048/domain/game_engine/direction.dart';
+import 'package:capivara_2048/data/models/tile.dart';
+import 'package:capivara_2048/data/models/game_state.dart';
 
 void main() {
   group('GameNotifier timer', () {
@@ -60,14 +62,30 @@ void main() {
       final container = ProviderContainer();
       addTearDown(container.dispose);
       final notifier = container.read(gameProvider.notifier);
+
+      // Set up a board with two adjacent same-value tiles in row 0 that will
+      // definitely merge on a left swipe, guaranteeing a valid move.
+      final board = List.generate(4, (r) => List<Tile?>.filled(4, null));
+      board[0][2] = const Tile(id: 'a', level: 1, row: 0, col: 2);
+      board[0][3] = const Tile(id: 'b', level: 1, row: 0, col: 3);
+      notifier.state = GameState(
+        board: board,
+        score: 0,
+        highScore: 0,
+        isGameOver: false,
+        hasWon: false,
+      );
+
       final before = container.read(gameProvider);
       notifier.onSwipe(Direction.left);
       final afterSwipe = container.read(gameProvider);
-      if (afterSwipe.undoStack.isNotEmpty) {
-        notifier.undo(1);
-        final restored = container.read(gameProvider);
-        expect(restored.board, before.board);
-      }
+
+      // The move must have been valid — fail loudly if the stack is empty.
+      expect(afterSwipe.undoStack, isNotEmpty);
+
+      notifier.undo(1);
+      final restored = container.read(gameProvider);
+      expect(restored.board, before.board);
     });
 
     test('undo(3) does not throw on a small stack', () {
