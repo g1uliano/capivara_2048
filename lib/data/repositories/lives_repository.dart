@@ -11,7 +11,7 @@ class LivesRepository {
   }
 
   Future<void> save(LivesState state) async {
-    final box = Hive.box<LivesState>(_boxName);
+    final box = await Hive.openBox<LivesState>(_boxName);
     await box.put(_key, state);
   }
 }

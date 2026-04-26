@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/lives_state.dart';
 import '../../data/repositories/lives_repository.dart';
 
 class LivesNotifier extends StateNotifier<LivesState> {
   final LivesRepository _repo;
+  final _ready = Completer<void>();
 
   LivesNotifier(this._repo) : super(LivesState.initial()) {
     _init();
@@ -13,6 +15,7 @@ class LivesNotifier extends StateNotifier<LivesState> {
     final loaded = await _repo.load();
     state = calcRegen(state: loaded, now: DateTime.now());
     await _repo.save(state);
+    _ready.complete();
   }
 
   static LivesState calcRegen({required LivesState state, required DateTime now}) {
@@ -55,11 +58,13 @@ class LivesNotifier extends StateNotifier<LivesState> {
   }
 
   Future<void> consume() async {
+    await _ready.future;
     state = applyConsume(state);
     await _repo.save(state);
   }
 
   Future<void> rewardFromAd() async {
+    await _ready.future;
     state = applyAdReward(state);
     await _repo.save(state);
   }
