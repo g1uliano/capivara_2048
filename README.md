@@ -104,8 +104,10 @@ assets/
 
 ## Roadmap
 
-- **Fase 1** — MVP: game engine puro + tela básica *(v0.1.1)*
-- **Fase 2** — Identidade visual: paleta, tipografia, animações
+- **Fase 1** — MVP: game engine puro + tela básica ✅ *(v0.1.1)*
+- **Fase 2** — Identidade visual, HomeScreen, vidas, fundo dinâmico ✅ *(v0.3.5)*
+  - 2.3.5 — Refinamento: vidas no game over, cores explícitas, transição sem flicker, OutlinedText, pause dinâmico ✅
+- **Fase 2.4** — Inventário: Bomba + Desfazer *(em andamento)*
 - **Fase 3** — Arte final: ilustrações dos 11 animais
 - **Fase 4** — Áudio: sons e música
 - **Fase 5** — Coleção e Desafio Diário
