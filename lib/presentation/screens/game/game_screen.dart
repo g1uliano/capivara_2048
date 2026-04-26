@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/animals_data.dart';
+import '../../../data/models/game_state.dart';
 import '../../../domain/game_engine/direction.dart';
+import '../../../domain/lives/lives_notifier.dart';
 import '../../controllers/game_notifier.dart';
 import '../../widgets/board_widget.dart';
 import '../../widgets/game_background.dart';
@@ -20,6 +22,12 @@ class GameScreen extends ConsumerWidget {
     final hasWon = state.hasWon;
     final notifier = ref.read(gameProvider.notifier);
     final hostAnimal = state.maxLevel > 0 ? animalForLevel(state.maxLevel) : null;
+
+    ref.listen<GameState>(gameProvider, (prev, next) {
+      if (prev != null && !prev.isGameOver && next.isGameOver) {
+        ref.read(livesProvider.notifier).consume();
+      }
+    });
 
     return Scaffold(
       body: GameBackground(

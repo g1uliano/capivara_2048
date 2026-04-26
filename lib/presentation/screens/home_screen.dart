@@ -69,7 +69,6 @@ class HomeScreen extends ConsumerWidget {
       );
       return;
     }
-    ref.read(livesProvider.notifier).consume();
     ref.read(gameProvider.notifier).restart();
     Navigator.push(context, MaterialPageRoute(builder: (_) => const GameScreen()));
   }

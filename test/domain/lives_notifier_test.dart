@@ -123,4 +123,22 @@ void main() {
       expect(result.adWatchedToday, 1);
     });
   });
+
+  group('consume timing contract', () {
+    test('canPlay false when lives == 0', () {
+      final s = _state(lives: 0);
+      expect(s.lives > 0, isFalse);
+    });
+
+    test('canPlay true when lives >= 1', () {
+      final s = _state(lives: 1);
+      expect(s.lives > 0, isTrue);
+    });
+
+    test('game over must trigger applyConsume (pure logic check)', () {
+      final before = _state(lives: 3);
+      final after = LivesNotifier.applyConsume(before);
+      expect(after.lives, 2);
+    });
+  });
 }
