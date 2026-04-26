@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/item_type.dart';
 import '../../domain/inventory/inventory_notifier.dart';
+import '../controllers/game_notifier.dart';
 import 'inventory_item_button.dart';
 
 class InventoryBar extends ConsumerWidget {
@@ -39,8 +40,10 @@ class InventoryBar extends ConsumerWidget {
             icon: Icons.undo,
             count: inventory.undo1,
             onPressed: inventory.undo1 > 0
-                ? () =>
-                    ref.read(inventoryProvider.notifier).consume(ItemType.undo1)
+                ? () {
+                    ref.read(gameProvider.notifier).undo(1);
+                    ref.read(inventoryProvider.notifier).consume(ItemType.undo1);
+                  }
                 : null,
           ),
           InventoryItemButton(
@@ -48,8 +51,10 @@ class InventoryBar extends ConsumerWidget {
             icon: Icons.fast_rewind,
             count: inventory.undo3,
             onPressed: inventory.undo3 > 0
-                ? () =>
-                    ref.read(inventoryProvider.notifier).consume(ItemType.undo3)
+                ? () {
+                    ref.read(gameProvider.notifier).undo(3);
+                    ref.read(inventoryProvider.notifier).consume(ItemType.undo3);
+                  }
                 : null,
           ),
         ],
