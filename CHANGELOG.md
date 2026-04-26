@@ -7,6 +7,29 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-04-25
+
+### Added
+- `HomeScreen` como tela inicial: botões Novo Jogo / Continuar / Ranking (placeholder) / Sair; SVG ensemble dos animais
+- Sistema de vidas completo: regen offline (1 vida a cada 30 min), `LivesState` persistido via Hive, `LivesIndicator` com corações, `NoLivesScreen` com mock-anúncio
+- `LivesNotifier` com `consume()`, `rewardFromAd()`, `canWatchAd`, `canPlay`; limite de 40 anúncios/dia com reset à meia-noite
+- `HostArtwork`: renderiza `hostSvgPath` se disponível, fallback automático para tile SVG
+- `StatusPanel`: cronômetro `HH:MM:SS`, pontuação atual e recorde — alinhado às colunas 3–4 do tabuleiro
+- Botão de pause flutuante (`Positioned`) sempre visível durante o jogo; funciona como toggle pause/resume
+- `GameBackground`: fundo dinâmico com `Color.lerp(borderColor, mint, 0.65)` + textura geométrica com 10–15% de opacidade
+- `TexturePainter`: 7 padrões geométricos por animal (pontilhado, hachura diagonal, grade, ondas, manchas, escamas, radial) via `dart:math`
+- `AnimatedSwitcher` 400 ms ao trocar animal anfitrião no fundo
+- `RepaintBoundary` isolando `BoardWidget` de repaints do fundo
+- `AppColors.primary` e `AppColors.mint` centralizando as cores de fundo
+- `GameConstants.twoCellWidth` para largura alinhada às colunas
+
+### Changed
+- `app.dart`: rota inicial alterada de `GameScreen` para `HomeScreen`
+- `HostBanner` refatorado para usar `HostArtwork` e `GameConstants.twoCellWidth`
+- `ScorePanel` simplificado (cronômetro extraído para `StatusPanel`)
+- Reorganização de assets: SVGs de tile em `assets/images/animals/tile/`, texturas em `assets/images/textures/`, host em `assets/images/animals/host/`
+- Modelo `Animal` estendido: `hostSvgPath`, `hostAspectRatio`, `backgroundTexturePath`, `texturePattern`
+
 ## [0.2.0] — 2026-04-25
 
 ### Added
