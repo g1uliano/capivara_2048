@@ -14,18 +14,16 @@ class GameBackground extends StatefulWidget {
 }
 
 class _GameBackgroundState extends State<GameBackground> {
-  Color _previousColor = AppColors.primary;
-
   @override
   Widget build(BuildContext context) {
     final targetColor = widget.animal?.backgroundBaseColor ?? AppColors.primary;
 
     return TweenAnimationBuilder<Color?>(
-      tween: ColorTween(begin: _previousColor, end: targetColor),
+      tween: ColorTween(begin: null, end: targetColor),
       duration: const Duration(milliseconds: 700),
       curve: Curves.easeInOut,
-      onEnd: () => _previousColor = targetColor,
-      builder: (context, color, _) {
+      child: widget.child,
+      builder: (context, color, child) {
         return Stack(
           fit: StackFit.expand,
           children: [
@@ -38,7 +36,7 @@ class _GameBackgroundState extends State<GameBackground> {
                   animal: widget.animal!,
                 ),
               ),
-            widget.child,
+            if (child != null) child,
           ],
         );
       },
@@ -52,9 +50,9 @@ class _TextureLayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Opacity(
-      opacity: 0.12,
-      child: RepaintBoundary(
+    return RepaintBoundary(
+      child: Opacity(
+        opacity: 0.12,
         child: animal.backgroundTexturePath != null
             ? Image.asset(
                 animal.backgroundTexturePath!,
