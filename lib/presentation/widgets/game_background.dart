@@ -46,13 +46,26 @@ class _Background extends StatelessWidget {
         Opacity(
           opacity: 0.12,
           child: RepaintBoundary(
-            child: CustomPaint(
-              painter: TexturePainter(
-                pattern: animal.texturePattern,
-                color: animal.borderColor,
-              ),
-              size: Size.infinite,
-            ),
+            child: animal.backgroundTexturePath != null
+                ? Image.asset(
+                    animal.backgroundTexturePath!,
+                    repeat: ImageRepeat.repeat,
+                    fit: BoxFit.none,
+                    errorBuilder: (_, __, ___) => CustomPaint(
+                      painter: TexturePainter(
+                        pattern: animal.texturePattern,
+                        color: animal.borderColor,
+                      ),
+                      size: Size.infinite,
+                    ),
+                  )
+                : CustomPaint(
+                    painter: TexturePainter(
+                      pattern: animal.texturePattern,
+                      color: animal.borderColor,
+                    ),
+                    size: Size.infinite,
+                  ),
           ),
         ),
         child,
