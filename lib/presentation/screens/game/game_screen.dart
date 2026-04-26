@@ -13,11 +13,36 @@ import '../../widgets/pause_overlay.dart';
 import '../../widgets/status_panel.dart';
 import '../no_lives_screen.dart';
 
-class GameScreen extends ConsumerWidget {
+class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<GameScreen> createState() => _GameScreenState();
+}
+
+class _GameScreenState extends ConsumerState<GameScreen> {
+  final GlobalKey _headerKey = GlobalKey();
+  double _pauseTop = 80;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _updatePausePosition());
+  }
+
+  void _updatePausePosition() {
+    final renderBox =
+        _headerKey.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox == null) return;
+    final headerBottom = renderBox.localToGlobal(Offset.zero).dy +
+        renderBox.size.height;
+    if (mounted) {
+      setState(() => _pauseTop = headerBottom + 12);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(gameProvider);
     final isGameOver = state.isGameOver;
     final hasWon = state.hasWon;
@@ -39,6 +64,7 @@ class GameScreen extends ConsumerWidget {
               Column(
                 children: [
                   Padding(
+                    key: _headerKey,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 8),
                     child: Row(
@@ -83,15 +109,15 @@ class GameScreen extends ConsumerWidget {
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: LivesIndicator(),
                   ),
-                  if (isGameOver) _buildOverlay('Game Over!', notifier, ref),
+                  if (isGameOver) _buildOverlay('Game Over!', notifier),
                   if (hasWon && !isGameOver)
-                    _buildOverlay('Capivara Lendária! 🎉', notifier, ref),
+                    _buildOverlay('Capivara Lendária! 🎉', notifier),
                 ],
               ),
-              // Floating pause button — positioned below the header row
+              // Floating pause button — positioned dynamically below the header row
               if (!isGameOver && !hasWon)
                 Positioned(
-                  top: 72,
+                  top: _pauseTop,
                   right: 8,
                   child: IconButton(
                     icon: Icon(
@@ -111,7 +137,7 @@ class GameScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildOverlay(String message, GameNotifier notifier, WidgetRef ref) {
+  Widget _buildOverlay(String message, GameNotifier notifier) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -125,7 +151,7 @@ class GameScreen extends ConsumerWidget {
           ElevatedButton(
             onPressed: () {
               if (!ref.read(livesProvider.notifier).canPlay) {
-                Navigator.of(ref.context).pushReplacement(
+                Navigator.of(context).pushReplacement(
                   MaterialPageRoute(builder: (_) => const NoLivesScreen(midGame: false)),
                 );
                 return;
