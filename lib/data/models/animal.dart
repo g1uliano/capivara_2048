@@ -9,10 +9,10 @@ class Animal {
   final Color borderColor;
   final Color backgroundBaseColor;
   final String assetPath;
+  final TexturePattern texturePattern;
   final String? hostSvgPath;
   final double? hostAspectRatio;
   final String? backgroundTexturePath;
-  final TexturePattern texturePattern;
 
   const Animal({
     required this.level,

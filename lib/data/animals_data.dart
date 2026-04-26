@@ -82,4 +82,5 @@ const List<Animal> animals = [
 ];
 
 Animal animalForLevel(int level) =>
-    animals.firstWhere((a) => a.level == level);
+    animals.firstWhere((a) => a.level == level,
+        orElse: () => throw ArgumentError('No animal for level $level'));
