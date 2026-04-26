@@ -2,19 +2,17 @@
 
 > Documento de especificação para desenvolvimento. Pensado para ser alimentado em ferramentas como Claude Code para implementação iterativa.
 >
-> **Status atual:** Fase 2.3.6 concluída ✅ (v0.3.6) — polimento UX (5 bugs corrigidos) + inventário completo (Bomba 2/3, Desfazer 1/3) com ícones placeholder Material/Lucide, PauseOverlay frosted-glass, GameOverModal com vidas. Os SVGs dos 11 animais foram **produzidos e estão na pasta** `assets/images/animals/` mas **ainda não foram integrados** ao código (tiles e anfitrião continuam usando placeholders coloridos).
+> **Status atual:** Fase 2.3.7 concluída ✅ (v0.4.0) — SVGs dos 11 animais integrados em tiles e anfitrião, Sagui no nível 5, PauseOverlay com OutlinedText completo, ícones SVG do inventário (bomb ×2/×3, undo ×1/×3), galeria de debug `AnimalsGalleryScreen`. Auditoria visual pendente (`docs/svg_audit_2_3_7.md` — preencher após inspeção na galeria).
 >
-> **Próximo:** **Fase 2.3.7 — Integração de Assets dos Animais + Refinamentos** — entrega central: integrar os SVGs já produzidos nos tiles e no anfitrião (substituindo placeholders coloridos). Junto: trocar Arara-azul por Sagui (asset disponível), aplicar `OutlinedText` em todos os textos do PauseOverlay (ilegíveis em alguns fundos), integrar SVGs definitivos dos ícones do inventário (quando produzidos), e validar visualmente todos os SVGs.
+> **Próximo:** **Fase 2.3.8 — Texturas + Áudio**
 >
-> **Mudanças principais nesta versão:**
-> - Lista de animais atualizada (Tanajura, Lobo-guará, Sapo-cururu, **Sagui**, Mico-leão-dourado, Sucuri)
-> - **Nível 5 trocado de Arara-azul para Sagui** — cor ajustada para `#A0826D`
-> - Visual dos tiles: fundo branco com animal em marca d'água + número
-> - Sistema de **anfitrião** (animal correspondente ao maior tile já formado)
-> - Sistema de **vidas, itens e loja** (free-to-play com anúncios e compras)
-> - Sistema de **recompensas diárias**, **ranking global e pessoal**, **convites**
-> - Sistema de **compartilhamento de itens** com códigos de resgate
-> - **Roadmap reorganizado:** 2.3.7 (integração SVGs animais + Sagui + PauseOverlay legível + SVGs do inventário + validação) → 2.3.8 (texturas + áudio) → 2.5+ (recompensas, coleção, loja, backend, etc)
+> **Mudanças principais na v0.4.0:**
+> - **SVGs integrados** nos tiles (marca d'água `Opacity(0.27)` + `SvgPicture.asset`) e no anfitrião (`hostSvgPath` populado para todos os 11 animais)
+> - **Nível 5 trocado de Arara-azul para Sagui** — `borderColor: #A0826D`, `scientificName: Callithrix penicillata`
+> - **PauseOverlay legível** — tint `Colors.black.withOpacity(0.25)` + `OutlinedText` em todos os textos + ícone `Text('⏸')` com 4 sombras
+> - **InventoryItemButton** aceita `String? svgPath` opcional com fallback para `IconData`; 4 SVGs de ícones entregues em `assets/icons/inventory/`
+> - **Galeria de debug** `AnimalsGalleryScreen` acessível via PauseOverlay → "Debug" (`kDebugMode` apenas)
+> - **Model `Animal`** ganhou campos `String? scientificName` e `String? funFact` (nullable, para Coleção na Fase 5)
 
 ---
 
