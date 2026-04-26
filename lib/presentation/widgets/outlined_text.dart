@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/text_styles.dart';
 
 class OutlinedText extends StatelessWidget {
   final String text;
@@ -18,32 +19,12 @@ class OutlinedText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const strokeWidth = 1.5;
-    final baseStyle = style ?? const TextStyle();
-
-    return Stack(
-      children: [
-        Text(
-          text,
-          style: baseStyle.copyWith(
-            color: null,
-            foreground: Paint()
-              ..style = PaintingStyle.stroke
-              ..strokeWidth = strokeWidth
-              ..color = Colors.black,
-          ),
-          textAlign: textAlign,
-          maxLines: maxLines,
-          overflow: overflow,
-        ),
-        Text(
-          text,
-          style: baseStyle.copyWith(color: Colors.white),
-          textAlign: textAlign,
-          maxLines: maxLines,
-          overflow: overflow,
-        ),
-      ],
+    return Text(
+      text,
+      style: outlinedWhiteTextStyle(style ?? const TextStyle()),
+      textAlign: textAlign,
+      maxLines: maxLines,
+      overflow: overflow,
     );
   }
 }
