@@ -4,6 +4,7 @@ import '../models/lives_state.dart';
 class LivesRepository {
   static const _boxName = 'lives';
   static const _key = 'state';
+  static const _prefsBox = 'prefs';
 
   Future<LivesState> load() async {
     final box = await Hive.openBox<LivesState>(_boxName);
@@ -15,11 +16,9 @@ class LivesRepository {
     await box.put(_key, state);
   }
 
-  static const _prefsBox = 'prefs';
-
   Future<bool> getMigrationFlag(String key) async {
     final box = await Hive.openBox<bool>(_prefsBox);
-    return box.get(key, defaultValue: false)!;
+    return box.get(key, defaultValue: false) ?? false;
   }
 
   Future<void> setMigrationFlag(String key) async {

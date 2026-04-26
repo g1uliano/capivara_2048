@@ -90,7 +90,7 @@ void main() {
   });
 
   group('migration v235', () {
-    test('applyMigration sets lives to maxLives', () {
+    test('copyWith sets lives to maxLives (state model check)', () {
       final s = _state(lives: 2, maxLives: 5);
       final result = s.copyWith(lives: s.maxLives);
       expect(result.lives, 5);
