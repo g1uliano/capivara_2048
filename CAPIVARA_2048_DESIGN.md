@@ -2,9 +2,9 @@
 
 > Documento de especificação para desenvolvimento. Pensado para ser alimentado em ferramentas como Claude Code para implementação iterativa.
 >
-> **Status atual:** Fase 2.3.5 concluída ✅ — vidas só consomem no game over, cores explícitas por animal, transição sem flicker, OutlinedText, pause posicionado dinamicamente.
+> **Status atual:** Fase 2.3.6 concluída ✅ (v0.3.6) — polimento UX + inventário completo (Bomba 2/3, Desfazer 1/3), PauseOverlay frosted-glass, GameOverModal com vidas, assets SVG dos 11 animais integrados.
 >
-> **Próximo:** **Fase 2.3.6 — Polimento UX + Inventário (sem assets finais)** — 4 bugs visuais identificados em uso real + funcionalidade completa de inventário (Bomba + Desfazer) usando ícones Material/Lucide como placeholders até os SVGs definitivos chegarem.
+> **Próximo:** **Fase 3 — Arte final** — integrar SVGs definitivos nos tiles e no anfitrião (assets placeholder já no lugar, ver seção 4.2).
 >
 > **Mudanças principais nesta versão:**
 > - Lista de animais atualizada (Tanajura, Lobo-guará, Sapo-cururu, Mico-leão-dourado, Sucuri)
@@ -115,10 +115,32 @@ lib/
 │   └── controllers/
 └── assets_manifest.dart
 assets/
-├── images/animals/tile/
-├── images/animals/host/
+├── images/animals/tile/        ← SVGs dos tiles (11 arquivos, v0.3.6 ✅)
+│   ├── Tanajura.svg
+│   ├── LoboGuara.svg
+│   ├── Cururu.svg
+│   ├── Tucano.svg
+│   ├── Sagui.svg               (placeholder — Arara-azul ainda não produzida)
+│   ├── Preguica.svg
+│   ├── MicoLeao.svg
+│   ├── Boto.svg
+│   ├── Onca.svg
+│   ├── Sucuri.svg
+│   └── Capivara.svg
+├── images/animals/host/        ← SVGs do anfitrião (11 arquivos, v0.3.6 ✅)
+│   ├── Tanajura.svg
+│   ├── LoboGuara.svg
+│   ├── Cururu.svg
+│   ├── Tucano.svg
+│   ├── Sagui.svg               (placeholder — Arara-azul ainda não produzida)
+│   ├── Preguica.svg
+│   ├── MicoLeao.svg
+│   ├── Boto.svg
+│   ├── Onca.svg
+│   ├── Sucuri.svg
+│   └── Capivara.svg
 ├── images/textures/
-├── icons/                  (Fase 2.3.6 — ícones placeholder do inventário)
+├── icons/                      (Fase 2.3.6 — ícones placeholder do inventário)
 ├── sounds/animals/
 ├── sounds/ui/
 ├── music/
@@ -170,19 +192,21 @@ assets/
 
 ## 4. Os Animais (Tiles)
 
-| Nível | Valor | Animal | Justificativa | Cor (contorno) |
-|---|---|---|---|---|
-| 1 | 2 | **Tanajura** | A famosa rainha alada que anuncia as chuvas | `#C0392B` |
-| 2 | 4 | **Lobo-guará** | Ícone do cerrado, estrela da nota de R$ 200 | `#E67E22` |
-| 3 | 8 | **Sapo-cururu** | Guardião noturno, figura clássica do folclore | `#8D6E63` |
-| 4 | 16 | **Tucano** | Embaixador visual das matas brasileiras | `#FFB300` |
-| 5 | 32 | **Arara-azul** | Majestade alada e inteligente | `#1E88E5` |
-| 6 | 64 | **Preguiça** | Mestre zen da copa das árvores | `#BCAAA4` |
-| 7 | 128 | **Mico-leão-dourado** | Ícone absoluto da conservação brasileira | `#FF8F00` |
-| 8 | 256 | **Boto-cor-de-rosa** | Misticismo dos rios, paleta única | `#F48FB1` |
-| 9 | 512 | **Onça-pintada** | Predador alfa supremo | `#FBC02D` |
-| 10 | 1024 | **Sucuri** | Gigante das águas profundas | `#2E7D32` |
-| 11 | 2048 | **🏆 Capivara Lendária** | "Diplomata da natureza" — fofura suprema | `#FFD54F` |
+| Nível | Valor | Animal | Justificativa | Cor (contorno) | SVG tile | SVG host |
+|---|---|---|---|---|---|---|
+| 1 | 2 | **Tanajura** | A famosa rainha alada que anuncia as chuvas | `#C0392B` | `tile/Tanajura.svg` ✅ | `host/Tanajura.svg` ✅ |
+| 2 | 4 | **Lobo-guará** | Ícone do cerrado, estrela da nota de R$ 200 | `#E67E22` | `tile/LoboGuara.svg` ✅ | `host/LoboGuara.svg` ✅ |
+| 3 | 8 | **Sapo-cururu** | Guardião noturno, figura clássica do folclore | `#8D6E63` | `tile/Cururu.svg` ✅ | `host/Cururu.svg` ✅ |
+| 4 | 16 | **Tucano** | Embaixador visual das matas brasileiras | `#FFB300` | `tile/Tucano.svg` ✅ | `host/Tucano.svg` ✅ |
+| 5 | 32 | **Arara-azul** | Majestade alada e inteligente | `#1E88E5` | `tile/Sagui.svg` ⚠️ placeholder | `host/Sagui.svg` ⚠️ placeholder |
+| 6 | 64 | **Preguiça** | Mestre zen da copa das árvores | `#BCAAA4` | `tile/Preguica.svg` ✅ | `host/Preguica.svg` ✅ |
+| 7 | 128 | **Mico-leão-dourado** | Ícone absoluto da conservação brasileira | `#FF8F00` | `tile/MicoLeao.svg` ✅ | `host/MicoLeao.svg` ✅ |
+| 8 | 256 | **Boto-cor-de-rosa** | Misticismo dos rios, paleta única | `#F48FB1` | `tile/Boto.svg` ✅ | `host/Boto.svg` ✅ |
+| 9 | 512 | **Onça-pintada** | Predador alfa supremo | `#FBC02D` | `tile/Onca.svg` ✅ | `host/Onca.svg` ✅ |
+| 10 | 1024 | **Sucuri** | Gigante das águas profundas | `#2E7D32` | `tile/Sucuri.svg` ✅ | `host/Sucuri.svg` ✅ |
+| 11 | 2048 | **🏆 Capivara Lendária** | "Diplomata da natureza" — fofura suprema | `#FFD54F` | `tile/Capivara.svg` ✅ | `host/Capivara.svg` ✅ |
+
+> Caminhos relativos a `assets/images/animals/`. ⚠️ Nível 5 (Arara-azul) usa `Sagui.svg` como placeholder — substituir quando o SVG definitivo chegar.
 
 ### 4.1 Visual do tile
 - **Fundo:** branco (`#FFFFFF`)
