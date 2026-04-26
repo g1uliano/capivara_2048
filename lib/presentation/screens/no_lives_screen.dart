@@ -55,8 +55,8 @@ class _NoLivesScreenState extends ConsumerState<NoLivesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(livesProvider);
-    final canWatch = ref.read(livesProvider.notifier).canWatchAd;
+    final state = ref.watch(livesProvider);
+    final canWatch = DateTime.now().isAfter(state.adCounterResetAt) || state.adWatchedToday < 40;
 
     return Scaffold(
       backgroundColor: Colors.black87,

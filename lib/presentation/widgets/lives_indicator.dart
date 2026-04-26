@@ -24,7 +24,7 @@ class _LivesIndicatorState extends ConsumerState<LivesIndicator> {
     final renderBox = context.findRenderObject() as RenderBox;
     final offset = renderBox.localToGlobal(Offset.zero);
 
-    _overlay = OverlayEntry(
+    final entry = OverlayEntry(
       builder: (_) => Positioned(
         top: offset.dy + renderBox.size.height + 4,
         left: offset.dx,
@@ -44,10 +44,13 @@ class _LivesIndicatorState extends ConsumerState<LivesIndicator> {
         ),
       ),
     );
-    Overlay.of(context).insert(_overlay!);
+    _overlay = entry;
+    Overlay.of(context).insert(entry);
     Future.delayed(const Duration(seconds: 3), () {
-      _overlay?.remove();
-      _overlay = null;
+      if (_overlay == entry) {
+        entry.remove();
+        _overlay = null;
+      }
     });
   }
 
