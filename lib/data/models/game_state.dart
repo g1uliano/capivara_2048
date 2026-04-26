@@ -1,4 +1,5 @@
 import 'tile.dart';
+import '../../domain/game_engine/bomb_mode.dart';
 
 class GameState {
   final List<List<Tile?>> board;
@@ -10,6 +11,9 @@ class GameState {
   final int elapsedMs;
   final bool isPaused;
   final List<GameState> undoStack;
+  final BombMode? bombMode;
+
+  static const _bombSentinel = Object();
 
   GameState({
     required this.board,
@@ -21,6 +25,7 @@ class GameState {
     this.elapsedMs = 0,
     this.isPaused = false,
     List<GameState>? undoStack,
+    this.bombMode,
   }) : undoStack = List.unmodifiable(undoStack ?? const []);
 
   GameState copyWith({
@@ -33,6 +38,7 @@ class GameState {
     int? elapsedMs,
     bool? isPaused,
     List<GameState>? undoStack,
+    Object? bombMode = _bombSentinel,
   }) {
     return GameState(
       board: board ?? this.board,
@@ -44,6 +50,7 @@ class GameState {
       elapsedMs: elapsedMs ?? this.elapsedMs,
       isPaused: isPaused ?? this.isPaused,
       undoStack: undoStack ?? this.undoStack,
+      bombMode: bombMode == _bombSentinel ? this.bombMode : bombMode as BombMode?,
     );
   }
 }

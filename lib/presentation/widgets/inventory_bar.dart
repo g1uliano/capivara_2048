@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/item_type.dart';
+import '../../domain/game_engine/bomb_mode.dart';
 import '../../domain/inventory/inventory_notifier.dart';
 import '../controllers/game_notifier.dart';
 import 'inventory_item_button.dart';
@@ -22,8 +23,10 @@ class InventoryBar extends ConsumerWidget {
             icon: Icons.bolt,
             count: inventory.bomb2,
             onPressed: inventory.bomb2 > 0
-                ? () =>
-                    ref.read(inventoryProvider.notifier).consume(ItemType.bomb2)
+                ? () {
+                    ref.read(gameProvider.notifier).enterBombMode(BombMode.bomb2);
+                    ref.read(inventoryProvider.notifier).consume(ItemType.bomb2);
+                  }
                 : null,
           ),
           InventoryItemButton(
@@ -31,8 +34,10 @@ class InventoryBar extends ConsumerWidget {
             icon: Icons.auto_fix_high,
             count: inventory.bomb3,
             onPressed: inventory.bomb3 > 0
-                ? () =>
-                    ref.read(inventoryProvider.notifier).consume(ItemType.bomb3)
+                ? () {
+                    ref.read(gameProvider.notifier).enterBombMode(BombMode.bomb3);
+                    ref.read(inventoryProvider.notifier).consume(ItemType.bomb3);
+                  }
                 : null,
           ),
           InventoryItemButton(

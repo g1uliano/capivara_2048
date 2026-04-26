@@ -6,6 +6,7 @@ import '../../../domain/game_engine/direction.dart';
 import '../../../domain/lives/lives_notifier.dart';
 import '../../controllers/game_notifier.dart';
 import '../../widgets/board_widget.dart';
+import '../../widgets/bomb_selection_overlay.dart';
 import '../../widgets/game_background.dart';
 import '../../widgets/game_over_modal.dart';
 import '../../widgets/host_banner.dart';
@@ -82,7 +83,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onPanEnd: (details) {
-                      if (state.isPaused || isGameOver || hasWon) return;
+                      if (state.isPaused || isGameOver || hasWon || state.bombMode != null) return;
                       final v = details.velocity.pixelsPerSecond;
                       const threshold = 100.0;
                       if (v.dx.abs() > v.dy.abs()) {
@@ -110,6 +111,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 ],
               ),
               if (state.isPaused) const Positioned.fill(child: PauseOverlay()),
+              if (state.bombMode != null)
+                const Positioned.fill(child: BombSelectionOverlay()),
               if (isGameOver)
                 const Positioned.fill(
                     child: GameOverModal(message: 'Game Over!')),

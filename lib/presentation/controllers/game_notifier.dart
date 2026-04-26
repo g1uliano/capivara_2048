@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/game_state.dart';
+import '../../domain/game_engine/bomb_mode.dart';
 import '../../domain/game_engine/direction.dart';
 import '../../domain/game_engine/game_engine.dart';
 
@@ -9,6 +10,7 @@ class GameNotifier extends StateNotifier<GameState> {
   final GameEngine _engine;
   Timer? _timer;
   bool _timerStarted = false;
+  List<(int, int)> _bombSelection = [];
 
   GameNotifier(this._engine) : super(_engine.newGame());
 
@@ -85,6 +87,42 @@ class GameNotifier extends StateNotifier<GameState> {
       maxLevel: 0,
     );
   }
+
+  void enterBombMode(BombMode mode) {
+    _bombSelection = [];
+    state = state.copyWith(bombMode: mode);
+  }
+
+  void selectBombTile(int row, int col) {
+    final mode = state.bombMode;
+    if (mode == null) return;
+    final maxTiles = mode == BombMode.bomb2 ? 2 : 3;
+
+    final pos = (row, col);
+    if (_bombSelection.contains(pos)) {
+      _bombSelection = _bombSelection.where((p) => p != pos).toList();
+    } else if (_bombSelection.length < maxTiles) {
+      _bombSelection = [..._bombSelection, pos];
+      if (_bombSelection.length == maxTiles) {
+        confirmBomb();
+      }
+    }
+  }
+
+  void confirmBomb() {
+    final mode = state.bombMode;
+    if (mode == null || _bombSelection.isEmpty) return;
+    final newState = GameEngine.removeTiles(state, _bombSelection);
+    _bombSelection = [];
+    state = newState.copyWith(bombMode: null);
+  }
+
+  void cancelBomb() {
+    _bombSelection = [];
+    state = state.copyWith(bombMode: null);
+  }
+
+  List<(int, int)> get bombSelection => List.unmodifiable(_bombSelection);
 
   @override
   void dispose() {
