@@ -20,6 +20,22 @@ void main() {
       expect(copy.maxLives, 5);
     });
 
+    test('copyWith can explicitly set nullable fields to null', () {
+      final state = LivesState(
+        lives: 3,
+        maxLives: 5,
+        lastRegenAt: DateTime(2026, 1, 1),
+        adWatchedToday: 0,
+        adCounterResetAt: DateTime(2026, 1, 2),
+        userId: 'user-123',
+        lastSyncedAt: DateTime(2026, 1, 1),
+      );
+      final cleared = state.copyWith(userId: null, lastSyncedAt: null);
+      expect(cleared.userId, isNull);
+      expect(cleared.lastSyncedAt, isNull);
+      expect(cleared.lives, 3);
+    });
+
     test('lastRegenAt advances by exact gained * 30min on copyWith', () {
       final base = DateTime(2026, 1, 1, 10, 0);
       final state = LivesState(
