@@ -52,6 +52,8 @@ class LivesState {
     return DateTime(now.year, now.month, now.day + 1);
   }
 
+  bool get canPlay => lives > 0;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||

@@ -11,7 +11,7 @@ class GameOverModal extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final canPlay = ref.watch(livesProvider.select((s) => s.lives > 0));
+    final canPlay = ref.watch(livesProvider.select((s) => s.canPlay));
     final notifier = ref.read(gameProvider.notifier);
 
     return Container(

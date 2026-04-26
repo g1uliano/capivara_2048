@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -15,22 +16,32 @@ class NoLivesScreen extends ConsumerStatefulWidget {
 }
 
 class _NoLivesScreenState extends ConsumerState<NoLivesScreen> {
-  late Stream<int> _countdownStream;
+  late final StreamController<int> _countdownController;
+  late final Stream<int> _countdownStream;
+  Timer? _countdownTimer;
 
   @override
   void initState() {
     super.initState();
-    _countdownStream = _buildCountdown();
+    _countdownController = StreamController<int>();
+    _countdownStream = _countdownController.stream;
+    _tick();
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) => _tick());
   }
 
-  Stream<int> _buildCountdown() async* {
-    while (true) {
-      final state = ref.read(livesProvider);
-      final next = state.lastRegenAt.add(const Duration(minutes: 30));
-      final remaining = next.difference(DateTime.now()).inSeconds;
-      yield remaining < 0 ? 0 : remaining;
-      await Future.delayed(const Duration(seconds: 1));
-    }
+  void _tick() {
+    if (!mounted || _countdownController.isClosed) return;
+    final state = ref.read(livesProvider);
+    final next = state.lastRegenAt.add(const Duration(minutes: 30));
+    final remaining = next.difference(DateTime.now()).inSeconds;
+    _countdownController.add(remaining < 0 ? 0 : remaining);
+  }
+
+  @override
+  void dispose() {
+    _countdownTimer?.cancel();
+    _countdownController.close();
+    super.dispose();
   }
 
   Future<void> _watchAd() async {

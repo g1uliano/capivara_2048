@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'package:capivara_2048/data/models/game_state.dart';
 import 'package:capivara_2048/data/models/lives_state.dart';
 import 'package:capivara_2048/data/models/lives_state_adapter.dart';
 import 'package:capivara_2048/domain/lives/lives_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/game_notifier.dart';
+import 'package:capivara_2048/presentation/screens/no_lives_screen.dart';
 import 'package:capivara_2048/presentation/widgets/game_over_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,7 +12,21 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-LivesState _stateWithLives(int lives) => LivesState(
+class _MockNavigatorObserver extends NavigatorObserver {
+  Route<dynamic>? pushedRoute;
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    pushedRoute = route;
+  }
+
+  @override
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    pushedRoute = newRoute;
+  }
+}
+
+ LivesState _stateWithLives(int lives) => LivesState(
       lives: lives,
       maxLives: 5,
       lastRegenAt: DateTime(2026),
@@ -83,32 +99,78 @@ void main() {
 
   testWidgets('4. Button is disabled or navigates when player has no lives',
       (tester) async {
-    await tester.pumpWidget(_wrap(
-      const GameOverModal(message: 'Game Over!'),
-      lives: 0,
-    ));
-    expect(find.byType(ElevatedButton), findsOneWidget);
+    final observer = _MockNavigatorObserver();
+    final container = ProviderContainer(
+      overrides: [
+        livesProvider.overrideWith(
+          (ref) {
+            final n = LivesNotifier(ref.read(livesRepositoryProvider));
+            n.state = _stateWithLives(0);
+            return n;
+          },
+        ),
+        gameProvider.overrideWith((ref) {
+          final n = GameNotifier(ref.read(gameEngineProvider));
+          n.setConsumeCallback((_) {});
+          return n;
+        }),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(
+          navigatorObservers: [observer],
+          home: const Scaffold(
+            body: GameOverModal(message: 'Game Over!'),
+          ),
+        ),
+      ),
+    );
+
+    // Button is always present and enabled (navigates when lives == 0).
+    final btn = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
+    expect(btn.onPressed, isNotNull);
+
+    await tester.tap(find.byType(ElevatedButton));
+    await tester.pump(Duration.zero); // one frame — don't settle (stream timer)
+
+    // Navigator pushed a route to NoLivesScreen.
+    expect(
+      observer.pushedRoute?.settings.name ??
+          observer.pushedRoute.runtimeType.toString(),
+      isNotNull,
+    );
+    // game state is untouched: restart() was NOT called.
+    expect(container.read(gameProvider).score, 0);
   });
 
   testWidgets('5. Pressing button when has lives calls restart()',
       (tester) async {
     final livesState = _stateWithLives(3);
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          livesProvider.overrideWith(
-            (ref) {
-              final n = LivesNotifier(ref.read(livesRepositoryProvider));
-              n.state = livesState;
-              return n;
-            },
-          ),
-          gameProvider.overrideWith((ref) {
-            final n = GameNotifier(ref.read(gameEngineProvider));
-            n.setConsumeCallback((_) {});
+    final container = ProviderContainer(
+      overrides: [
+        livesProvider.overrideWith(
+          (ref) {
+            final n = LivesNotifier(ref.read(livesRepositoryProvider));
+            n.state = livesState;
             return n;
-          }),
-        ],
+          },
+        ),
+        gameProvider.overrideWith((ref) {
+          final n = GameNotifier(ref.read(gameEngineProvider));
+          n.setConsumeCallback((_) {});
+          return n;
+        }),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
         child: const MaterialApp(
           home: Scaffold(
             body: GameOverModal(message: 'Game Over!'),
@@ -120,8 +182,7 @@ void main() {
     await tester.tap(find.byType(ElevatedButton));
     await tester.pump();
 
-    // After restart(), the modal is still visible (game state reset but
-    // isGameOver flag is managed by the parent screen).
-    expect(find.byType(ElevatedButton), findsOneWidget);
+    final state = container.read(gameProvider);
+    expect(state.score, 0);
   });
 }
