@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'data/models/lives_state_adapter.dart';
+import 'core/providers/reduce_effects_provider.dart';
 import 'app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   Hive.registerAdapter(LivesStateAdapter());
-  runApp(const ProviderScope(child: CapivaraApp()));
+  final container = ProviderContainer();
+  await container.read(reduceEffectsProvider.notifier).load();
+  runApp(UncontrolledProviderScope(container: container, child: const CapivaraApp()));
 }

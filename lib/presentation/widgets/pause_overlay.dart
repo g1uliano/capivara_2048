@@ -6,11 +6,26 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/providers/reduce_effects_provider.dart';
 import '../controllers/game_notifier.dart';
 
-class PauseOverlay extends ConsumerWidget {
+class PauseOverlay extends ConsumerStatefulWidget {
   const PauseOverlay({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PauseOverlay> createState() => _PauseOverlayState();
+}
+
+class _PauseOverlayState extends ConsumerState<PauseOverlay> {
+  double _opacity = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() => _opacity = 1.0);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final reduceEffects = ref.watch(reduceEffectsProvider);
     final notifier = ref.read(gameProvider.notifier);
 
@@ -87,7 +102,7 @@ class PauseOverlay extends ConsumerWidget {
     }
 
     return AnimatedOpacity(
-      opacity: 1.0,
+      opacity: _opacity,
       duration: const Duration(milliseconds: 250),
       child: content,
     );
