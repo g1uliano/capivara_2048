@@ -1,6 +1,9 @@
+import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/providers/reduce_effects_provider.dart';
 import '../controllers/game_notifier.dart';
 
 class PauseOverlay extends ConsumerWidget {
@@ -8,10 +11,13 @@ class PauseOverlay extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final reduceEffects = ref.watch(reduceEffectsProvider);
     final notifier = ref.read(gameProvider.notifier);
 
-    return Container(
-      color: const Color(0xF02D7A4F),
+    Widget content = Container(
+      color: reduceEffects
+          ? const Color(0xE6000000)
+          : const Color(0x4DFFF8E7),
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -45,9 +51,45 @@ class PauseOverlay extends ConsumerWidget {
                 Navigator.of(context).maybePop();
               },
             ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Reduzir efeitos visuais',
+                  style: TextStyle(color: Colors.white),
+                ),
+                Switch(
+                  value: reduceEffects,
+                  onChanged: (_) =>
+                      ref.read(reduceEffectsProvider.notifier).toggle(),
+                ),
+              ],
+            ),
+            if (kDebugMode)
+              TextButton(
+                onPressed: () {},
+                child: const Text(
+                  'Debug',
+                  style: TextStyle(color: Colors.white70),
+                ),
+              ),
           ],
         ),
       ),
+    );
+
+    if (!reduceEffects) {
+      content = BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: content,
+      );
+    }
+
+    return AnimatedOpacity(
+      opacity: 1.0,
+      duration: const Duration(milliseconds: 250),
+      child: content,
     );
   }
 }
