@@ -75,11 +75,12 @@ class GameNotifier extends StateNotifier<GameState> {
     if (_timerStarted && !state.isGameOver && !state.hasWon) _startTimer();
   }
 
-  void undo(int steps) {
+  bool undo(int steps) {
     final stack = state.undoStack;
-    if (stack.isEmpty) return;
+    if (stack.isEmpty) return false;
     final idx = (steps - 1).clamp(0, stack.length - 1);
     state = stack[idx];
+    return true;
   }
 
   void restart() {

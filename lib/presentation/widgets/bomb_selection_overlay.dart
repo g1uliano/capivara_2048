@@ -18,10 +18,9 @@ class BombSelectionOverlay extends ConsumerWidget {
     final selected = state.selectedBombTiles;
     final board = state.board;
 
-    // Board pixel size: tiles + gaps + padding
-    const double boardPixelSize = GameConstants.boardSize * GameConstants.tileSize +
-        (GameConstants.boardSize - 1) * GameConstants.tileSpacing +
-        2 * GameConstants.boardPadding;
+    // Board pixel size: responsive, matching BoardWidget
+    final screenWidth = MediaQuery.of(context).size.width;
+    final boardPixelSize = screenWidth - GameConstants.boardPadding * 2;
 
     return Container(
       color: const Color(0x80000000),

@@ -44,8 +44,8 @@ class InventoryBar extends ConsumerWidget {
             count: inventory.undo1,
             onPressed: inventory.undo1 > 0
                 ? () {
-                    ref.read(gameProvider.notifier).undo(1);
-                    ref.read(inventoryProvider.notifier).consume(ItemType.undo1);
+                    final ok = ref.read(gameProvider.notifier).undo(1);
+                    if (ok) ref.read(inventoryProvider.notifier).consume(ItemType.undo1);
                   }
                 : null,
           ),
@@ -55,8 +55,8 @@ class InventoryBar extends ConsumerWidget {
             count: inventory.undo3,
             onPressed: inventory.undo3 > 0
                 ? () {
-                    ref.read(gameProvider.notifier).undo(3);
-                    ref.read(inventoryProvider.notifier).consume(ItemType.undo3);
+                    final ok = ref.read(gameProvider.notifier).undo(3);
+                    if (ok) ref.read(inventoryProvider.notifier).consume(ItemType.undo3);
                   }
                 : null,
           ),
