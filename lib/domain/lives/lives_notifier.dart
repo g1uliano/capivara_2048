@@ -4,6 +4,8 @@ import '../../data/models/lives_state.dart';
 import '../../data/repositories/lives_repository.dart';
 
 class LivesNotifier extends StateNotifier<LivesState> {
+  static const _migrationKeyV235 = 'lives_reset_v235';
+
   final LivesRepository _repo;
   final _ready = Completer<void>();
 
@@ -15,10 +17,10 @@ class LivesNotifier extends StateNotifier<LivesState> {
     var loaded = await _repo.load();
     loaded = calcRegen(state: loaded, now: DateTime.now());
 
-    final hasReset = await _repo.getMigrationFlag('lives_reset_v235');
+    final hasReset = await _repo.getMigrationFlag(_migrationKeyV235);
     if (!hasReset) {
       loaded = loaded.copyWith(lives: loaded.maxLives);
-      await _repo.setMigrationFlag('lives_reset_v235');
+      await _repo.setMigrationFlag(_migrationKeyV235);
     }
 
     state = loaded;

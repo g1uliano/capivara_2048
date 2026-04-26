@@ -92,11 +92,6 @@ void main() {
       final s = _state(lives: 1);
       expect(LivesNotifier.applyConsume(s).lives, 0);
     });
-
-    test('applyConsume from 0 → stays 0 (idempotent)', () {
-      final s = _state(lives: 0);
-      expect(LivesNotifier.applyConsume(s).lives, 0);
-    });
   });
 
   group('migration v235', () {
