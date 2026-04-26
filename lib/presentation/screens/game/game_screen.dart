@@ -4,8 +4,9 @@ import '../../../domain/game_engine/direction.dart';
 import '../../controllers/game_notifier.dart';
 import '../../widgets/board_widget.dart';
 import '../../widgets/host_banner.dart';
+import '../../widgets/lives_indicator.dart';
 import '../../widgets/pause_overlay.dart';
-import '../../widgets/score_panel.dart';
+import '../../widgets/status_panel.dart';
 
 class GameScreen extends ConsumerWidget {
   const GameScreen({super.key});
@@ -13,47 +14,83 @@ class GameScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(gameProvider);
+    final isGameOver = state.isGameOver;
+    final hasWon = state.hasWon;
+    final notifier = ref.read(gameProvider.notifier);
 
     return Scaffold(
       backgroundColor: const Color(0xFF3FA968),
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            const ScorePanel(),
-            const HostBanner(),
-            const Spacer(),
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onPanEnd: (details) {
-                if (state.isPaused || state.isGameOver) return;
-                final v = details.velocity.pixelsPerSecond;
-                const threshold = 100.0;
-                if (v.dx.abs() > v.dy.abs()) {
-                  if (v.dx > threshold) {
-                    ref.read(gameProvider.notifier).onSwipe(Direction.right);
-                  } else if (v.dx < -threshold) {
-                    ref.read(gameProvider.notifier).onSwipe(Direction.left);
-                  }
-                } else {
-                  if (v.dy > threshold) {
-                    ref.read(gameProvider.notifier).onSwipe(Direction.down);
-                  } else if (v.dy < -threshold) {
-                    ref.read(gameProvider.notifier).onSwipe(Direction.up);
-                  }
-                }
-              },
-              child: Stack(
-                children: [
-                  const BoardWidget(),
-                  if (state.isPaused) const PauseOverlay(),
-                ],
-              ),
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      HostBanner(),
+                      Spacer(),
+                      StatusPanel(),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onPanEnd: (details) {
+                    if (state.isPaused || isGameOver) return;
+                    final v = details.velocity.pixelsPerSecond;
+                    const threshold = 100.0;
+                    if (v.dx.abs() > v.dy.abs()) {
+                      if (v.dx > threshold) {
+                        notifier.onSwipe(Direction.right);
+                      } else if (v.dx < -threshold) {
+                        notifier.onSwipe(Direction.left);
+                      }
+                    } else {
+                      if (v.dy > threshold) {
+                        notifier.onSwipe(Direction.down);
+                      } else if (v.dy < -threshold) {
+                        notifier.onSwipe(Direction.up);
+                      }
+                    }
+                  },
+                  child: Stack(
+                    children: [
+                      const BoardWidget(),
+                      if (state.isPaused) const PauseOverlay(),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: LivesIndicator(),
+                ),
+                if (isGameOver) _buildOverlay('Game Over!', ref),
+                if (hasWon && !isGameOver)
+                  _buildOverlay('Capivara Lendária! 🎉', ref),
+              ],
             ),
-            const Spacer(),
-            if (state.isGameOver)
-              _buildOverlay('Game Over!', ref),
-            if (state.hasWon && !state.isGameOver)
-              _buildOverlay('Capivara Lendária! 🎉', ref),
+            // Floating pause button — positioned below the header row
+            if (!isGameOver && !hasWon)
+              Positioned(
+                top: 72,
+                right: 8,
+                child: IconButton(
+                  icon: Icon(
+                    state.isPaused
+                        ? Icons.play_arrow_rounded
+                        : Icons.pause_rounded,
+                    color: Colors.white,
+                  ),
+                  iconSize: 32,
+                  onPressed: state.isPaused ? notifier.resume : notifier.pause,
+                ),
+              ),
           ],
         ),
       ),
@@ -67,7 +104,9 @@ class GameScreen extends ConsumerWidget {
         children: [
           Text(message,
               style: const TextStyle(
-                  fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white)),
           const SizedBox(height: 8),
           ElevatedButton(
             onPressed: () => ref.read(gameProvider.notifier).restart(),

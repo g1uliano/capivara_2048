@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/constants/game_constants.dart';
 import '../../data/animals_data.dart';
 import '../controllers/game_notifier.dart';
+import 'host_artwork.dart';
 
 class HostBanner extends ConsumerWidget {
   const HostBanner({super.key});
@@ -10,38 +12,35 @@ class HostBanner extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final maxLevel = ref.watch(gameProvider.select((s) => s.maxLevel));
+    // Width = 2 tiles + 1 inner gap
+    final bannerWidth = GameConstants.tileSize * 2 + GameConstants.tileSpacing;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+    return SizedBox(
+      width: bannerWidth,
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 400),
-        transitionBuilder: (child, animation) {
-          return FadeTransition(
-            opacity: animation,
-            child: ScaleTransition(scale: animation, child: child),
-          );
-        },
+        transitionBuilder: (child, anim) =>
+            FadeTransition(opacity: anim, child: child),
         child: maxLevel == 0
-            ? const _Placeholder(key: ValueKey('placeholder'))
-            : _AnimalHost(
-                key: ValueKey(maxLevel),
-                level: maxLevel,
-              ),
+            ? _Placeholder(key: const ValueKey('ph'), width: bannerWidth)
+            : _AnimalHost(key: ValueKey(maxLevel), level: maxLevel),
       ),
     );
   }
 }
 
 class _Placeholder extends StatelessWidget {
-  const _Placeholder({super.key});
+  final double width;
+  const _Placeholder({super.key, required this.width});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         const SizedBox(
-          width: 48,
-          height: 48,
+          width: 64,
+          height: 64,
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: Color(0xFFC9B79C),
@@ -49,14 +48,15 @@ class _Placeholder extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(height: 4),
         Text(
           'Comece a jogar!',
           style: GoogleFonts.nunito(
-            fontSize: 16,
+            fontSize: 13,
             color: Colors.white,
             fontWeight: FontWeight.w600,
           ),
+          textAlign: TextAlign.center,
         ),
       ],
     );
@@ -70,33 +70,20 @@ class _AnimalHost extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final animal = animalForLevel(level);
-    return Row(
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: animal.borderColor, width: 2),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Image.asset(
-              animal.assetPath,
-              fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
+        HostArtwork(animal: animal, size: 64),
+        const SizedBox(height: 4),
         Text(
           animal.name,
           style: GoogleFonts.nunito(
-            fontSize: 16,
+            fontSize: 13,
             color: Colors.white,
             fontWeight: FontWeight.w600,
           ),
+          textAlign: TextAlign.center,
+          overflow: TextOverflow.ellipsis,
         ),
       ],
     );
