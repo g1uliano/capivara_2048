@@ -12,7 +12,7 @@ Puzzle game multiplataforma inspirado no 2048 clássico, onde os números são s
 | 2 | 4 | Lobo-guará |
 | 3 | 8 | Sapo-cururu |
 | 4 | 16 | Tucano |
-| 5 | 32 | Arara-azul |
+| 5 | 32 | Sagui |
 | 6 | 64 | Preguiça |
 | 7 | 128 | Mico-leão-dourado |
 | 8 | 256 | Boto-cor-de-rosa |
