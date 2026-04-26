@@ -3,73 +3,79 @@ import '../../core/constants/app_colors.dart';
 import '../../data/models/animal.dart';
 import 'texture_painter.dart';
 
-class GameBackground extends StatelessWidget {
+class GameBackground extends StatefulWidget {
   final Animal? animal;
   final Widget child;
 
   const GameBackground({super.key, required this.animal, required this.child});
 
   @override
+  State<GameBackground> createState() => _GameBackgroundState();
+}
+
+class _GameBackgroundState extends State<GameBackground> {
+  Color _previousColor = AppColors.primary;
+
+  @override
   Widget build(BuildContext context) {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 400),
-      child: animal == null
-          ? ColoredBox(
-              key: const ValueKey('no-animal'),
-              color: AppColors.primary,
-              child: SizedBox.expand(child: child),
-            )
-          : _Background(
-              key: ValueKey(animal!.level),
-              animal: animal!,
-              child: child,
-            ),
+    final targetColor = widget.animal?.backgroundBaseColor ?? AppColors.primary;
+
+    return TweenAnimationBuilder<Color?>(
+      tween: ColorTween(begin: _previousColor, end: targetColor),
+      duration: const Duration(milliseconds: 700),
+      curve: Curves.easeInOut,
+      onEnd: () => _previousColor = targetColor,
+      builder: (context, color, _) {
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            ColoredBox(color: color ?? AppColors.primary),
+            if (widget.animal != null)
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 400),
+                child: _TextureLayer(
+                  key: ValueKey(widget.animal!.level),
+                  animal: widget.animal!,
+                ),
+              ),
+            widget.child,
+          ],
+        );
+      },
     );
   }
 }
 
-class _Background extends StatelessWidget {
+class _TextureLayer extends StatelessWidget {
   final Animal animal;
-  final Widget child;
-
-  const _Background({super.key, required this.animal, required this.child});
-
-  Color get _bgColor =>
-      Color.lerp(animal.borderColor, AppColors.mint, 0.65) ?? AppColors.mint;
+  const _TextureLayer({super.key, required this.animal});
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        ColoredBox(color: _bgColor),
-        Opacity(
-          opacity: 0.12,
-          child: RepaintBoundary(
-            child: animal.backgroundTexturePath != null
-                ? Image.asset(
-                    animal.backgroundTexturePath!,
-                    repeat: ImageRepeat.repeat,
-                    fit: BoxFit.none,
-                    errorBuilder: (_, __, ___) => CustomPaint(
-                      painter: TexturePainter(
-                        pattern: animal.texturePattern,
-                        color: animal.borderColor,
-                      ),
-                      size: Size.infinite,
-                    ),
-                  )
-                : CustomPaint(
-                    painter: TexturePainter(
-                      pattern: animal.texturePattern,
-                      color: animal.borderColor,
-                    ),
-                    size: Size.infinite,
+    return Opacity(
+      opacity: 0.12,
+      child: RepaintBoundary(
+        child: animal.backgroundTexturePath != null
+            ? Image.asset(
+                animal.backgroundTexturePath!,
+                repeat: ImageRepeat.repeat,
+                fit: BoxFit.none,
+                errorBuilder: (_, __, ___) => CustomPaint(
+                  painter: TexturePainter(
+                    pattern: animal.texturePattern,
+                    color: animal.borderColor,
                   ),
-          ),
-        ),
-        child,
-      ],
+                  size: Size.infinite,
+                ),
+              )
+            : CustomPaint(
+                painter: TexturePainter(
+                  pattern: animal.texturePattern,
+                  color: animal.borderColor,
+                ),
+                size: Size.infinite,
+              ),
+      ),
     );
   }
 }
