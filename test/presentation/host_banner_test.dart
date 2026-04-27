@@ -15,14 +15,14 @@ void main() {
       expect(find.byType(HostBanner), findsOneWidget);
     });
 
-    testWidgets('has fixed width of twoCellWidth', (tester) async {
+    testWidgets('has width equal to tileSize by default', (tester) async {
       await tester.pumpWidget(_wrap(const HostBanner()));
       await tester.pump();
       final sizedBox = tester.widget<SizedBox>(
         find.descendant(of: find.byType(HostBanner), matching: find.byType(SizedBox)).first,
       );
-      // twoCellWidth = 72*2+8 = 152
-      expect(sizedBox.width, 152.0);
+      // tileSize = 72.0 (GameConstants.tileSize)
+      expect(sizedBox.width, 72.0);
     });
   });
 }

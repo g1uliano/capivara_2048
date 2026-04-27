@@ -8,38 +8,45 @@ import '../controllers/game_notifier.dart';
 import 'host_artwork.dart';
 
 class HostBanner extends ConsumerWidget {
-  const HostBanner({super.key});
+  final double tileSize;
+
+  const HostBanner({super.key, this.tileSize = GameConstants.tileSize});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final maxLevel = ref.watch(gameProvider.select((s) => s.maxLevel));
 
     return SizedBox(
-      width: GameConstants.twoCellWidth,
+      width: tileSize,
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 400),
         transitionBuilder: (child, anim) =>
             FadeTransition(opacity: anim, child: child),
         child: maxLevel == 0
-            ? _Placeholder(key: const ValueKey('ph'))
-            : _AnimalHost(key: ValueKey(maxLevel), level: maxLevel),
+            ? _Placeholder(key: const ValueKey('ph'), tileSize: tileSize)
+            : _AnimalHost(
+                key: ValueKey(maxLevel),
+                level: maxLevel,
+                tileSize: tileSize,
+              ),
       ),
     );
   }
 }
 
 class _Placeholder extends StatelessWidget {
-  const _Placeholder({super.key});
+  final double tileSize;
+  const _Placeholder({super.key, required this.tileSize});
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: GameConstants.twoCellWidth,
-      height: GameConstants.twoCellWidth + 36,
+      width: tileSize,
+      height: tileSize + 36,
       child: Align(
         alignment: Alignment.bottomCenter,
         child: Text(
-          'Comece a jogar!',
+          'Comece!',
           style: outlinedWhiteTextStyle(
             GoogleFonts.nunito(fontSize: 11, fontWeight: FontWeight.w600),
           ),
@@ -52,7 +59,8 @@ class _Placeholder extends StatelessWidget {
 
 class _AnimalHost extends StatelessWidget {
   final int level;
-  const _AnimalHost({super.key, required this.level});
+  final double tileSize;
+  const _AnimalHost({super.key, required this.level, required this.tileSize});
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +78,7 @@ class _AnimalHost extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 4),
-        HostArtwork(animal: animal),
+        HostArtwork(animal: animal, size: tileSize),
       ],
     );
   }
