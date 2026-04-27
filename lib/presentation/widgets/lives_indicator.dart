@@ -3,6 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../domain/lives/lives_notifier.dart';
+import 'lives_status_banner.dart';
 
 class LivesIndicator extends ConsumerStatefulWidget {
   const LivesIndicator({super.key});
@@ -15,10 +16,12 @@ class _LivesIndicatorState extends ConsumerState<LivesIndicator>
     with SingleTickerProviderStateMixin {
   late Ticker _ticker;
   Duration _elapsed = Duration.zero;
+  int _prevLives = 0;
 
   @override
   void initState() {
     super.initState();
+    _prevLives = ref.read(livesProvider).lives;
     _ticker = createTicker((elapsed) {
       setState(() => _elapsed = elapsed);
     })..start();
@@ -30,18 +33,22 @@ class _LivesIndicatorState extends ConsumerState<LivesIndicator>
     super.dispose();
   }
 
-  String _nextRegenText(DateTime lastRegenAt) {
+  String _semanticsLabel(int lives, int regenCap, DateTime lastRegenAt) {
+    if (lives == 0) return 'Sem vidas';
+    if (lives == regenCap) return '$lives vidas, banco completo';
+    if (lives > regenCap) return '$lives vidas, bônus';
     final next = lastRegenAt.add(const Duration(minutes: 30));
     final remaining = next.difference(DateTime.now());
-    if (remaining.isNegative) return '00:00';
     final mm = remaining.inMinutes.remainder(60).toString().padLeft(2, '0');
     final ss = (remaining.inSeconds % 60).toString().padLeft(2, '0');
-    return '$mm:$ss';
+    return '$lives vidas, próxima em $mm:$ss';
   }
 
-  void _onTap() {
-    final state = ref.read(livesProvider);
-    final timerText = _nextRegenText(state.lastRegenAt);
+  void _onTap(int lives, int regenCap, DateTime lastRegenAt) {
+    final next = lastRegenAt.add(const Duration(minutes: 30));
+    final remaining = next.difference(DateTime.now());
+    final mm = remaining.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final ss = (remaining.inSeconds % 60).toString().padLeft(2, '0');
     showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
@@ -52,9 +59,9 @@ class _LivesIndicatorState extends ConsumerState<LivesIndicator>
           textAlign: TextAlign.center,
         ),
         content: Text(
-          state.lives >= state.regenCap
+          lives >= regenCap
               ? 'Vidas cheias!'
-              : 'Próxima vida em $timerText',
+              : 'Próxima vida em $mm:$ss',
           style: GoogleFonts.nunito(fontSize: 15),
           textAlign: TextAlign.center,
         ),
@@ -74,56 +81,50 @@ class _LivesIndicatorState extends ConsumerState<LivesIndicator>
     // ignore: unused_local_variable
     final _ = _elapsed;
     final state = ref.watch(livesProvider);
-    final isBonusLives = state.lives > state.regenCap;
 
-    return GestureDetector(
-      onTap: _onTap,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          SizedBox(
-            width: 44,
-            height: 44,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                const Icon(Icons.favorite, color: Colors.redAccent, size: 40),
-                Text(
-                  '${state.lives}',
-                  style: GoogleFonts.fredoka(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    shadows: const [
-                      Shadow(color: Colors.black54, blurRadius: 2),
-                    ],
+    // Capturar _prevLives antes do rebuild para passar ao banner
+    final prevLives = _prevLives;
+    // Atualizar após usar
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _prevLives = state.lives;
+    });
+
+    return Semantics(
+      label: _semanticsLabel(state.lives, state.regenCap, state.lastRegenAt),
+      child: GestureDetector(
+        onTap: () => _onTap(state.lives, state.regenCap, state.lastRegenAt),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 44,
+              height: 44,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  const Icon(Icons.favorite, color: Colors.redAccent, size: 40),
+                  Text(
+                    '${state.lives}',
+                    style: GoogleFonts.fredoka(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      shadows: const [
+                        Shadow(color: Colors.black54, blurRadius: 2),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          if (isBonusLives)
-            Positioned(
-              top: -10,
-              left: 30,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFD600),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.white, width: 1),
-                ),
-                child: Text(
-                  'Bônus ⭐',
-                  style: GoogleFonts.nunito(
-                    fontSize: 9,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
+                ],
               ),
             ),
-        ],
+            const SizedBox(width: 6),
+            LivesStatusBanner(
+              current: state.lives,
+              previousCurrent: prevLives,
+              lastRegenAt: state.lastRegenAt,
+            ),
+          ],
+        ),
       ),
     );
   }

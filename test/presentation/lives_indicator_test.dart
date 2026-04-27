@@ -2,6 +2,7 @@ import 'package:capivara_2048/data/models/lives_state.dart';
 import 'package:capivara_2048/data/repositories/lives_repository.dart';
 import 'package:capivara_2048/domain/lives/lives_notifier.dart';
 import 'package:capivara_2048/presentation/widgets/lives_indicator.dart';
+import 'package:capivara_2048/presentation/widgets/lives_status_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,10 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 Widget _wrap({required LivesState livesState}) {
   return ProviderScope(
     overrides: [
-      livesProvider.overrideWith((_) {
-        final notifier = _FakeLivesNotifier(livesState);
-        return notifier;
-      }),
+      livesProvider.overrideWith((_) => _FakeLivesNotifier(livesState)),
     ],
     child: const MaterialApp(home: Scaffold(body: LivesIndicator())),
   );
@@ -64,16 +62,34 @@ void main() {
       expect(find.text('3'), findsOneWidget);
     });
 
-    testWidgets('shows Bônus badge when lives > regenCap', (tester) async {
-      await tester.pumpWidget(_wrap(livesState: _state(lives: 7, regenCap: 5)));
+    testWidgets('shows LivesStatusBanner widget', (tester) async {
+      await tester.pumpWidget(_wrap(livesState: _state(lives: 3)));
       await tester.pump();
-      expect(find.textContaining('Bônus'), findsOneWidget);
+      expect(find.byType(LivesStatusBanner), findsOneWidget);
     });
 
-    testWidgets('no badge when lives <= regenCap', (tester) async {
-      await tester.pumpWidget(_wrap(livesState: _state(lives: 4, regenCap: 5)));
+    testWidgets('banner shows "Bônus" when lives > regenCap', (tester) async {
+      await tester.pumpWidget(_wrap(livesState: _state(lives: 7, regenCap: 5)));
       await tester.pump();
-      expect(find.textContaining('Bônus'), findsNothing);
+      expect(find.text('Bônus'), findsOneWidget);
+    });
+
+    testWidgets('banner shows "Completo" when lives == regenCap', (tester) async {
+      await tester.pumpWidget(_wrap(livesState: _state(lives: 5, regenCap: 5)));
+      await tester.pump();
+      expect(find.text('Completo'), findsOneWidget);
+    });
+
+    testWidgets('banner shows "Restando" when lives < regenCap', (tester) async {
+      await tester.pumpWidget(_wrap(livesState: _state(lives: 3, regenCap: 5)));
+      await tester.pump();
+      expect(find.textContaining('Restando'), findsOneWidget);
+    });
+
+    testWidgets('banner shows "Sem vidas" when lives == 0', (tester) async {
+      await tester.pumpWidget(_wrap(livesState: _state(lives: 0, regenCap: 5)));
+      await tester.pump();
+      expect(find.text('Sem vidas'), findsOneWidget);
     });
   });
 }
