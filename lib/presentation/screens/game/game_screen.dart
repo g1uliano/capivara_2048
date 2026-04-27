@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/constants/game_constants.dart';
 import '../../../data/animals_data.dart';
 import '../../../data/models/game_state.dart';
 import '../../../domain/game_engine/direction.dart';
@@ -12,39 +13,15 @@ import '../../widgets/game_over_modal.dart';
 import '../../widgets/host_banner.dart';
 import '../../widgets/inventory_bar.dart';
 import '../../widgets/lives_indicator.dart';
+import '../../widgets/pause_button_tile.dart';
 import '../../widgets/pause_overlay.dart';
 import '../../widgets/status_panel.dart';
 
-class GameScreen extends ConsumerStatefulWidget {
+class GameScreen extends ConsumerWidget {
   const GameScreen({super.key});
 
   @override
-  ConsumerState<GameScreen> createState() => _GameScreenState();
-}
-
-class _GameScreenState extends ConsumerState<GameScreen> {
-  final GlobalKey _headerKey = GlobalKey();
-  double _pauseTop = 80;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _updatePausePosition());
-  }
-
-  void _updatePausePosition() {
-    final renderBox =
-        _headerKey.currentContext?.findRenderObject() as RenderBox?;
-    if (renderBox == null) return;
-    final headerBottom =
-        renderBox.localToGlobal(Offset.zero).dy + renderBox.size.height;
-    if (mounted) {
-      setState(() => _pauseTop = headerBottom + 12);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(gameProvider);
     final isGameOver = state.isGameOver;
     final hasWon = state.hasWon;
@@ -58,6 +35,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       }
     });
 
+    const tileSize = GameConstants.tileSize;
+
     return Scaffold(
       body: GameBackground(
         animal: hostAnimal,
@@ -69,29 +48,42 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 4),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: const [
-                        LivesIndicator(),
-                        Spacer(),
-                        StatusPanel(),
-                      ],
+                    child: const Align(
+                      alignment: Alignment.centerLeft,
+                      child: LivesIndicator(),
                     ),
                   ),
                   Padding(
-                    key: _headerKey,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 4),
-                    child: const Align(
-                      alignment: Alignment.centerLeft,
-                      child: HostBanner(),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const HostBanner(),
+                        Expanded(
+                          flex: 2,
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: const StatusPanel(),
+                          ),
+                        ),
+                        PauseButtonTile(
+                          tileSize: tileSize,
+                          onTap: state.isPaused
+                              ? notifier.resume
+                              : notifier.pause,
+                        ),
+                      ],
                     ),
                   ),
                   const Spacer(),
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onPanEnd: (details) {
-                      if (state.isPaused || isGameOver || hasWon || state.bombMode != null) return;
+                      if (state.isPaused ||
+                          isGameOver ||
+                          hasWon ||
+                          state.bombMode != null) return;
                       final v = details.velocity.pixelsPerSecond;
                       const threshold = 100.0;
                       if (v.dx.abs() > v.dy.abs()) {
@@ -124,22 +116,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               if (hasWon && !isGameOver)
                 const Positioned.fill(
                     child: GameOverModal(message: 'Capivara Lendária! 🎉')),
-              if (!isGameOver && !hasWon)
-                Positioned(
-                  top: _pauseTop,
-                  right: 8,
-                  child: IconButton(
-                    icon: Icon(
-                      state.isPaused
-                          ? Icons.play_arrow_rounded
-                          : Icons.pause_rounded,
-                      color: Colors.white,
-                    ),
-                    iconSize: 32,
-                    onPressed:
-                        state.isPaused ? notifier.resume : notifier.pause,
-                  ),
-                ),
             ],
           ),
         ),

@@ -59,6 +59,7 @@ class _PauseButtonTileState extends State<PauseButtonTile>
             width: widget.tileSize,
             height: widget.tileSize,
             child: Container(
+              clipBehavior: Clip.hardEdge,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
@@ -74,25 +75,28 @@ class _PauseButtonTileState extends State<PauseButtonTile>
                   ),
                 ],
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.pause_circle_filled,
-                    color: const Color(0xFFFF8C42),
-                    size: widget.tileSize * 0.50,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Pausar',
-                    style: outlinedWhiteTextStyle(
-                      GoogleFonts.fredoka(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+              child: OverflowBox(
+                maxHeight: double.infinity,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.pause_circle_filled,
+                      color: const Color(0xFFFF8C42),
+                      size: widget.tileSize * 0.50,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Pausar',
+                      style: outlinedWhiteTextStyle(
+                        GoogleFonts.fredoka(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

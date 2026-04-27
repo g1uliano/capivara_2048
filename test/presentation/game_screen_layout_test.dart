@@ -1,23 +1,33 @@
+import 'package:capivara_2048/presentation/widgets/pause_button_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('Pause button layout', () {
-    testWidgets('pause button has minimum touch area 48x48', (tester) async {
+  group('GameScreen layout', () {
+    testWidgets('PauseButtonTile tem tamanho mínimo 48x48', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: IconButton(
-              icon: const Icon(Icons.pause_rounded, color: Colors.white),
-              iconSize: 32,
-              onPressed: () {},
-            ),
+            body: PauseButtonTile(tileSize: 72, onTap: () {}),
           ),
         ),
       );
-      final button = tester.getSize(find.byType(IconButton));
-      expect(button.width, greaterThanOrEqualTo(48));
-      expect(button.height, greaterThanOrEqualTo(48));
+      final size = tester.getSize(find.byType(PauseButtonTile));
+      expect(size.width, greaterThanOrEqualTo(48));
+      expect(size.height, greaterThanOrEqualTo(48));
+    });
+
+    testWidgets('PauseButtonTile tem tileSize de 72dp (GameConstants.tileSize)', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: PauseButtonTile(tileSize: 72, onTap: () {}),
+          ),
+        ),
+      );
+      final size = tester.getSize(find.byType(PauseButtonTile));
+      expect(size.width, 72.0);
+      expect(size.height, 72.0);
     });
   });
 }
