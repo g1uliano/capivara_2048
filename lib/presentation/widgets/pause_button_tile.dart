@@ -59,7 +59,6 @@ class _PauseButtonTileState extends State<PauseButtonTile>
             width: widget.tileSize,
             height: widget.tileSize,
             child: Container(
-              clipBehavior: Clip.hardEdge,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
@@ -75,10 +74,11 @@ class _PauseButtonTileState extends State<PauseButtonTile>
                   ),
                 ],
               ),
-              child: OverflowBox(
-                maxHeight: double.infinity,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
                       Icons.pause_circle_filled,
