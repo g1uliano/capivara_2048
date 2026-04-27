@@ -39,7 +39,7 @@ class GameHeader extends StatelessWidget {
                     width: slotWidth,
                     height: tileSize,
                     child: Align(
-                      alignment: Alignment.centerLeft,
+                      alignment: Alignment.centerRight,
                       child: PauseButtonTile(
                         tileSize: tileSize,
                         onTap: onPauseTap,

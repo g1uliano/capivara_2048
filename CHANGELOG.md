@@ -7,6 +7,11 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-04-27
+
+### Changed
+- `PauseButtonTile`: alinhamento `centerLeft` → `centerRight` dentro do slot 2×1
+
 ## [0.7.0] - 2026-04-27
 
 ### Added
