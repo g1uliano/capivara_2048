@@ -7,6 +7,11 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.7.4] - 2026-04-27
+
+### Changed
+- `GameHeader`: bloco direito (StatusPanel + PauseButtonTile) alinhado à direita (`CrossAxisAlignment.end`)
+
 ## [0.7.3] - 2026-04-27
 
 ### Changed

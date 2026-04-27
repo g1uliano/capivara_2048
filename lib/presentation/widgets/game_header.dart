@@ -32,6 +32,7 @@ class GameHeader extends StatelessWidget {
               flex: 2,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   const StatusPanel(),
                   const SizedBox(height: 6),
