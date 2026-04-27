@@ -16,9 +16,7 @@ void main() {
           ),
         ),
       );
-
       expect(find.byType(Icon), findsOneWidget);
-      expect(find.byType(Image), findsNothing);
     });
 
     testWidgets('renders Image when pngPath is provided', (tester) async {
@@ -34,11 +32,12 @@ void main() {
           ),
         ),
       );
-
+      // Image.asset is rendered; Icon should not appear
       expect(find.byType(Image), findsOneWidget);
+      expect(find.byType(Icon), findsNothing);
     });
 
-    testWidgets('shows count badge when count > 0', (tester) async {
+    testWidgets('shows exact count badge when count <= 99', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -50,11 +49,27 @@ void main() {
           ),
         ),
       );
-
       expect(find.text('3'), findsOneWidget);
+      expect(find.text('99+'), findsNothing);
     });
 
-    testWidgets('hides count badge when count is 0', (tester) async {
+    testWidgets('shows 99+ badge when count > 99', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: InventoryItemButton(
+              icon: Icons.dangerous,
+              label: 'Bomba',
+              count: 150,
+            ),
+          ),
+        ),
+      );
+      expect(find.text('99+'), findsOneWidget);
+      expect(find.text('150'), findsNothing);
+    });
+
+    testWidgets('hides badge when count is 0', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -66,7 +81,6 @@ void main() {
           ),
         ),
       );
-
       expect(find.text('0'), findsNothing);
     });
 
@@ -89,6 +103,25 @@ void main() {
             const ColorFilter.mode(Colors.transparent, BlendMode.dst);
       });
       expect(colorFilteredFinder, findsOneWidget);
+    });
+
+    testWidgets('long press shows tooltip with exact count', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: InventoryItemButton(
+              icon: Icons.dangerous,
+              label: 'Bomba',
+              count: 150,
+            ),
+          ),
+        ),
+      );
+      final gesture = await tester.startGesture(tester.getCenter(find.byType(InventoryItemButton)));
+      await tester.pump(const Duration(milliseconds: 600));
+      await gesture.up();
+      await tester.pumpAndSettle();
+      expect(find.text('150 Bomba'), findsOneWidget);
     });
   });
 }

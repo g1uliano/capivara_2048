@@ -19,8 +19,12 @@ class InventoryItemButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = count > 0;
+    final badgeText = count > 99 ? '99+' : '$count';
 
-    return SizedBox(
+    return Tooltip(
+      message: '$count $label',
+      triggerMode: TooltipTriggerMode.longPress,
+      child: SizedBox(
       width: 56,
       height: 56,
       child: Stack(
@@ -75,7 +79,7 @@ class InventoryItemButton extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: Text(
-                  '$count',
+                  badgeText,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 10,
@@ -85,6 +89,7 @@ class InventoryItemButton extends StatelessWidget {
               ),
             ),
         ],
+      ),
       ),
     );
   }
