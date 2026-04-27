@@ -7,6 +7,20 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-04-27
+
+### Added
+- `GameHeader` widget: extrai cabeçalho da `GameScreen` em componente isolado (`StatelessWidget`)
+- `StatusPanelTest`: testes de regressão para ausência de `PauseButtonTile` na subárvore
+- Galeria de debug: coluna "Host 2×2" mostrando `HostArtwork` no tamanho real (152dp)
+
+### Changed
+- `GameScreen`: usa `GameHeader()`; `Padding(horizontal: 12)` compartilhado entre header e board
+- `HostBanner`: slot fixo 2×2 (152dp); `_Placeholder` com silhueta Capivara (opacity 0.15) + "Comece!"; nome em Fredoka 16sp
+- `HostArtwork`: `BoxFit.cover` (era `contain`) — PNGs são quadrados, sem risco de corte
+- `StatusPanel`: fontes cronômetro 18sp, pontuação 24sp, recorde 13sp; `CrossAxisAlignment.center`
+- `PauseButtonTile`: separado do `StatusPanel` — agora empilhado abaixo com espaço de 6dp
+
 ## [0.5.0] - 2026-04-27
 
 ### Added
