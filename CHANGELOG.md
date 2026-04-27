@@ -7,6 +7,11 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.7.5] - 2026-04-27
+
+### Changed
+- `LivesIndicator`: espaço entre coração e texto reduzido de 6→2dp
+
 ## [0.7.4] - 2026-04-27
 
 ### Changed

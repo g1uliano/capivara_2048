@@ -117,7 +117,7 @@ class _LivesIndicatorState extends ConsumerState<LivesIndicator>
                 ],
               ),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 2),
             LivesStatusBanner(
               current: state.lives,
               previousCurrent: prevLives,
