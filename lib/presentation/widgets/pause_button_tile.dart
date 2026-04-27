@@ -48,8 +48,9 @@ class _PauseButtonTileState extends State<PauseButtonTile>
       child: GestureDetector(
         onTapDown: (_) => _ctrl.forward(),
         onTapUp: (_) {
-          _ctrl.reverse();
-          widget.onTap();
+          _ctrl.reverse().then((_) {
+            if (mounted) widget.onTap();
+          });
         },
         onTapCancel: () => _ctrl.reverse(),
         child: ScaleTransition(
@@ -69,7 +70,7 @@ class _PauseButtonTileState extends State<PauseButtonTile>
                   BoxShadow(
                     offset: const Offset(0, 2),
                     blurRadius: 4,
-                    color: Colors.black.withOpacity(0.25),
+                    color: Colors.black.withValues(alpha: 0.25),
                   ),
                 ],
               ),
