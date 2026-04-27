@@ -67,16 +67,24 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               Column(
                 children: [
                   Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 4),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: const [
+                        LivesIndicator(),
+                        Spacer(),
+                        StatusPanel(),
+                      ],
+                    ),
+                  ),
+                  Padding(
                     key: _headerKey,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const HostBanner(),
-                        const Spacer(),
-                        const StatusPanel(),
-                      ],
+                        horizontal: 16, vertical: 4),
+                    child: const Align(
+                      alignment: Alignment.centerLeft,
+                      child: HostBanner(),
                     ),
                   ),
                   const Spacer(),
@@ -104,10 +112,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                   ),
                   const Spacer(),
                   const InventoryBar(),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: LivesIndicator(),
-                  ),
+                  const SizedBox(height: 8),
                 ],
               ),
               if (state.isPaused) const Positioned.fill(child: PauseOverlay()),

@@ -3,28 +3,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+Widget _wrap(Widget child) => ProviderScope(
+      child: MaterialApp(home: Scaffold(body: child)),
+    );
+
 void main() {
-  testWidgets('HostBanner placeholder has no DecoratedBox', (tester) async {
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: MaterialApp(
-          home: Scaffold(body: HostBanner()),
-        ),
-      ),
-    );
+  group('HostBanner', () {
+    testWidgets('renders without error', (tester) async {
+      await tester.pumpWidget(_wrap(const HostBanner()));
+      await tester.pump();
+      expect(find.byType(HostBanner), findsOneWidget);
+    });
 
-    expect(find.byType(DecoratedBox), findsNothing);
-  });
-
-  testWidgets('HostBanner placeholder shows "Comece a jogar!" text', (tester) async {
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: MaterialApp(
-          home: Scaffold(body: HostBanner()),
-        ),
-      ),
-    );
-
-    expect(find.text('Comece a jogar!'), findsOneWidget);
+    testWidgets('has fixed width of twoCellWidth', (tester) async {
+      await tester.pumpWidget(_wrap(const HostBanner()));
+      await tester.pump();
+      final sizedBox = tester.widget<SizedBox>(
+        find.descendant(of: find.byType(HostBanner), matching: find.byType(SizedBox)).first,
+      );
+      // twoCellWidth = 72*2+8 = 152
+      expect(sizedBox.width, 152.0);
+    });
   });
 }

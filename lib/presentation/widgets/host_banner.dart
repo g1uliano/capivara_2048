@@ -34,8 +34,8 @@ class _Placeholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 64,
-      height: 68,
+      width: GameConstants.twoCellWidth,
+      height: GameConstants.twoCellWidth + 36,
       child: Align(
         alignment: Alignment.bottomCenter,
         child: Text(
@@ -60,16 +60,17 @@ class _AnimalHost extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        HostArtwork(animal: animal),
-        const SizedBox(height: 4),
         Text(
           animal.name,
           style: outlinedWhiteTextStyle(
-            GoogleFonts.nunito(fontSize: 13, fontWeight: FontWeight.w600),
+            GoogleFonts.nunito(fontSize: 13, fontWeight: FontWeight.w700),
           ),
           textAlign: TextAlign.center,
+          maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
+        const SizedBox(height: 4),
+        HostArtwork(animal: animal),
       ],
     );
   }
