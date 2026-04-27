@@ -53,5 +53,22 @@ void main() {
       await tester.pump();
       expect(tapped, isTrue);
     });
+
+    testWidgets('HostBanner está à esquerda do StatusPanel', (tester) async {
+      await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () {})));
+      await tester.pump(); // pumpAndSettle times out — LivesIndicator has continuous animation
+      final hostPos = tester.getTopLeft(find.byType(HostBanner));
+      final statusPos = tester.getTopLeft(find.byType(StatusPanel));
+      expect(hostPos.dx, lessThan(statusPos.dx));
+    });
+
+    testWidgets('sem overflow em 360dp de largura', (tester) async {
+      tester.view.physicalSize = const Size(360, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () {})));
+      await tester.pump(); // pumpAndSettle times out — LivesIndicator has continuous animation
+      expect(tester.takeException(), isNull);
+    });
   });
 }
