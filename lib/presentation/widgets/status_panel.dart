@@ -23,26 +23,26 @@ class StatusPanel extends ConsumerWidget {
     final elapsedMs = ref.watch(gameProvider.select((s) => s.elapsedMs));
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           _formatTime(elapsedMs),
           style: outlinedWhiteTextStyle(
-            GoogleFonts.fredoka(fontSize: 16, fontWeight: FontWeight.bold),
+            GoogleFonts.fredoka(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ),
         const SizedBox(height: 2),
         Text(
           '$score',
           style: outlinedWhiteTextStyle(
-            GoogleFonts.fredoka(fontSize: 20, fontWeight: FontWeight.bold),
+            GoogleFonts.fredoka(fontSize: 24, fontWeight: FontWeight.bold),
           ),
         ),
         Text(
           'Recorde: $highScore',
           style: outlinedWhiteTextStyle(
-            GoogleFonts.nunito(fontSize: 11),
+            GoogleFonts.nunito(fontSize: 13),
           ),
         ),
       ],
