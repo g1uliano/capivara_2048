@@ -1,0 +1,48 @@
+import 'dart:io';
+import 'package:capivara_2048/data/models/lives_state_adapter.dart';
+import 'package:capivara_2048/presentation/widgets/game_header.dart';
+import 'package:capivara_2048/presentation/widgets/host_banner.dart';
+import 'package:capivara_2048/presentation/widgets/lives_indicator.dart';
+import 'package:capivara_2048/presentation/widgets/pause_button_tile.dart';
+import 'package:capivara_2048/presentation/widgets/status_panel.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hive/hive.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+Widget _wrap(Widget child) => ProviderScope(
+      child: MaterialApp(home: Scaffold(body: child)),
+    );
+
+void main() {
+  late Directory tempDir;
+
+  setUpAll(() async {
+    tempDir = await Directory.systemTemp.createTemp('hive_game_header_test');
+    Hive.init(tempDir.path);
+    if (!Hive.isAdapterRegistered(1)) {
+      Hive.registerAdapter(LivesStateAdapter());
+    }
+  });
+
+  tearDownAll(() async {
+    await Hive.close();
+    await tempDir.delete(recursive: true);
+  });
+
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+
+  group('GameHeader', () {
+    testWidgets('renderiza LivesIndicator, HostBanner, StatusPanel e PauseButtonTile', (tester) async {
+      await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () {})));
+      await tester.pump();
+      expect(find.byType(LivesIndicator), findsOneWidget);
+      expect(find.byType(HostBanner), findsOneWidget);
+      expect(find.byType(StatusPanel), findsOneWidget);
+      expect(find.byType(PauseButtonTile), findsOneWidget);
+    });
+  });
+}
