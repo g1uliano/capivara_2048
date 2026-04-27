@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/constants/game_constants.dart';
 import '../../core/theme/text_styles.dart';
 import '../controllers/game_notifier.dart';
 
@@ -23,33 +22,30 @@ class StatusPanel extends ConsumerWidget {
     final highScore = ref.watch(gameProvider.select((s) => s.highScore));
     final elapsedMs = ref.watch(gameProvider.select((s) => s.elapsedMs));
 
-    return SizedBox(
-      width: GameConstants.twoCellWidth,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            _formatTime(elapsedMs),
-            style: outlinedWhiteTextStyle(
-              GoogleFonts.fredoka(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          _formatTime(elapsedMs),
+          style: outlinedWhiteTextStyle(
+            GoogleFonts.fredoka(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 2),
-          Text(
-            '$score',
-            style: outlinedWhiteTextStyle(
-              GoogleFonts.fredoka(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          '$score',
+          style: outlinedWhiteTextStyle(
+            GoogleFonts.fredoka(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          Text(
-            'Recorde: $highScore',
-            style: outlinedWhiteTextStyle(
-              GoogleFonts.nunito(fontSize: 11),
-            ),
+        ),
+        Text(
+          'Recorde: $highScore',
+          style: outlinedWhiteTextStyle(
+            GoogleFonts.nunito(fontSize: 11),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
