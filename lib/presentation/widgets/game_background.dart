@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../data/models/animal.dart';
-import 'texture_painter.dart';
 
 class GameBackground extends StatelessWidget {
   final Animal? animal;
@@ -11,55 +10,10 @@ class GameBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final targetColor = animal?.backgroundBaseColor ?? AppColors.primary;
-
-    return TweenAnimationBuilder<Color?>(
-      tween: ColorTween(begin: null, end: targetColor),
-      duration: const Duration(milliseconds: 700),
-      curve: Curves.easeInOut,
-      child: child,
-      builder: (context, color, child) {
-        return Stack(
-          fit: StackFit.expand,
-          children: [
-            ColoredBox(color: color ?? AppColors.primary),
-            if (animal != null)
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 400),
-                child: _TextureLayer(
-                  key: ValueKey(animal!.level),
-                  animal: animal!,
-                ),
-              ),
-            if (child != null) child,
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _TextureLayer extends StatelessWidget {
-  final Animal animal;
-  const _TextureLayer({super.key, required this.animal});
-
-  static TexturePattern _patternForLevel(int level) {
-    const patterns = TexturePattern.values;
-    return patterns[(level - 1) % patterns.length];
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return RepaintBoundary(
-      child: Opacity(
-        opacity: 0.12,
-        child: CustomPaint(
-          painter: TexturePainter(
-            pattern: _patternForLevel(animal.level),
-            color: animal.borderColor,
-          ),
-          size: Size.infinite,
-        ),
+      child: ColoredBox(
+        color: AppColors.gameBackground,
+        child: child,
       ),
     );
   }

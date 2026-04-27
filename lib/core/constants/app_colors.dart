@@ -8,4 +8,7 @@ class AppColors {
 
   /// Mint — target lerp color for dynamic game background.
   static const Color mint = Color(0xFFA8DFBC);
+
+  /// Fixed game background color.
+  static const Color gameBackground = Color(0xFFD4F1DE);
 }
