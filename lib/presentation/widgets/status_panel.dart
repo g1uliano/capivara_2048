@@ -23,7 +23,7 @@ class StatusPanel extends ConsumerWidget {
     final elapsedMs = ref.watch(gameProvider.select((s) => s.elapsedMs));
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(

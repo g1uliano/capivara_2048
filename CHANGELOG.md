@@ -7,6 +7,11 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.7.2] - 2026-04-27
+
+### Changed
+- `StatusPanel`: conteúdo alinhado à direita (`CrossAxisAlignment.end`)
+
 ## [0.7.1] - 2026-04-27
 
 ### Changed
