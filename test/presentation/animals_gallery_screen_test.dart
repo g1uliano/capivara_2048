@@ -14,6 +14,14 @@ void main() {
     expect(find.text('Galeria de Animais'), findsOneWidget);
   });
 
+  testWidgets('AnimalsGalleryScreen mostra coluna Host 2×2', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(home: AnimalsGalleryScreen()),
+    );
+    await tester.pump();
+    expect(find.text('Host 2×2'), findsAtLeastNWidgets(1));
+  });
+
   testWidgets('AnimalsGalleryScreen shows all 11 animal names', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/constants/game_constants.dart';
 import '../../../data/animals_data.dart';
 import '../../../data/models/animal.dart';
 import '../../widgets/host_artwork.dart';
@@ -29,6 +30,7 @@ class _AnimalRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const slot2x = GameConstants.twoCellWidth;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -40,15 +42,28 @@ class _AnimalRow extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _TilePreview(animal: animal),
+            Column(
+              children: [
+                const Text('Tile', style: TextStyle(fontSize: 10)),
+                const SizedBox(height: 4),
+                _TilePreview(animal: animal),
+              ],
+            ),
             const SizedBox(width: 16),
-            HostArtwork(animal: animal),
+            Column(
+              children: [
+                const Text('Host 1×1', style: TextStyle(fontSize: 10)),
+                const SizedBox(height: 4),
+                HostArtwork(animal: animal),
+              ],
+            ),
             const SizedBox(width: 16),
-            Container(
-              color: animal.backgroundBaseColor,
-              width: 80,
-              height: 80,
-              child: HostArtwork(animal: animal),
+            Column(
+              children: [
+                const Text('Host 2×2', style: TextStyle(fontSize: 10)),
+                const SizedBox(height: 4),
+                HostArtwork(animal: animal, size: slot2x),
+              ],
             ),
           ],
         ),
