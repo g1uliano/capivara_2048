@@ -34,6 +34,7 @@ class LivesNotifier extends StateNotifier<LivesState> {
   }
 
   static LivesState calcRegen({required LivesState state, required DateTime now}) {
+    if (state.lives >= state.regenCap) return state;
     final delta = now.difference(state.lastRegenAt);
     final totalMinutes = delta.inMinutes;
     final gained = (totalMinutes ~/ 30).clamp(0, state.regenCap - state.lives);
