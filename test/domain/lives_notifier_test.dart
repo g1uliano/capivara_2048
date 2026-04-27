@@ -96,7 +96,7 @@ void main() {
     });
   });
 
-  group('migration v235', () {
+  group('migration v238', () {
     test('copyWith sets lives to regenCap (state model check)', () {
       final s = _state(lives: 2, regenCap: 5);
       final result = s.copyWith(lives: s.regenCap);
