@@ -1,3 +1,4 @@
+import 'package:capivara_2048/core/constants/game_constants.dart';
 import 'package:capivara_2048/presentation/widgets/host_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,20 +10,36 @@ Widget _wrap(Widget child) => ProviderScope(
 
 void main() {
   group('HostBanner', () {
-    testWidgets('renders without error', (tester) async {
+    testWidgets('renderiza sem erro', (tester) async {
       await tester.pumpWidget(_wrap(const HostBanner()));
       await tester.pump();
       expect(find.byType(HostBanner), findsOneWidget);
     });
 
-    testWidgets('has width equal to tileSize by default', (tester) async {
+    testWidgets('largura igual a twoCellWidth (152dp)', (tester) async {
       await tester.pumpWidget(_wrap(const HostBanner()));
       await tester.pump();
-      final sizedBox = tester.widget<SizedBox>(
-        find.descendant(of: find.byType(HostBanner), matching: find.byType(SizedBox)).first,
+      final size = tester.getSize(find.byType(HostBanner));
+      expect(size.width, GameConstants.twoCellWidth);
+    });
+
+    testWidgets('placeholder mostra texto Comece! quando maxLevel == 0', (tester) async {
+      await tester.pumpWidget(_wrap(const HostBanner()));
+      await tester.pump();
+      expect(find.text('Comece!'), findsOneWidget);
+    });
+
+    testWidgets('nome Mico-leão-dourado não causa overflow em 152dp', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          SizedBox(
+            width: GameConstants.twoCellWidth,
+            child: const HostBanner(),
+          ),
+        ),
       );
-      // tileSize = 72.0 (GameConstants.tileSize)
-      expect(sizedBox.width, 72.0);
+      await tester.pump();
+      expect(tester.takeException(), isNull);
     });
   });
 }

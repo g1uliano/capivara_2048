@@ -8,26 +8,25 @@ import '../controllers/game_notifier.dart';
 import 'host_artwork.dart';
 
 class HostBanner extends ConsumerWidget {
-  final double tileSize;
-
-  const HostBanner({super.key, this.tileSize = GameConstants.tileSize});
+  const HostBanner({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final maxLevel = ref.watch(gameProvider.select((s) => s.maxLevel));
+    const slotWidth = GameConstants.twoCellWidth;
 
     return SizedBox(
-      width: tileSize,
+      width: slotWidth,
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 400),
         transitionBuilder: (child, anim) =>
             FadeTransition(opacity: anim, child: child),
         child: maxLevel == 0
-            ? _Placeholder(key: const ValueKey('ph'), tileSize: tileSize)
+            ? _Placeholder(key: const ValueKey('ph'), slotWidth: slotWidth)
             : _AnimalHost(
                 key: ValueKey(maxLevel),
                 level: maxLevel,
-                tileSize: tileSize,
+                slotWidth: slotWidth,
               ),
       ),
     );
@@ -35,22 +34,38 @@ class HostBanner extends ConsumerWidget {
 }
 
 class _Placeholder extends StatelessWidget {
-  final double tileSize;
-  const _Placeholder({super.key, required this.tileSize});
+  final double slotWidth;
+  const _Placeholder({super.key, required this.slotWidth});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: tileSize,
-      height: tileSize + 36,
-      child: Align(
-        alignment: Alignment.bottomCenter,
-        child: Text(
-          'Comece!',
-          style: outlinedWhiteTextStyle(
-            GoogleFonts.nunito(fontSize: 11, fontWeight: FontWeight.w600),
-          ),
-          textAlign: TextAlign.center,
+    final slotHeight = GameConstants.twoCellWidth;
+    return Semantics(
+      label: 'Anfitrião: nenhum. Faça seu primeiro merge!',
+      child: SizedBox(
+        width: slotWidth,
+        height: slotHeight + 28,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Opacity(
+              opacity: 0.15,
+              child: Image.asset(
+                'assets/images/animals/host/Capivara.png',
+                width: slotWidth,
+                height: slotHeight,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+              ),
+            ),
+            Text(
+              'Comece!',
+              style: outlinedWhiteTextStyle(
+                GoogleFonts.nunito(fontSize: 13, fontWeight: FontWeight.w600),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       ),
     );
@@ -59,27 +74,30 @@ class _Placeholder extends StatelessWidget {
 
 class _AnimalHost extends StatelessWidget {
   final int level;
-  final double tileSize;
-  const _AnimalHost({super.key, required this.level, required this.tileSize});
+  final double slotWidth;
+  const _AnimalHost({super.key, required this.level, required this.slotWidth});
 
   @override
   Widget build(BuildContext context) {
     final animal = animalForLevel(level);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          animal.name,
-          style: outlinedWhiteTextStyle(
-            GoogleFonts.nunito(fontSize: 13, fontWeight: FontWeight.w700),
+    return Semantics(
+      label: 'Anfitrião: ${animal.name}',
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            animal.name,
+            style: outlinedWhiteTextStyle(
+              GoogleFonts.fredoka(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
-          textAlign: TextAlign.center,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-        const SizedBox(height: 4),
-        HostArtwork(animal: animal, size: tileSize),
-      ],
+          const SizedBox(height: 4),
+          HostArtwork(animal: animal, size: slotWidth),
+        ],
+      ),
     );
   }
 }
