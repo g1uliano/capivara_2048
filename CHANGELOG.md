@@ -7,6 +7,25 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-04-27
+
+### Added
+- Confirmation dialog for all inventory item uses
+- LivesIndicator redesign: single heart with number overlay, bonus badge when lives exceed regen cap
+- Lives system: `regenCap` (5) and `earnedCap` (15) caps; purchased lives have no cap; `addEarned`/`addPurchased` methods
+- Inventory 99+ badge when count exceeds 99; long-press tooltip shows exact count
+
+### Changed
+- Migrated all 22 animal assets from SVG to PNG; removed `flutter_svg` dependency
+- `Animal` model: `assetPath`/`hostSvgPath` renamed to `tilePngPath`/`hostPngPath`; removed `texturePattern`, `hostAspectRatio`, `backgroundTexturePath`
+- Fixed game background to solid `#D4F1DE`; removed animated texture system
+- Host banner: animal name moves to top (2 lines), artwork in 2×2 tile slot below
+- Game screen header: LivesIndicator + StatusPanel in top row; HostBanner in second row
+- PNG images precached with `ResizeImage` on app startup
+
+### Migration
+- Hive data reset to initial state (v2.3.8 migration)
+
 ## [0.4.0] — 2026-04-26
 
 ### Added
