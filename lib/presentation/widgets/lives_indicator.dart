@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../domain/lives/lives_notifier.dart';
@@ -10,84 +11,118 @@ class LivesIndicator extends ConsumerStatefulWidget {
   ConsumerState<LivesIndicator> createState() => _LivesIndicatorState();
 }
 
-class _LivesIndicatorState extends ConsumerState<LivesIndicator> {
-  OverlayEntry? _overlay;
+class _LivesIndicatorState extends ConsumerState<LivesIndicator>
+    with SingleTickerProviderStateMixin {
+  late Ticker _ticker;
+  Duration _elapsed = Duration.zero;
 
-  void _showTimerOverlay(BuildContext context, DateTime lastRegenAt) {
-    _overlay?.remove();
-    final next = lastRegenAt.add(const Duration(minutes: 30));
-    final remaining = next.difference(DateTime.now());
-    if (remaining.isNegative) return;
-    final mm = remaining.inMinutes.toString().padLeft(2, '0');
-    final ss = (remaining.inSeconds % 60).toString().padLeft(2, '0');
-
-    final renderBox = context.findRenderObject() as RenderBox;
-    final offset = renderBox.localToGlobal(Offset.zero);
-
-    final entry = OverlayEntry(
-      builder: (_) => Positioned(
-        top: offset.dy + renderBox.size.height + 4,
-        left: offset.dx,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.black87,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              'Próxima vida em $mm:$ss',
-              style: GoogleFonts.nunito(color: Colors.white, fontSize: 13),
-            ),
-          ),
-        ),
-      ),
-    );
-    _overlay = entry;
-    Overlay.of(context).insert(entry);
-    Future.delayed(const Duration(seconds: 3), () {
-      if (_overlay == entry) {
-        entry.remove();
-        _overlay = null;
-      }
-    });
+  @override
+  void initState() {
+    super.initState();
+    _ticker = createTicker((elapsed) {
+      setState(() => _elapsed = elapsed);
+    })..start();
   }
 
   @override
   void dispose() {
-    _overlay?.remove();
+    _ticker.dispose();
     super.dispose();
+  }
+
+  String _nextRegenText(DateTime lastRegenAt) {
+    final next = lastRegenAt.add(const Duration(minutes: 30));
+    final remaining = next.difference(DateTime.now());
+    if (remaining.isNegative) return '00:00';
+    final mm = remaining.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final ss = (remaining.inSeconds % 60).toString().padLeft(2, '0');
+    return '$mm:$ss';
+  }
+
+  void _onTap() {
+    final state = ref.read(livesProvider);
+    final timerText = _nextRegenText(state.lastRegenAt);
+    showDialog<void>(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Vidas',
+          style: GoogleFonts.fredoka(fontWeight: FontWeight.bold, fontSize: 20),
+          textAlign: TextAlign.center,
+        ),
+        content: Text(
+          state.lives >= state.regenCap
+              ? 'Vidas cheias!'
+              : 'Próxima vida em $timerText',
+          style: GoogleFonts.nunito(fontSize: 15),
+          textAlign: TextAlign.center,
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Ok', style: GoogleFonts.nunito(fontSize: 16)),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    // ignore: unused_local_variable
+    final _ = _elapsed;
     final state = ref.watch(livesProvider);
-    final displayHearts = state.lives.clamp(0, 5);
-    final showCount = state.lives > 5;
+    final isBonusLives = state.lives > state.regenCap;
 
     return GestureDetector(
-      onTap: () => _showTimerOverlay(context, state.lastRegenAt),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+      onTap: _onTap,
+      child: Stack(
+        clipBehavior: Clip.none,
         children: [
-          for (int i = 0; i < 5; i++)
-            Icon(
-              i < displayHearts ? Icons.favorite : Icons.favorite_border,
-              color: Colors.redAccent,
-              size: 22,
+          SizedBox(
+            width: 44,
+            height: 44,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                const Icon(Icons.favorite, color: Colors.redAccent, size: 40),
+                Text(
+                  '${state.lives}',
+                  style: GoogleFonts.fredoka(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    shadows: const [
+                      Shadow(color: Colors.black54, blurRadius: 2),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          if (showCount) ...[
-            const SizedBox(width: 4),
-            Text(
-              '×${state.lives}',
-              style: GoogleFonts.fredoka(
-                fontSize: 16,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+          ),
+          if (isBonusLives)
+            Positioned(
+              top: -10,
+              left: 30,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFD600),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.white, width: 1),
+                ),
+                child: Text(
+                  'Bônus ⭐',
+                  style: GoogleFonts.nunito(
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
               ),
             ),
-          ],
         ],
       ),
     );
