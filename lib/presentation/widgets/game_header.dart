@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/game_constants.dart';
 import 'host_banner.dart';
 import 'lives_indicator.dart';
 import 'pause_button_tile.dart';
 import 'status_panel.dart';
 
-class GameHeader extends ConsumerWidget {
+class GameHeader extends StatelessWidget {
   final VoidCallback onPauseTap;
 
   const GameHeader({super.key, required this.onPauseTap});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     const tileSize = GameConstants.tileSize;
     const slotWidth = GameConstants.twoCellWidth;
 

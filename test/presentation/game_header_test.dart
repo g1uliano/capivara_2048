@@ -44,5 +44,14 @@ void main() {
       expect(find.byType(StatusPanel), findsOneWidget);
       expect(find.byType(PauseButtonTile), findsOneWidget);
     });
+
+    testWidgets('chama onPauseTap ao tocar no PauseButtonTile', (tester) async {
+      var tapped = false;
+      await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () => tapped = true)));
+      await tester.pump();
+      await tester.tap(find.byType(PauseButtonTile));
+      await tester.pump();
+      expect(tapped, isTrue);
+    });
   });
 }
