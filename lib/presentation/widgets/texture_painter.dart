@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import '../../data/models/animal.dart';
+
+enum TexturePattern { dots, diagonal, grid, waves, blobs, scales, radial }
 
 class TexturePainter extends CustomPainter {
   final TexturePattern pattern;

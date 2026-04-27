@@ -1,11 +1,10 @@
 import 'package:capivara_2048/presentation/widgets/inventory_item_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('InventoryItemButton', () {
-    testWidgets('renders Icon when svgPath is null', (tester) async {
+    testWidgets('renders Icon when pngPath is null', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -19,10 +18,10 @@ void main() {
       );
 
       expect(find.byType(Icon), findsOneWidget);
-      expect(find.byType(SvgPicture), findsNothing);
+      expect(find.byType(Image), findsNothing);
     });
 
-    testWidgets('renders SvgPicture when svgPath is provided', (tester) async {
+    testWidgets('renders Image when pngPath is provided', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -30,14 +29,13 @@ void main() {
               icon: Icons.dangerous,
               label: 'Bomba',
               count: 2,
-              svgPath: 'assets/icons/inventory/bomb_2.svg',
+              pngPath: 'assets/icons/inventory/bomb_2.png',
             ),
           ),
         ),
       );
 
-      expect(find.byType(SvgPicture), findsOneWidget);
-      expect(find.byType(Icon), findsNothing);
+      expect(find.byType(Image), findsOneWidget);
     });
 
     testWidgets('shows count badge when count > 0', (tester) async {

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import '../../../data/animals_data.dart';
 import '../../../data/models/animal.dart';
 import '../../widgets/host_artwork.dart';
@@ -43,13 +42,13 @@ class _AnimalRow extends StatelessWidget {
           children: [
             _TilePreview(animal: animal),
             const SizedBox(width: 16),
-            HostArtwork(animal: animal, size: 80),
+            HostArtwork(animal: animal),
             const SizedBox(width: 16),
             Container(
               color: animal.backgroundBaseColor,
               width: 80,
               height: 80,
-              child: HostArtwork(animal: animal, size: 80),
+              child: HostArtwork(animal: animal),
             ),
           ],
         ),
@@ -88,10 +87,10 @@ class _TilePreview extends StatelessWidget {
               padding: const EdgeInsets.all(size * 0.08),
               child: Opacity(
                 opacity: 0.27,
-                child: SvgPicture.asset(
-                  animal.assetPath,
+                child: Image.asset(
+                  animal.tilePngPath,
                   fit: BoxFit.contain,
-                  placeholderBuilder: (_) => const SizedBox.shrink(),
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                 ),
               ),
             ),

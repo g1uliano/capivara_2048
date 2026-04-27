@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
 import '../../domain/lives/lives_notifier.dart';
@@ -30,11 +29,7 @@ class HomeScreen extends ConsumerWidget {
                 child: LivesIndicator(),
               ),
               const Spacer(),
-              SvgPicture.asset(
-                'assets/images/home_ensemble.svg',
-                height: 220,
-                semanticsLabel: 'Animais da Amazônia',
-              ),
+              const SizedBox(height: 220),
               const SizedBox(height: 32),
               _HomeButton(
                 label: 'Novo Jogo',

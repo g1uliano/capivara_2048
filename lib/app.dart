@@ -1,9 +1,42 @@
 import 'package:flutter/material.dart';
 import 'core/theme/app_theme.dart';
+import 'data/animals_data.dart';
 import 'presentation/screens/home_screen.dart';
 
-class CapivaraApp extends StatelessWidget {
+class CapivaraApp extends StatefulWidget {
   const CapivaraApp({super.key});
+
+  @override
+  State<CapivaraApp> createState() => _CapivaraAppState();
+}
+
+class _CapivaraAppState extends State<CapivaraApp> {
+  bool _precached = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_precached) return;
+    _precached = true;
+    for (final animal in animals) {
+      precacheImage(
+        ResizeImage(
+          AssetImage(animal.tilePngPath),
+          width: 144,
+          height: 144,
+        ),
+        context,
+      );
+      precacheImage(
+        ResizeImage(
+          AssetImage(animal.hostPngPath),
+          width: 304,
+          height: 304,
+        ),
+        context,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

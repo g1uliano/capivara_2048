@@ -60,7 +60,7 @@ class _AnimalHost extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        HostArtwork(animal: animal, size: 64),
+        HostArtwork(animal: animal),
         const SizedBox(height: 4),
         Text(
           animal.name,

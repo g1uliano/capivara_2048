@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class InventoryItemButton extends StatelessWidget {
   final String label;
   final int count;
   final VoidCallback? onPressed;
   final IconData icon;
-  final String? svgPath;
+  final String? pngPath;
 
   const InventoryItemButton({
     super.key,
@@ -14,7 +13,7 @@ class InventoryItemButton extends StatelessWidget {
     required this.count,
     required this.icon,
     this.onPressed,
-    this.svgPath,
+    this.pngPath,
   });
 
   @override
@@ -46,8 +45,10 @@ class InventoryItemButton extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      svgPath != null
-                          ? SvgPicture.asset(svgPath!, width: 32, height: 32)
+                      pngPath != null
+                          ? Image.asset(pngPath!, width: 32, height: 32,
+                              errorBuilder: (_, __, ___) =>
+                                  Icon(icon, color: Colors.white, size: 22))
                           : Icon(icon, color: Colors.white, size: 22),
                       Text(
                         label,

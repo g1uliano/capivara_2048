@@ -43,31 +43,23 @@ class _TextureLayer extends StatelessWidget {
   final Animal animal;
   const _TextureLayer({super.key, required this.animal});
 
+  static TexturePattern _patternForLevel(int level) {
+    const patterns = TexturePattern.values;
+    return patterns[(level - 1) % patterns.length];
+  }
+
   @override
   Widget build(BuildContext context) {
     return RepaintBoundary(
       child: Opacity(
         opacity: 0.12,
-        child: animal.backgroundTexturePath != null
-            ? Image.asset(
-                animal.backgroundTexturePath!,
-                repeat: ImageRepeat.repeat,
-                fit: BoxFit.none,
-                errorBuilder: (_, __, ___) => CustomPaint(
-                  painter: TexturePainter(
-                    pattern: animal.texturePattern,
-                    color: animal.borderColor,
-                  ),
-                  size: Size.infinite,
-                ),
-              )
-            : CustomPaint(
-                painter: TexturePainter(
-                  pattern: animal.texturePattern,
-                  color: animal.borderColor,
-                ),
-                size: Size.infinite,
-              ),
+        child: CustomPaint(
+          painter: TexturePainter(
+            pattern: _patternForLevel(animal.level),
+            color: animal.borderColor,
+          ),
+          size: Size.infinite,
+        ),
       ),
     );
   }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../data/animals_data.dart';
 import '../../data/models/tile.dart';
@@ -66,10 +65,10 @@ class _FilledTile extends StatelessWidget {
               padding: EdgeInsets.all(size * 0.08),
               child: Opacity(
                 opacity: 0.27,
-                child: SvgPicture.asset(
-                  animal.assetPath,
+                child: Image.asset(
+                  animal.tilePngPath,
                   fit: BoxFit.contain,
-                  placeholderBuilder: (_) => const SizedBox.shrink(),
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                 ),
               ),
             ),

@@ -10,8 +10,8 @@ void main() {
         level: 1, value: 2, name: 'Test',
         borderColor: Color(0xFF000000),
         backgroundBaseColor: Color(0xFFFFFFFF),
-        assetPath: 'assets/images/animals/tile/Tanajura.svg',
-        texturePattern: TexturePattern.dots,
+        tilePngPath: 'assets/images/animals/tile/Tanajura.png',
+        hostPngPath: 'assets/images/animals/host/Tanajura.png',
         scientificName: 'Atta sexdens',
         funFact: 'Some fact.',
       );
@@ -24,8 +24,8 @@ void main() {
         level: 1, value: 2, name: 'Test',
         borderColor: Color(0xFF000000),
         backgroundBaseColor: Color(0xFFFFFFFF),
-        assetPath: 'assets/images/animals/tile/Tanajura.svg',
-        texturePattern: TexturePattern.dots,
+        tilePngPath: 'assets/images/animals/tile/Tanajura.png',
+        hostPngPath: 'assets/images/animals/host/Tanajura.png',
       );
       expect(a.scientificName, isNull);
       expect(a.funFact, isNull);
@@ -51,33 +51,29 @@ void main() {
       expect(level5.funFact!.isNotEmpty, isTrue);
     });
 
-    test('all animals have assetPath pointing to .svg files', () {
+    test('all animals have tilePngPath pointing to .png files', () {
       for (final animal in animals) {
         expect(
-          animal.assetPath.endsWith('.svg'),
+          animal.tilePngPath.endsWith('.png'),
           isTrue,
-          reason: '${animal.name} assetPath should end in .svg',
+          reason: '${animal.name} tilePngPath should end in .png',
         );
       }
     });
 
-    test('all animals have hostSvgPath set', () {
+    test('all animals have hostPngPath set', () {
       for (final animal in animals) {
         expect(
-          animal.hostSvgPath,
+          animal.hostPngPath,
           isNotNull,
-          reason: '${animal.name} hostSvgPath should not be null',
+          reason: '${animal.name} hostPngPath should not be null',
         );
       }
     });
 
-    test('all animals have hostAspectRatio set to 1.0', () {
+    test('no animal has hostSvgPath or assetPath field (old API gone)', () {
       for (final animal in animals) {
-        expect(
-          animal.hostAspectRatio,
-          1.0,
-          reason: '${animal.name} hostAspectRatio should be 1.0',
-        );
+        expect(animal.tilePngPath, isNotEmpty);
       }
     });
 
