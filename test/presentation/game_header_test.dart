@@ -38,7 +38,7 @@ void main() {
   group('GameHeader', () {
     testWidgets('renderiza LivesIndicator, HostBanner, StatusPanel e PauseButtonTile', (tester) async {
       await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () {})));
-      await tester.pump();
+      await tester.pump(); // pumpAndSettle times out — LivesIndicator has continuous animation
       expect(find.byType(LivesIndicator), findsOneWidget);
       expect(find.byType(HostBanner), findsOneWidget);
       expect(find.byType(StatusPanel), findsOneWidget);
@@ -48,7 +48,7 @@ void main() {
     testWidgets('chama onPauseTap ao tocar no PauseButtonTile', (tester) async {
       var tapped = false;
       await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () => tapped = true)));
-      await tester.pump();
+      await tester.pump(); // pumpAndSettle times out — LivesIndicator has continuous animation
       await tester.tap(find.byType(PauseButtonTile));
       await tester.pump();
       expect(tapped, isTrue);
