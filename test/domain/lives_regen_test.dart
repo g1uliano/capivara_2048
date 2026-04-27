@@ -6,7 +6,8 @@ void main() {
     test('copyWith preserves nullable sync fields', () {
       final state = LivesState(
         lives: 3,
-        maxLives: 5,
+        regenCap: 5,
+        earnedCap: 15,
         lastRegenAt: DateTime(2026, 1, 1, 10, 0),
         adWatchedToday: 0,
         adCounterResetAt: DateTime(2026, 1, 2, 0, 0),
@@ -17,13 +18,14 @@ void main() {
       expect(copy.userId, isNull);
       expect(copy.lastSyncedAt, isNull);
       expect(copy.lives, 4);
-      expect(copy.maxLives, 5);
+      expect(copy.regenCap, 5);
     });
 
     test('copyWith can explicitly set nullable fields to null', () {
       final state = LivesState(
         lives: 3,
-        maxLives: 5,
+        regenCap: 5,
+        earnedCap: 15,
         lastRegenAt: DateTime(2026, 1, 1),
         adWatchedToday: 0,
         adCounterResetAt: DateTime(2026, 1, 2),
@@ -40,7 +42,8 @@ void main() {
       final base = DateTime(2026, 1, 1, 10, 0);
       final state = LivesState(
         lives: 1,
-        maxLives: 5,
+        regenCap: 5,
+        earnedCap: 15,
         lastRegenAt: base,
         adWatchedToday: 0,
         adCounterResetAt: DateTime(2026, 1, 2),

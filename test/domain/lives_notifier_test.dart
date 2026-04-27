@@ -4,14 +4,16 @@ import 'package:capivara_2048/domain/lives/lives_notifier.dart';
 
 LivesState _state({
   int lives = 3,
-  int maxLives = 5,
+  int regenCap = 5,
+  int earnedCap = 15,
   DateTime? lastRegenAt,
   int adWatchedToday = 0,
   DateTime? adCounterResetAt,
 }) =>
     LivesState(
       lives: lives,
-      maxLives: maxLives,
+      regenCap: regenCap,
+      earnedCap: earnedCap,
       lastRegenAt: lastRegenAt ?? DateTime.now(),
       adWatchedToday: adWatchedToday,
       adCounterResetAt: adCounterResetAt ?? DateTime.now().add(const Duration(hours: 24)),
@@ -46,22 +48,22 @@ void main() {
       expect(result.lives, 4);
     });
 
-    test('regen respects cap (maxLives: 5)', () {
+    test('regen respects cap (regenCap: 5)', () {
       final last = DateTime.now().subtract(const Duration(minutes: 90));
       final result = LivesNotifier.calcRegen(
-        state: _state(lives: 4, maxLives: 5, lastRegenAt: last),
+        state: _state(lives: 4, regenCap: 5, lastRegenAt: last),
         now: DateTime.now(),
       );
       expect(result.lives, 5);
     });
 
-    test('regen no cap when maxLives == -1', () {
-      final last = DateTime.now().subtract(const Duration(minutes: 120));
+    test('regen clamps to regenCap', () {
+      final last = DateTime.now().subtract(const Duration(minutes: 180));
       final result = LivesNotifier.calcRegen(
-        state: _state(lives: 8, maxLives: -1, lastRegenAt: last),
+        state: _state(lives: 1, regenCap: 5, lastRegenAt: last),
         now: DateTime.now(),
       );
-      expect(result.lives, 12);
+      expect(result.lives, 5);
     });
 
     test('lastRegenAt advances by gained*30min, not total elapsed', () {
@@ -95,9 +97,9 @@ void main() {
   });
 
   group('migration v235', () {
-    test('copyWith sets lives to maxLives (state model check)', () {
-      final s = _state(lives: 2, maxLives: 5);
-      final result = s.copyWith(lives: s.maxLives);
+    test('copyWith sets lives to regenCap (state model check)', () {
+      final s = _state(lives: 2, regenCap: 5);
+      final result = s.copyWith(lives: s.regenCap);
       expect(result.lives, 5);
     });
   });
@@ -139,6 +141,67 @@ void main() {
       final before = _state(lives: 3);
       final after = LivesNotifier.applyConsume(before);
       expect(after.lives, 2);
+    });
+  });
+
+  group('regenCap / earnedCap rules', () {
+    test('regen stops at regenCap, not earnedCap', () {
+      final last = DateTime.now().subtract(const Duration(minutes: 120));
+      final s = LivesState(
+        lives: 3,
+        regenCap: 5,
+        earnedCap: 15,
+        lastRegenAt: last,
+        adWatchedToday: 0,
+        adCounterResetAt: DateTime.now().add(const Duration(hours: 24)),
+      );
+      final result = LivesNotifier.calcRegen(state: s, now: DateTime.now());
+      expect(result.lives, 5); // capped at regenCap
+    });
+
+    test('addEarned goes above regenCap up to earnedCap', () {
+      final s = LivesState(
+        lives: 5,
+        regenCap: 5,
+        earnedCap: 15,
+        lastRegenAt: DateTime.now(),
+        adWatchedToday: 0,
+        adCounterResetAt: DateTime.now().add(const Duration(hours: 24)),
+      );
+      final result = LivesNotifier.applyAddEarned(s, 3);
+      expect(result.lives, 8);
+    });
+
+    test('addEarned clamps at earnedCap', () {
+      final s = LivesState(
+        lives: 14,
+        regenCap: 5,
+        earnedCap: 15,
+        lastRegenAt: DateTime.now(),
+        adWatchedToday: 0,
+        adCounterResetAt: DateTime.now().add(const Duration(hours: 24)),
+      );
+      final result = LivesNotifier.applyAddEarned(s, 5);
+      expect(result.lives, 15);
+    });
+
+    test('addPurchased has no cap', () {
+      final s = LivesState(
+        lives: 15,
+        regenCap: 5,
+        earnedCap: 15,
+        lastRegenAt: DateTime.now(),
+        adWatchedToday: 0,
+        adCounterResetAt: DateTime.now().add(const Duration(hours: 24)),
+      );
+      final result = LivesNotifier.applyAddPurchased(s, 10);
+      expect(result.lives, 25);
+    });
+
+    test('LivesState.initial has regenCap=5 and earnedCap=15', () {
+      final s = LivesState.initial();
+      expect(s.regenCap, 5);
+      expect(s.earnedCap, 15);
     });
   });
 }

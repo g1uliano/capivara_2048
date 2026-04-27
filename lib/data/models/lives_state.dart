@@ -1,6 +1,7 @@
 class LivesState {
   final int lives;
-  final int maxLives;
+  final int regenCap;
+  final int earnedCap;
   final DateTime lastRegenAt;
   final int adWatchedToday;
   final DateTime adCounterResetAt;
@@ -9,7 +10,8 @@ class LivesState {
 
   const LivesState({
     required this.lives,
-    required this.maxLives,
+    required this.regenCap,
+    required this.earnedCap,
     required this.lastRegenAt,
     required this.adWatchedToday,
     required this.adCounterResetAt,
@@ -21,7 +23,8 @@ class LivesState {
 
   LivesState copyWith({
     int? lives,
-    int? maxLives,
+    int? regenCap,
+    int? earnedCap,
     DateTime? lastRegenAt,
     int? adWatchedToday,
     DateTime? adCounterResetAt,
@@ -30,7 +33,8 @@ class LivesState {
   }) {
     return LivesState(
       lives: lives ?? this.lives,
-      maxLives: maxLives ?? this.maxLives,
+      regenCap: regenCap ?? this.regenCap,
+      earnedCap: earnedCap ?? this.earnedCap,
       lastRegenAt: lastRegenAt ?? this.lastRegenAt,
       adWatchedToday: adWatchedToday ?? this.adWatchedToday,
       adCounterResetAt: adCounterResetAt ?? this.adCounterResetAt,
@@ -41,7 +45,8 @@ class LivesState {
 
   factory LivesState.initial() => LivesState(
         lives: 5,
-        maxLives: 5,
+        regenCap: 5,
+        earnedCap: 15,
         lastRegenAt: DateTime.now(),
         adWatchedToday: 0,
         adCounterResetAt: _nextMidnight(),
@@ -60,7 +65,8 @@ class LivesState {
       other is LivesState &&
           runtimeType == other.runtimeType &&
           lives == other.lives &&
-          maxLives == other.maxLives &&
+          regenCap == other.regenCap &&
+          earnedCap == other.earnedCap &&
           lastRegenAt == other.lastRegenAt &&
           adWatchedToday == other.adWatchedToday &&
           adCounterResetAt == other.adCounterResetAt &&
@@ -70,7 +76,8 @@ class LivesState {
   @override
   int get hashCode => Object.hash(
         lives,
-        maxLives,
+        regenCap,
+        earnedCap,
         lastRegenAt,
         adWatchedToday,
         adCounterResetAt,

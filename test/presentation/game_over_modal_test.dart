@@ -28,7 +28,8 @@ class _MockNavigatorObserver extends NavigatorObserver {
 
  LivesState _stateWithLives(int lives) => LivesState(
       lives: lives,
-      maxLives: 5,
+      regenCap: 5,
+      earnedCap: 15,
       lastRegenAt: DateTime(2026),
       adWatchedToday: 0,
       adCounterResetAt: DateTime(2026, 1, 2),
