@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/constants/game_constants.dart';
 import '../../../data/animals_data.dart';
 import '../../../data/models/game_state.dart';
 import '../../../domain/game_engine/direction.dart';
@@ -9,13 +8,10 @@ import '../../controllers/game_notifier.dart';
 import '../../widgets/board_widget.dart';
 import '../../widgets/bomb_selection_overlay.dart';
 import '../../widgets/game_background.dart';
+import '../../widgets/game_header.dart';
 import '../../widgets/game_over_modal.dart';
-import '../../widgets/host_banner.dart';
 import '../../widgets/inventory_bar.dart';
-import '../../widgets/lives_indicator.dart';
-import '../../widgets/pause_button_tile.dart';
 import '../../widgets/pause_overlay.dart';
-import '../../widgets/status_panel.dart';
 
 class GameScreen extends ConsumerWidget {
   const GameScreen({super.key});
@@ -35,77 +31,51 @@ class GameScreen extends ConsumerWidget {
       }
     });
 
-    const tileSize = GameConstants.tileSize;
-
     return Scaffold(
       body: GameBackground(
         animal: hostAnimal,
         child: SafeArea(
           child: Stack(
             children: [
-              Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 4),
-                    child: const Align(
-                      alignment: Alignment.centerLeft,
-                      child: LivesIndicator(),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Column(
+                  children: [
+                    GameHeader(
+                      onPauseTap: state.isPaused
+                          ? notifier.resume
+                          : notifier.pause,
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 4),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const HostBanner(),
-                        Expanded(
-                          flex: 2,
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: const StatusPanel(),
-                          ),
-                        ),
-                        PauseButtonTile(
-                          tileSize: tileSize,
-                          onTap: state.isPaused
-                              ? notifier.resume
-                              : notifier.pause,
-                        ),
-                      ],
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onPanEnd: (details) {
+                        if (state.isPaused ||
+                            isGameOver ||
+                            hasWon ||
+                            state.bombMode != null) return;
+                        final v = details.velocity.pixelsPerSecond;
+                        const threshold = 100.0;
+                        if (v.dx.abs() > v.dy.abs()) {
+                          if (v.dx > threshold) {
+                            notifier.onSwipe(Direction.right);
+                          } else if (v.dx < -threshold) {
+                            notifier.onSwipe(Direction.left);
+                          }
+                        } else {
+                          if (v.dy > threshold) {
+                            notifier.onSwipe(Direction.down);
+                          } else if (v.dy < -threshold) {
+                            notifier.onSwipe(Direction.up);
+                          }
+                        }
+                      },
+                      child: const RepaintBoundary(child: BoardWidget()),
                     ),
-                  ),
-                  const Spacer(),
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onPanEnd: (details) {
-                      if (state.isPaused ||
-                          isGameOver ||
-                          hasWon ||
-                          state.bombMode != null) return;
-                      final v = details.velocity.pixelsPerSecond;
-                      const threshold = 100.0;
-                      if (v.dx.abs() > v.dy.abs()) {
-                        if (v.dx > threshold) {
-                          notifier.onSwipe(Direction.right);
-                        } else if (v.dx < -threshold) {
-                          notifier.onSwipe(Direction.left);
-                        }
-                      } else {
-                        if (v.dy > threshold) {
-                          notifier.onSwipe(Direction.down);
-                        } else if (v.dy < -threshold) {
-                          notifier.onSwipe(Direction.up);
-                        }
-                      }
-                    },
-                    child: const RepaintBoundary(child: BoardWidget()),
-                  ),
-                  const Spacer(),
-                  const InventoryBar(),
-                  const SizedBox(height: 8),
-                ],
+                    const Spacer(),
+                    const InventoryBar(),
+                    const SizedBox(height: 8),
+                  ],
+                ),
               ),
               if (state.isPaused) const Positioned.fill(child: PauseOverlay()),
               if (state.bombMode != null)
