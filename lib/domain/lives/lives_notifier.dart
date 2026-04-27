@@ -4,7 +4,6 @@ import '../../data/models/lives_state.dart';
 import '../../data/repositories/lives_repository.dart';
 
 class LivesNotifier extends StateNotifier<LivesState> {
-  static const _migrationKeyV235 = 'lives_reset_v235';
   static const _migrationKeyV238 = 'lives_reset_v238';
 
   final LivesRepository _repo;
