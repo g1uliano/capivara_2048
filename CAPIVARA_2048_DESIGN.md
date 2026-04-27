@@ -2,17 +2,15 @@
 
 > Documento de especificação para desenvolvimento. Pensado para ser alimentado em ferramentas como Claude Code para implementação iterativa.
 >
-> **Status atual:** Fase 2.3.8 concluída ✅ (v0.5.0) — migração SVG→PNG, ConfirmUseDialog universal, anfitrião tile-sized com nome em cima, fundo fixo `#D4F1DE`, LivesIndicator redesenhado (coração + número + badge "Bônus ⭐"), `regenCap`/`earnedCap` no LivesState, badge 99+ e tooltip no inventário. 125 testes passando.
+> **Status atual:** Fase 2.3.9 concluída ✅ (v0.6.0) — fundo do jogo via PNG (`fundo.png`), `LivesStatusBanner` com 4 estados visuais (Completo/Bônus/Restando/Sem vidas) + animações fade/scale, `PauseButtonTile` tile-sized fixo no cabeçalho, `GameScreen` refatorado para `ConsumerWidget` sem pause flutuante. 143 testes passando.
 >
-> **Próximo:** **Fase 2.4 — Sons + Música ambiente** — sons dos 11 animais (~50KB cada), sons de UI completos, música de fundo em loop, integração `audioplayers`, pool de AudioPlayers, mixer nas Configurações.
+> **Próximo:** **Fase 2.4 — Áudio** — pool de `AudioPlayers`, sons de merge/game-over/vitória, música de fundo.
 >
-> **Mudanças principais nesta versão:**
-> - **Assets PNG em vez de SVG** (performance) — todos os 11 animais e os 4 ícones do inventário migram pra PNG
-> - **Anfitrião redesenhado** — tile-sized (mesmas dimensões de um tile do tabuleiro), posicionado acima do primeiro tile (canto superior esquerdo), nome em cima, sem moldura
-> - **Fundo fixo** — sem variação de cor/textura por animal anfitrião (remove `backgroundBaseColor` do uso ativo, simplifica o `GameBackground`)
-> - **Indicador de vidas centralizado no topo** — coração único com número dentro + badge "Completo" quando 5/5; visualização compacta que escala pra qualquer quantidade armazenada
-> - **Confirmação universal** pra uso de itens do inventário
-> - **Sem cap de inventário pra bombas e desfazer** — apenas vidas têm cap (15 ganhas / ilimitado compradas)
+> **Mudanças principais nesta versão (2.3.9):**
+> - **Fundo do jogo via PNG** — `GameBackground` usa `DecoratedBox`+`DecorationImage(BoxFit.cover)` com fallback `#D4F1DE`; `precacheImage` no boot
+> - **`LivesStatusBanner`** — pill com 4 estados: "Completo" (verde `#66BB6A`), "Bônus" (dourado `#FFD54F`), "Restando MM:SS" (laranja `#FFA726`), "Sem vidas" (vermelho `#EF5350`); fade 300ms + scale positivo 1→1.1→1 (200ms)
+> - **`PauseButtonTile`** — botão tile-sized (72dp) com ícone pause + "Pausar", `FittedBox(scaleDown)`, animação tap 0.95
+> - **`GameScreen` → `ConsumerWidget`** — removidos `_pauseTop`, `_headerKey`, `_updatePausePosition`; novo cabeçalho `Row([HostBanner, Expanded(StatusPanel), PauseButtonTile])`
 
 ---
 
@@ -53,11 +51,10 @@
 | Estado | `flutter_riverpod` | Gerenciamento de estado |
 | ID | `uuid` | IDs dos tiles para animação |
 | Animações | `flutter_animate` | Transições suaves |
-| Áudio | `audioplayers` ou `just_audio` | Sons e música |
+| Áudio | `audioplayers` ou `just_audio` | Sons e música (Fase 5) |
 | Persistência | `hive` + `shared_preferences` | Local |
 | Tipografia | `google_fonts` | Fredoka, Nunito |
-| Imagens | `Image.asset` (Flutter nativo) | PNGs dos animais e ícones (Fase 2.3.8) |
-| ~~SVG~~ | ~~`flutter_svg`~~ | **Removido na Fase 2.3.8 (gargalo de performance)** |
+| Imagens | `Image.asset` (Flutter nativo) | PNGs dos animais e ícones |
 | Haptic | `flutter` nativo (HapticFeedback) | Vibração |
 | Localização | `flutter_localizations` + `intl` | PT-BR / EN |
 | Backend | `firebase_core` + `cloud_firestore` + `firebase_auth` | Ranking, contas |
@@ -101,59 +98,40 @@ lib/
 │   │   └── tutorial/
 │   ├── widgets/
 │   │   ├── board_widget.dart            ✅
-│   │   ├── tile_widget.dart             ✅ (PNG na 2.3.8)
+│   │   ├── tile_widget.dart             ✅
 │   │   ├── score_panel.dart             ✅
-│   │   ├── status_panel.dart            ✅
-│   │   ├── host_banner.dart             ✅ (redesenhado tile-sized na 2.3.8)
-│   │   ├── host_artwork.dart            ✅ (PNG na 2.3.8)
-│   │   ├── game_background.dart         ✅ (simplificado pra fundo fixo na 2.3.8)
-│   │   ├── lives_indicator.dart         ✅ (redesenhado coração+número na 2.3.8)
+│   │   ├── status_panel.dart            ✅ (refatorado pra acomodar pause tile-sized na 2.3.9)
+│   │   ├── host_banner.dart             ✅
+│   │   ├── host_artwork.dart            ✅
+│   │   ├── game_background.dart         ✅ (PNG na 2.3.9)
+│   │   ├── lives_indicator.dart         ✅ (faixa estilizada na 2.3.9)
+│   │   ├── lives_status_banner.dart     ← Fase 2.3.9 (faixa "Completo/Bônus/Restando")
+│   │   ├── pause_button_tile.dart       ← Fase 2.3.9 (botão tile-sized)
 │   │   ├── outlined_text.dart           ✅
 │   │   ├── pause_overlay.dart           ✅
 │   │   ├── inventory_bar.dart           ✅
-│   │   ├── inventory_item_button.dart   ✅ (PNG na 2.3.8)
-│   │   ├── confirm_use_dialog.dart      ✅ (Fase 2.3.8)
+│   │   ├── inventory_item_button.dart   ✅
+│   │   ├── confirm_use_dialog.dart      ✅
 │   │   ├── bomb_selection_overlay.dart  ✅
 │   │   └── animal_card.dart
 │   └── controllers/
 └── assets_manifest.dart
 assets/
-├── images/animals/tile/        ← PNGs dos tiles (Fase 2.3.8 — substituem SVGs)
-│   ├── Tanajura.png
-│   ├── LoboGuara.png
-│   ├── Cururu.png
-│   ├── Tucano.png
-│   ├── Sagui.png
-│   ├── Preguica.png
-│   ├── MicoLeao.png
-│   ├── Boto.png
-│   ├── Onca.png
-│   ├── Sucuri.png
-│   └── Capivara.png
-├── images/animals/host/        ← PNGs do anfitrião (Fase 2.3.8 — substituem SVGs)
-│   ├── Tanajura.png
-│   ├── LoboGuara.png
-│   ├── Cururu.png
-│   ├── Tucano.png
-│   ├── Sagui.png
-│   ├── Preguica.png
-│   ├── MicoLeao.png
-│   ├── Boto.png
-│   ├── Onca.png
-│   ├── Sucuri.png
-│   └── Capivara.png
-├── icons/inventory/            ← PNGs dos ícones do inventário (Fase 2.3.8 — substituem SVGs)
-│   ├── bomb_2.png
-│   ├── bomb_3.png
-│   ├── undo_1.png
-│   └── undo_3.png
-├── sounds/animals/             ← Fase 2.4
-├── sounds/ui/                  ← Fase 2.4
-├── music/                      ← Fase 2.4
+├── images/
+│   ├── fundo.png                     ← Fase 2.3.9 (fundo do jogo, substitui cor sólida)
+│   ├── animals/tile/                 ← PNGs dos tiles ✅
+│   │   ├── Tanajura.png ... Capivara.png (11 arquivos)
+│   ├── animals/host/                 ← PNGs do anfitrião ✅
+│   │   ├── Tanajura.png ... Capivara.png (11 arquivos)
+├── icons/inventory/                  ← PNGs dos ícones do inventário ✅
+│   ├── bomb_2.png, bomb_3.png, undo_1.png, undo_3.png
+├── sounds/animals/                   ← Fase 5
+├── sounds/ui/                        ← Fase 5
+├── music/                            ← Fase 5
 └── fonts/
 ```
 
-> **Nota sobre os PNGs:** os arquivos PNG já estão nos diretórios corretos com os mesmos nomes dos SVGs (só muda a extensão). Os SVGs serão removidos na Fase 2.3.8.
+> **Nota sobre `fundo.png`:** o arquivo já está disponível em `assets/images/fundo.png`. A integração efetiva é feita na Fase 2.3.9 item C.
 
 ---
 
@@ -216,8 +194,8 @@ assets/
 
 > Caminhos relativos a `assets/images/animals/`. Nível 5 = Sagui (substituiu Arara-azul na Fase 2.3.7).
 
-#### `backgroundBaseColor` — DEPRECADO na 2.3.8
-A partir da Fase 2.3.8, o fundo do jogo é **fixo** (não varia por animal). O campo `backgroundBaseColor` no model `Animal` permanece pra retrocompatibilidade da Coleção (Fase 2.6), mas **não é mais usado pelo `GameBackground`**.
+#### `backgroundBaseColor` — DEPRECADO desde a 2.3.8
+A partir da Fase 2.3.8, o fundo do jogo é fixo (não varia por animal). O campo `backgroundBaseColor` no model `Animal` permanece pra retrocompatibilidade da Coleção (Fase 2.6), mas não é mais usado pelo `GameBackground`.
 
 ### 4.1 Visual do tile
 - **Fundo:** branco (`#FFFFFF`)
@@ -227,7 +205,7 @@ A partir da Fase 2.3.8, o fundo do jogo é **fixo** (não varia por animal). O c
 - **Sombra:** suave abaixo
 - **Animação idle:** respiração lenta + piscar aleatório (futuro)
 
-### 4.2 Anfitrião do jogo (redesenhado na Fase 2.3.8)
+### 4.2 Anfitrião do jogo
 - **Posição:** acima do tabuleiro, alinhado com o **primeiro tile da primeira linha** (canto superior esquerdo do tabuleiro)
 - **Tamanho:** **igual ao de um tile** — mesmas dimensões (largura e altura) que uma célula do tabuleiro 4x4
 - **Conteúdo (de cima pra baixo):**
@@ -236,29 +214,32 @@ A partir da Fase 2.3.8, o fundo do jogo é **fixo** (não varia por animal). O c
 - **Atualização:** muda quando o jogador forma um tile de nível superior ao recorde da partida
 - **Animação:** transição suave (fade + scale) ao trocar
 - **Sem placeholder antes do primeiro tile** — o slot do anfitrião fica vazio até o primeiro animal aparecer (decidido na Fase 2.3.6 item B)
-- **Espaço à direita do anfitrião** (onde antes ficava o `StatusPanel` ao lado): pode ficar livre ou receber elementos da UI a critério do `LayoutBuilder`. As vidas vão pro topo central agora — ver 4.5
+- **Espaço à direita do anfitrião** (acima das colunas 2-4 do tabuleiro): recebe o `StatusPanel` (cronômetro/score/recorde) e o **botão de pause tile-sized** (Fase 2.3.9 item B)
 
-### 4.3 Fundo do jogo — fixo (a partir da Fase 2.3.8)
-- **Cor base:** verde-menta claro (`#D4F1DE`) ou outra cor neutra padrão definida em 10.2
-- **Sem textura geométrica por animal** (placeholder removido)
-- **Sem transição de cor** ao mudar anfitrião (não há mais variação)
-- O `GameBackground` widget é simplificado pra um `Container` com cor única
-- Decisão de design: simplifica o jogo, melhora performance (sem `AnimatedContainer` constante), e foca a atenção do jogador no tabuleiro e no anfitrião
+### 4.3 Fundo do jogo (atualizado na Fase 2.3.9 — PNG)
+- **A partir da Fase 2.3.9:** fundo é uma imagem PNG (`assets/images/fundo.png`) renderizada em tela cheia
+- **Configuração de renderização:**
+  - `BoxFit.cover` (preenche a tela toda, pode cortar bordas) — preserva proporção
+  - Alternativa em telas largas/estreitas onde `cover` corta demais: `BoxFit.fill` (estica) — decidir no brainstorm
+- **Sem variação por animal** — fundo é o mesmo em qualquer fase do jogo (mantém a regra da Fase 2.3.8)
+- **Cor de fallback:** `#D4F1DE` (verde-menta) é exibido **apenas se o PNG falhar** ao carregar
 
 ### 4.4 Texto sobre cor — legibilidade
 - Textos brancos importantes têm contorno preto sutil (1–1.5px) com anti-aliasing suave (Fase 2.3.6 item A)
 - Aplicado em: nome do anfitrião, cronômetro, pontuação, recorde, todos os textos do `PauseOverlay`
+- **Atenção (Fase 2.3.9):** com fundo PNG variado, alguns textos podem ficar ilegíveis em regiões claras/escuras da imagem. Avaliar se reforça contornos ou aplica gradient overlay no fundo
 
-### 4.5 Indicador de vidas (redesenhado na Fase 2.3.8)
+### 4.5 Indicador de vidas (refinado na Fase 2.3.9)
 - **Posição:** **topo central** da tela (acima do anfitrião e do tabuleiro)
-- **Visual:**
-  - **Coração único** (ícone, ~36x36dp) com **o número de vidas dentro** (Fredoka Bold, sobreposto ao coração)
-  - **Badge à direita do coração** com texto:
-    - Se vidas = 5/5: badge "Completo" (verde-folha, indica banco cheio sem ter que processar regen)
-    - Se vidas < 5: badge com **timer regressivo** pra próxima vida (formato MM:SS) — substitui o "Completo"
-    - Se vidas > 5 (compradas, ou recém-recebidas como recompensa): apenas o número dentro do coração; badge ausente ou ainda mostrando "Completo" (banco está acima do cap de regen)
-- **Comportamento de tap:** abre painel/dialog explicando o sistema de vidas e mostrando opções (ex: assistir anúncio se ≤4 vidas, link pra loja)
-- **Visualização escala bem:** o jogador pode ter 3, 5, 10, 50 vidas armazenadas — sempre 1 ícone com número, nunca uma fileira de corações que estoure a tela
+- **Visual atualizado na 2.3.9:**
+  - **Coração único** (ícone, ~36x36dp) com **número de vidas dentro** (Fredoka Bold, sobreposto, com `OutlinedText`)
+  - **Faixa estilizada à direita do coração** (retângulo arredondado tipo banner/pill, com gradiente ou cor sólida + sombra) com texto interno mudando conforme o estado:
+    - **Vidas = 5:** texto **"Completo"** (cor verde-folha `#66BB6A`)
+    - **Vidas > 5 e ≤ 15:** texto **"Bônus"** (cor dourada `#FFD54F`)
+    - **Vidas < 5:** texto **"Restando"** seguido do timer regressivo MM:SS (cor cinza neutra ou laranja-aviso)
+  - Texto da faixa em Fredoka SemiBold, ~13sp, com `OutlinedText` pra legibilidade sobre o fundo PNG
+- **Comportamento de tap:** abre dialog explicando o sistema de vidas e mostrando opções
+- **Visualização escala bem:** o jogador pode ter 3, 5, 10, 50 vidas — sempre 1 ícone com número, nunca uma fileira que estoure
 
 ---
 
@@ -283,13 +264,22 @@ A partir da Fase 2.3.8, o fundo do jogo é **fixo** (não varia por animal). O c
 
 > **Atenção (única limitação de inventário):** apenas vidas têm cap de armazenamento. Bombas e desfazer **não têm cap** — o jogador pode acumular quantos quiser.
 
-### 5.3 Vidas zeradas
+### 5.3 Estados visuais da faixa do `LivesIndicator` (Fase 2.3.9)
+| Faixa | Condição | Cor sugerida |
+|---|---|---|
+| **"Completo"** | `current == 5` | Verde-folha `#66BB6A` |
+| **"Bônus"** | `5 < current ≤ 15` | Dourado `#FFD54F` |
+| **"Restando MM:SS"** | `current < 5` | Cinza neutro `#9E9E9E` ou laranja-aviso `#FF8C42` |
+
+> **Caso especial — `current > 15`** (raro, só com compras massivas): tratar como "Bônus" também. O texto da faixa não distingue entre 16 e 99 — quem quiser ver o número exato, lê o número dentro do coração.
+
+### 5.4 Vidas zeradas
 1. Diálogo: "Você ficou sem vidas! Quer assistir um anúncio de 30s pra ganhar +1 vida?"
 2. Aceita: anúncio recompensado → +1 vida
 3. **Limite diário:** até 40 anúncios recompensados de vida por dia
 4. Após o limite: opção bloqueada até a meia-noite (timezone do dispositivo)
 
-### 5.4 Modelo de dados
+### 5.5 Modelo de dados
 ```dart
 class LivesState {
   final int current;              // pode ser > 15 se houver compras
@@ -301,7 +291,7 @@ class LivesState {
 }
 ```
 
-### 5.5 Lógica de adicionar vidas
+### 5.6 Lógica de adicionar vidas
 - **Regen automática:** soma 1 enquanto `current < regenCap`
 - **Recompensa:** soma N, mas resultado fica clamped em `min(current + N, earnedCap)` — se já tem 14 e ganha 5, vai pra 15 (não 19)
 - **Compra:** soma N **sem cap** — se tem 14 e compra 10, vai pra 24
@@ -324,21 +314,21 @@ class LivesState {
 
 #### Localização
 - **`InventoryBar`** no rodapé da tela de jogo, abaixo do tabuleiro
-- Mostra cada item com **ícone PNG** (Fase 2.3.8), **contador (badge)** e **estado**
+- Mostra cada item com **ícone PNG**, **contador (badge)** e **estado**
 - Itens com contador 0 ficam **acinzentados e desabilitados**, mas continuam visíveis
 
 #### Ícones do inventário
 PNGs em `assets/icons/inventory/`:
 - `bomb_2.png`, `bomb_3.png`, `undo_1.png`, `undo_3.png`
 
-#### Confirmação universal antes do uso (NOVO na Fase 2.3.8)
+#### Confirmação universal antes do uso (Fase 2.3.8)
 **TODOS os itens do inventário exigem confirmação antes de serem usados.** Não há mais ação imediata em nenhum tap de item.
 
 **Fluxo unificado:**
 1. Tap no ícone do item → abre `ConfirmUseDialog` com:
    - Ícone grande do item
    - Texto: "Usar [nome do item]?" (ex: "Usar Bomba 2?")
-   - Sub-texto explicativo do efeito (ex: "Explode 2 casas adjacentes escolhidas")
+   - Sub-texto explicativo do efeito
    - Contador atual (ex: "Você tem 3 deste item")
    - Botão **"Cancelar"** e botão **"Usar"** (destacado)
 2. Cancelar → fecha dialog, nada muda
@@ -346,18 +336,18 @@ PNGs em `assets/icons/inventory/`:
    - **Desfazer:** executa `gameNotifier.undo(steps)`, animação reversa (300ms), decrementa contador
    - **Bomba:** entra em modo seleção (`BombSelectionOverlay`); jogador escolhe casas; depois confirma "Explodir" no overlay → animação de explosão (500ms), tiles removidos, decrementa contador
 
-> **Por que confirmar até pra Desfazer:** evita uso acidental (tap fora do tabuleiro durante swipe), respeita o valor escasso do item, e padroniza o comportamento da `InventoryBar`.
+> **Por que confirmar até pra Desfazer:** evita uso acidental, respeita o valor escasso do item, padroniza o comportamento da `InventoryBar`.
 
 #### Regras de bombas
-- **Bomba 2:** 2 casas adjacentes (compartilhar uma borda — 4-vizinhos: cima/baixo/esquerda/direita)
-- **Bomba 3:** 3 casas, livre escolha (sem restrição de adjacência)
+- **Bomba 2:** 2 casas adjacentes (compartilhar uma borda — 4-vizinhos)
+- **Bomba 3:** 3 casas, livre escolha
 - Não pode explodir células vazias: feedback "Selecione um tile"
 - Cancelar no `BombSelectionOverlay` não consome o item
 
 ### 6.3 Game over com itens disponíveis
 1. Modal de Game Over checa `Inventory`
-2. Se desfazer ≥1: oferece "Desfazer última jogada" (ressuscita) — passa pelo `ConfirmUseDialog`
-3. Se bomba ≥1: oferece "Usar bomba" (entra em modo seleção) — passa pelo `ConfirmUseDialog`
+2. Se desfazer ≥1: oferece "Desfazer última jogada" (passa pelo `ConfirmUseDialog`)
+3. Se bomba ≥1: oferece "Usar bomba" (passa pelo `ConfirmUseDialog`)
 4. Se sem itens: oferece anúncio recompensado pra item grátis
 5. Sempre oferece link pra loja
 
@@ -505,7 +495,8 @@ users/{userId}/personalRecords
 ### 10.2 Paleta principal
 | Uso | Cor | Hex |
 |---|---|---|
-| **Fundo do jogo (fixo, Fase 2.3.8)** | **Verde-menta claro** | **`#D4F1DE`** |
+| **Fundo do jogo (Fase 2.3.9)** | **`assets/images/fundo.png`** | — (PNG) |
+| Fundo (fallback se PNG falhar) | Verde-menta claro | `#D4F1DE` |
 | Fundo (folhagem alternativa) | Verde-floresta médio | `#3FA968` |
 | Tabuleiro | Madeira clara | `#E8D5B7` |
 | Célula vazia | Madeira sombreada | `#C9B79C` |
@@ -515,6 +506,8 @@ users/{userId}/personalRecords
 | Texto sobre cor | Branco-creme | `#FFF8E7` |
 | Contorno de texto | Preto | `#000000` |
 | Sucesso / "Completo" | Verde-folha | `#66BB6A` |
+| **"Bônus" (faixa de vidas)** | **Dourado** | **`#FFD54F`** |
+| **"Restando" (faixa de vidas)** | **Cinza neutro** ou laranja-aviso | **`#9E9E9E`** ou `#FF8C42` |
 | Alerta | Vermelho-açaí | `#C0392B` |
 | Coração de vidas | Vermelho-coração | `#E53935` |
 | Premium/dourado | Dourado | `#FFD54F` |
@@ -524,7 +517,8 @@ users/{userId}/personalRecords
 - **Texto/UI**: `Nunito` (legível, amigável)
 - **Pontuação e número do tile**: `Fredoka Bold`
 - **Número dentro do coração de vidas**: `Fredoka Bold`, branco com `OutlinedText`
-- **Texto branco sobre fundo dinâmico**: contorno preto 1–1.5px com anti-aliasing (ver 4.4 e Fase 2.3.6 item A)
+- **Texto da faixa de vidas (Completo/Bônus/Restando)**: `Fredoka SemiBold`, ~13sp, com `OutlinedText`
+- **Texto branco sobre fundo dinâmico**: contorno preto 1–1.5px com anti-aliasing (ver 4.4)
 
 ### 10.4 Iconografia
 - Ícones com traço arredondado (Phosphor/Lucide "duotone")
@@ -538,7 +532,6 @@ users/{userId}/personalRecords
 | Merge | Pop (scale 1 → 1.2 → 1), 250ms |
 | Merge da Capivara | Flash dourado, partículas de folhas, zoom out, 1500ms |
 | Troca de anfitrião | Fade + scale, 400ms |
-| ~~Mudança de fundo~~ | **Removido — fundo agora é fixo** |
 | Game Over | Tabuleiro escurece, modal slide+fade |
 | Botão pressionado | Scale 1 → 0.95 → 1, 100ms |
 | Pause overlay (entrada) | Fade do blur 0 → max + scale do conteúdo, 250ms |
@@ -549,11 +542,14 @@ users/{userId}/personalRecords
 | Bomba — célula selecionada | Pulsa loop infinito, opacidade 0.7 ↔ 1.0, 600ms |
 | `LivesIndicator` — vida ganha | Coração pulsa (scale 1 → 1.15 → 1), 300ms |
 | `LivesIndicator` — vida perdida | Coração tremula (rotate ±5°), 200ms |
+| **Faixa de vidas — transição entre estados** | **Fade entre cores (300ms)** quando muda de "Restando" pra "Completo" ou de "Completo" pra "Bônus" |
 | `ConfirmUseDialog` (entrada) | Fade + slide-up, 200ms |
+| **Botão pause tile-sized — pressionado** | **Scale 1 → 0.95 → 1, 100ms** |
 
 ---
 
 ## 11. Sons e Música
+*(Implementação adiada para a Fase 5 — junto com polimento e lançamento)*
 
 ### 11.1 Sons dos animais
 | Animal | Som sugerido |
@@ -612,8 +608,9 @@ users/{userId}/personalRecords
    ↓
 [Home/Menu Principal]
    ├── [Jogo Clássico]
-   │      ├── (vidas no topo central)
+   │      ├── (vidas no topo central — coração + faixa "Completo/Bônus/Restando")
    │      ├── (anfitrião acima do primeiro tile, com nome em cima e PNG embaixo)
+   │      ├── (botão pause tile-sized fixo, ao lado direito do anfitrião)
    │      ├── (tabuleiro 4x4)
    │      ├── (inventário no rodapé)
    │      └── [Game Over Modal]
@@ -636,27 +633,33 @@ users/{userId}/personalRecords
 
 ### 12.2 Tela: Home
 - Logo grande com a Capivara mascote ao centro
-- **Indicador de vidas** no topo central (coração único + número + badge "Completo"/timer — ver 4.5)
+- **Indicador de vidas** no topo central (coração + faixa "Completo/Bônus/Restando" — ver 4.5)
 - Botão grande **"Jogar"** (Novo jogo / Continuar partida salva)
 - Cards: Loja, Ranking, Recompensa Diária (com badge), Convidar
 - Ícones menores: Coleção, Configurações, Como Jogar
 - Background: cena da floresta com paralaxe leve
 
-### 12.3 Tela: Jogo (redesenhada na Fase 2.3.8)
+### 12.3 Tela: Jogo (refinada na Fase 2.3.9)
 **Layout (de cima pra baixo):**
 
-1. **Topo central:** `LivesIndicator` (coração + número + badge "Completo"/timer)
-2. **Acima do tabuleiro, lado esquerdo (sobre a 1ª coluna):** `HostBanner` tile-sized
-   - Nome do animal em cima (com `OutlinedText`)
-   - PNG do animal embaixo, ocupando o slot tile-sized
-3. **Acima do tabuleiro, lado direito:** `StatusPanel` (cronômetro + pontuação + recorde + pause integrado)
-4. **Centro:** tabuleiro 4x4
-5. **Rodapé:** `InventoryBar` (4 itens com ícones PNG + badges de contador)
+1. **Topo central:** `LivesIndicator` (coração + faixa estilizada)
+2. **Acima do tabuleiro, lado esquerdo (sobre a 1ª coluna):** `HostBanner` tile-sized (nome em cima, PNG embaixo)
+3. **Acima do tabuleiro, lado direito (sobre a 4ª coluna):** **`PauseButtonTile`** — botão de pause tile-sized fixo (Fase 2.3.9 item B)
+4. **Acima do tabuleiro, espaço entre anfitrião e botão pause (sobre colunas 2-3):** `StatusPanel` (cronômetro + pontuação + recorde)
+5. **Centro:** tabuleiro 4x4
+6. **Rodapé:** `InventoryBar` (4 itens com ícones PNG + badges de contador)
 
-> **Nota de layout:** removida a regra antiga de "anfitrião alinhado às 2 primeiras colunas". Agora o anfitrião ocupa apenas a largura de **1 tile** (a primeira coluna). O lado direito do cabeçalho fica disponível pro `StatusPanel`.
+> **Nota de layout:** o cabeçalho acima do tabuleiro agora é dividido em 3 zonas alinhadas às 4 colunas:
+> - Coluna 1: anfitrião tile-sized
+> - Colunas 2 e 3: `StatusPanel` (cronômetro/score/recorde)
+> - Coluna 4: botão de pause tile-sized
 
-#### 12.3.1 Posicionamento do botão pause
-Integrado ao `StatusPanel` (canto direito) ou flutuante com `LayoutBuilder` garantindo margem de segurança ≥12dp.
+#### 12.3.1 Posicionamento do botão pause (atualizado na Fase 2.3.9)
+- **Tile-sized e fixo** — ocupa o espaço da 4ª coluna do tabuleiro, acima dela
+- **NÃO é mais flutuante** — substitui completamente o pause flutuante anterior
+- Ícone de pausa centralizado (Material `Icons.pause_circle` ou similar) com texto "Pausar" embaixo
+- Mesmas dimensões de um tile do tabuleiro (largura e altura)
+- Animação de tap: scale 1 → 0.95 → 1 (100ms)
 
 #### 12.3.2 Pause overlay — vidro fosco cobrindo o tabuleiro
 **Regra crítica:** quando o jogo está pausado, o jogador não pode estudar o tabuleiro.
@@ -717,8 +720,6 @@ class Animal {
   final Color backgroundBaseColor;      // usado apenas na Coleção (fase 2.6); ignorado no jogo
 }
 ```
-
-> Os campos `hostAspectRatio`, `backgroundTexturePath` e `texturePattern` foram removidos na 2.3.8 — o anfitrião agora é tile-sized (proporção fixa 1:1) e o fundo é fixo.
 
 ### 13.2 Tile
 ```dart
@@ -908,192 +909,30 @@ class ShareCode {
 - C — `OutlinedText` completo no `PauseOverlay`
 - D — Ícones SVG do inventário (bomb 2/3, undo 1/3)
 - E — Tela debug `AnimalsGalleryScreen`
-- **Identificado:** processamento de SVG em runtime causa lentidão — motiva a Fase 2.3.8
+- **Identificado:** processamento de SVG em runtime causa lentidão — motivou a Fase 2.3.8
 
 ### ✅ Fase 2.3.8 — Otimização de Assets + Refinamentos de UI (v0.5.0)
-**Objetivo:** corrigir gargalo de performance (SVG → PNG) e fazer 7 ajustes de UI/UX que melhoram a experiência de jogo. Os PNGs já estão nos diretórios corretos com os mesmos nomes dos SVGs (só muda a extensão).
+- A — Migração SVG → PNG (remove `flutter_svg`, troca por `Image.asset`)
+- B — `ConfirmUseDialog` universal pra todos os 4 itens do inventário
+- C — Anfitrião redesenhado: tile-sized, posicionado sobre o 1º tile, nome em cima
+- D — Fundo fixo `#D4F1DE` (sem variação por animal)
+- E — `LivesIndicator`: coração único + número + badge "Bônus ⭐"
+- F — `LivesState` com `regenCap`/`earnedCap`, `addEarned`/`addPurchased`
+- G — Inventário sem cap pra bombas e desfazer (badge 99+ + tooltip)
+- 125 testes passando
 
-**Entregues:** A (SVG→PNG + precache), B (ConfirmUseDialog universal), C (anfitrião tile-sized, nome em cima), D (fundo fixo `#D4F1DE`), E (LivesIndicator: coração+número+badge "Bônus ⭐"), F (regenCap/earnedCap, addEarned/addPurchased), G (badge 99+, tooltip long-press). 125 testes, 0 falhas.
+### ✅ Fase 2.3.9 — Refinamentos visuais (v0.6.0)
+**Objetivo:** três ajustes de UI identificados em uso real após a 2.3.8 — fundo do jogo via PNG, faixa do `LivesIndicator` com 4 estados visuais distintos, botão de pause tile-sized fixo no cabeçalho.
 
-**Estimativa:** ~~4–6 dias.~~
-
-#### A — Migrar todos os assets de SVG para PNG (entrega central)
-**Bug atual:** o jogo está lento porque `flutter_svg` processa cada SVG em runtime. Com 11 animais (×2 versões: tile + host) e 4 ícones do inventário, são até 26 SVGs sendo decodificados — gargalo perceptível especialmente em devices Android medianos.
-
-**Mudanças:**
-- **Remover** dependência `flutter_svg` do `pubspec.yaml`
-- Atualizar `pubspec.yaml` declarando os mesmos diretórios mas confirmando que apontam pra PNGs (nada muda no caminho — só a extensão dos arquivos)
-- Refatorar `tile_widget.dart`:
-  - Trocar `SvgPicture.asset(animal.svgPath)` por `Image.asset(animal.tilePngPath)`
-  - Manter `Opacity(opacity: 0.28)` da marca d'água
-  - Manter `BoxFit.contain` (Image.asset suporta direto)
-  - Pré-cache via `precacheImage(AssetImage(...), context)` em vez de `precachePicture`
-- Refatorar `host_artwork.dart`:
-  - Trocar `SvgPicture.asset(animal.hostSvgPath)` por `Image.asset(animal.hostPngPath)`
-  - Sem moldura, sem fundo branco, ocupando o slot tile-sized (ver item C)
-- Refatorar `inventory_item_button.dart`:
-  - Trocar `SvgPicture.asset(svgPath, ...)` por `Image.asset(pngPath, width: 32, height: 32)`
-  - Manter `colorFilter` se já estava aplicado pra estado disabled (`Image.asset` aceita via `color` + `colorBlendMode`)
-- Atualizar `animals_data.dart`: renomear campos `svgPath` → `tilePngPath` e `hostSvgPath` → `hostPngPath`; mudar extensões em todos os 11 entries
-- Apagar arquivos `.svg` dos diretórios `assets/images/animals/tile/`, `assets/images/animals/host/`, `assets/icons/inventory/` (manter só PNGs)
-
-**Casos de teste obrigatórios:**
-- Cada um dos 11 níveis renderiza com PNG correto na tile (snapshot test)
-- Anfitrião renderiza PNG correto pra cada animal
-- Itens do inventário renderizam PNGs (`bomb_2`, `bomb_3`, `undo_1`, `undo_3`)
-- **Performance:** medir FPS médio em 60s de gameplay vs versão 0.4.0 (SVG) — deve melhorar visivelmente em devices fracos
-- App startup mais rápido (sem decodificação de SVGs em sequência)
-- Pré-cache de PNGs via `precacheImage` no boot não causa lag visível
-- Sem dependência residual de `flutter_svg` (lint: import deve falhar se alguém tentar usar)
-
-#### B — Confirmação universal pra TODOS os itens do inventário
-**Bug atual:** Desfazer já tinha confirmação, mas Bomba abre direto o modo de seleção. Comportamento inconsistente.
-
-**Mudanças:**
-- Criar widget `confirm_use_dialog.dart`:
-  - Recebe: `String itemName`, `String description`, `int currentCount`, `IconData icon` (ou `String pngPath`), `VoidCallback onConfirm`
-  - Layout: ícone grande, título "Usar [itemName]?", sub-texto descritivo, contador atual, botões Cancelar/Usar
-- Refatorar `InventoryItemButton.onTap`:
-  - Sempre abre `ConfirmUseDialog` antes de qualquer ação
-  - Se confirma:
-    - **Desfazer:** chama `gameNotifier.undo(steps)`, decrementa contador
-    - **Bomba:** abre `BombSelectionOverlay` (que tem sua própria confirmação no botão "Explodir" — esse passo continua)
-- Garantir que o dialog usa as mesmas convenções de UI (botões grandes, cores do tema, sombra inferior)
-- Som específico de confirmação ao tocar "Usar" (ver 11.2)
-
-**Casos de teste obrigatórios:**
-- Tap em Desfazer 1 → abre `ConfirmUseDialog`; cancela → nada muda; confirma → desfaz e decrementa
-- Tap em Desfazer 3 → mesma coisa
-- Tap em Bomba 2 → abre `ConfirmUseDialog`; cancela → nada muda; confirma → entra em modo seleção
-- Tap em Bomba 3 → mesma coisa
-- Item desabilitado (contador 0): tap não abre dialog (visual já é acinzentado)
-- Snapshot test do `ConfirmUseDialog` pra cada um dos 4 itens
-
-#### C — Anfitrião redesenhado: tile-sized, posicionado sobre o 1º tile, nome em cima
-**Bug atual:** o anfitrião ocupa 2 colunas e tem o nome embaixo do PNG. Decisão é diminuir pra 1 tile e inverter a ordem (nome em cima).
-
-**Mudanças:**
-- Refatorar `host_banner.dart`:
-  - Layout vertical: `Column` com `Text` (nome) em cima, `HostArtwork` (PNG tile-sized) embaixo
-  - Largura total = largura de 1 tile + nada de margem extra (alinha ao 1º tile da 1ª coluna do tabuleiro)
-  - Altura = altura do tile + altura do texto + spacing (~4dp)
-- Refatorar `host_artwork.dart`:
-  - Container quadrado (1:1) com largura/altura dinâmica calculada via `LayoutBuilder` baseada na largura do tabuleiro
-  - `Image.asset(animal.hostPngPath, fit: BoxFit.contain)` ocupando o slot inteiro
-  - Sem moldura, sem borda, sem fundo branco
-- Atualizar layout da `GameScreen`:
-  - Remover regra antiga de "anfitrião alinhado às 2 primeiras colunas"
-  - Posicionar `HostBanner` sobre a 1ª coluna do tabuleiro (canto superior esquerdo)
-  - O espaço acima das colunas 2-4 fica disponível pro `StatusPanel` (cronômetro/score/pause)
-- Nome do animal usa `OutlinedText` (Fredoka SemiBold, ~14sp pra caber na largura de 1 tile)
-
-**Casos de teste obrigatórios:**
-- Snapshot test: `HostBanner` ocupa exatamente largura de 1 tile, alinhado ao 1º tile do tabuleiro
-- Nome do animal aparece em cima do PNG, não embaixo
-- PNG ocupa o slot quadrado sem distorção (`BoxFit.contain`)
-- Para cada um dos 11 animais: nome cabe na largura sem overflow (testar com "Mico-leão-dourado" — nome longo)
-- `LayoutBuilder` ajusta o tamanho do tile do anfitrião proporcional ao tabuleiro (em telas estreitas e largas)
-
-#### D — Fundo fixo (sem variação por animal)
-**Bug atual:** o fundo muda de cor/textura conforme o animal anfitrião — adiciona complexidade e pode atrapalhar a leitura do tabuleiro.
-
-**Mudanças:**
-- Refatorar `game_background.dart`:
-  - Reduzir a um `Container(color: AppColors.menta)` (`#D4F1DE`)
-  - Remover toda lógica de `AnimatedContainer`, `Tween<Color>`, textura, crossfade
-  - Remover dependência de `backgroundBaseColor` do `Animal` (manter o campo no model pra retrocompatibilidade da Coleção, mas não usar aqui)
-- Atualizar `pubspec.yaml`: pasta `assets/images/textures/` pode ser removida ou mantida vazia (decidir no brainstorm — provavelmente remover, junto com a Fase 2.3.8.A antiga que não vai mais existir)
-- Atualizar `animations_table` em 10.5: remover entrada "Mudança de fundo"
-- Atualizar seção 4.3 do doc (já feito)
-
-**Casos de teste obrigatórios:**
-- `GameBackground` renderiza cor única (`#D4F1DE`) independente do anfitrião
-- Trocar de Tanajura pra Capivara: fundo NÃO muda (assert direto)
-- Performance: nenhum `AnimatedContainer` em loop no fundo (verificar com debug paint que o widget não está rebuildando)
-- Tabuleiro continua bem visível no fundo menta (contraste adequado)
-
-#### E — Indicador de vidas: topo central, coração único + número + badge "Completo"/timer
-**Bug atual:** o indicador atual mostra vários corações em fileira; não escala bem se o jogador tem muitas vidas (compradas).
-
-**Mudanças:**
-- Refatorar `lives_indicator.dart`:
-  - Layout horizontal: `Row` com `[Heart com número dentro] [Badge]`
-  - **Heart com número:**
-    - `Stack` com ícone de coração (`Icon(Icons.favorite, size: 36, color: AppColors.heartRed)`) por baixo
-    - `OutlinedText` por cima (`Fredoka Bold`, branco, ~16sp) com o número de vidas
-    - Centralizado dentro do coração
-  - **Badge à direita:**
-    - Se `current >= 5`: pill verde com texto "Completo" (Nunito SemiBold, ~12sp, branco)
-    - Se `current < 5`: pill cinza com timer regressivo MM:SS pra próxima vida (calculado a partir de `nextRegenAt`)
-  - Tap no indicador → abre dialog explicativo (ou navega pra Loja)
-- Posicionar no **topo central** da `GameScreen` e da `HomeScreen` (acima do `HostBanner` e do tabuleiro)
-- Animação:
-  - Vida ganha: coração pulsa (300ms) + badge atualiza
-  - Vida perdida (game over): coração tremula (200ms) + número decrementa
-
-**Casos de teste obrigatórios:**
-- `LivesIndicator` com 1 vida → coração com "1" + timer regressivo
-- `LivesIndicator` com 4 vidas → coração com "4" + timer
-- `LivesIndicator` com 5 vidas → coração com "5" + badge "Completo"
-- `LivesIndicator` com 10 vidas (compradas) → coração com "10" + badge "Completo" (banco está acima do cap de regen)
-- `LivesIndicator` com 99 vidas → coração com "99" + badge "Completo" (não estoura layout)
-- Timer regressivo atualiza a cada segundo
-- Tap abre dialog/painel
-- Snapshot test pra cada estado (1, 4, 5, 10, 99)
-
-#### F — Sistema de vidas: confirmar regras de armazenamento (5/15/ilimitado)
-As regras já estão na seção 5, mas precisam ser refletidas no código:
-
-**Mudanças:**
-- Atualizar `LivesState` model:
-  - Adicionar campo `regenCap` (= 5, constante) e `earnedCap` (= 15, constante)
-  - Manter `current` como `int` sem upper bound (pode ser 100, 1000)
-- Atualizar `LivesNotifier`:
-  - Método `regenerate()`: só roda se `current < regenCap`; soma 1; atualiza `nextRegenAt`
-  - Método `addEarned(int amount)`: `current = min(current + amount, earnedCap)` — pra recompensas
-  - Método `addPurchased(int amount)`: `current = current + amount` — sem cap
-  - Método `consume()`: decrementa 1, agenda regen se `current < regenCap`
-- Verificar que recompensas (diárias, ranking, recorde, convite) chamam `addEarned` e compras chamam `addPurchased`
-
-**Casos de teste obrigatórios:**
-- Estado inicial: `current = 5`, `regenCap = 5`, `earnedCap = 15`, `nextRegenAt = null`
-- Game over: `current` decrementa pra 4, `nextRegenAt` é agendado pra +30min
-- Após 30min de regen: `current` volta pra 5, `nextRegenAt` vira null
-- Receber recompensa de 5 vidas com `current = 14`: vai pra 15 (não 19) — clamp em earnedCap
-- Receber recompensa de 5 vidas com `current = 15`: fica em 15 (clamp)
-- Comprar 10 vidas com `current = 14`: vai pra 24 (sem cap)
-- Comprar 10 vidas com `current = 50`: vai pra 60 (sem cap)
-- Após game over com `current = 24`: vai pra 23, `nextRegenAt = null` (porque ainda > regenCap)
-- Após game over com `current = 6`: vai pra 5, `nextRegenAt = null`
-- Após game over com `current = 5`: vai pra 4, `nextRegenAt = +30min` (regen ativa abaixo do cap)
-
-#### G — Inventário sem cap pra bombas e desfazer
-**Bug atual:** doc anterior mencionava cap de 15 pra inventário. Decisão é remover — só vidas têm cap.
-
-**Mudanças:**
-- Atualizar `Inventory` model: remover qualquer constante `MAX_INVENTORY` ou similar
-- `InventoryNotifier.add(ItemType, int)`: soma sem clamp
-- Badges de contador no `InventoryBar`: se passar de 99, mostrar "99+" (texto curto pra não estourar layout)
-- Documentação na seção 6.1: explicitar "sem cap" pros 4 itens
-
-**Casos de teste obrigatórios:**
-- Comprar 4 bombas com `bomb3 = 100`: fica em 104
-- Receber recompensa com `undo1 = 50`: soma normalmente
-- Badge no botão mostra "99+" quando contador > 99
-- Sem clamp/cap em nenhum item do `Inventory`
+- C — `GameBackground` com `fundo.png` via `DecoratedBox`+`DecorationImage(BoxFit.cover)`, fallback `#D4F1DE`, `precacheImage` no boot
+- A — `LivesStatusBanner` (pill 120dp): "Completo" verde `#66BB6A`, "Bônus" dourado `#FFD54F`, "Restando MM:SS" laranja `#FFA726`, "Sem vidas" vermelho `#EF5350`; `AnimatedSwitcher` fade 300ms + `ScaleTransition` 1→1.1→1 (200ms) em transições positivas
+- B — `PauseButtonTile` (72dp tile-sized): branco, borda laranja 3px, ícone + "Pausar", `FittedBox(scaleDown)`, tap scale 0.95; `GameScreen` refatorado pra `ConsumerWidget` — removidos `_pauseTop`/`_headerKey`/`_updatePausePosition`; cabeçalho `Row([HostBanner, Expanded(StatusPanel), PauseButtonTile])`
+- 143 testes passando
+- Tiles brancos têm contraste adequado
+- Textos com `OutlinedText` permanecem legíveis (especialmente sobre regiões claras/escuras do PNG)
+- Performance: medir FPS em 60s de gameplay vs versão 0.5.0 (cor sólida) — `BoxFit.cover` num PNG estático não deve impactar (cache nativo do Flutter)
 
 ---
-
-### 🔜 Fase 2.4 — Sons + Música ambiente (1–2 semanas)
-- Sons dos 11 animais (~50KB cada, OGG/M4A/MP3)
-- Sons de UI completos
-- Música ambiente: loop de floresta com flautas + marimba
-- Integrar com `audioplayers` ou `just_audio`
-- Pool de AudioPlayers
-- Mixer simples nas Configurações
-- Pré-carregar tudo no início do app
-
-> **Nota:** texturas de fundo (que estavam previstas na antiga 2.3.8.A) foram removidas — fundo é fixo agora.
 
 ### 🔜 Fase 2.5 — Recompensas diárias (3 dias)
 - Tela de recompensas com grid 7 dias
@@ -1131,13 +970,27 @@ As regras já estão na seção 5, mas precisam ser refletidas no código:
 - Splash screen final
 - Validação visual completa
 
-### 🔜 Fase 5 — Polimento e Lançamento
+### 🔜 Fase 5 — Áudio + Polimento + Lançamento
+**Áudio (parte 1 — adiada de fases anteriores):**
+- Sons dos 11 animais (~50KB cada, OGG/M4A/MP3)
+- Sons de UI completos
+- Música ambiente: loop de floresta com flautas + marimba
+- Integrar com `audioplayers` ou `just_audio`
+- Pool de AudioPlayers
+- Mixer simples nas Configurações
+- Pré-carregar tudo no início do app
+
+**Polimento e lançamento (parte 2):**
 - Localização PT-BR / EN
-- Acessibilidade
+- Acessibilidade (contraste, leitor de tela, fonte ajustável)
 - Modo escuro (opcional)
 - Testes em dispositivos reais
 - Build para iOS, Android, Web
-- Submissão App Store / Play Store
+- Submissão App Store / Play Store / Web hosting
+- Política de privacidade e termos de uso
+- LGPD/COPPA compliance
+
+> **Por que áudio foi adiado:** o foco até aqui foi mecânica + UI visual. Áudio adiciona polish significativo mas não é bloqueador pra validar gameplay. Implementar perto do lançamento garante que os sons casem com a versão final do jogo (sem retrabalho se a UI mudar de novo).
 
 ---
 
@@ -1148,17 +1001,18 @@ As regras já estão na seção 5, mas precisam ser refletidas no código:
 - Forma + cor + número + nome
 - `Semantics` pra leitor de tela
 - Pause overlay anunciado ao leitor de tela ("Jogo pausado")
-- `LivesIndicator` anunciado: "5 vidas, banco completo" ou "3 vidas, próxima em 12 minutos"
+- `LivesIndicator` anunciado: "5 vidas, banco completo" / "8 vidas, bônus" / "3 vidas, próxima em 12 minutos"
+- `PauseButtonTile` anunciado: "Botão Pausar"
 - Modo "alta visibilidade"
 - Tamanho de fonte ajustável
 
 ### 16.2 Performance
 - `const` e Riverpod selectors
-- **PNGs em vez de SVGs (Fase 2.3.8 item A)** — gargalo de processamento removido
-- `precacheImage` pra os 22 PNGs dos animais + 4 do inventário no boot
-- Pool de AudioPlayers
+- PNGs em vez de SVGs (Fase 2.3.8 item A) — gargalo removido
+- `precacheImage` pra os 22 PNGs dos animais + 4 do inventário + `fundo.png` no boot
+- Pool de AudioPlayers (Fase 5)
 - 60fps em Snapdragon 660+ / iPhone 8+
-- `RepaintBoundary` no `GameBackground` (agora muito mais leve por ser cor única)
+- `RepaintBoundary` no `GameBackground` (cor única na 2.3.8 / PNG estático na 2.3.9 — ambos leves)
 - `BackdropFilter` no `PauseOverlay` é o único custo significativo de UI — fallback se ficar < 50fps
 
 ### 16.3 LGPD / COPPA / Crianças
@@ -1181,84 +1035,63 @@ As regras já estão na seção 5, mas precisam ser refletidas no código:
 
 ---
 
-## 17. Prompt Sugerido para o Claude Code (Fase 2.3.8 — via skill superpowers)
+## 17. Prompt Sugerido para o Claude Code (Fase 2.3.9 — via skill superpowers)
 
-> O prompt abaixo entra no fluxo do **superpowers/brainstorming**. O resultado esperado é uma **spec detalhada da Fase 2.3.8** (refinada via brainstorm), que depois alimenta o **superpowers/writing-plans** pra gerar o plano executável. Nada de código nesta etapa — apenas elicitação, refinamento de design e plano.
+> O prompt abaixo entra no fluxo do **superpowers/brainstorming**. O resultado esperado é uma **spec detalhada da Fase 2.3.9** (refinada via brainstorm), que depois alimenta o **superpowers/writing-plans** pra gerar o plano executável. Nada de código nesta etapa — apenas elicitação, refinamento de design e plano.
 
 ---
 
 > Use a skill `superpowers/brainstorming` pra refinar o design da próxima fase do projeto **Capivara 2048** (Flutter).
 >
-> **Contexto:** Estamos no projeto Capivara 2048. Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente seções 4.2, 4.3, 4.5, 5, 6.2, 12.3, 13.1, 13.4, 13.5 e 15 — Fase 2.3.8).
+> **Contexto:** Estamos no projeto Capivara 2048. Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente seções 4.3, 4.5, 5.3, 12.3, 12.3.1 e 15 — Fase 2.3.9).
 >
 > **Fases concluídas:**
-> - Fase 1, 2.1, 2.2, 2.3, 2.3.5, 2.3.6
-> - **Fase 2.3.7 (v0.4.0)** — SVGs dos 11 animais integrados em tiles e anfitrião, Sagui no nível 5, PauseOverlay com OutlinedText completo, ícones SVG do inventário, galeria de debug `AnimalsGalleryScreen`
-> - **Identificado em uso real:** processamento de SVG em runtime causa lentidão perceptível, especialmente em devices Android medianos
+> - Fase 1 a 2.3.7
+> - **Fase 2.3.8 (v0.5.0)** — migração SVG→PNG, ConfirmUseDialog universal, anfitrião tile-sized com nome em cima, fundo fixo `#D4F1DE`, LivesIndicator com coração + número + badge "Bônus ⭐", regenCap/earnedCap, badge 99+ no inventário. 125 testes passando.
 >
-> **Tópico do brainstorm:** desenhar a **Fase 2.3.8 — Otimização de Assets + Refinamentos de UI**. Sete entregas que podem rodar em paralelo após o item A:
+> **Tópico do brainstorm:** desenhar a **Fase 2.3.9 — Refinamentos visuais**. Três ajustes de UI identificados em uso real:
 >
-> **A — Migrar SVGs para PNGs (entrega central, desbloqueia performance):** remover `flutter_svg`, trocar `SvgPicture.asset` por `Image.asset` em `tile_widget.dart`, `host_artwork.dart`, `inventory_item_button.dart`. Renomear campos em `animals_data.dart` (`svgPath` → `tilePngPath`, `hostSvgPath` → `hostPngPath`). Apagar arquivos SVG, manter só PNGs (que já estão nos diretórios com mesmo nome, só muda extensão). Pré-cache via `precacheImage` no boot.
+> **A — `LivesIndicator` com faixa estilizada (Completo / Bônus / Restando):** criar `lives_status_banner.dart` (pill/banner arredondado) com 3 estados visuais distintos: "Completo" verde se `current == 5`, "Bônus" dourado se `current > 5`, "Restando MM:SS" cinza/laranja se `current < 5`. Texto Fredoka SemiBold ~13sp com `OutlinedText`. Refatorar `lives_indicator.dart` pra usar o novo banner. Animação fade 300ms na transição entre estados.
 >
-> **B — Confirmação universal pra TODOS os itens do inventário:** criar `confirm_use_dialog.dart` reutilizável. Refatorar `InventoryItemButton.onTap` pra abrir o dialog antes de qualquer ação (Desfazer já tinha; Bomba não tinha — agora terá). Manter o passo de confirmação no `BombSelectionOverlay` ("Explodir") como segunda confirmação contextual.
+> **B — Botão de pause tile-sized fixo (substitui pause flutuante):** criar `pause_button_tile.dart` com mesmas dimensões de um tile do tabuleiro, posicionado fixo na 4ª coluna do cabeçalho (acima da coluna 4 do tabuleiro). Refatorar layout da `GameScreen` pra ter 3 zonas no cabeçalho (anfitrião | StatusPanel 2 cols | PauseButtonTile). Remover toda lógica de `Positioned`/`LayoutBuilder` que evitava sobreposição.
 >
-> **C — Anfitrião redesenhado: tile-sized, posicionado sobre o 1º tile, nome em cima:** refatorar `host_banner.dart` (Column: nome em cima, PNG embaixo) e `host_artwork.dart` (slot quadrado 1:1 dimensionado pelo `LayoutBuilder` baseado no tabuleiro). Anfitrião agora ocupa largura de 1 tile (não 2). Nome em cima usa `OutlinedText` Fredoka SemiBold ~14sp.
->
-> **D — Fundo fixo (sem variação por animal):** simplificar `game_background.dart` pra `Container(color: #D4F1DE)`. Remover `AnimatedContainer`, `Tween<Color>`, textura geométrica, crossfade. Manter `backgroundBaseColor` no model `Animal` apenas pra Coleção (Fase 2.6).
->
-> **E — Indicador de vidas: topo central, coração único + número + badge "Completo"/timer:** redesenhar `lives_indicator.dart` pra `Row` com [coração (Icon) com número dentro (OutlinedText)] + [badge "Completo" verde se ≥5, ou timer MM:SS regressivo se <5]. Tap abre dialog explicativo ou navega pra loja. Escala bem pra qualquer quantidade armazenada (1, 5, 50, 99+).
->
-> **F — Sistema de vidas: confirmar regras 5/15/ilimitado:** atualizar `LivesState` (campos `regenCap=5`, `earnedCap=15`, `current` sem upper bound), `LivesNotifier` com métodos `regenerate()`, `addEarned(N)` (clamp em 15), `addPurchased(N)` (sem cap), `consume()`. Recompensas chamam `addEarned`, loja chama `addPurchased`.
->
-> **G — Inventário sem cap pra bombas e desfazer:** remover qualquer cap residual no `Inventory`. Badge no `InventoryBar` mostra "99+" se contador > 99.
+> **C — Fundo do jogo via PNG (`assets/images/fundo.png`):** o arquivo já está em `assets/images/fundo.png`. Refatorar `game_background.dart` pra usar `DecorationImage` com `BoxFit.cover`. Pré-cache via `precacheImage` no boot. Fallback pra cor `#D4F1DE` se asset falhar. Avaliar legibilidade dos textos sobre o novo fundo e considerar gradient overlay se necessário.
 >
 > **Pontos abertos pra explorar no brainstorm (elicitação esperada):**
 >
-> Sobre o item A (PNGs):
-> - Tamanhos ideais dos PNGs: tiles costumam ser 200x200 ou 256x256? Hosts podem ser maiores (ex: 384x384) já que aparecem em destaque. Custo de memória vs nitidez em telas Retina.
-> - `precacheImage` no boot — todos os 26 PNGs (22 animais + 4 inventário), ou priorizar os primeiros 5 níveis (mais comuns)?
-> - Caches do Flutter: `Image.asset` usa cache automaticamente. Vale forçar tamanho via `cacheWidth`/`cacheHeight` pra reduzir RAM em devices fracos?
-> - Estratégia de teste de regressão visual: já tinha snapshot tests com SVG (Fase 2.3.7 item E). Esses snapshots vão precisar ser regenerados pra PNG — vale aproveitar pra atualizar o `golden_toolkit`/`alchemist`?
+> Sobre o item A (faixa de vidas):
+> - Cor da faixa "Restando" — cinza neutro `#9E9E9E` (passivo, "esperando") ou laranja-aviso `#FF8C42` (chama atenção pro tempo)? Qual psicologicamente faz o jogador querer voltar pra ver as vidas?
+> - O timer regressivo MM:SS dentro da faixa — atualiza a cada segundo via `StreamBuilder` ou `Timer.periodic`? Tradeoff de rebuild vs simplicidade.
+> - A faixa deve ter shadow/elevation pra destacar do fundo PNG (item C), ou fica plana? Como balanceia com o coração ao lado?
+> - Quando `current` cruza um threshold (4→5, 5→6), a faixa muda. Animação de fade 300ms é suficiente, ou vale uma micro-celebração (scale leve, partículas)?
+> - Caso de borda — `current = 0` (sem vidas): a faixa mostra "Restando" mesmo? Ou texto especial tipo "Sem vidas — aguarde"? Como o jogador entende que precisa esperar 30min ou ver anúncio?
+> - Largura da faixa — mínima fixa pra acomodar "Restando MM:SS" (~120dp) ou flexível (cresce conforme texto)? Qual é mais consistente visualmente?
 >
-> Sobre o item B (confirmação universal):
-> - O `ConfirmUseDialog` deve ter uma opção "Não perguntar de novo" (preferência salva)? Ou confirmação universal é firme (vale mais que conveniência)?
-> - Animação de entrada do dialog — quanto tempo? 200ms é padrão Material; vale algo mais lento pra dar peso à decisão?
-> - Som de confirmação: clique decisivo só pro botão "Usar" (Cancelar é neutro)?
+> Sobre o item B (botão de pause tile-sized):
+> - Conteúdo do botão: ícone + texto "Pausar" embaixo, ou só ícone grande centralizado? Texto ajuda crianças (público secundário).
+> - Cor do ícone — laranja-tucano `#FF8C42` combina com a borda? Ou usar cor neutra mais escura (cinza/marrom)?
+> - Ao pausar o jogo, o botão muda de aparência (ex: vira "Continuar" com ícone play)? Ou continua como "Pausar" e o overlay é onde o jogador interage?
+> - Tap acidental — o botão é grande agora (tile-sized = ~80x80dp em smartphones). Vale ter delay/long-press pra evitar pause acidental durante swipe rápido?
 >
-> Sobre o item C (anfitrião tile-sized):
-> - Texto do nome do animal acima do PNG: 1 linha sempre, com `FittedBox` se for longo? Ou permitir 2 linhas pra "Mico-leão-dourado"?
-> - Espaço acima da coluna 2 (à direita do anfitrião) — fica vazio ou recebe `StatusPanel` reposicionado? Como afeta a hierarquia visual?
-> - Tamanho do tile do anfitrião — exatamente igual ao do tile do tabuleiro, ou ligeiramente maior pra dar destaque (ex: 110% do tamanho do tile)?
->
-> Sobre o item D (fundo fixo):
-> - Cor `#D4F1DE` (verde-menta) é a melhor escolha, ou vale considerar outras (cinza muito claro neutro, ou a paleta da Home)?
-> - O slot vazio do anfitrião antes do primeiro tile fica com a mesma cor do fundo, sumindo visualmente — tudo bem ou precisa de algum marcador?
->
-> Sobre o item E (LivesIndicator):
-> - O timer regressivo atualiza a cada segundo via `Timer.periodic`? Ou via `StreamBuilder<DateTime>` mais limpo?
-> - Quando o jogador tem ≥6 vidas (acima do regen cap), o badge mostra "Completo" verde, mas o jogador pode ter conquistado isso. Vale um badge alternativo tipo "Bônus" amarelo pra distinguir 5/5 (regen completa) de >5 (extra comprado/recompensado)? Ou mantém "Completo" pra simplificar?
-> - Tap no indicador na `HomeScreen` abre dialog explicativo. Tap na `GameScreen` durante uma partida — abre o mesmo dialog ou pausa o jogo?
-> - Tamanho do coração: 36x36dp é bom em smartphones, mas pode ficar pequeno em tablets — usar `MediaQuery` pra escalar?
->
-> Sobre o item F (regras de vidas):
-> - Migração de jogadores existentes (v0.4.0 → 2.3.8): se algum jogador já tem `current = 15` por compras antigas, isso continua funcionando? Schema do Hive precisa de versão e migration?
-> - O que acontece se o jogador comprar 100 vidas e nunca jogar? Game over depois de 30 dias — `regenerate` deve ser chamada quantas vezes? Resposta: nenhuma, porque `current > regenCap`. Vale documentar isso explicitamente.
->
-> Sobre o item G (inventário sem cap):
-> - Badge "99+" — quando o número exato importa? Ex: jogador quer saber se tem 100 ou 200 bombas. Vale tap no botão mostrar contador exato em tooltip?
+> Sobre o item C (fundo PNG):
+> - `BoxFit.cover` corta as bordas da imagem em telas com aspect diferente. `BoxFit.fill` estica (perde proporção). `BoxFit.contain` deixa borda lateral. Qual é o tradeoff aceitável dado o conteúdo da `fundo.png`?
+> - O `fundo.png` provavelmente tem regiões com gradiente/cor variando — algum texto branco com `OutlinedText` pode ficar ilegível? Vale aplicar gradient overlay sutil (ex: gradient preto top→bottom 0→15% opacity) pra reforçar contraste?
+> - Aplicar o mesmo `fundo.png` na `HomeScreen` ou ela mantém visual próprio? Se aplicar agora, evita inconsistência futura.
+> - Performance: `precacheImage` pra `fundo.png` (provavelmente arquivo grande) — vale comprimir antes de bundlar (TinyPNG ou similar)? Tamanho ideal pra mobile?
 >
 > Sobre integração:
-> - Ordem das 7 entregas: A primeiro (desbloqueia performance), depois B/C/D/E em paralelo, F/G como cleanup final?
-> - Vale tirar screenshots/vídeo do app rodando antes/depois da migração SVG→PNG pra documentar o ganho de performance?
-> - Testes de regressão: a galeria de debug `AnimalsGalleryScreen` (Fase 2.3.7 item E) precisa ser atualizada pra usar PNGs também? Ela é o lugar ideal pra validar a migração visualmente.
+> - Ordem das 3 entregas: A primeiro (faixa nova), C depois (fundo, vai impactar legibilidade da faixa), B por último (refator do layout do cabeçalho)?
+> - Vale fazer screenshots/vídeo do app antes/depois da 2.3.9 pra documentar as 3 mudanças visuais?
+> - Testes de regressão visual: snapshot tests existentes do `LivesIndicator` (Fase 2.3.8) precisam ser regenerados com a nova faixa. Idem pros snapshots da `GameScreen` com novo botão de pause e novo fundo.
+> - Sobre acessibilidade: o `Semantics` do `LivesIndicator` precisa anunciar o estado da faixa (ex: "5 vidas, banco completo" / "8 vidas, bônus" / "3 vidas, próxima em 12 minutos") — atualizar conforme.
 >
 > **Output esperado do brainstorm:**
-> Uma **spec detalhada da Fase 2.3.8** (markdown, tipo `FASE_2_3_8_SPEC.md`) com:
+> Uma **spec detalhada da Fase 2.3.9** (markdown, tipo `FASE_2_3_9_SPEC.md`) com:
 > - Decisões tomadas em cada ponto aberto
-> - Para cada uma das 7 sub-entregas: arquivos a criar/modificar, mudança exata, casos de teste obrigatórios, critérios de aceite
-> - Ordem de execução recomendada e dependências entre as 7 entregas
-> - Estratégia de migração de schema do Hive se necessário (item F)
-> - Cobertura de testes existentes que precisa ser atualizada (especialmente snapshot tests com SVGs)
+> - Para cada uma das 3 sub-entregas: arquivos a criar/modificar, mudança exata, casos de teste obrigatórios, critérios de aceite
+> - Ordem de execução recomendada (dependências entre as 3 entregas)
+> - Cobertura de testes existentes que precisa ser atualizada (especialmente snapshots da Fase 2.3.8)
+> - Estratégia de validação visual após cada entrega (screenshots/golden tests)
 >
 > Esse documento será depois consumido pela skill `superpowers/writing-plans` pra gerar o plano executável (TDD-friendly, com checkpoints).
 >
