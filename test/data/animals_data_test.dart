@@ -71,7 +71,7 @@ void main() {
       }
     });
 
-    test('no animal has hostSvgPath or assetPath field (old API gone)', () {
+    test('all animals have non-empty tilePngPath', () {
       for (final animal in animals) {
         expect(animal.tilePngPath, isNotEmpty);
       }

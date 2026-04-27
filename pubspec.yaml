@@ -60,7 +60,6 @@ flutter:
     - assets/images/animals/tile/
     - assets/images/animals/host/
     - assets/images/textures/
-    - assets/images/home_ensemble.svg
     - assets/icons/inventory/
 
   # To add assets to your application, add an assets section, like this:
