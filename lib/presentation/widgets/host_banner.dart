@@ -39,34 +39,28 @@ class _Placeholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final slotHeight = GameConstants.twoCellWidth;
     return Semantics(
       label: 'Anfitrião: nenhum. Faça seu primeiro merge!',
-      child: SizedBox(
-        width: slotWidth,
-        height: slotHeight + 28,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Opacity(
-              opacity: 0.15,
-              child: Image.asset(
-                'assets/images/animals/host/Capivara.png',
-                width: slotWidth,
-                height: slotHeight,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-              ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Comece!',
+            style: outlinedWhiteTextStyle(
+              GoogleFonts.fredoka(fontSize: 16, fontWeight: FontWeight.w600),
             ),
-            Text(
-              'Comece!',
-              style: outlinedWhiteTextStyle(
-                GoogleFonts.nunito(fontSize: 13, fontWeight: FontWeight.w600),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+          ),
+          const SizedBox(height: 4),
+          Image.asset(
+            'assets/images/animals/host/Capivara.png',
+            width: slotWidth,
+            height: slotWidth,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+          ),
+        ],
       ),
     );
   }

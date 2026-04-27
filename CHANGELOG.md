@@ -7,6 +7,11 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.7.3] - 2026-04-27
+
+### Changed
+- `HostBanner` placeholder: Capivara visível em tamanho cheio (sem opacidade); "Comece!" no lugar do nome (Fredoka 16sp), mesmo layout de `_AnimalHost`
+
 ## [0.7.2] - 2026-04-27
 
 ### Changed
