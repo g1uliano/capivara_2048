@@ -11,8 +11,14 @@ class GameBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RepaintBoundary(
-      child: ColoredBox(
-        color: AppColors.gameBackground,
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          color: AppColors.gameBackground,
+          image: DecorationImage(
+            image: AssetImage('assets/images/fundo.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
         child: child,
       ),
     );

@@ -1,44 +1,43 @@
+import 'package:capivara_2048/presentation/widgets/game_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:capivara_2048/presentation/widgets/game_background.dart';
 
 void main() {
   group('GameBackground', () {
-    testWidgets('renders fixed background color D4F1DE', (tester) async {
+    testWidgets('renders DecoratedBox with DecorationImage', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: GameBackground(animal: null, child: SizedBox()),
+          home: GameBackground(
+            animal: null,
+            child: SizedBox(width: 100, height: 100),
+          ),
         ),
       );
-      await tester.pump();
-
-      final container = tester.widget<ColoredBox>(
-        find.descendant(
-          of: find.byType(GameBackground),
-          matching: find.byType(ColoredBox),
-        ).first,
+      final decoratedBox = tester.widget<DecoratedBox>(
+        find.byType(DecoratedBox).first,
       );
-      expect(container.color, const Color(0xFFD4F1DE));
+      final decoration = decoratedBox.decoration as BoxDecoration;
+      expect(decoration.image, isNotNull);
+      expect(decoration.image!.fit, BoxFit.cover);
     });
 
-    testWidgets('renders same fixed color regardless of animal', (tester) async {
+    testWidgets('decoration includes fallback color', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: GameBackground(animal: null, child: SizedBox()),
+          home: GameBackground(
+            animal: null,
+            child: SizedBox(width: 100, height: 100),
+          ),
         ),
       );
-      await tester.pump();
-      final box1 = tester.widget<ColoredBox>(
-        find.descendant(
-          of: find.byType(GameBackground),
-          matching: find.byType(ColoredBox),
-        ).first,
+      final decoratedBox = tester.widget<DecoratedBox>(
+        find.byType(DecoratedBox).first,
       );
-
-      expect(box1.color, const Color(0xFFD4F1DE));
+      final decoration = decoratedBox.decoration as BoxDecoration;
+      expect(decoration.color, const Color(0xFFD4F1DE));
     });
 
-    testWidgets('renders child', (tester) async {
+    testWidgets('renders child widget', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: GameBackground(
@@ -47,7 +46,6 @@ void main() {
           ),
         ),
       );
-      await tester.pump();
       expect(find.text('hello'), findsOneWidget);
     });
   });
