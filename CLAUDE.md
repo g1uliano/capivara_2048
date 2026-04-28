@@ -52,7 +52,7 @@ lib/
 
 ## Fases do roadmap
 
-Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 2.3.10 concluída (v0.7.0) — próximo: Fase 2.4 (áudio)**.
+Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 2.3.11 concluída (v0.8.0) — próximo: Fase 2.4 (áudio)**.
 
 | Fase | Foco |
 |------|------|
