@@ -16,7 +16,7 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final gameState = ref.watch(gameProvider);
-    final hasSave = gameState.score > 0 || gameState.maxLevel > 0;
+    final hasSave = gameState.score > 0;
 
     return GameBackground(
       child: Scaffold(
