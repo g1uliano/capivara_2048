@@ -30,6 +30,7 @@ class GameEngine {
       highScore: 0,
       isGameOver: false,
       hasWon: false,
+      maxLevel: 1,
     );
     state = _spawnTile(state);
     state = _spawnTile(state);

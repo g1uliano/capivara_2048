@@ -90,7 +90,6 @@ class GameNotifier extends StateNotifier<GameState> {
     state = fresh.copyWith(
       elapsedMs: 0,
       isPaused: false,
-      maxLevel: 0,
     );
   }
 

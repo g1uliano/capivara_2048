@@ -327,9 +327,9 @@ void main() {
   });
 
   group('maxLevel tracking', () {
-    test('maxLevel starts at 0 on newGame', () {
+    test('maxLevel starts at 1 on newGame', () {
       final state = engine.newGame();
-      expect(state.maxLevel, 0);
+      expect(state.maxLevel, 1);
     });
 
     test('maxLevel updates after merge', () {

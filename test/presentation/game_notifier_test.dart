@@ -45,6 +45,16 @@ void main() {
       expect(state.elapsedMs, 0);
       expect(state.isPaused, false);
     });
+
+    test('restart resets maxLevel to 1', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      // Simular maxLevel alto (após alguns moves hipotéticos)
+      // restart() deve sempre voltar para 1
+      container.read(gameProvider.notifier).restart();
+      final state = container.read(gameProvider);
+      expect(state.maxLevel, 1);
+    });
   });
 
   group('GameNotifier.undo', () {
