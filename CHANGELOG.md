@@ -7,6 +7,21 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-04-28
+
+### Added
+- `HostBanner`: Tanajura exibida desde o boot como anfitrião inicial (sem placeholder "Comece!")
+- `HomeScreen`: mesmo `fundo.png` da `GameScreen` — fundo visual unificado entre as telas
+- Galeria de debug: nota informativa sobre Tanajura ser o anfitrião inicial (Fase 2.3.11)
+
+### Changed
+- `maxLevel` inicia em 1 em `GameEngine.newGame()` e `GameNotifier.restart()`
+- `hasSave` na `HomeScreen` usa `score > 0` (corrige falso-positivo causado pelo novo `maxLevel = 1`)
+- `GameBackground`: parâmetro `animal` removido (dead code)
+
+### Removed
+- `_Placeholder` widget do `HostBanner`
+
 ## [0.7.5] - 2026-04-27
 
 ### Changed
