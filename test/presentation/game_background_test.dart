@@ -8,7 +8,6 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: GameBackground(
-            animal: null,
             child: SizedBox(width: 100, height: 100),
           ),
         ),
@@ -25,7 +24,6 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: GameBackground(
-            animal: null,
             child: SizedBox(width: 100, height: 100),
           ),
         ),
@@ -41,7 +39,6 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: GameBackground(
-            animal: null,
             child: Text('hello'),
           ),
         ),

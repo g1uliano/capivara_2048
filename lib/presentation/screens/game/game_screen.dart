@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/animals_data.dart';
 import '../../../data/models/game_state.dart';
 import '../../../domain/game_engine/direction.dart';
 import '../../../domain/lives/lives_notifier.dart';
@@ -22,9 +21,6 @@ class GameScreen extends ConsumerWidget {
     final isGameOver = state.isGameOver;
     final hasWon = state.hasWon;
     final notifier = ref.read(gameProvider.notifier);
-    final hostAnimal =
-        state.maxLevel > 0 ? animalForLevel(state.maxLevel) : null;
-
     ref.listen<GameState>(gameProvider, (prev, next) {
       if (prev != null && !prev.isGameOver && next.isGameOver && !next.hasWon) {
         ref.read(livesProvider.notifier).consume();
@@ -33,7 +29,6 @@ class GameScreen extends ConsumerWidget {
 
     return Scaffold(
       body: GameBackground(
-        animal: hostAnimal,
         child: SafeArea(
           child: Stack(
             children: [
