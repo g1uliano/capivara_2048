@@ -38,12 +38,14 @@ void main() {
     ];
 
     for (final name in expectedNames) {
+      // Use "— Name —" pattern to match only animal rows, not the header note.
+      final rowFinder = find.textContaining('— $name —');
       await tester.scrollUntilVisible(
-        find.textContaining(name),
+        rowFinder,
         200,
         scrollable: find.byType(Scrollable).first,
       );
-      expect(find.textContaining(name), findsAtLeastNWidgets(1),
+      expect(rowFinder, findsAtLeastNWidgets(1),
           reason: '$name should appear in the gallery');
     }
   });

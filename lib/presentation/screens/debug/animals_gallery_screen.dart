@@ -13,10 +13,16 @@ class AnimalsGalleryScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Galeria de Animais')),
       body: ListView.separated(
         padding: const EdgeInsets.all(16),
-        itemCount: animals.length,
+        itemCount: animals.length + 1,
         separatorBuilder: (_, __) => const Divider(height: 32),
         itemBuilder: (context, index) {
-          final animal = animals[index];
+          if (index == 0) {
+            return const Text(
+              'Nível 1 (Tanajura) é o anfitrião inicial desde a Fase 2.3.11 (maxLevel = 1).',
+              style: TextStyle(fontSize: 12, color: Colors.black54),
+            );
+          }
+          final animal = animals[index - 1];
           return _AnimalRow(animal: animal);
         },
       ),
