@@ -21,46 +21,11 @@ class HostBanner extends ConsumerWidget {
         duration: const Duration(milliseconds: 400),
         transitionBuilder: (child, anim) =>
             FadeTransition(opacity: anim, child: child),
-        child: maxLevel == 0
-            ? _Placeholder(key: const ValueKey('ph'), slotWidth: slotWidth)
-            : _AnimalHost(
-                key: ValueKey(maxLevel),
-                level: maxLevel,
-                slotWidth: slotWidth,
-              ),
-      ),
-    );
-  }
-}
-
-class _Placeholder extends StatelessWidget {
-  final double slotWidth;
-  const _Placeholder({super.key, required this.slotWidth});
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      label: 'Anfitrião: nenhum. Faça seu primeiro merge!',
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'Comece!',
-            style: outlinedWhiteTextStyle(
-              GoogleFonts.fredoka(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-          ),
-          const SizedBox(height: 4),
-          Image.asset(
-            'assets/images/animals/host/Capivara.png',
-            width: slotWidth,
-            height: slotWidth,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-          ),
-        ],
+        child: _AnimalHost(
+          key: ValueKey(maxLevel),
+          level: maxLevel,
+          slotWidth: slotWidth,
+        ),
       ),
     );
   }

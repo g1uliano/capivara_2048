@@ -23,10 +23,11 @@ void main() {
       expect(size.width, GameConstants.twoCellWidth);
     });
 
-    testWidgets('placeholder mostra texto Comece! quando maxLevel == 0', (tester) async {
+    testWidgets('exibe Tanajura no estado inicial (maxLevel == 1)', (tester) async {
       await tester.pumpWidget(_wrap(const HostBanner()));
       await tester.pump();
-      expect(find.text('Comece!'), findsOneWidget);
+      expect(find.text('Tanajura'), findsOneWidget);
+      expect(find.text('Comece!'), findsNothing);
     });
 
     testWidgets('nome Mico-leão-dourado não causa overflow em 152dp', (tester) async {
