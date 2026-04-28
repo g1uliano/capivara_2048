@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
 import '../../domain/lives/lives_notifier.dart';
 import '../controllers/game_notifier.dart';
+import '../widgets/game_background.dart';
 import '../widgets/lives_indicator.dart';
 import 'game/game_screen.dart';
 import 'no_lives_screen.dart';
@@ -17,39 +18,41 @@ class HomeScreen extends ConsumerWidget {
     final gameState = ref.watch(gameProvider);
     final hasSave = gameState.score > 0 || gameState.maxLevel > 0;
 
-    return Scaffold(
-      backgroundColor: AppColors.primary,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-          child: Column(
-            children: [
-              const Align(
-                alignment: Alignment.centerRight,
-                child: LivesIndicator(),
-              ),
-              const Spacer(),
-              const SizedBox(height: 220),
-              const SizedBox(height: 32),
-              _HomeButton(
-                label: 'Novo Jogo',
-                onPressed: () => _startNew(context, ref),
-              ),
-              const SizedBox(height: 12),
-              _HomeButton(
-                label: 'Continuar',
-                onPressed: hasSave ? () => _continue(context) : null,
-              ),
-              const SizedBox(height: 12),
-              const _RankingButton(),
-              const SizedBox(height: 12),
-              _HomeButton(
-                label: 'Sair',
-                onPressed: () => SystemNavigator.pop(),
-                secondary: true,
-              ),
-              const Spacer(),
-            ],
+    return GameBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+            child: Column(
+              children: [
+                const Align(
+                  alignment: Alignment.centerRight,
+                  child: LivesIndicator(),
+                ),
+                const Spacer(),
+                const SizedBox(height: 220),
+                const SizedBox(height: 32),
+                _HomeButton(
+                  label: 'Novo Jogo',
+                  onPressed: () => _startNew(context, ref),
+                ),
+                const SizedBox(height: 12),
+                _HomeButton(
+                  label: 'Continuar',
+                  onPressed: hasSave ? () => _continue(context) : null,
+                ),
+                const SizedBox(height: 12),
+                const _RankingButton(),
+                const SizedBox(height: 12),
+                _HomeButton(
+                  label: 'Sair',
+                  onPressed: () => SystemNavigator.pop(),
+                  secondary: true,
+                ),
+                const Spacer(),
+              ],
+            ),
           ),
         ),
       ),
