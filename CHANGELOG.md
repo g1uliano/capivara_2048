@@ -7,6 +7,18 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.8.1] — 2026-04-30
+
+### Fixed
+- `LivesIndicator` centralizado horizontalmente em `GameScreen` e `HomeScreen` (era esquerda/direita)
+- `HostBanner` colado à borda esquerda do tabuleiro — gap eliminado com `Spacer()` (Fase 2.3.12-B)
+- Timer de regen de vidas implementado em `LivesNotifier` — vidas agora incrementam durante sessão ativa (Fase 2.3.12-C)
+- Recálculo offline de vidas ao retornar do background via `AppLifecycleListener` (Fase 2.3.12-C)
+
+### Changed
+- Ícones do inventário agora usam PNGs finais temáticos (Sucuri, Mico-leão, Capivara, Onça) (Fase 2.3.12-D)
+- `ConfirmUseDialog` exibe ícone 40×40 do item no título (Fase 2.3.12-D)
+
 ## [0.8.0] - 2026-04-28
 
 ### Added
