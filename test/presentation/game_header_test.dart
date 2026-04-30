@@ -72,6 +72,27 @@ void main() {
       expect(indicatorCenter, closeTo(headerCenter, 2.0));
     });
 
+    testWidgets('HostBanner está no lado esquerdo sem espaço à esquerda', (tester) async {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () {})));
+      await tester.pump();
+      final headerBox = tester.getRect(find.byType(GameHeader));
+      final hostBox = tester.getRect(find.byType(HostBanner));
+      // HostBanner deve começar na borda esquerda do GameHeader (tolerância 2px)
+      expect(hostBox.left, closeTo(headerBox.left, 2.0));
+    });
+
+    testWidgets('PauseButtonTile está à direita do HostBanner', (tester) async {
+      await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () {})));
+      await tester.pump();
+      final hostBox = tester.getRect(find.byType(HostBanner));
+      final pauseBox = tester.getRect(find.byType(PauseButtonTile));
+      expect(pauseBox.left, greaterThan(hostBox.right));
+    });
+
     testWidgets('sem overflow em 360dp de largura', (tester) async {
       tester.view.physicalSize = const Size(360, 800);
       tester.view.devicePixelRatio = 1.0;

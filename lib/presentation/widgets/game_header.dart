@@ -13,7 +13,6 @@ class GameHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const tileSize = GameConstants.tileSize;
-    const slotWidth = GameConstants.twoCellWidth;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -24,31 +23,19 @@ class GameHeader extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Expanded(
-              flex: 2,
-              child: HostBanner(),
-            ),
-            Expanded(
-              flex: 2,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const StatusPanel(),
-                  const SizedBox(height: 6),
-                  SizedBox(
-                    width: slotWidth,
-                    height: tileSize,
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: PauseButtonTile(
-                        tileSize: tileSize,
-                        onTap: onPauseTap,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            const HostBanner(),
+            const Spacer(),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                const StatusPanel(),
+                const SizedBox(height: 6),
+                PauseButtonTile(
+                  tileSize: tileSize,
+                  onTap: onPauseTap,
+                ),
+              ],
             ),
           ],
         ),
