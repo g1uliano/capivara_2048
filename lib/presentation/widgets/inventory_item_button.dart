@@ -46,24 +46,11 @@ class InventoryItemButton extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 onTap: onPressed,
                 child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      pngPath != null
-                          ? Image.asset(pngPath!, width: 28, height: 28,
-                              errorBuilder: (_, __, ___) =>
-                                  Icon(icon, color: Colors.white, size: 22))
-                          : Icon(icon, color: Colors.white, size: 22),
-                      Text(
-                        label,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
+                  child: pngPath != null
+                      ? Image.asset(pngPath!, width: 36, height: 36,
+                          errorBuilder: (_, __, ___) =>
+                              Icon(icon, color: Colors.white, size: 28))
+                      : Icon(icon, color: Colors.white, size: 28),
                 ),
               ),
             ),
