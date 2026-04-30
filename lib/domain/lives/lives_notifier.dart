@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/lives_state.dart';
 import '../../data/repositories/lives_repository.dart';
@@ -8,6 +9,8 @@ class LivesNotifier extends StateNotifier<LivesState> {
 
   final LivesRepository _repo;
   final _ready = Completer<void>();
+  Timer? _regenTimer;
+  AppLifecycleListener? _lifecycleListener;
 
   LivesNotifier(this._repo) : super(LivesState.initial()) {
     _init();
@@ -30,6 +33,11 @@ class LivesNotifier extends StateNotifier<LivesState> {
     state = loaded;
     await _repo.save(state);
     _ready.complete();
+    _startRegenTimer();
+    _lifecycleListener = AppLifecycleListener(
+      onPause: _pauseRegen,
+      onResume: _resumeRegen,
+    );
   }
 
   static LivesState calcRegen({required LivesState state, required DateTime now}) {
@@ -76,6 +84,34 @@ class LivesNotifier extends StateNotifier<LivesState> {
     return applyAddEarned(s.copyWith(adWatchedToday: s.adWatchedToday + 1), 1);
   }
 
+  void _startRegenTimer() {
+    _regenTimer?.cancel();
+    _regenTimer = Timer.periodic(const Duration(seconds: 30), (_) => _onRegenTick());
+  }
+
+  void _onRegenTick() {
+    final before = state.lives;
+    final updated = calcRegen(state: state, now: DateTime.now());
+    if (updated.lives != before) {
+      state = updated;
+      _repo.save(state);
+    }
+  }
+
+  void _pauseRegen() {
+    _regenTimer?.cancel();
+    _regenTimer = null;
+  }
+
+  void _resumeRegen() {
+    final updated = calcRegen(state: state, now: DateTime.now());
+    if (updated.lives != state.lives) {
+      state = updated;
+      _repo.save(state);
+    }
+    _startRegenTimer();
+  }
+
   Future<void> consume() async {
     await _ready.future;
     state = applyConsume(state);
@@ -98,6 +134,13 @@ class LivesNotifier extends StateNotifier<LivesState> {
     await _ready.future;
     state = applyAdReward(state);
     await _repo.save(state);
+  }
+
+  @override
+  void dispose() {
+    _regenTimer?.cancel();
+    _lifecycleListener?.dispose();
+    super.dispose();
   }
 
   bool get canWatchAd => canWatchAdFor(state);

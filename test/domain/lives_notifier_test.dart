@@ -144,6 +144,51 @@ void main() {
     });
   });
 
+  group('regen timer (LivesNotifier._onTick)', () {
+    test('calcRegen após 30s não ganha vida (janela não fechou)', () {
+      final last = DateTime.now().subtract(const Duration(seconds: 30));
+      final s = _state(lives: 3, lastRegenAt: last);
+      final result = LivesNotifier.calcRegen(state: s, now: DateTime.now());
+      expect(result.lives, 3);
+    });
+
+    test('calcRegen após 30min ganha 1 vida', () {
+      final last = DateTime.now().subtract(const Duration(minutes: 30));
+      final s = _state(lives: 3, lastRegenAt: last);
+      final result = LivesNotifier.calcRegen(state: s, now: DateTime.now());
+      expect(result.lives, 4);
+    });
+
+    test('calcRegen com lives == regenCap não altera estado', () {
+      final last = DateTime.now().subtract(const Duration(minutes: 60));
+      final s = _state(lives: 5, regenCap: 5, lastRegenAt: last);
+      final result = LivesNotifier.calcRegen(state: s, now: DateTime.now());
+      expect(result.lives, 5);
+      expect(identical(result, s), isTrue);
+    });
+
+    test('resumeRegen offline 6h: lives == 0 → lives == 5', () {
+      final last = DateTime.now().subtract(const Duration(hours: 6));
+      final s = _state(lives: 0, regenCap: 5, lastRegenAt: last);
+      final result = LivesNotifier.calcRegen(state: s, now: DateTime.now());
+      expect(result.lives, 5);
+    });
+
+    test('resumeRegen offline 6h com lives == 2: clamp a 5', () {
+      final last = DateTime.now().subtract(const Duration(hours: 6));
+      final s = _state(lives: 2, regenCap: 5, lastRegenAt: last);
+      final result = LivesNotifier.calcRegen(state: s, now: DateTime.now());
+      expect(result.lives, 5);
+    });
+
+    test('calcRegen com remaining negativo (lastRegenAt no futuro): sem mudança', () {
+      final last = DateTime.now().add(const Duration(minutes: 5));
+      final s = _state(lives: 3, lastRegenAt: last);
+      final result = LivesNotifier.calcRegen(state: s, now: DateTime.now());
+      expect(result.lives, 3);
+    });
+  });
+
   group('regenCap / earnedCap rules', () {
     test('regen stops at regenCap, not earnedCap', () {
       final last = DateTime.now().subtract(const Duration(minutes: 120));
