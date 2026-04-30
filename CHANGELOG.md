@@ -7,6 +7,11 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.8.4] — 2026-04-30
+
+### Changed
+- Botões do inventário: PNG ocupa 56×56 inteiro — o PNG é o botão (sem fundo verde)
+
 ## [0.8.3] — 2026-04-30
 
 ### Fixed
