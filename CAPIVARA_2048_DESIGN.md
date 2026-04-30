@@ -2,9 +2,9 @@
 
 > Documento de especificação para desenvolvimento. Pensado para ser alimentado em ferramentas como Claude Code para implementação iterativa.
 >
-> **Status atual:** Fase 2.3.10 concluída ✅ (v0.7.0) — `GameHeader` extraído, `HostBanner` 2×2 (152dp), `StatusPanel` reescalonado (18/24/13sp), `PauseButtonTile` separado do StatusPanel. 152 testes passando.
+> **Status atual:** Fase 2.3.12 concluída ✅ — `LivesIndicator` centralizado, `HostBanner` colado à coluna 1 (sem gap), timer de regen de vidas implementado (`Timer.periodic` + `AppLifecycleListener`), PNGs finais do inventário integrados com ícone no `ConfirmUseDialog`.
 >
-> **Próximo:** **Fase 2.4 — Áudio** — sons dos 11 animais e UI + música ambiente.
+> **Próximo:** **Fase 2.4 — Áudio e música**.
 
 ---
 
@@ -22,7 +22,7 @@
 ### 1.3 Diferenciais
 - **Identidade brasileira**: fauna nacional como protagonista
 - **Apelo visual limpo**: tile branco com animal em marca d'água + número grande, contorno colorido
-- **Anfitrião dinâmico**: animal correspondente ao maior tile da partida atual aparece acima do tabuleiro
+- **Anfitrião dinâmico**: animal correspondente ao maior tile da partida atual aparece acima do tabuleiro (começa pela Tanajura desde o início — ver 4.2)
 - **Free-to-play justo**: sistema de vidas, itens, loja, anúncios opcionais, recompensas diárias e convites
 - **Competitivo**: ranking global semanal + ranking pessoal vitalício
 - **Mascote forte**: a Capivara como ícone do jogo
@@ -45,7 +45,7 @@
 | Estado | `flutter_riverpod` | Gerenciamento de estado |
 | ID | `uuid` | IDs dos tiles para animação |
 | Animações | `flutter_animate` | Transições suaves |
-| Áudio | `audioplayers` ou `just_audio` | Sons e música (Fase 2.4) |
+| Áudio | `audioplayers` ou `just_audio` | Sons e música (Fase 4.5) |
 | Persistência | `hive` + `shared_preferences` | Local |
 | Tipografia | `google_fonts` | Fredoka, Nunito |
 | Imagens | `Image.asset` (Flutter nativo) | PNGs dos animais e ícones |
@@ -73,7 +73,7 @@ lib/
 │   └── shop_data.dart
 ├── domain/
 │   ├── game_engine/        ✅
-│   ├── lives_system/       ✅
+│   ├── lives_system/       ✅ (regen timer corrigido na 2.3.12)
 │   ├── inventory_system/   ✅
 │   ├── ranking/
 │   ├── rewards/
@@ -94,13 +94,14 @@ lib/
 │   │   ├── board_widget.dart            ✅
 │   │   ├── tile_widget.dart             ✅
 │   │   ├── score_panel.dart             ✅
-│   │   ├── status_panel.dart            ✅ (ajustado pra remover pause na 2.3.10)
-│   │   ├── host_banner.dart             ✅ (expandido pra 2x2 na 2.3.10)
-│   │   ├── host_artwork.dart            ✅ (escala pro novo tamanho 2x2 na 2.3.10)
+│   │   ├── status_panel.dart            ✅
+│   │   ├── game_header.dart             ✅ (gap à esquerda corrigido na 2.3.12)
+│   │   ├── host_banner.dart             ✅
+│   │   ├── host_artwork.dart            ✅
 │   │   ├── game_background.dart         ✅
-│   │   ├── lives_indicator.dart         ✅
+│   │   ├── lives_indicator.dart         ✅ (centralizado na 2.3.12)
 │   │   ├── lives_status_banner.dart     ✅
-│   │   ├── pause_button_tile.dart       ✅ (reposicionado na 2.3.10)
+│   │   ├── pause_button_tile.dart       ✅
 │   │   ├── outlined_text.dart           ✅
 │   │   ├── pause_overlay.dart           ✅
 │   │   ├── inventory_bar.dart           ✅
@@ -115,10 +116,14 @@ assets/
 │   ├── fundo.png                     ✅
 │   ├── animals/tile/                 ← 11 PNGs ✅
 │   └── animals/host/                 ← 11 PNGs ✅
-├── icons/inventory/                  ← 4 PNGs ✅ (bomb_2, bomb_3, undo_1, undo_3)
-├── sounds/animals/                   ← Fase 2.4
-├── sounds/ui/                        ← Fase 2.4
-├── music/                            ← Fase 2.4
+├── icons/inventory/                  ← 4 PNGs finais ✅
+│   ├── bomb_2.png   ← Bomba 2 — tema **Sucuri** (verde)
+│   ├── bomb_3.png   ← Bomba 3 — tema **Mico-leão-dourado**
+│   ├── undo_1.png   ← Desfazer 1 — tema **Capivara**
+│   └── undo_3.png   ← Desfazer 3 — tema **Onça-pintada**
+├── sounds/animals/                   ← Fase 4.5
+├── sounds/ui/                        ← Fase 4.5
+├── music/                            ← Fase 4.5
 └── fonts/
 ```
 
@@ -139,7 +144,7 @@ assets/
 - Tabela de valores: nível 1 = 2 pts ... nível 11 = 2048
 - **Cronômetro:** começa na primeira peça, para ao formar 2048
 - **High score pessoal**: maior pontuação alcançada
-- **Maior nível alcançado**: nível mais alto formado (1–11)
+- **Maior nível alcançado:** começa em 1 (Tanajura) e sobe até 11 (Capivara Lendária) conforme o jogador faz merges
 
 ### 3.3 Algoritmo de movimento (Fase 1)
 1. Para cada linha/coluna na direção do swipe:
@@ -191,30 +196,29 @@ assets/
 - **Sombra:** suave abaixo
 - **Animação idle:** respiração lenta + piscar aleatório (futuro)
 
-### 4.2 Anfitrião do jogo (atualizado na Fase 2.3.10 — 2x2)
-- **Posição:** acima do tabuleiro, **lado direito**, alinhado às **colunas 3 e 4** do tabuleiro
-- **Tamanho:** **2 tiles de largura × 2 tiles de altura** (área de 2×2 = 4 tiles do tabuleiro)
-  - Largura calculada: `2 × tileWidth + 1 × tileSpacing`
-  - Altura calculada: `2 × tileHeight + 1 × tileSpacing`
+### 4.2 Anfitrião do jogo (Fase 2.3.10 — 2x2; Fase 2.3.11 — Tanajura inicial; Fase 2.3.12 — colado à coluna 1)
+- **Posição (definida em brainstorm anterior; gap à esquerda corrigido na 2.3.12):** acima do tabuleiro, **lado esquerdo, colado à coluna 1** (sem gap entre a borda esquerda do anfitrião e a borda esquerda do tabuleiro), alinhado às **colunas 1 e 2** do tabuleiro
+- **Tamanho:** **2 tiles de largura × 2 tiles de altura** (152dp `GameConstants.twoCellWidth`)
 - **Conteúdo (de cima pra baixo):**
-  - **Nome do animal** (em cima) — Fredoka SemiBold, ~16sp (cabe melhor agora com largura 2x), com `OutlinedText`
-  - **PNG do animal** (embaixo) — ocupa o slot 2x2 com `BoxFit.contain`, sem moldura, sem fundo branco
+  - **Nome do animal** (em cima) — Fredoka SemiBold, 16sp, com `OutlinedText` e `maxLines: 2`
+  - **PNG do animal** (embaixo) — ocupa o slot 2x2 com `BoxFit.cover`, sem moldura, sem fundo branco
 - **Atualização:** muda quando o jogador forma um tile de nível superior ao recorde da partida
 - **Animação:** transição suave (fade + scale) ao trocar
-- **Sem placeholder antes do primeiro tile** — o slot do anfitrião fica vazio até o primeiro animal aparecer
-- **Lado esquerdo do mesmo nível** (acima das colunas 1 e 2): recebe o **`PauseButtonTile`** alinhado pela base, com espaço vazio acima dele (porque é só 1x1, mas a linha tem altura 2x)
+- **Estado inicial:** Tanajura é o anfitrião desde o boot (Fase 2.3.11) — `highestLevelReached` começa em 1
+- **Lado direito do mesmo nível** (acima das colunas 3 e 4): recebe o **`PauseButtonTile`** abaixo do `StatusPanel`/cronômetro (posição mantida — não muda na 2.3.12)
 
-### 4.3 Fundo do jogo (Fase 2.3.9 — PNG)
+### 4.3 Fundo do jogo (Fase 2.3.9 — PNG; Fase 2.3.11 — unificado com Home)
 - Imagem PNG (`assets/images/fundo.png`) renderizada em tela cheia via `BoxFit.cover`
 - Sem variação por animal — fundo é o mesmo em qualquer fase do jogo
+- O mesmo `fundo.png` é aplicado também na `HomeScreen`, garantindo consistência visual entre o menu principal e a tela de jogo
 - Cor de fallback: `#D4F1DE` (verde-menta) é exibido apenas se o PNG falhar ao carregar
 
 ### 4.4 Texto sobre cor — legibilidade
 - Textos brancos importantes têm contorno preto sutil (1–1.5px) com anti-aliasing suave (Fase 2.3.6 item A)
 - Aplicado em: nome do anfitrião, cronômetro, pontuação, recorde, todos os textos do `PauseOverlay`
 
-### 4.5 Indicador de vidas (Fase 2.3.9)
-- **Posição:** topo da tela (acima de tudo)
+### 4.5 Indicador de vidas (Fase 2.3.9; Fase 2.3.12 — centralizado)
+- **Posição:** topo da tela, **horizontalmente centralizado** (a partir da Fase 2.3.12)
 - **Visual:** coração único (~36x36dp) com número dentro + faixa estilizada à direita com 4 estados (ver 5.3)
 - **Comportamento de tap:** abre dialog explicando o sistema de vidas
 
@@ -251,6 +255,8 @@ assets/
 
 Animações: fade 300ms entre estados + scale 1→1.1→1 (200ms) em transições positivas (vida ganha).
 
+> **Atenção (a partir da Fase 2.3.12):** o timer regressivo MM:SS depende da regeneração estar funcionando. Até a 2.3.11 inclusive, a faixa "Restando" mostrava o texto mas o número não decrementava porque o regen timer não estava implementado de fato — corrigido na Fase 2.3.12 item C.
+
 ### 5.4 Vidas zeradas
 1. Diálogo: "Você ficou sem vidas! Quer assistir um anúncio de 30s pra ganhar +1 vida?"
 2. Aceita: anúncio recompensado → +1 vida
@@ -270,7 +276,7 @@ class LivesState {
 ```
 
 ### 5.6 Lógica de adicionar vidas
-- **Regen automática:** soma 1 enquanto `current < regenCap`
+- **Regen automática:** soma 1 enquanto `current < regenCap`. **Implementação efetiva a partir da Fase 2.3.12** — antes disso o `nextRegenAt` era populado mas o ticker que dispara o ganho não estava em loop.
 - **Recompensa:** soma N, mas resultado fica clamped em `min(current + N, earnedCap)` — se já tem 14 e ganha 5, vai pra 15 (não 19)
 - **Compra:** soma N **sem cap** — se tem 14 e compra 10, vai pra 24
 
@@ -296,8 +302,11 @@ class LivesState {
 - Itens com contador 0 ficam **acinzentados e desabilitados**, mas continuam visíveis
 
 #### Ícones do inventário
-PNGs em `assets/icons/inventory/`:
-- `bomb_2.png`, `bomb_3.png`, `undo_1.png`, `undo_3.png`
+PNGs finais (1024×1024, fundo transparente) em `assets/icons/inventory/`:
+- `bomb_2.png` — Bomba 2 casas, tema **Sucuri** (verde, com pavio aceso)
+- `bomb_3.png` — Bomba 3 casas, tema **Mico-leão-dourado**
+- `undo_1.png` — Desfazer 1, tema **Capivara** (segurando relógio com seta de retorno)
+- `undo_3.png` — Desfazer 3, tema **Onça-pintada**
 
 #### Confirmação universal antes do uso (Fase 2.3.8)
 **TODOS os itens do inventário exigem confirmação antes de serem usados.**
@@ -495,7 +504,7 @@ users/{userId}/personalRecords
 - **Pontuação e número do tile**: `Fredoka Bold`
 - **Número dentro do coração de vidas**: `Fredoka Bold`, branco com `OutlinedText`
 - **Texto da faixa de vidas (Completo/Bônus/Restando/Sem vidas)**: `Fredoka SemiBold`, ~13sp, com `OutlinedText`
-- **Nome do anfitrião 2x2**: `Fredoka SemiBold`, ~16sp (a partir da 2.3.10), com `OutlinedText`
+- **Nome do anfitrião 2x2**: `Fredoka SemiBold`, 16sp (definido na 2.3.10), com `OutlinedText` e `maxLines: 2`
 - **Texto branco sobre fundo dinâmico**: contorno preto 1–1.5px com anti-aliasing (ver 4.4)
 
 ### 10.4 Iconografia
@@ -527,7 +536,7 @@ users/{userId}/personalRecords
 ---
 
 ## 11. Sons e Música
-*(Implementação na Fase 2.4 — depois das fases visuais e antes do backend)*
+*(Implementação na Fase 4.5 — depois de toda a arte e polimento visual, antes do lançamento)*
 
 ### 11.1 Sons dos animais
 | Animal | Som sugerido |
@@ -586,9 +595,9 @@ users/{userId}/personalRecords
    ↓
 [Home/Menu Principal]
    ├── [Jogo Clássico]
-   │      ├── (vidas no topo central — coração + faixa estilizada)
+   │      ├── (vidas centralizadas no topo — coração + faixa estilizada)
    │      ├── (StatusPanel: cronômetro + pontuação + recorde — sem pause)
-   │      ├── (linha intermediária: PauseButtonTile à esquerda, Anfitrião 2x2 à direita)
+   │      ├── (linha intermediária: Anfitrião 2x2 à esquerda colado, PauseButtonTile à direita)
    │      ├── (tabuleiro 4x4)
    │      ├── (inventário no rodapé)
    │      └── [Game Over Modal]
@@ -607,36 +616,32 @@ users/{userId}/personalRecords
 ```
 
 ### 12.2 Tela: Home
+- **Fundo:** mesmo `assets/images/fundo.png` da `GameScreen` (Fase 2.3.11) — `BoxFit.cover`, fallback `#D4F1DE`
 - Logo grande com a Capivara mascote ao centro
-- **Indicador de vidas** no topo central (coração + faixa "Completo/Bônus/Restando/Sem vidas")
+- **Indicador de vidas** centralizado no topo (coração + faixa "Completo/Bônus/Restando/Sem vidas")
 - Botão grande **"Jogar"** (Novo jogo / Continuar partida salva)
 - Cards: Loja, Ranking, Recompensa Diária (com badge), Convidar
 - Ícones menores: Coleção, Configurações, Como Jogar
-- Background: cena da floresta com paralaxe leve
 
-### 12.3 Tela: Jogo (atualizada na Fase 2.3.10)
+### 12.3 Tela: Jogo (Fase 2.3.10; reordenada na 2.3.12)
 **Layout (de cima pra baixo):**
 
-1. **Topo:** `LivesIndicator` (coração + faixa estilizada)
-2. **Abaixo:** `StatusPanel` (cronômetro + pontuação + recorde) — **sem o pause** (separado na 2.3.10)
-3. **Linha intermediária (entre StatusPanel e tabuleiro):**
-   - **Lado esquerdo (sobre colunas 1-2):** `PauseButtonTile` (1 tile, alinhado à base da linha)
-   - **Lado direito (sobre colunas 3-4):** `HostBanner` 2x2 (nome em cima, PNG embaixo)
+1. **Topo:** `LivesIndicator` (coração + faixa estilizada) — **horizontalmente centralizado** (Fase 2.3.12)
+2. **Abaixo:** `StatusPanel` (cronômetro + pontuação + recorde) — sem o pause
+3. **Linha intermediária (entre StatusPanel e tabuleiro), a partir da Fase 2.3.12:**
+   - **Lado esquerdo (sobre colunas 1-2), colado à coluna 1:** `HostBanner` 2x2 com Tanajura desde o início
+   - **Lado direito (sobre colunas 3-4):** `PauseButtonTile` (1 tile, alinhado à direita em slot 152×72dp via `Align(centerRight)`)
 4. **Centro:** tabuleiro 4x4
 5. **Rodapé:** `InventoryBar` (4 itens com ícones PNG + badges de contador)
 
-> **Nota de layout:** o cabeçalho não é mais uma única `Row` com 3 zonas (como na 2.3.9). Agora são **3 linhas distintas empilhadas**:
-> - Linha A: `LivesIndicator` (centralizado)
+> **Nota de layout (Fase 2.3.12):** o cabeçalho continua dividido em 3 linhas distintas empilhadas (mesmo padrão estabelecido em brainstorm anterior). A correção da 2.3.12 é **eliminar o gap entre o `HostBanner` e a borda esquerda do tabuleiro** — o anfitrião já estava à esquerda, mas com padding/margin que afastava ele da coluna 1.
+> - Linha A: `LivesIndicator` (centralizado horizontalmente — correção da 2.3.12)
 > - Linha B: `StatusPanel` (largura total, sem pause integrado)
-> - Linha C: `Row([PauseButtonTile, HostBanner 2x2])` — pause à esquerda, anfitrião à direita ocupando 2 colunas em largura e 2 tiles de altura
->
-> A altura da Linha C é dominada pela altura do anfitrião (2 tiles + 1 spacing). O `PauseButtonTile` tem altura de apenas 1 tile, então o `Align` deixa ele alinhado pela base (próximo do tabuleiro), ou pelo topo, ou centralizado — decidir no brainstorm.
+> - Linha C: `Row(HostBanner 2×2 esquerda colado à coluna 1 | Spacer | PauseButtonTile direita)` — anfitrião colado pixel-perfect à borda esquerda do tabuleiro, pause permanece à direita (sem mudança)
 
-#### 12.3.1 Posicionamento do botão pause (atualizado na Fase 2.3.10)
+#### 12.3.1 Posicionamento do botão pause (Fase 2.3.10; sem mudança na 2.3.12)
 - **Tile-sized 1×1, fixo, separado do StatusPanel**
-- Posicionado na **linha intermediária do cabeçalho**, alinhado à esquerda do tabuleiro (sobre as 2 primeiras colunas — porque o anfitrião ocupa as 2 últimas)
-- **NÃO é mais flutuante** (regra mantida desde a 2.3.9)
-- **NÃO é mais grudado ao recorde/pontuação/timer** (correção da 2.3.10)
+- Posicionado na linha intermediária do cabeçalho, alinhado à **direita** do tabuleiro (posição definida em brainstorm anterior — sem mudança na 2.3.12)
 - Ícone de pausa centralizado + texto "Pausar" embaixo
 - Animação de tap: scale 1 → 0.95 → 1 (100ms)
 
@@ -678,7 +683,7 @@ users/{userId}/personalRecords
 - Após resgate: oferta de dobrar via anúncio
 
 ### 12.9 Tela: Debug — Galeria de Animais
-Tela acessível apenas em build de debug (via `kDebugMode`). Mostra os 11 animais lado a lado em 2 modos (tile + host). Atualizada na 2.3.10 pra mostrar host no novo tamanho 2x2.
+Tela acessível apenas em build de debug (via `kDebugMode`). Mostra os 11 animais lado a lado em 3 modos: tile, host 1x1 (legado da 2.3.7) e host 2x2 (atualizada na 2.3.10).
 
 ---
 
@@ -718,7 +723,7 @@ class GameState {
   final List<List<Tile?>> board;
   final int score;
   final int highScore;
-  final int highestLevelReached;
+  final int highestLevelReached;     // a partir da 2.3.11: inicializa em 1 (Tanajura)
   final bool isGameOver;
   final bool hasWon;
   final DateTime? startedAt;
@@ -888,7 +893,6 @@ class ShareCode {
 - C — `OutlinedText` completo no `PauseOverlay`
 - D — Ícones SVG do inventário
 - E — Tela debug `AnimalsGalleryScreen`
-- **Identificado:** processamento de SVG em runtime causa lentidão
 
 ### ✅ Fase 2.3.8 — Otimização de Assets + Refinamentos de UI (v0.5.0)
 - A — Migração SVG → PNG
@@ -904,32 +908,148 @@ class ShareCode {
 - A — `LivesStatusBanner` com 4 estados (Completo/Bônus/Restando/Sem vidas)
 - B — `PauseButtonTile` tile-sized fixo
 - C — Fundo do jogo via PNG (`fundo.png`)
-- `GameScreen` refatorado pra `ConsumerWidget` (removidos `_pauseTop`/`_headerKey`/`_updatePausePosition`)
 - 143 testes passando
 
 ### ✅ Fase 2.3.10 — Reorganização do cabeçalho + Anfitrião 2×2 (v0.7.0)
-- A — `GameHeader` (`StatelessWidget`) extraído da `GameScreen`; layout: `LivesIndicator` → `Row(HostBanner 2×2 | Column(StatusPanel + PauseButtonTile))`
-- B — `HostBanner` fixado em 152dp (`GameConstants.twoCellWidth`); `_Placeholder` com silhueta Capivara (opacity 0.15) + "Comece!"; nome Fredoka 16sp com `maxLines:2`
-- C — `HostArtwork`: `BoxFit.cover` (era `contain`); `size` recebido direto (sem `LayoutBuilder`)
-- D — `StatusPanel`: fontes 18sp/24sp/13sp; `CrossAxisAlignment.center`
-- E — `PauseButtonTile` separado do `StatusPanel`; alinhado à esquerda em slot 152×72dp via `Align(centerLeft)`
-- F — Galeria debug: coluna "Host 2×2" mostrando `HostArtwork` em 152dp para todos os 11 animais
+- A — `GameHeader` extraído da `GameScreen`
+- B — `HostBanner` fixado em 152dp
+- C — `HostArtwork`: `BoxFit.cover`, `size` recebido direto
+- D — `StatusPanel`: fontes 18sp/24sp/13sp
+- E — `PauseButtonTile` separado do `StatusPanel` (à esquerda na 2.3.10)
+- F — Galeria debug com coluna Host 2×2
 - 152 testes passando
+
+### ✅ Fase 2.3.11 — Anfitrião inicial Tanajura + Fundo unificado
+- A — `highestLevelReached` inicia em 1 (em vez de 0)
+- B — `_Placeholder` removido do `HostBanner`
+- C — Galeria de debug com nota explicativa sobre Tanajura
+- D — Fundo unificado: `fundo.png` aplicado também na `HomeScreen`
+
+### 🚧 Fase 2.3.12 — Bugfixes de layout, regen e ícones do inventário (PRÓXIMA)
+**Objetivo:** quatro correções identificadas em uso real após a 2.3.11 — `LivesIndicator` está desalinhado (precisa ser centralizado), `HostBanner` 2x2 está à esquerda mas com gap visível à esquerda dele (precisa colar na coluna 1 do tabuleiro), cronômetro de regeneração de vidas não está funcionando (texto "Restando MM:SS" aparece mas o número não decrementa), e os PNGs finais dos ícones do inventário (com temas Sucuri/Mico-leão/Capivara/Onça) ainda não foram integrados ao código — estão na pasta `assets/icons/inventory/` mas o `InventoryItemButton` continua renderizando os ícones antigos/placeholder.
+
+**Estimativa:** 2–3 dias.
+
+#### A — Centralizar `LivesIndicator` no topo
+**Bug atual:** o `LivesIndicator` aparece no topo da tela mas não está horizontalmente centralizado (provavelmente alinhado à esquerda ou desalinhado por causa do `Row` que o contém).
+
+**Mudanças:**
+- Investigar `game_screen.dart` (e `home_screen.dart`) pra identificar como o `LivesIndicator` está sendo posicionado atualmente
+- Garantir que o widget está dentro de um `Row` com `mainAxisAlignment: MainAxisAlignment.center`, ou envolvido em um `Center`, ou (se estiver dentro de uma `Column`) com `crossAxisAlignment: CrossAxisAlignment.center`
+- Aplicar a mesma correção na `HomeScreen` (mesmo `LivesIndicator` aparece nas duas telas)
+- Validar que a centralização funciona em diferentes tamanhos de tela (360px, 412px, tablets)
+
+**Casos de teste obrigatórios:**
+- Snapshot test da `GameScreen`: `LivesIndicator` está horizontalmente centralizado no topo
+- Snapshot test da `HomeScreen`: idem
+- Em tela 360px (smartphone pequeno): `LivesIndicator` continua centralizado, sem overflow lateral
+- Em tela 412px (smartphone padrão): centralizado
+- Em tela 768px+ (tablet): centralizado (não fica colado à esquerda nem estica até as bordas)
+- Quando a faixa muda de "Completo" (mais curta) pra "Restando MM:SS" (mais longa): permanece centralizado (não desloca pro lado conforme o texto cresce)
+
+#### B — Colar `HostBanner` à coluna 1 (eliminar gap à esquerda)
+**Estado atual:** o anfitrião **já está à esquerda** desde decisão tomada em brainstorm — `HostBanner` 2x2 nas colunas 1-2, `PauseButtonTile` à direita (abaixo do cronômetro/StatusPanel). **O bug é só que o `HostBanner` não está colado à coluna 1** — existe um padding/margin/`Spacer` à esquerda dele que cria um gap visual entre a borda esquerda do tabuleiro e a borda esquerda do anfitrião.
+
+**Investigação necessária:**
+- Auditar `game_header.dart` pra identificar a fonte do gap:
+  - Padding interno do `Row` da Linha C?
+  - Margin/padding do próprio `HostBanner`?
+  - `mainAxisAlignment: spaceBetween` numa `Row` que tem só 2 filhos (anfitrião e pause)? Isso colaria os filhos nas extremidades, então provavelmente NÃO é isso
+  - Algum `Center` ou `Align(centerLeft)` errado que centraliza o anfitrião num espaço maior em vez de colar à esquerda?
+  - O `GameHeader` inteiro tem padding horizontal externo que faz o anfitrião não bater com a borda do tabuleiro?
+
+**Mudanças:**
+- Refatorar `game_header.dart`:
+  - Garantir que o `HostBanner` está alinhado à esquerda colado, sem nenhum `padding`/`margin` lateral antes dele
+  - Estrutura sugerida: `Row(children: [HostBanner(...), Spacer(), PauseButtonTile(...)])` — o `Spacer` empurra o pause pra direita, e o anfitrião fica naturalmente colado à esquerda
+  - Se houver padding horizontal externo do `GameHeader`, garantir que ele bate exatamente com o padding/margin do tabuleiro (pra que a "coluna 1" do anfitrião alinhe pixel-perfect com a "coluna 1" do tabuleiro)
+- Validar visualmente que a borda esquerda do `HostBanner` e a borda esquerda do tabuleiro formam uma linha vertical contínua (sem desalinhamento de 1-4px)
+- O `PauseButtonTile` permanece à direita (sem alteração de posição) — só o anfitrião precisa ser ajustado
+
+**Casos de teste obrigatórios:**
+- Snapshot test: borda esquerda do `HostBanner` está alinhada à borda esquerda do tabuleiro (offset = 0px)
+- Pixel-perfect test: medir `HostBanner.left` e `BoardWidget.left` na renderização — devem ser idênticos
+- Em tela 360px: alinhamento mantido sem overflow
+- Em tela 412px: idem
+- O `PauseButtonTile` continua na posição atual (à direita) — regressão
+- Tap no pause continua funcionando — regressão
+- Animação de troca de anfitrião continua funcionando — regressão
+- Galeria `/debug/animals_gallery` não é afetada (independente do layout do `GameHeader`)
+
+#### C — Implementar cronômetro de regeneração de vidas
+**Bug atual:** o `LivesStatusBanner` mostra "Restando MM:SS" quando `current < 5`, mas o número MM:SS é estático ou não decrementa visualmente. Quando os 30 minutos completam (em teoria), a vida não é adicionada automaticamente. O sistema só funciona "passivamente" (se o jogador fechar e reabrir o app depois de 30min, a vida está lá), mas não em tempo real durante a sessão.
+
+**Investigação necessária:**
+- Auditar `lives_notifier.dart` (ou equivalente) pra entender como `nextRegenAt` é populado e quando `current` é incrementado
+- Verificar se existe um `Timer.periodic` ou `Stream<DateTime>` ativo enquanto o app está aberto que dispara `regenerate()` quando `DateTime.now() >= nextRegenAt`
+- Verificar se o `LivesStatusBanner` está consultando `nextRegenAt` em loop pra atualizar o texto MM:SS a cada segundo
+
+**Mudanças:**
+- **No domínio (`lives_system/lives_notifier.dart`):**
+  - Adicionar um `Timer.periodic(Duration(seconds: 1), ...)` no `LivesNotifier` (ou usar `Stream.periodic`)
+  - A cada tick: se `current < regenCap` E `DateTime.now() >= nextRegenAt`, chamar `regenerate()` que soma 1 vida e recalcula `nextRegenAt = now + 30min` (ou null se atingiu o cap)
+  - Garantir que o `Timer` é cancelado quando o `LivesNotifier` é descartado (lifecycle)
+  - Lidar com app em background: ao retornar do background, recalcular quantas vidas deveriam ter sido adicionadas com base no tempo decorrido (não confiar só no Timer enquanto estava em background)
+- **Na UI (`lives_status_banner.dart`):**
+  - Quando estado é "Restando", consumir um `StreamProvider<DateTime>` (ou `Timer.periodic` próprio) que atualiza o texto MM:SS a cada segundo
+  - Calcular `remaining = nextRegenAt - DateTime.now()` e formatar como `MM:SS`
+  - Cuidar do edge case: se `remaining <= 0`, não mostrar "00:00" travado — disparar a regeneração no notifier e a UI atualiza naturalmente
+- **Persistência (Hive):**
+  - Confirmar que `nextRegenAt` continua sendo persistido no Hive (já é, desde a Fase 2.3.8)
+  - Ao boot do app: ler o `LivesState` salvo, calcular se houve regeneração offline (várias vidas podem ter sido geradas se o app ficou fechado por horas), e atualizar `current` antes de iniciar o Timer
+
+**Casos de teste obrigatórios:**
+- `LivesNotifier`: com `current = 4` e `nextRegenAt = now + 30min`, esperar 30min simulados → `current` vira 5, `nextRegenAt` vira null (atingiu regenCap)
+- `LivesNotifier`: com `current = 3` e `nextRegenAt = now + 30min`, esperar 60min simulados → `current` vira 5, `nextRegenAt` vira null (regen rodou 2 vezes)
+- `LivesNotifier`: com `current = 1` e `nextRegenAt = now + 30min`, esperar 30min simulados → `current` vira 2, `nextRegenAt` recalculado pra now + 30min
+- App em background: fechar app com `current = 2` e `nextRegenAt = now + 10min`, abrir 90min depois → `current` vira 5 (3 regenerações offline), `nextRegenAt` null
+- `LivesStatusBanner`: com `current = 4` e `nextRegenAt = now + 12min`, texto exibido é "Restando 12:00" e decrementa a cada segundo até "00:00"
+- `LivesStatusBanner`: ao chegar em "00:00", o estado muda pra "Completo" automaticamente (regen disparada + UI atualiza)
+- Game over com `current = 5` (estava completo): após game over, `current = 4`, `nextRegenAt = now + 30min`, faixa muda pra "Restando 30:00" decrementando
+- Comprar 10 vidas com `current = 4`: vai pra 14 (sem cap por ser compra), faixa muda pra "Bônus" (current > 5), `nextRegenAt = null` (parou regen porque já passou do cap)
+
+#### D — Integrar PNGs finais dos ícones do inventário
+**Bug atual:** os PNGs finais dos 4 ícones de inventário (com temas dos animais — Sucuri pra Bomba 2, Mico-leão pra Bomba 3, Capivara pra Desfazer 1, Onça pra Desfazer 3) já estão em `assets/icons/inventory/` (1024×1024, fundo transparente, gerados pelo pipeline `cache/remove_bg.sh` + `cache/square_icons.sh`). Mas o `InventoryItemButton` continua renderizando os ícones antigos/placeholder (Material/Lucide ou versões anteriores). A integração desses assets é trivial mas nunca foi feita explicitamente como entrega numa fase.
+
+**Mudanças:**
+- Auditar `inventory_item_button.dart` pra confirmar como os ícones estão sendo renderizados atualmente (provavelmente `Icon(IconData)` ou `Image.asset` com path antigo)
+- Atualizar `inventory_bar.dart` (ou onde os 4 botões são instanciados) pra apontar pros PNGs finais:
+  - Bomba 2 → `assets/icons/inventory/bomb_2.png`
+  - Bomba 3 → `assets/icons/inventory/bomb_3.png`
+  - Desfazer 1 → `assets/icons/inventory/undo_1.png`
+  - Desfazer 3 → `assets/icons/inventory/undo_3.png`
+- Confirmar que `pubspec.yaml` declara `assets/icons/inventory/` (provavelmente já declara desde a Fase 2.3.8)
+- Adicionar os 4 ícones ao `precacheImage` do boot (já tem fundo.png + 22 PNGs de animais; agora vão 26 PNGs precacheados)
+- Validar visualmente:
+  - Cada ícone PNG ocupa o slot do `InventoryItemButton` com `BoxFit.contain` (evita corte das bordas dos animais)
+  - Estado disabled (contador 0): aplicar `Opacity(0.4)` ou `ColorFilter.matrix` pra acinzentar — confirmar que funciona com PNG colorido (alguns blends podem ficar estranhos com transparência)
+  - Badge de contador continua bem posicionado (canto superior direito) sobre o novo ícone
+  - Estado "99+" continua funcionando com os novos ícones
+- Atualizar `confirm_use_dialog.dart` (Fase 2.3.8 item B) pra usar o mesmo PNG no ícone grande — assim o jogador vê o mesmo asset no botão e na confirmação
+
+**Casos de teste obrigatórios:**
+- `InventoryItemButton` renderiza PNG correto pra cada um dos 4 itens (snapshot test)
+- Estado habilitado (contador ≥1): PNG colorido, totalmente visível
+- Estado disabled (contador 0): PNG acinzentado/com opacity reduzida, ainda reconhecível
+- Badge de contador (incluindo "99+") continua legível sobre o novo ícone
+- `ConfirmUseDialog` mostra o mesmo PNG do botão (consistência visual)
+- Performance: `precacheImage` dos 4 PNGs no boot não causa lag visível
+- Sem dependências residuais aos ícones antigos (lint/grep: `Icons.dangerous`, `Icons.undo`, paths SVG antigos não devem aparecer mais)
+
+#### Ordem de execução recomendada
+1. **A primeiro** (centralizar `LivesIndicator`) — mudança mais simples, isolada visualmente
+2. **B depois** (colar `HostBanner` à coluna 1) — ajuste de padding/margin contido em `game_header.dart`
+3. **D** (integrar PNGs do inventário) — independente, pode rodar em paralelo com A/B/C; entrega visual rápida
+4. **C por último** (cronômetro de regen) — mudança lógica + UI, mais arriscada e merece atenção dedicada
 
 ---
 
-### 🔜 Fase 2.4 — Áudio (1–2 semanas)
-**Sons dos 11 animais e UI + música ambiente.**
+### 🔀 Fase 2.4 — Áudio (movida para Fase 4.5)
+**Esta fase foi movida pra perto do final do desenvolvimento, antes do lançamento.** Ver **Fase 4.5** logo abaixo no roadmap pra detalhes da implementação.
 
-- Sons dos 11 animais (~50KB cada, OGG/M4A/MP3) — ver tabela 11.1
-- Sons de UI completos — ver lista 11.2
-- Música ambiente: loop de floresta com flautas + marimba
-- Integrar com `audioplayers` ou `just_audio` (decidir qual)
-- Pool de AudioPlayers (evita latência no merge)
-- Mixer simples nas Configurações (slider SFX + slider música + mute persistente)
-- Pré-carregar tudo no início do app
+**Por que foi movida:** os sons dos animais e UI dependem da identidade visual final. Implementar antes da Fase 4 (arte adicional) corre risco de retrabalho se a paleta/tom do jogo mudar. A posição na Fase 4.5 garante que o áudio seja a última camada de polimento antes do lançamento.
 
-> **Posicionamento desta fase:** o áudio entra **depois** do polimento visual (2.3.x) e **antes** das próximas features de gameplay (recompensas, coleção, loja). Ele não bloqueia gameplay, mas a essa altura a UI estará estabilizada e os sons casarão com os elementos visuais finais.
+> O slot **2.4** é mantido aqui pra preservar a numeração histórica do roadmap e deixar explícito que a fase foi reposicionada (não removida).
 
 ### 🔜 Fase 2.5 — Recompensas diárias (3 dias)
 - Tela de recompensas com grid 7 dias
@@ -941,7 +1061,7 @@ class ShareCode {
 ### 🔜 Fase 2.6 — Tela Home + Coleção + Configurações (1 semana)
 - Home com todos os botões e indicadores
 - Tela de Coleção (silhuetas para não desbloqueados, card detalhado para desbloqueados — usa `backgroundBaseColor` do Animal)
-- Configurações (volume SFX, volume música, haptic, idioma)
+- Configurações (volume SFX, volume música, haptic, idioma) — sliders de áudio ficam desabilitados/ocultos até a Fase 4.5
 
 ### 🔜 Fase 2.7 — Loja mock (3 dias)
 - Tela com os 6 pacotes
@@ -966,6 +1086,17 @@ class ShareCode {
 - Ícone do app
 - Splash screen final
 - Validação visual completa
+
+### 🔜 Fase 4.5 — Áudio (1–2 semanas)
+**Sons dos 11 animais e UI + música ambiente.** Esta fase entra **depois** de toda a arte e polimento visual e **antes** do lançamento — quando todos os assets visuais finais estão consolidados, os sons casarão exatamente com os elementos.
+
+- Sons dos 11 animais (~50KB cada, OGG/M4A/MP3) — ver tabela 11.1
+- Sons de UI completos — ver lista 11.2
+- Música ambiente: loop de floresta com flautas + marimba
+- Integrar com `audioplayers` ou `just_audio` (decidir qual)
+- Pool de AudioPlayers (evita latência no merge)
+- Mixer simples nas Configurações (slider SFX + slider música + mute persistente) — habilitar os controles que ficaram desabilitados na Fase 2.6
+- Pré-carregar tudo no início do app
 
 ### 🔜 Fase 5 — Polimento + Lançamento
 - Localização PT-BR / EN
@@ -996,10 +1127,11 @@ class ShareCode {
 - `const` e Riverpod selectors
 - PNGs em vez de SVGs (Fase 2.3.8 item A) — gargalo removido
 - `precacheImage` pra os 22 PNGs dos animais + 4 do inventário + `fundo.png` no boot
-- Pool de AudioPlayers (Fase 2.4)
+- Pool de AudioPlayers (Fase 4.5)
 - 60fps em Snapdragon 660+ / iPhone 8+
 - `RepaintBoundary` no `GameBackground`
 - `BackdropFilter` no `PauseOverlay` é o único custo significativo de UI — fallback se ficar < 50fps
+- **Timer de regeneração de vidas (Fase 2.3.12 item C):** `Timer.periodic` rodando a cada segundo é leve, mas garantir que o widget é desmontado corretamente (`dispose`) pra não vazar timers entre navegações
 
 ### 16.3 LGPD / COPPA / Crianças
 - Conformidade COPPA (US) e LGPD (BR)
@@ -1021,57 +1153,70 @@ class ShareCode {
 
 ---
 
-## 17. Prompt Sugerido para o Claude Code (Fase 2.3.10 — via skill superpowers)
+## 17. Prompt Sugerido para o Claude Code (Fase 2.3.12 — via skill superpowers)
 
-> O prompt abaixo entra no fluxo do **superpowers/brainstorming**. O resultado esperado é uma **spec detalhada da Fase 2.3.10** (refinada via brainstorm), que depois alimenta o **superpowers/writing-plans** pra gerar o plano executável. Nada de código nesta etapa — apenas elicitação, refinamento de design e plano.
+> O prompt abaixo entra no fluxo do **superpowers/brainstorming**. O resultado esperado é uma **spec detalhada da Fase 2.3.12** (refinada via brainstorm), que depois alimenta o **superpowers/writing-plans** pra gerar o plano executável. Nada de código nesta etapa — apenas elicitação, refinamento de design e plano.
 
 ---
 
 > Use a skill `superpowers/brainstorming` pra refinar o design da próxima fase do projeto **Capivara 2048** (Flutter).
 >
-> **Contexto:** Estamos no projeto Capivara 2048. Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente seções 4.2, 12.3, 12.3.1 e 15 — Fase 2.3.10).
+> **Contexto:** Estamos no projeto Capivara 2048. Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente seções 4.2, 4.5, 5.6, 12.3 e 15 — Fase 2.3.12).
 >
 > **Fases concluídas:**
-> - Fase 1 a 2.3.8
-> - **Fase 2.3.9 (v0.6.0)** — fundo PNG, `LivesStatusBanner` 4 estados, `PauseButtonTile` tile-sized fixo, `GameScreen` como `ConsumerWidget`. 143 testes passando.
+> - Fase 1 a 2.3.10
+> - **Fase 2.3.11** — Tanajura como anfitrião desde o boot (`highestLevelReached` inicia em 1), `_Placeholder` removido, `fundo.png` aplicado também na `HomeScreen`.
 >
-> **Tópico do brainstorm:** desenhar a **Fase 2.3.10 — Reorganização do cabeçalho + Anfitrião 2x2**. Dois ajustes de layout identificados em uso real:
+> **Tópico do brainstorm:** desenhar a **Fase 2.3.12 — Bugfixes de layout, regen e ícones do inventário**. Quatro correções identificadas em uso real após a 2.3.11:
 >
-> **A — Separar pause do StatusPanel:** atualmente o `PauseButtonTile` está na mesma `Row` que o `StatusPanel` (cronômetro/pontuação/recorde), parecendo "grudado" no recorde. A correção é refatorar o cabeçalho em **3 linhas distintas**:
-> - Linha A: `LivesIndicator` (já existente)
-> - Linha B: `StatusPanel` largura total — só cronômetro + pontuação + recorde, sem pause
-> - Linha C (entre StatusPanel e tabuleiro): `Row([PauseButtonTile, HostBanner 2x2])`
+> **A — Centralizar `LivesIndicator` no topo:** atualmente está desalinhado (provavelmente à esquerda). Ajustar `game_screen.dart` e `home_screen.dart` pra garantir centralização horizontal usando `Row` com `mainAxisAlignment: center` ou `Center` widget.
 >
-> **B — Anfitrião 2x2 no lado direito:** o anfitrião 1x1 ficou pequeno demais. Expandir pra ocupar 2 tiles de largura (colunas 3-4) e 2 tiles de altura. PNG ocupa todo o slot 2x2 com `BoxFit.contain`. Nome em cima pode ser maior (~16sp) porque tem mais largura. `HostArtwork` recalcula dimensões via `LayoutBuilder`.
+> **B — Colar `HostBanner` à coluna 1 (eliminar gap à esquerda):** o anfitrião **já está à esquerda** desde decisão tomada em brainstorm anterior, e o `PauseButtonTile` já está à direita abaixo do cronômetro. Mas o `HostBanner` não está colado à borda esquerda — existe um gap visível entre a borda esquerda do tabuleiro e a borda esquerda do anfitrião. Investigar `game_header.dart` pra identificar a fonte do gap (padding interno do `Row`, margin do widget, ou padding externo do `GameHeader` que não bate com o tabuleiro) e ajustar pra que as duas bordas formem uma linha vertical contínua.
+>
+> **C — Implementar cronômetro de regeneração de vidas:** o `LivesStatusBanner` mostra "Restando MM:SS" mas o número não decrementa visualmente. Auditar `LivesNotifier` pra confirmar se há `Timer.periodic` ativo, implementar se não tiver. UI consome `StreamProvider<DateTime>` ou Timer próprio pra atualizar a cada segundo. Lidar com app em background (recalcular vidas geradas offline ao retornar).
+>
+> **D — Integrar PNGs finais dos ícones do inventário:** os 4 PNGs (temas Sucuri/Mico-leão/Capivara/Onça) já estão em `assets/icons/inventory/` mas o `InventoryItemButton` continua usando ícones antigos/placeholder. Atualizar paths, adicionar ao `precacheImage` do boot, validar estado disabled (acinzentado) e badge de contador sobre o novo ícone. Sincronizar com `ConfirmUseDialog` pra mostrar o mesmo asset.
 >
 > **Pontos abertos pra explorar no brainstorm (elicitação esperada):**
 >
-> Sobre o item A (cabeçalho em 3 linhas):
-> - Spacing vertical entre as 3 linhas — 8dp uniforme, ou hierarquia (mais espaço entre Linha A e B, menos entre B e C)?
-> - O `StatusPanel` agora ocupa largura total — vale aumentar o tamanho da fonte do cronômetro/pontuação/recorde já que tem mais espaço, ou manter? Como afeta a hierarquia visual?
-> - Visualmente, ter pause + anfitrião na mesma linha (Linha C) faz sentido, ou seria melhor separar em mais uma linha (Linha C: pause; Linha D: anfitrião)? Tradeoff de altura total do cabeçalho vs clareza.
-> - Quando o jogo recém-iniciado e o anfitrião está vazio (Fase 2.3.6 item B): o slot 2x2 fica em branco. Isso parece estranho? Ou tudo bem porque a área é maior? Vale silhueta da Capivara em opacity baixa enquanto não tem nada?
+> Sobre o item A (centralizar LivesIndicator):
+> - Verificar se o problema é técnico (faltou `mainAxisAlignment`) ou de design (`LivesIndicator` está dentro de um container com `padding` assimétrico)?
+> - A correção vale só pra `GameScreen` ou também pra `HomeScreen`? Provavelmente as duas, mas confirmar.
+> - Se o `LivesIndicator` continuar desalinhado em alguma tela, vale adicionar regression test que falha se ele sair do centro?
 >
-> Sobre o item B (anfitrião 2x2):
-> - Alinhamento vertical do `PauseButtonTile` na Linha C (já que tem altura menor que o anfitrião 2x2): base, topo, ou centro? Qual fica melhor visualmente — pause "ancorado" no tabuleiro (base), "subindo" junto com o nome (topo), ou flutuando no meio?
-> - Os PNGs do anfitrião foram desenhados pensando num slot 1x1 (tile-sized) na Fase 2.3.7. Agora num slot 2x2, vão ficar maiores — algum animal pode ficar visualmente desproporcional (ex: muito alto, ou com bordas vazias)? Vale revalidar todos na galeria de debug?
-> - O `BoxFit.contain` no slot 2x2 quadrado preserva proporção mas pode deixar barras nas laterais/topo/base se o PNG não for quadrado. Faz sentido manter `contain`, ou vale `BoxFit.cover` (preenche tudo, corta bordas)?
-> - Tamanho do nome do animal (~16sp foi sugerido) — vale fazer maior já que tem 2x a largura? Ex: 18sp, 20sp? Considerar legibilidade vs hierarquia (não pode competir com o número do tile).
-> - Fronteira: o slot 2x2 do anfitrião e os tiles do tabuleiro abaixo têm exatamente o mesmo grid de colunas (3-4)? Ou tem leve offset? Importante pra bater visualmente.
+> Sobre o item B (colar HostBanner à coluna 1):
+> - Diagnóstico do gap: o problema é (a) padding interno do `Row` da Linha C, (b) margin do `HostBanner` widget, (c) `mainAxisAlignment` errado da `Row`, (d) padding externo do `GameHeader` que não bate com o tabuleiro, ou (e) algum `Center`/`Align` indevido? Vale investigar antes de propor solução.
+> - Pixel-perfect: a borda esquerda do `HostBanner` deve ficar exatamente alinhada com a borda esquerda da coluna 1 do tabuleiro? Ou pode haver tolerância de 1-2px? Como medir/testar isso de forma confiável?
+> - Se o `GameHeader` e o `BoardWidget` estão ambos dentro de um container com padding horizontal externo, basta garantir que ambos consomem o mesmo padding. Se estiverem em containers diferentes, vale unificar?
+> - O `PauseButtonTile` à direita continua na posição atual (sem mudança) — confirmar que a correção do anfitrião não desloca acidentalmente o pause.
+>
+> Sobre o item C (regen timer):
+> - Tradeoff `Timer.periodic` vs `Stream.periodic`: qual encaixa melhor no padrão Riverpod do projeto? Vale usar `StreamProvider`?
+> - Frequência do tick: 1 segundo é o ideal, ou 1 minuto seria suficiente (já que o display é MM:SS, mas o usuário pode olhar e esperar a transição da contagem)?
+> - Recálculo offline: ao voltar do background, calcular `min(elapsedTime / 30min, regenCap - current)` vidas adicionadas. Edge case: se o jogador ficou 6 horas fora, com `current = 0`, deve voltar com 5 (regenCap atingido) e `nextRegenAt = null`.
+> - O `LivesNotifier` precisa ter um método `pauseRegen()`/`resumeRegen()` pra lifecycle do app (em background → pausa Timer; em foreground → retoma e recalcula)?
+> - A faixa "Restando" exibe MM:SS — quando faltam ≥60min (ex: jogador comprou pacote enorme e perdeu várias vidas), mostrar HH:MM:SS, ou continua MM:SS truncando? Edge case raro, mas vale decidir.
+> - Animação ao chegar em "00:00" e a regen disparar: a faixa muda pra "Completo" (ou "Restando MM:SS" se ainda < 5) com animação fade+scale (já existente da 2.3.9 item A) — confirmar que continua funcionando.
+>
+> Sobre o item D (PNGs do inventário):
+> - Os PNGs novos têm fundo transparente e tema dos animais (Sucuri/Mico-leão/Capivara/Onça). Vão competir com o número/badge de contador que fica em cima? Vale revisar contraste em estado disabled (com Opacity 0.4)?
+> - Os ícones antigos (placeholder Material/Lucide ou versões anteriores) — vale apagar de vez do código, ou manter como fallback (similar ao que foi feito com SVGs antigos no inventário)?
+> - O `BoxFit.contain` no slot do `InventoryItemButton` preserva proporção mas pode deixar barras laterais. Faz sentido ou vale `BoxFit.cover` (consistente com `HostArtwork` da 2.3.10)?
+> - Sincronização visual com `ConfirmUseDialog`: o ícone grande do dialog também passa a usar o PNG novo? Tamanho diferente (ex: 64x64) — o PNG 1024x1024 vai ser redimensionado automaticamente pelo Flutter, ou vale forçar `cacheWidth: 64`?
+> - Estado disabled (contador 0): `Opacity(0.4)` simples, ou `ColorFilter.matrix` pra dessaturar pra escala de cinza? Qual fica mais reconhecível com PNG colorido?
 >
 > Sobre integração:
-> - Ordem das 2 entregas: A primeiro (refatoração estrutural do cabeçalho), B depois (preenche um lado da Linha C criada no A). Confirma a sequência?
-> - A Galeria `/debug/animals_gallery` atualmente mostra host no tamanho 1x1 — atualizar pra mostrar 2x2 também na 2.3.10?
-> - Snapshot tests existentes da `GameScreen` (Fase 2.3.9) precisam ser regenerados — ambos os itens A e B mudam a árvore de widgets significativamente.
-> - Acessibilidade: o `Semantics` do `HostBanner` precisa anunciar "Anfitrião: [nome do animal]"?
+> - Ordem das entregas: A primeiro (mais simples), B depois (refator de layout), C por último (mais complexo) — confirma a sequência?
+> - Testes existentes: snapshots da `GameScreen` e `HomeScreen` (pelo menos 5-10 testes) precisam ser regenerados depois de A e B. Refazer ou ajustar?
+> - Vale tirar screenshots/vídeo do antes/depois pra validar visualmente?
+> - Sobre o item C: vale escrever um teste de integração que simula 30 minutos passando (com `FakeAsync` ou similar) pra validar regen end-to-end?
 >
 > **Output esperado do brainstorm:**
-> Uma **spec detalhada da Fase 2.3.10** (markdown, tipo `FASE_2_3_10_SPEC.md`) com:
+> Uma **spec detalhada da Fase 2.3.12** (markdown, tipo `FASE_2_3_12_SPEC.md`) com:
 > - Decisões tomadas em cada ponto aberto
-> - Para cada uma das 2 sub-entregas: arquivos a criar/modificar, mudança exata, casos de teste obrigatórios, critérios de aceite
-> - Ordem de execução recomendada (A → B)
-> - Cobertura de testes existentes que precisa ser atualizada (especialmente snapshots da Fase 2.3.9)
-> - Estratégia de validação visual após cada entrega (screenshots/golden tests, galeria atualizada)
+> - Para cada uma das 4 sub-entregas: arquivos a criar/modificar, mudança exata, casos de teste obrigatórios, critérios de aceite
+> - Estratégia de implementação do regen timer (item C — Timer vs Stream, lifecycle, offline recalc)
+> - Lista de testes existentes que precisam ser ajustados (snapshots de layout)
 >
 > Esse documento será depois consumido pela skill `superpowers/writing-plans` pra gerar o plano executável (TDD-friendly, com checkpoints).
 >
