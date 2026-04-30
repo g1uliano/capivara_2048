@@ -7,6 +7,11 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.8.3] — 2026-04-30
+
+### Fixed
+- `HostBanner` colado à esquerda do header sem padding — simetria com `PauseButtonTile` à direita
+
 ## [0.8.2] — 2026-04-30
 
 ### Fixed
