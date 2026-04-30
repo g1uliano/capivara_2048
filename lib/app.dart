@@ -40,6 +40,10 @@ class _CapivaraAppState extends State<CapivaraApp> {
       const AssetImage('assets/images/fundo.png'),
       context,
     );
+    precacheImage(const AssetImage('assets/icons/inventory/bomb_2.png'), context);
+    precacheImage(const AssetImage('assets/icons/inventory/bomb_3.png'), context);
+    precacheImage(const AssetImage('assets/icons/inventory/undo_1.png'), context);
+    precacheImage(const AssetImage('assets/icons/inventory/undo_3.png'), context);
   }
 
   @override

@@ -5,6 +5,7 @@ Future<bool> showConfirmUseDialog({
   required BuildContext context,
   required String itemName,
   required String description,
+  String? pngPath,
 }) async {
   final result = await showDialog<bool>(
     context: context,
@@ -12,6 +13,7 @@ Future<bool> showConfirmUseDialog({
     builder: (_) => _ConfirmUseDialog(
       itemName: itemName,
       description: description,
+      pngPath: pngPath,
     ),
   );
   return result ?? false;
@@ -20,20 +22,31 @@ Future<bool> showConfirmUseDialog({
 class _ConfirmUseDialog extends StatelessWidget {
   final String itemName;
   final String description;
+  final String? pngPath;
 
   const _ConfirmUseDialog({
     required this.itemName,
     required this.description,
+    this.pngPath,
   });
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      title: Text(
-        'Usar $itemName?',
-        style: GoogleFonts.fredoka(fontWeight: FontWeight.bold, fontSize: 20),
-        textAlign: TextAlign.center,
+      title: Row(
+        children: [
+          if (pngPath != null) ...[
+            Image.asset(pngPath!, width: 40, height: 40),
+            const SizedBox(width: 8),
+          ],
+          Flexible(
+            child: Text(
+              'Usar $itemName?',
+              style: GoogleFonts.fredoka(fontWeight: FontWeight.bold, fontSize: 20),
+            ),
+          ),
+        ],
       ),
       content: Text(
         description,

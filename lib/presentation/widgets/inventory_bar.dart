@@ -19,6 +19,7 @@ class InventoryBar extends ConsumerWidget {
         context: context,
         itemName: 'Bomba 2',
         description: 'Remove os 2 tiles de menor valor do tabuleiro.',
+        pngPath: 'assets/icons/inventory/bomb_2.png',
       );
       if (!ok) return;
       ref.read(gameProvider.notifier).enterBombMode(BombMode.bomb2, ItemType.bomb2);
@@ -29,6 +30,7 @@ class InventoryBar extends ConsumerWidget {
         context: context,
         itemName: 'Bomba 3',
         description: 'Remove os 3 tiles de menor valor do tabuleiro.',
+        pngPath: 'assets/icons/inventory/bomb_3.png',
       );
       if (!ok) return;
       ref.read(gameProvider.notifier).enterBombMode(BombMode.bomb3, ItemType.bomb3);
@@ -39,6 +41,7 @@ class InventoryBar extends ConsumerWidget {
         context: context,
         itemName: 'Desfazer 1',
         description: 'Desfaz o último movimento.',
+        pngPath: 'assets/icons/inventory/undo_1.png',
       );
       if (!ok) return;
       final undone = ref.read(gameProvider.notifier).undo(1);
@@ -50,6 +53,7 @@ class InventoryBar extends ConsumerWidget {
         context: context,
         itemName: 'Desfazer 3',
         description: 'Desfaz os últimos 3 movimentos.',
+        pngPath: 'assets/icons/inventory/undo_3.png',
       );
       if (!ok) return;
       final undone = ref.read(gameProvider.notifier).undo(3);
@@ -64,24 +68,28 @@ class InventoryBar extends ConsumerWidget {
           InventoryItemButton(
             label: 'Bomba 2',
             icon: Icons.bolt,
+            pngPath: 'assets/icons/inventory/bomb_2.png',
             count: inventory.bomb2,
             onPressed: inventory.bomb2 > 0 ? useBomb2 : null,
           ),
           InventoryItemButton(
             label: 'Bomba 3',
             icon: Icons.auto_fix_high,
+            pngPath: 'assets/icons/inventory/bomb_3.png',
             count: inventory.bomb3,
             onPressed: inventory.bomb3 > 0 ? useBomb3 : null,
           ),
           InventoryItemButton(
             label: 'Desfazer 1',
             icon: Icons.undo,
+            pngPath: 'assets/icons/inventory/undo_1.png',
             count: inventory.undo1,
             onPressed: inventory.undo1 > 0 ? useUndo1 : null,
           ),
           InventoryItemButton(
             label: 'Desfazer 3',
             icon: Icons.fast_rewind,
+            pngPath: 'assets/icons/inventory/undo_3.png',
             count: inventory.undo3,
             onPressed: inventory.undo3 > 0 ? useUndo3 : null,
           ),

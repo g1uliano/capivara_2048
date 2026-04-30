@@ -48,4 +48,16 @@ void main() {
         .toList();
     expect(buttons[0].onPressed, isNotNull);
   });
+
+  testWidgets('Bomba 2 button has pngPath set', (tester) async {
+    await tester.pumpWidget(buildSubject());
+    await tester.pump();
+    final buttons = tester
+        .widgetList<InventoryItemButton>(find.byType(InventoryItemButton))
+        .toList();
+    expect(buttons[0].pngPath, 'assets/icons/inventory/bomb_2.png');
+    expect(buttons[1].pngPath, 'assets/icons/inventory/bomb_3.png');
+    expect(buttons[2].pngPath, 'assets/icons/inventory/undo_1.png');
+    expect(buttons[3].pngPath, 'assets/icons/inventory/undo_3.png');
+  });
 }

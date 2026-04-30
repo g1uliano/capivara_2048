@@ -50,7 +50,7 @@ class InventoryItemButton extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       pngPath != null
-                          ? Image.asset(pngPath!, width: 32, height: 32,
+                          ? Image.asset(pngPath!, width: 28, height: 28,
                               errorBuilder: (_, __, ___) =>
                                   Icon(icon, color: Colors.white, size: 22))
                           : Icon(icon, color: Colors.white, size: 22),
