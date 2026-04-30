@@ -26,10 +26,7 @@ class HomeScreen extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
             child: Column(
               children: [
-                const Align(
-                  alignment: Alignment.centerRight,
-                  child: LivesIndicator(),
-                ),
+                const Center(child: LivesIndicator()),
                 const Spacer(),
                 const SizedBox(height: 220),
                 const SizedBox(height: 32),

@@ -19,7 +19,7 @@ class GameHeader extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const LivesIndicator(),
+        const Center(child: LivesIndicator()),
         const SizedBox(height: 12),
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,

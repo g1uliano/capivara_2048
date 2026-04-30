@@ -62,6 +62,16 @@ void main() {
       expect(hostPos.dx, lessThan(statusPos.dx));
     });
 
+    testWidgets('LivesIndicator está horizontalmente centralizado', (tester) async {
+      await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () {})));
+      await tester.pump();
+      final headerBox = tester.getRect(find.byType(GameHeader));
+      final indicatorBox = tester.getRect(find.byType(LivesIndicator));
+      final headerCenter = headerBox.left + headerBox.width / 2;
+      final indicatorCenter = indicatorBox.left + indicatorBox.width / 2;
+      expect(indicatorCenter, closeTo(headerCenter, 2.0));
+    });
+
     testWidgets('sem overflow em 360dp de largura', (tester) async {
       tester.view.physicalSize = const Size(360, 800);
       tester.view.devicePixelRatio = 1.0;
