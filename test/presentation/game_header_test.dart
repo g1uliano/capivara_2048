@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:capivara_2048/core/constants/game_constants.dart';
 import 'package:capivara_2048/data/models/lives_state_adapter.dart';
 import 'package:capivara_2048/presentation/widgets/game_header.dart';
 import 'package:capivara_2048/presentation/widgets/host_banner.dart';
@@ -73,7 +72,7 @@ void main() {
       expect(indicatorCenter, closeTo(headerCenter, 2.0));
     });
 
-    testWidgets('HostBanner está alinhado com a coluna 1 (offset tileSpacing*1.5 da borda)', (tester) async {
+    testWidgets('HostBanner está colado à esquerda do header', (tester) async {
       tester.view.physicalSize = const Size(400, 800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -82,9 +81,7 @@ void main() {
       await tester.pump();
       final headerBox = tester.getRect(find.byType(GameHeader));
       final hostBox = tester.getRect(find.byType(HostBanner));
-      // HostBanner offset = tileSpacing + tileSpacing/2 = 12px para alinhar com coluna 1
-      const expectedOffset = GameConstants.tileSpacing + GameConstants.tileSpacing / 2;
-      expect(hostBox.left - headerBox.left, closeTo(expectedOffset, 2.0));
+      expect(hostBox.left, closeTo(headerBox.left, 2.0));
     });
 
     testWidgets('PauseButtonTile está à direita do HostBanner', (tester) async {
