@@ -7,6 +7,12 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.8.2] — 2026-04-30
+
+### Fixed
+- `HostBanner` alinhado com a coluna 1 do tabuleiro (offset `tileSpacing * 1.5` corrigido)
+- Botões do inventário sem label de texto — apenas PNG centralizado no slot
+
 ## [0.8.1] — 2026-04-30
 
 ### Fixed
