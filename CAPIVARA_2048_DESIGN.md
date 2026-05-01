@@ -2,7 +2,7 @@
 
 > Documento de especificação para desenvolvimento. Pensado para ser alimentado em ferramentas como Claude Code para implementação iterativa.
 >
-> **Status atual:** Fase 2.3.12 concluída ✅ — `LivesIndicator` centralizado, `HostBanner` colado à coluna 1 (sem gap), timer de regen de vidas implementado (`Timer.periodic` + `AppLifecycleListener`), PNGs finais do inventário integrados com ícone no `ConfirmUseDialog`.
+> **Status atual:** Fase 2.3.12 concluída ✅ (v0.8.4+21) — `LivesIndicator` centralizado, `HostBanner` flush-left sem padding (colado à borda esquerda do header, simétrico ao `PauseButtonTile` flush-right), timer de regen de vidas implementado (`Timer.periodic` + `AppLifecycleListener`), PNGs finais do inventário integrados — **PNG ocupa o slot 56×56 inteiro (o PNG é o botão)**, sem fundo verde, com fallback `Material`+`Icon` se o asset falhar.
 >
 > **Próximo:** **Fase 2.4 — Áudio e música**.
 
@@ -95,7 +95,7 @@ lib/
 │   │   ├── tile_widget.dart             ✅
 │   │   ├── score_panel.dart             ✅
 │   │   ├── status_panel.dart            ✅
-│   │   ├── game_header.dart             ✅ (gap à esquerda corrigido na 2.3.12)
+│   │   ├── game_header.dart             ✅ (flush-left HostBanner + centralizado LivesIndicator, 2.3.12)
 │   │   ├── host_banner.dart             ✅
 │   │   ├── host_artwork.dart            ✅
 │   │   ├── game_background.dart         ✅
@@ -196,8 +196,8 @@ assets/
 - **Sombra:** suave abaixo
 - **Animação idle:** respiração lenta + piscar aleatório (futuro)
 
-### 4.2 Anfitrião do jogo (Fase 2.3.10 — 2x2; Fase 2.3.11 — Tanajura inicial; Fase 2.3.12 — colado à coluna 1)
-- **Posição (definida em brainstorm anterior; gap à esquerda corrigido na 2.3.12):** acima do tabuleiro, **lado esquerdo, colado à coluna 1** (sem gap entre a borda esquerda do anfitrião e a borda esquerda do tabuleiro), alinhado às **colunas 1 e 2** do tabuleiro
+### 4.2 Anfitrião do jogo (Fase 2.3.10 — 2x2; Fase 2.3.11 — Tanajura inicial; Fase 2.3.12 — flush-left sem padding)
+- **Posição:** acima do tabuleiro, **lado esquerdo, flush-left** — borda esquerda do `HostBanner` alinhada pixel-perfect com a borda esquerda do header (sem padding nem margin à esquerda), espelhando a simetria do `PauseButtonTile` que é flush-right; alinhado às **colunas 1 e 2** do tabuleiro
 - **Tamanho:** **2 tiles de largura × 2 tiles de altura** (152dp `GameConstants.twoCellWidth`)
 - **Conteúdo (de cima pra baixo):**
   - **Nome do animal** (em cima) — Fredoka SemiBold, 16sp, com `OutlinedText` e `maxLines: 2`
@@ -307,6 +307,8 @@ PNGs finais (1024×1024, fundo transparente) em `assets/icons/inventory/`:
 - `bomb_3.png` — Bomba 3 casas, tema **Mico-leão-dourado**
 - `undo_1.png` — Desfazer 1, tema **Capivara** (segurando relógio com seta de retorno)
 - `undo_3.png` — Desfazer 3, tema **Onça-pintada**
+
+**Visual do botão (Fase 2.3.12):** o PNG ocupa o slot 56×56 inteiro — o PNG **é** o botão. Sem fundo verde nem `Material`. Fallback automático para `Material(#4CAF50)` + `Icon` branco se o asset falhar ao carregar.
 
 #### Confirmação universal antes do uso (Fase 2.3.8)
 **TODOS os itens do inventário exigem confirmação antes de serem usados.**
@@ -634,10 +636,10 @@ users/{userId}/personalRecords
 4. **Centro:** tabuleiro 4x4
 5. **Rodapé:** `InventoryBar` (4 itens com ícones PNG + badges de contador)
 
-> **Nota de layout (Fase 2.3.12):** o cabeçalho continua dividido em 3 linhas distintas empilhadas (mesmo padrão estabelecido em brainstorm anterior). A correção da 2.3.12 é **eliminar o gap entre o `HostBanner` e a borda esquerda do tabuleiro** — o anfitrião já estava à esquerda, mas com padding/margin que afastava ele da coluna 1.
-> - Linha A: `LivesIndicator` (centralizado horizontalmente — correção da 2.3.12)
+> **Nota de layout (Fase 2.3.12):** o cabeçalho tem 3 linhas distintas empilhadas:
+> - Linha A: `LivesIndicator` (`Center`) — horizontalmente centralizado
 > - Linha B: `StatusPanel` (largura total, sem pause integrado)
-> - Linha C: `Row(HostBanner 2×2 esquerda colado à coluna 1 | Spacer | PauseButtonTile direita)` — anfitrião colado pixel-perfect à borda esquerda do tabuleiro, pause permanece à direita (sem mudança)
+> - Linha C: `Row(HostBanner flush-left | Spacer | Column(StatusPanel+PauseButtonTile) flush-right)` — sem padding à esquerda, `HostBanner` colado à borda esquerda do header
 
 #### 12.3.1 Posicionamento do botão pause (Fase 2.3.10; sem mudança na 2.3.12)
 - **Tile-sized 1×1, fixo, separado do StatusPanel**
@@ -925,122 +927,14 @@ class ShareCode {
 - C — Galeria de debug com nota explicativa sobre Tanajura
 - D — Fundo unificado: `fundo.png` aplicado também na `HomeScreen`
 
-### 🚧 Fase 2.3.12 — Bugfixes de layout, regen e ícones do inventário (PRÓXIMA)
-**Objetivo:** quatro correções identificadas em uso real após a 2.3.11 — `LivesIndicator` está desalinhado (precisa ser centralizado), `HostBanner` 2x2 está à esquerda mas com gap visível à esquerda dele (precisa colar na coluna 1 do tabuleiro), cronômetro de regeneração de vidas não está funcionando (texto "Restando MM:SS" aparece mas o número não decrementa), e os PNGs finais dos ícones do inventário (com temas Sucuri/Mico-leão/Capivara/Onça) ainda não foram integrados ao código — estão na pasta `assets/icons/inventory/` mas o `InventoryItemButton` continua renderizando os ícones antigos/placeholder.
+### ✅ Fase 2.3.12 — Bugfixes de layout, regen e ícones do inventário (v0.8.4)
+**Quatro correções após uso real pós-2.3.11:**
 
-**Estimativa:** 2–3 dias.
+- **A** — `LivesIndicator` centralizado horizontalmente (`Center`) em `GameHeader` e `HomeScreen`
+- **B** — `HostBanner` flush-left no `GameHeader` (sem padding à esquerda) — simetria com `PauseButtonTile` flush-right; `Row(HostBanner, Spacer(), Column(StatusPanel+Pause))`
+- **C** — Timer de regeneração de vidas implementado: `Timer.periodic(30s)` em `LivesNotifier` + `AppLifecycleListener` para recálculo offline ao retornar do background
+- **D** — PNGs finais do inventário integrados: PNG ocupa slot 56×56 inteiro (**o PNG é o botão**, sem fundo verde); fallback `Material`+`Icon` se asset falhar; texto dos botões removido; `ConfirmUseDialog` exibe ícone 40×40 no título
 
-#### A — Centralizar `LivesIndicator` no topo
-**Bug atual:** o `LivesIndicator` aparece no topo da tela mas não está horizontalmente centralizado (provavelmente alinhado à esquerda ou desalinhado por causa do `Row` que o contém).
-
-**Mudanças:**
-- Investigar `game_screen.dart` (e `home_screen.dart`) pra identificar como o `LivesIndicator` está sendo posicionado atualmente
-- Garantir que o widget está dentro de um `Row` com `mainAxisAlignment: MainAxisAlignment.center`, ou envolvido em um `Center`, ou (se estiver dentro de uma `Column`) com `crossAxisAlignment: CrossAxisAlignment.center`
-- Aplicar a mesma correção na `HomeScreen` (mesmo `LivesIndicator` aparece nas duas telas)
-- Validar que a centralização funciona em diferentes tamanhos de tela (360px, 412px, tablets)
-
-**Casos de teste obrigatórios:**
-- Snapshot test da `GameScreen`: `LivesIndicator` está horizontalmente centralizado no topo
-- Snapshot test da `HomeScreen`: idem
-- Em tela 360px (smartphone pequeno): `LivesIndicator` continua centralizado, sem overflow lateral
-- Em tela 412px (smartphone padrão): centralizado
-- Em tela 768px+ (tablet): centralizado (não fica colado à esquerda nem estica até as bordas)
-- Quando a faixa muda de "Completo" (mais curta) pra "Restando MM:SS" (mais longa): permanece centralizado (não desloca pro lado conforme o texto cresce)
-
-#### B — Colar `HostBanner` à coluna 1 (eliminar gap à esquerda)
-**Estado atual:** o anfitrião **já está à esquerda** desde decisão tomada em brainstorm — `HostBanner` 2x2 nas colunas 1-2, `PauseButtonTile` à direita (abaixo do cronômetro/StatusPanel). **O bug é só que o `HostBanner` não está colado à coluna 1** — existe um padding/margin/`Spacer` à esquerda dele que cria um gap visual entre a borda esquerda do tabuleiro e a borda esquerda do anfitrião.
-
-**Investigação necessária:**
-- Auditar `game_header.dart` pra identificar a fonte do gap:
-  - Padding interno do `Row` da Linha C?
-  - Margin/padding do próprio `HostBanner`?
-  - `mainAxisAlignment: spaceBetween` numa `Row` que tem só 2 filhos (anfitrião e pause)? Isso colaria os filhos nas extremidades, então provavelmente NÃO é isso
-  - Algum `Center` ou `Align(centerLeft)` errado que centraliza o anfitrião num espaço maior em vez de colar à esquerda?
-  - O `GameHeader` inteiro tem padding horizontal externo que faz o anfitrião não bater com a borda do tabuleiro?
-
-**Mudanças:**
-- Refatorar `game_header.dart`:
-  - Garantir que o `HostBanner` está alinhado à esquerda colado, sem nenhum `padding`/`margin` lateral antes dele
-  - Estrutura sugerida: `Row(children: [HostBanner(...), Spacer(), PauseButtonTile(...)])` — o `Spacer` empurra o pause pra direita, e o anfitrião fica naturalmente colado à esquerda
-  - Se houver padding horizontal externo do `GameHeader`, garantir que ele bate exatamente com o padding/margin do tabuleiro (pra que a "coluna 1" do anfitrião alinhe pixel-perfect com a "coluna 1" do tabuleiro)
-- Validar visualmente que a borda esquerda do `HostBanner` e a borda esquerda do tabuleiro formam uma linha vertical contínua (sem desalinhamento de 1-4px)
-- O `PauseButtonTile` permanece à direita (sem alteração de posição) — só o anfitrião precisa ser ajustado
-
-**Casos de teste obrigatórios:**
-- Snapshot test: borda esquerda do `HostBanner` está alinhada à borda esquerda do tabuleiro (offset = 0px)
-- Pixel-perfect test: medir `HostBanner.left` e `BoardWidget.left` na renderização — devem ser idênticos
-- Em tela 360px: alinhamento mantido sem overflow
-- Em tela 412px: idem
-- O `PauseButtonTile` continua na posição atual (à direita) — regressão
-- Tap no pause continua funcionando — regressão
-- Animação de troca de anfitrião continua funcionando — regressão
-- Galeria `/debug/animals_gallery` não é afetada (independente do layout do `GameHeader`)
-
-#### C — Implementar cronômetro de regeneração de vidas
-**Bug atual:** o `LivesStatusBanner` mostra "Restando MM:SS" quando `current < 5`, mas o número MM:SS é estático ou não decrementa visualmente. Quando os 30 minutos completam (em teoria), a vida não é adicionada automaticamente. O sistema só funciona "passivamente" (se o jogador fechar e reabrir o app depois de 30min, a vida está lá), mas não em tempo real durante a sessão.
-
-**Investigação necessária:**
-- Auditar `lives_notifier.dart` (ou equivalente) pra entender como `nextRegenAt` é populado e quando `current` é incrementado
-- Verificar se existe um `Timer.periodic` ou `Stream<DateTime>` ativo enquanto o app está aberto que dispara `regenerate()` quando `DateTime.now() >= nextRegenAt`
-- Verificar se o `LivesStatusBanner` está consultando `nextRegenAt` em loop pra atualizar o texto MM:SS a cada segundo
-
-**Mudanças:**
-- **No domínio (`lives_system/lives_notifier.dart`):**
-  - Adicionar um `Timer.periodic(Duration(seconds: 1), ...)` no `LivesNotifier` (ou usar `Stream.periodic`)
-  - A cada tick: se `current < regenCap` E `DateTime.now() >= nextRegenAt`, chamar `regenerate()` que soma 1 vida e recalcula `nextRegenAt = now + 30min` (ou null se atingiu o cap)
-  - Garantir que o `Timer` é cancelado quando o `LivesNotifier` é descartado (lifecycle)
-  - Lidar com app em background: ao retornar do background, recalcular quantas vidas deveriam ter sido adicionadas com base no tempo decorrido (não confiar só no Timer enquanto estava em background)
-- **Na UI (`lives_status_banner.dart`):**
-  - Quando estado é "Restando", consumir um `StreamProvider<DateTime>` (ou `Timer.periodic` próprio) que atualiza o texto MM:SS a cada segundo
-  - Calcular `remaining = nextRegenAt - DateTime.now()` e formatar como `MM:SS`
-  - Cuidar do edge case: se `remaining <= 0`, não mostrar "00:00" travado — disparar a regeneração no notifier e a UI atualiza naturalmente
-- **Persistência (Hive):**
-  - Confirmar que `nextRegenAt` continua sendo persistido no Hive (já é, desde a Fase 2.3.8)
-  - Ao boot do app: ler o `LivesState` salvo, calcular se houve regeneração offline (várias vidas podem ter sido geradas se o app ficou fechado por horas), e atualizar `current` antes de iniciar o Timer
-
-**Casos de teste obrigatórios:**
-- `LivesNotifier`: com `current = 4` e `nextRegenAt = now + 30min`, esperar 30min simulados → `current` vira 5, `nextRegenAt` vira null (atingiu regenCap)
-- `LivesNotifier`: com `current = 3` e `nextRegenAt = now + 30min`, esperar 60min simulados → `current` vira 5, `nextRegenAt` vira null (regen rodou 2 vezes)
-- `LivesNotifier`: com `current = 1` e `nextRegenAt = now + 30min`, esperar 30min simulados → `current` vira 2, `nextRegenAt` recalculado pra now + 30min
-- App em background: fechar app com `current = 2` e `nextRegenAt = now + 10min`, abrir 90min depois → `current` vira 5 (3 regenerações offline), `nextRegenAt` null
-- `LivesStatusBanner`: com `current = 4` e `nextRegenAt = now + 12min`, texto exibido é "Restando 12:00" e decrementa a cada segundo até "00:00"
-- `LivesStatusBanner`: ao chegar em "00:00", o estado muda pra "Completo" automaticamente (regen disparada + UI atualiza)
-- Game over com `current = 5` (estava completo): após game over, `current = 4`, `nextRegenAt = now + 30min`, faixa muda pra "Restando 30:00" decrementando
-- Comprar 10 vidas com `current = 4`: vai pra 14 (sem cap por ser compra), faixa muda pra "Bônus" (current > 5), `nextRegenAt = null` (parou regen porque já passou do cap)
-
-#### D — Integrar PNGs finais dos ícones do inventário
-**Bug atual:** os PNGs finais dos 4 ícones de inventário (com temas dos animais — Sucuri pra Bomba 2, Mico-leão pra Bomba 3, Capivara pra Desfazer 1, Onça pra Desfazer 3) já estão em `assets/icons/inventory/` (1024×1024, fundo transparente, gerados pelo pipeline `cache/remove_bg.sh` + `cache/square_icons.sh`). Mas o `InventoryItemButton` continua renderizando os ícones antigos/placeholder (Material/Lucide ou versões anteriores). A integração desses assets é trivial mas nunca foi feita explicitamente como entrega numa fase.
-
-**Mudanças:**
-- Auditar `inventory_item_button.dart` pra confirmar como os ícones estão sendo renderizados atualmente (provavelmente `Icon(IconData)` ou `Image.asset` com path antigo)
-- Atualizar `inventory_bar.dart` (ou onde os 4 botões são instanciados) pra apontar pros PNGs finais:
-  - Bomba 2 → `assets/icons/inventory/bomb_2.png`
-  - Bomba 3 → `assets/icons/inventory/bomb_3.png`
-  - Desfazer 1 → `assets/icons/inventory/undo_1.png`
-  - Desfazer 3 → `assets/icons/inventory/undo_3.png`
-- Confirmar que `pubspec.yaml` declara `assets/icons/inventory/` (provavelmente já declara desde a Fase 2.3.8)
-- Adicionar os 4 ícones ao `precacheImage` do boot (já tem fundo.png + 22 PNGs de animais; agora vão 26 PNGs precacheados)
-- Validar visualmente:
-  - Cada ícone PNG ocupa o slot do `InventoryItemButton` com `BoxFit.contain` (evita corte das bordas dos animais)
-  - Estado disabled (contador 0): aplicar `Opacity(0.4)` ou `ColorFilter.matrix` pra acinzentar — confirmar que funciona com PNG colorido (alguns blends podem ficar estranhos com transparência)
-  - Badge de contador continua bem posicionado (canto superior direito) sobre o novo ícone
-  - Estado "99+" continua funcionando com os novos ícones
-- Atualizar `confirm_use_dialog.dart` (Fase 2.3.8 item B) pra usar o mesmo PNG no ícone grande — assim o jogador vê o mesmo asset no botão e na confirmação
-
-**Casos de teste obrigatórios:**
-- `InventoryItemButton` renderiza PNG correto pra cada um dos 4 itens (snapshot test)
-- Estado habilitado (contador ≥1): PNG colorido, totalmente visível
-- Estado disabled (contador 0): PNG acinzentado/com opacity reduzida, ainda reconhecível
-- Badge de contador (incluindo "99+") continua legível sobre o novo ícone
-- `ConfirmUseDialog` mostra o mesmo PNG do botão (consistência visual)
-- Performance: `precacheImage` dos 4 PNGs no boot não causa lag visível
-- Sem dependências residuais aos ícones antigos (lint/grep: `Icons.dangerous`, `Icons.undo`, paths SVG antigos não devem aparecer mais)
-
-#### Ordem de execução recomendada
-1. **A primeiro** (centralizar `LivesIndicator`) — mudança mais simples, isolada visualmente
-2. **B depois** (colar `HostBanner` à coluna 1) — ajuste de padding/margin contido em `game_header.dart`
-3. **D** (integrar PNGs do inventário) — independente, pode rodar em paralelo com A/B/C; entrega visual rápida
-4. **C por último** (cronômetro de regen) — mudança lógica + UI, mais arriscada e merece atenção dedicada
 
 ---
 
