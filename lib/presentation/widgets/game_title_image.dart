@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class GameTitleImage extends StatelessWidget {
@@ -8,7 +7,6 @@ class GameTitleImage extends StatelessWidget {
   final String asset;
   final double? height;
 
-  @visibleForTesting
   static String pickAsset({Random? random}) {
     final r = random ?? Random();
     return r.nextInt(2) == 0
