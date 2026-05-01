@@ -1,4 +1,5 @@
-# 🦫 Capivara 2048
+# 🦫 Olha o Bichim!
+> Anteriormente conhecido como Capivara 2048
 
 > Combine animais da Amazônia em um tabuleiro 4x4 e descubra a Capivara Lendária.
 

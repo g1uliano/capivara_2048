@@ -49,7 +49,7 @@ class _CapivaraAppState extends State<CapivaraApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Capivara 2048',
+      title: 'Olha o Bichim!',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       home: const HomeScreen(),
