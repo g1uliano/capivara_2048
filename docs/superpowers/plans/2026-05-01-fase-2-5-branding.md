@@ -636,7 +636,11 @@
 
 - [ ] **Step 3: Atualizar `CAPIVARA_2048_DESIGN.md`**
 
-  Na Seção 1 (Visão Geral), remover qualquer referência a "(anteriormente Capivara 2048)" ou similar — o rebranding está consolidado.
+  3a. Na Seção 1 (Visão Geral), remover qualquer referência a "(anteriormente Capivara 2048)" ou similar — o rebranding está consolidado.
+
+  3b. Na seção de roadmap (§15), marcar a Fase 2.5 como concluída (trocar `🔜` por `✅`) e atualizar o cabeçalho da Fase 2.6 para indicar que é a próxima.
+
+  3c. Adicionar ao final do documento (ou substituir a seção §17 existente) o **prompt de brainstorm da Fase 2.6**, copiado integralmente de `docs/superpowers/specs/2026-05-01-fase-2-5-design.md` (seção "Prompt para brainstorm da Fase 2.6"). Esse prompt é o ponto de entrada da próxima sessão de design.
 
 - [ ] **Step 4: Bump de versão em `pubspec.yaml`**
 
