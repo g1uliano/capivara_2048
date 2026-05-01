@@ -1014,117 +1014,11 @@ Esta fase consolida a nova identidade do produto antes de avançar com novas tel
 - Tela de Coleção (silhuetas para não desbloqueados, card detalhado para desbloqueados — usa `backgroundBaseColor` do Animal)
 - Configurações (haptic, idioma) — sliders de volume SFX/música ficam desabilitados/ocultos até a Fase 5
 
-### 🔜 Fase 2.7 — Loja mock (3 dias) — **PRÓXIMA**
-
-**Objetivo:** Implementar a `ShopScreen` com os 6 pacotes da §7.1, cards com preços De/Por e badge de desconto, botão "Comprar" simulado que entrega os itens localmente, e bottom sheet de "Código para presentear" gerado após a compra. Sem integração real de pagamento (IAP real entra na Fase 3).
-
-**A — ShopScreen (conteúdo)**
-
-Substituir o stub criado na Fase 2.6 pelo conteúdo real.
-
-Arquivos:
-- `lib/presentation/screens/shop_screen.dart` — reescrever
-- `lib/data/shop_data.dart` — criar (lista dos 6 `ShopPackage`)
-- `lib/presentation/controllers/shop_notifier.dart` — criar
-
-Layout:
-```
-Scaffold
-└── GameBackground()
-    └── Column
-        ├── AppBar("Loja", Fredoka 22, #3FA968, BackButton)
-        └── Expanded
-            └── ListView
-                // 6 _ShopPackageCard, ordem da tabela §7.1
-```
-
-**`_ShopPackageCard`**
-```dart
-_ShopPackageCard({required ShopPackage package})
-// Container: borderRadius 16, sombra inferior, fundo branco leve
-// Conteúdo:
-//   Row: nome (Fredoka 18) + badge desconto no canto sup. direito (círculo laranja #FF8C42: "50%" ou "75%")
-//   Text(description, Nunito 14, cor cinza) — conteúdo do RewardBundle em texto compacto
-//   Row: Text("De R$ X,XX", Nunito 14, riscado, cinza) + Text("Por R$ X,XX", Fredoka 20, #3FA968)
-//   ElevatedButton("Comprar", onTap: _onBuy)
-```
-
-**`_onBuy` — fluxo de compra simulada**
-1. Mostrar `AlertDialog` de confirmação: "Comprar [nome] por R$ X,XX?"
-2. Ao confirmar: `inventoryProvider.add(package.contents)` + `livesProvider.add(package.contents.lives)`
-3. Mostrar `_GiftCodeSheet` com o código gerado (`ShareCode` local, sem backend)
-4. `ShareCode` gerado localmente com UUID truncado 8 chars uppercase com hífen (ex: `A3F9-B2C1`), status `pending`, armazenado em `SharedPreferences` (últimos 20 — Fase 3 migra para Firestore)
-
-**B — `_GiftCodeSheet` (bottom sheet pós-compra)**
-
-```dart
-// DraggableScrollableSheet, initialChildSize: 0.5
-// Conteúdo:
-//   Text("Presente gerado!", Fredoka 24)
-//   Text("Compartilhe este código com um amigo:", Nunito 14)
-//   Container com código em Fredoka Bold 28 (formato: "A3F9-B2C1")
-//   IconButton(Icons.copy) — copia para clipboard
-//   Text("Seu amigo recebe: [conteúdo do giftContents]", Nunito 14)
-//   ElevatedButton("Fechar")
-```
-
-**C — Dados `shop_data.dart`**
-
-Lista estática dos 6 `ShopPackage` conforme §7.1:
-- `[01]` 4× Bomba 3 — De R$7,99 / Por R$3,99 / 50%
-- `[02]` 4× Desfazer 3 — De R$3,99 / Por R$1,99 / 50%
-- `[03]` 6 vidas — De R$9,99 / Por R$2,49 / 75%
-- `[04]` 10 vidas — De R$19,99 / Por R$4,99 / 75%
-- `[05]` Combo Mata Atlântica (6v+2b+2d) — De R$10,99 / Por R$4,99 / 50%
-- `[06]` Combo Floresta Amazônica (10v+4b+4d) — De R$31,99 / Por R$9,99 / 50%
-
-**D — Persistência local de `ShareCode`**
-
-```dart
-// SharedPreferences key: 'generated_share_codes'
-// Valor: List<String> de JSON serializado (manual, sem freezed) dos ShareCode gerados
-// Limite: últimos 20. Fase 3 migra para Firestore sem quebra de estrutura.
-```
-
-**E — Documentação**
-- `CHANGELOG.md`: entrada v0.9.3
-- `README.md`: Fase 2.7 ✅
-- `CLAUDE.md`: fase atual → "Fase 2.7 concluída — próximo: Fase 3"
-- `CAPIVARA_2048_DESIGN.md` §15: marcar Fase 2.7 ✅
-- `CAPIVARA_2048_DESIGN.md` §17: substituir pelo prompt da Fase 3
-
-**Providers**
-
-| Provider | Tipo | Novo? |
-|---|---|---|
-| `shopPackagesProvider` | `Provider<List<ShopPackage>>` | Sim — lista estática de `shop_data.dart` |
-| `generatedShareCodesProvider` | `StateNotifierProvider<...>` | Sim — lista local de `ShareCode` gerados, persistida em `SharedPreferences` |
-| `inventoryProvider` | já existe | Reusar — `add()` com `package.contents` |
-| `livesProvider` | já existe | Reusar — `add(package.contents.lives)` |
-
-**Testes obrigatórios**
-- 6 cards de pacotes presentes no widget tree
-- Cada card exibe nome, preço De, preço Por, badge desconto
-- Tap Comprar → `AlertDialog` de confirmação
-- Confirmar compra → `inventoryProvider` atualizado
-- Confirmar compra → `_GiftCodeSheet` aparece com código
-- Botão copiar → código no clipboard
-
-**Critérios de aceite**
-- 6 pacotes visíveis em scroll sem overflow
-- Badge de desconto correto (50% / 75%) em cada card
-- Preço "De" riscado, preço "Por" em destaque verde
-- Compra simulada entrega itens no inventário imediatamente
-- Código de presente gerado no formato `XXXX-XXXX` e copiável
-- Sem integração IAP real (Fase 3)
-
-**Sincronização com Fase 3**
-
-| Slot criado na 2.7 | O que a Fase 3 faz |
-|---|---|
-| `_onBuy` mock (entrega local) | Substituir por `in_app_purchase` real |
-| `ShareCode` em SharedPreferences | Migrar para Firestore |
-| `_GiftCodeSheet` com código local | Conectar ao backend para validação |
+### 🔜 Fase 2.7 — Loja mock (3 dias)
+- Tela com os 6 pacotes
+- Cards com "De/Por" e badges de desconto
+- Botão "Comprar" simulado
+- Tela de "Código para presentear" gerada após compra simulada
 
 ### 🔜 Fase 3 — Backend, ranking e monetização (3–4 semanas)
 - Setup Firebase (Auth, Firestore)
@@ -1211,80 +1105,95 @@ Lista estática dos 6 `ShopPackage` conforme §7.1:
 
 ---
 
-## 17. Prompt Sugerido para o Claude Code (Fase 2.7 — via skill superpowers)
+## 17. Prompt Sugerido para o Claude Code (Fase 2.6 — via skill superpowers)
 
-> O prompt abaixo entra no fluxo do **superpowers/brainstorming**. O resultado esperado é uma **spec detalhada da Fase 2.7** (refinada via brainstorm), que depois alimenta o **superpowers/writing-plans** pra gerar o plano executável. Nada de código nesta etapa — apenas elicitação, refinamento de design e plano.
+> O prompt abaixo entra no fluxo do **superpowers/brainstorming**. O resultado esperado é uma **spec detalhada da Fase 2.6** (refinada via brainstorm), que depois alimenta o **superpowers/writing-plans** pra gerar o plano executável. Nada de código nesta etapa — apenas elicitação, refinamento de design e plano.
 
 ---
 
 > Use a skill `superpowers/brainstorming` pra refinar o design da próxima fase do projeto **Olha o Bichim!** (Flutter, codename `capivara_2048`).
 >
-> **Contexto:** Fase 2.6 concluída (v0.9.2) — Home redesenhada com grid 2×N de cards e animação do logo, Tela de Coleção (11 animais, grid 2 colunas, bottom sheet detalhado), Tela de Configurações (haptic, idioma, sliders de áudio desabilitados), stubs de navegação criados (`ShopScreen`, `InviteFriendsScreen`, `RedeemCodeScreen`). Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente §7 — Loja de Itens, §12.4 — Tela Loja, §13.7 — `ShopPackage`, §13.8 — `ShareCode`, §15 — roadmap Fase 2.7).
+> **Contexto:** Fase 2.5 concluída (v0.9.1) — rebranding, `GameTitleImage` na Home, ícone e launcher name. Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente §10 — Identidade Visual, §12.1 — Mapa de telas, §12.2 — Tela Home, §13.1 — modelo `Animal`, §15 — roadmap Fase 2.6).
 >
-> **Fases concluídas:** Fases 1 a 2.6 (v0.9.2). Áudio segue na **Fase 5**. Backend (Firebase, IAP real) entra na **Fase 3**.
+> **Fases concluídas:** Fases 1 a 2.5 (v0.9.1, ≥197 testes passando). Áudio segue na **Fase 5**.
 >
-> **Tópico do brainstorm:** **Fase 2.7 — Loja mock**. Esta fase preenche o stub `ShopScreen` com os 6 pacotes da §7.1, simula a compra localmente (sem IAP real), entrega os itens no inventário local, e gera um código de presente. Não há nova lógica de jogo nem integração com backend.
+> **Tópico do brainstorm:** **Fase 2.6 — Tela Home redesenhada + Tela de Coleção + Configurações**. Esta fase torna o app navegável e visualmente completo antes do backend (Fase 3). Não há nova lógica de jogo.
 >
-> **Sub-entregas (ver §15 — Fase 2.7 e spec em `docs/superpowers/specs/2026-05-01-fase-2-6-design.md`):**
+> **Sub-entregas (ver §15 — Fase 2.6):**
 >
-> **A — ShopScreen (conteúdo):**
-> - Substituir o stub criado na Fase 2.6 pelo conteúdo real — não criar nova tela.
-> - `ListView` com os 6 `_ShopPackageCard` na ordem da tabela §7.1.
-> - Cada card: nome do pacote, descrição do conteúdo (`RewardBundle`), preço "De" riscado, preço "Por" em destaque, badge de desconto (50% ou 75%), botão "Comprar".
-> - Botão "Comprar" → `AlertDialog` de confirmação → entrega local via `inventoryProvider` + `livesProvider` → exibe `_GiftCodeSheet`.
-> - `shop_data.dart`: lista estática dos 6 `ShopPackage` conforme §7.1 — sem backend.
+> **A — Home redesenhada:**
+> - Consumir `GameTitleImage(asset: _titleAsset, height: 220)` já existente no slot definido na 2.5 — não reescrever o widget.
+> - Todos os botões e indicadores do mapa de telas (§12.2): Novo Jogo, Continuar, Ranking (desabilitado "Em breve"), Recompensa Diária (com badge), Coleção, Configurações, Como Jogar.
+> - `LivesIndicator` já existente mantido no topo.
+> - Animação de entrada do logo (`flutter_animate` fade+scale) entra nesta fase — decidir no brainstorm.
+> - Layout final da Home antes do backend; Fase 3 só adiciona dados reais nos slots já existentes.
 >
-> **B — `_GiftCodeSheet` (bottom sheet pós-compra):**
-> - `DraggableScrollableSheet` com código de presente gerado localmente (UUID truncado).
-> - Exibe: título "Presente gerado!", código formatado, conteúdo do `giftContents`, botão copiar para clipboard, botão fechar.
-> - `ShareCode` armazenado em `SharedPreferences` — Fase 3 migra para Firestore sem alterar a estrutura.
+> **B — Tela de Coleção:**
+> - Grid dos 11 animais (Tanajura → Capivara Lendária).
+> - Animal desbloqueado (`highestLevelReached >= animal.level`): card colorido com PNG tile + nome + fun fact.
+> - Animal bloqueado: silhueta escura (PNG tile com `ColorFilter` ou opacidade) + "???" no nome.
+> - Card detalhado ao tocar num animal desbloqueado: nome completo, nome científico, fun fact, imagem host 2x2.
+> - Usar `backgroundBaseColor` do modelo `Animal` (§13.1) como cor de fundo do card.
+> - Fonte: Fredoka (título) + Nunito (fun fact) — padrão §10.3.
 >
-> **C — `shop_notifier.dart` e `generatedShareCodesProvider`:**
-> - `shopPackagesProvider`: `Provider<List<ShopPackage>>` — lista estática.
-> - `generatedShareCodesProvider`: `StateNotifierProvider` — lista local de `ShareCode` gerados, persistida em `SharedPreferences`.
+> **C — Configurações:**
+> - Haptic feedback toggle (persistente via SharedPreferences).
+> - Seleção de idioma (PT-BR / EN) — placeholder; l10n real na Fase 6.
+> - Sliders de volume SFX e música: presentes mas **desabilitados/ocultos** com label "Disponível na Fase 5" — os controles precisam existir no layout para a Fase 5 habilitá-los.
+> - Informações do app: versão (via `package_info_plus`), "Sobre".
 >
-> **D — README, CHANGELOG, CLAUDE.md, design doc:**
+> **D — Navegação entre telas:**
+> - Definir padrão de roteamento: `Navigator.push` com `MaterialPageRoute` (padrão atual do projeto) vs `go_router` vs `bottom NavigationBar`.
+> - Botão "Voltar" ou AppBar em cada tela secundária.
+> - Telas de Ranking, Loja, Convidar, Resgatar Código: stubs navegáveis com "Em breve" — não implementar conteúdo.
+>
+> **E — README, CHANGELOG, CLAUDE.md, design doc:**
 > - Atualizar documentação ao fechar a fase.
-> - Atualizar §17 do design doc com o prompt de brainstorm da **Fase 3**.
+> - Atualizar §17 do design doc com o prompt de brainstorm da **Fase 2.7**.
 >
 > **Pontos abertos pra explorar no brainstorm (elicitação esperada):**
 >
-> Sobre **A (ShopScreen — visual do card):**
-> - Badge de desconto: chip no canto superior direito do card vs inline na linha de preço? Recomendação: canto superior direito (mais visível, padrão e-commerce).
-> - Conteúdo do `RewardBundle` no card: texto compacto descritivo ("6 vidas + 2 bombas + 2 desfazer") vs lista com ícones dos itens? Recomendação: texto compacto — ícones exigem assets extras não planejados.
-> - Scroll da loja: `ListView` simples vs `CustomScrollView` com `SliverAppBar` colapsável? Recomendação: `ListView` simples — 6 itens não justificam complexidade.
-> - Header da `ShopScreen`: AppBar simples (padrão da 2.6) vs banner colorido com ilustração? Recomendação: AppBar padrão — arte adicional fica para a Fase 4.
+> Sobre **A (Home):**
+> - Layout exato dos botões: lista vertical (padrão atual) ou grid de cards (Loja, Ranking, etc.)? §12.2 descreve cards — alinhar com a identidade visual cartoon.
+> - Animação de entrada do logo nesta fase (fade+scale `flutter_animate`) ou ainda estático? Recomendação inicial: animar aqui, já que é o redesign completo da Home.
+> - `DailyRewardEntryTile` já existente: reposicioná-lo ou mantê-lo no canto superior direito?
+> - Como Jogar: tela dedicada ou bottom sheet/modal simples?
 >
-> Sobre **B (`_GiftCodeSheet`):**
-> - Formato do código: UUID truncado 8 chars uppercase com hífen (`A3F9-B2C1`) vs código alfanumérico de 6 chars sem hífen? Recomendação: 8 chars com hífen — legível e fácil de digitar para o amigo.
-> - `_GiftCodeSheet` ou `AlertDialog` simples? Recomendação: bottom sheet — consistente com o padrão da 2.6 (Coleção, Como Jogar).
-> - Confirmação de compra: `AlertDialog` simples ("Comprar [nome] por R$ X,XX?") vs bottom sheet estilizado? Recomendação: `AlertDialog` — fluxo transacional não precisa de visual elaborado.
-> - Exibir o conteúdo do `giftContents` (o que o amigo recebe) separado do `contents` (o que o comprador recebe)?
+> Sobre **B (Coleção):**
+> - Grid: quantas colunas? (2 = cards grandes com fun fact visível; 3 = mais compacto, fun fact só no detalhe). Recomendação: 2 colunas com fun fact truncado.
+> - Card detalhado: modal/bottom sheet ou nova tela de rota? Recomendação: bottom sheet (menos navegação).
+> - Silhueta de animal bloqueado: `ColorFilter.matrix` pra escurecer o PNG (mantém shape) ou `Image` com `color: Colors.black54` e `colorBlendMode: BlendMode.srcATop`?
+> - Ordem: nível crescente (1→11) ou por desbloqueio? Recomendação: nível crescente fixo.
+> - Cabeçalho: "X/11 animais descobertos" com barra de progresso.
 >
-> Sobre **C (providers e persistência):**
-> - `generatedShareCodesProvider` precisa de notifier próprio ou basta um `StateProvider<List<ShareCode>>`? Recomendação: notifier próprio — encapsula a persistência em `SharedPreferences`.
-> - Serialização do `ShareCode`: `jsonEncode`/`jsonDecode` manual vs `freezed`/`json_serializable`? Recomendação: manual — estrutura simples, sem dependência extra.
-> - Limite de códigos armazenados localmente? Recomendação: últimos 20 — Fase 3 move para Firestore.
+> Sobre **C (Configurações):**
+> - Tela dedicada via `Navigator.push` ou bottom sheet/modal? Recomendação: tela dedicada (mais espaço para os controles futuros de áudio).
+> - Haptic: `HapticFeedback.lightImpact()` — onde aplicar no app (botões, merges)?
+> - `package_info_plus` já está no projeto? Verificar pubspec antes de adicionar.
+> - Idioma: `Locale` hard-coded ou via `Intl`? Fase 6 faz l10n real — o toggle de Configurações apenas persiste a preferência.
+>
+> Sobre **D (navegação):**
+> - Padrão atual: `Navigator.push` com `MaterialPageRoute` — manter ou migrar para `go_router` agora? Recomendação: manter `Navigator.push` até a Fase 3, quando deep links exigirão roteamento nomeado.
+> - Transições: `MaterialPageRoute` padrão (slide) ou `PageRouteBuilder` com fade/scale cartoon? Recomendação: slide padrão nesta fase, animar na Fase 6.
 >
 > Sobre **testes:**
-> - Widget tests obrigatórios: 6 cards presentes, fluxo completo de compra (tap → dialog → confirmação → inventário atualizado → código gerado), botão copiar, código no clipboard.
-> - `inventoryProvider` e `livesProvider` devem ser mockados nos testes da `ShopScreen`.
-> - Golden tests: não — mesma decisão da Fase 2.6.
+> - Widget tests obrigatórios: `CollectionScreen` (desbloqueados vs bloqueados), `SettingsScreen` (toggle haptic persiste), `HomeScreen` redesenhada (todos os botões presentes).
+> - Golden tests (opcional): úteis pra garantir layout da Coleção — decidir se entram nesta fase.
+> - `highestLevelReached` controla desbloqueio — testar com valores 1, 5, 11.
 >
-> Sobre **sincronização com Fase 3 (Backend/IAP):**
-> - `_onBuy` mock entrega itens localmente — Fase 3 substitui pela chamada `in_app_purchase`.
-> - `ShareCode` em `SharedPreferences` — Fase 3 migra para Firestore; mesma estrutura `ShareCode` já definida em §13.8.
-> - `_GiftCodeSheet` exibe código local — Fase 3 conecta ao backend para validação do resgate.
-> - `RedeemCodeScreen` (stub criado na 2.6) recebe conteúdo na Fase 3.
+> Sobre **sincronização com Fase 2.7 (Loja mock) e Fase 3 (Backend):**
+> - Botão "Loja" na Home já deve navegar para stub de Loja (Fase 2.7 implementa o conteúdo).
+> - Slots de Ranking, Convidar, Resgatar Código ficam como stubs navegáveis — Fase 3 preenche.
+> - `PlayerProfile` (Fase 3) vai alimentar a Coleção com dados reais — o widget deve estar pronto para receber o provider quando existir.
 >
 > **Output esperado do brainstorm:**
-> Uma **spec detalhada da Fase 2.7** (`docs/superpowers/specs/YYYY-MM-DD-fase-2-7-design.md`) com:
-> - Decisões tomadas em cada ponto aberto (visual do card, formato do código, confirmação, scroll).
-> - Para cada sub-entrega (A–D): arquivos a criar/modificar, contratos exatos (assinaturas de widgets, modelos de dados usados, providers Riverpod necessários), casos de teste obrigatórios, critérios de aceite.
-> - Diagrama de navegação textual (fluxo de compra completo: ShopScreen → AlertDialog → GiftCodeSheet).
-> - Lista de pontos a sincronizar com Fase 3 (IAP real, Firestore, validação de código).
-> - Plano de validação manual (emulador Android, simulador iOS — conferir layout da loja, fluxo de compra, código gerado e copiável).
-> - Ao final do documento: **prompt de brainstorm da Fase 3** seguindo este mesmo padrão de cascata.
+> Uma **spec detalhada da Fase 2.6** (`docs/superpowers/specs/YYYY-MM-DD-fase-2-6-design.md`) com:
+> - Decisões tomadas em cada ponto aberto (layout Home, colunas da Coleção, silhueta técnica, navegação, animação do logo).
+> - Para cada sub-entrega (A–E): arquivos a criar/modificar, contratos exatos (assinaturas de widgets, modelos de dados usados, providers Riverpod necessários), casos de teste obrigatórios, critérios de aceite.
+> - Diagrama de navegação textual (quais rotas existem, quais são stubs).
+> - Lista de pontos a sincronizar com Fase 2.7 (Loja) e Fase 3 (Backend/PlayerProfile).
+> - Plano de validação manual (emulador Android, simulador iOS, web — conferir layout, navegação, Coleção com animais desbloqueados e bloqueados).
+> - Ao final do documento: **prompt de brainstorm da Fase 2.7** seguindo este mesmo padrão de cascata.
 >
 > Esse documento será depois consumido pela skill `superpowers/writing-plans` pra gerar o plano executável (TDD-friendly, com checkpoints).
 >
