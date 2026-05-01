@@ -640,7 +640,103 @@
 
   3b. Na seção de roadmap (§15), marcar a Fase 2.5 como concluída (trocar `🔜` por `✅`) e atualizar o cabeçalho da Fase 2.6 para indicar que é a próxima.
 
-  3c. Adicionar ao final do documento (ou substituir a seção §17 existente) o **prompt de brainstorm da Fase 2.6**, copiado integralmente de `docs/superpowers/specs/2026-05-01-fase-2-5-design.md` (seção "Prompt para brainstorm da Fase 2.6"). Esse prompt é o ponto de entrada da próxima sessão de design.
+  3c. Substituir a seção `## 17. Prompt Sugerido para o Claude Code (Fase 2.5 — via skill superpowers)` pelo prompt da Fase 2.6 abaixo, renomeando para `## 17. Prompt Sugerido para o Claude Code (Fase 2.6 — via skill superpowers)`:
+
+  ```markdown
+  ## 17. Prompt Sugerido para o Claude Code (Fase 2.6 — via skill superpowers)
+
+  > O prompt abaixo entra no fluxo do **superpowers/brainstorming**. O resultado esperado é uma **spec detalhada da Fase 2.6** (refinada via brainstorm), que depois alimenta o **superpowers/writing-plans** pra gerar o plano executável. Nada de código nesta etapa — apenas elicitação, refinamento de design e plano.
+
+  ---
+
+  > Use a skill `superpowers/brainstorming` pra refinar o design da próxima fase do projeto **Olha o Bichim!** (Flutter, codename `capivara_2048`).
+  >
+  > **Contexto:** Fase 2.5 concluída (v0.9.1) — rebranding, `GameTitleImage` na Home, ícone e launcher name. Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente §10 — Identidade Visual, §12.1 — Mapa de telas, §12.2 — Tela Home, §13.1 — modelo `Animal`, §15 — roadmap Fase 2.6).
+  >
+  > **Fases concluídas:** Fases 1 a 2.5 (v0.9.1, ≥197 testes passando). Áudio segue na **Fase 5**.
+  >
+  > **Tópico do brainstorm:** **Fase 2.6 — Tela Home redesenhada + Tela de Coleção + Configurações**. Esta fase torna o app navegável e visualmente completo antes do backend (Fase 3). Não há nova lógica de jogo.
+  >
+  > **Sub-entregas (ver §15 — Fase 2.6):**
+  >
+  > **A — Home redesenhada:**
+  > - Consumir `GameTitleImage(asset: _titleAsset, height: 220)` já existente no slot definido na 2.5 — não reescrever o widget.
+  > - Todos os botões e indicadores do mapa de telas (§12.2): Novo Jogo, Continuar, Ranking (desabilitado "Em breve"), Recompensa Diária (com badge), Coleção, Configurações, Como Jogar.
+  > - `LivesIndicator` já existente mantido no topo.
+  > - Animação de entrada do logo (`flutter_animate` fade+scale) entra nesta fase — decidir no brainstorm.
+  > - Layout final da Home antes do backend; Fase 3 só adiciona dados reais nos slots já existentes.
+  >
+  > **B — Tela de Coleção:**
+  > - Grid dos 11 animais (Tanajura → Capivara Lendária).
+  > - Animal desbloqueado (`highestLevelReached >= animal.level`): card colorido com PNG tile + nome + fun fact.
+  > - Animal bloqueado: silhueta escura (PNG tile com `ColorFilter` ou opacidade) + "???" no nome.
+  > - Card detalhado ao tocar num animal desbloqueado: nome completo, nome científico, fun fact, imagem host 2x2.
+  > - Usar `backgroundBaseColor` do modelo `Animal` (§13.1) como cor de fundo do card.
+  > - Fonte: Fredoka (título) + Nunito (fun fact) — padrão §10.3.
+  >
+  > **C — Configurações:**
+  > - Haptic feedback toggle (persistente via SharedPreferences).
+  > - Seleção de idioma (PT-BR / EN) — placeholder; l10n real na Fase 6.
+  > - Sliders de volume SFX e música: presentes mas **desabilitados/ocultos** com label "Disponível na Fase 5" — os controles precisam existir no layout para a Fase 5 habilitá-los.
+  > - Informações do app: versão (via `package_info_plus`), "Sobre".
+  >
+  > **D — Navegação entre telas:**
+  > - Definir padrão de roteamento: `Navigator.push` com `MaterialPageRoute` (padrão atual do projeto) vs `go_router` vs `bottom NavigationBar`.
+  > - Botão "Voltar" ou AppBar em cada tela secundária.
+  > - Telas de Ranking, Loja, Convidar, Resgatar Código: stubs navegáveis com "Em breve" — não implementar conteúdo.
+  >
+  > **E — README, CHANGELOG, CLAUDE.md, design doc:**
+  > - Atualizar documentação ao fechar a fase.
+  > - Atualizar §17 do design doc com o prompt de brainstorm da **Fase 2.7**.
+  >
+  > **Pontos abertos pra explorar no brainstorm (elicitação esperada):**
+  >
+  > Sobre **A (Home):**
+  > - Layout exato dos botões: lista vertical (padrão atual) ou grid de cards (Loja, Ranking, etc.)? §12.2 descreve cards — alinhar com a identidade visual cartoon.
+  > - Animação de entrada do logo nesta fase (fade+scale `flutter_animate`) ou ainda estático? Recomendação inicial: animar aqui, já que é o redesign completo da Home.
+  > - `DailyRewardEntryTile` já existente: reposicioná-lo ou mantê-lo no canto superior direito?
+  > - Como Jogar: tela dedicada ou bottom sheet/modal simples?
+  >
+  > Sobre **B (Coleção):**
+  > - Grid: quantas colunas? (2 = cards grandes com fun fact visível; 3 = mais compacto, fun fact só no detalhe). Recomendação: 2 colunas com fun fact truncado.
+  > - Card detalhado: modal/bottom sheet ou nova tela de rota? Recomendação: bottom sheet (menos navegação).
+  > - Silhueta de animal bloqueado: `ColorFilter.matrix` pra escurecer o PNG (mantém shape) ou `Image` com `color: Colors.black54` e `colorBlendMode: BlendMode.srcATop`?
+  > - Ordem: nível crescente (1→11) ou por desbloqueio? Recomendação: nível crescente fixo.
+  > - Cabeçalho: "X/11 animais descobertos" com barra de progresso.
+  >
+  > Sobre **C (Configurações):**
+  > - Tela dedicada via `Navigator.push` ou bottom sheet/modal? Recomendação: tela dedicada (mais espaço para os controles futuros de áudio).
+  > - Haptic: `HapticFeedback.lightImpact()` — onde aplicar no app (botões, merges)?
+  > - `package_info_plus` já está no projeto? Verificar pubspec antes de adicionar.
+  > - Idioma: `Locale` hard-coded ou via `Intl`? Fase 6 faz l10n real — o toggle de Configurações apenas persiste a preferência.
+  >
+  > Sobre **D (navegação):**
+  > - Padrão atual: `Navigator.push` com `MaterialPageRoute` — manter ou migrar para `go_router` agora? Recomendação: manter `Navigator.push` até a Fase 3, quando deep links exigirão roteamento nomeado.
+  > - Transições: `MaterialPageRoute` padrão (slide) ou `PageRouteBuilder` com fade/scale cartoon? Recomendação: slide padrão nesta fase, animar na Fase 6.
+  >
+  > Sobre **testes:**
+  > - Widget tests obrigatórios: `CollectionScreen` (desbloqueados vs bloqueados), `SettingsScreen` (toggle haptic persiste), `HomeScreen` redesenhada (todos os botões presentes).
+  > - Golden tests (opcional): úteis pra garantir layout da Coleção — decidir se entram nesta fase.
+  > - `highestLevelReached` controla desbloqueio — testar com valores 1, 5, 11.
+  >
+  > Sobre **sincronização com Fase 2.7 (Loja mock) e Fase 3 (Backend):**
+  > - Botão "Loja" na Home já deve navegar para stub de Loja (Fase 2.7 implementa o conteúdo).
+  > - Slots de Ranking, Convidar, Resgatar Código ficam como stubs navegáveis — Fase 3 preenche.
+  > - `PlayerProfile` (Fase 3) vai alimentar a Coleção com dados reais — o widget deve estar pronto para receber o provider quando existir.
+  >
+  > **Output esperado do brainstorm:**
+  > Uma **spec detalhada da Fase 2.6** (`docs/superpowers/specs/YYYY-MM-DD-fase-2-6-design.md`) com:
+  > - Decisões tomadas em cada ponto aberto (layout Home, colunas da Coleção, silhueta técnica, navegação, animação do logo).
+  > - Para cada sub-entrega (A–E): arquivos a criar/modificar, contratos exatos (assinaturas de widgets, modelos de dados usados, providers Riverpod necessários), casos de teste obrigatórios, critérios de aceite.
+  > - Diagrama de navegação textual (quais rotas existem, quais são stubs).
+  > - Lista de pontos a sincronizar com Fase 2.7 (Loja) e Fase 3 (Backend/PlayerProfile).
+  > - Plano de validação manual (emulador Android, simulador iOS, web — conferir layout, navegação, Coleção com animais desbloqueados e bloqueados).
+  > - Ao final do documento: **prompt de brainstorm da Fase 2.7** seguindo este mesmo padrão de cascata.
+  >
+  > Esse documento será depois consumido pela skill `superpowers/writing-plans` pra gerar o plano executável (TDD-friendly, com checkpoints).
+  >
+  > **Não escreva código nesta etapa.** Foque em refinar o design, fazer perguntas críticas e produzir a spec.
+  ```
 
 - [ ] **Step 4: Bump de versão em `pubspec.yaml`**
 
