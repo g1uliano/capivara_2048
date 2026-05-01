@@ -3,18 +3,52 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
+import '../../domain/daily_rewards/daily_rewards_engine.dart';
+import '../../domain/daily_rewards/daily_rewards_notifier.dart';
 import '../../domain/lives/lives_notifier.dart';
 import '../controllers/game_notifier.dart';
+import '../widgets/daily_reward_entry_tile.dart';
 import '../widgets/game_background.dart';
 import '../widgets/lives_indicator.dart';
 import 'game/game_screen.dart';
 import 'no_lives_screen.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  bool _toastShown = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeShowToast());
+  }
+
+  void _maybeShowToast() {
+    if (_toastShown) return;
+    final dailyState = ref.read(dailyRewardsProvider);
+    final status = computeDailyRewardStatus(DateTime.now(), dailyState);
+    if (status == DailyRewardStatus.available || status == DailyRewardStatus.cycleCompleted) {
+      _toastShown = true;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Sua recompensa diária está disponível!',
+            style: GoogleFonts.nunito(),
+          ),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final gameState = ref.watch(gameProvider);
     final hasSave = gameState.score > 0;
 
@@ -26,13 +60,19 @@ class HomeScreen extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
             child: Column(
               children: [
-                const Center(child: LivesIndicator()),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: const [
+                    LivesIndicator(),
+                    DailyRewardEntryTile(),
+                  ],
+                ),
                 const Spacer(),
                 const SizedBox(height: 220),
                 const SizedBox(height: 32),
                 _HomeButton(
                   label: 'Novo Jogo',
-                  onPressed: () => _startNew(context, ref),
+                  onPressed: () => _startNew(context),
                 ),
                 const SizedBox(height: 12),
                 _HomeButton(
@@ -56,7 +96,7 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  void _startNew(BuildContext context, WidgetRef ref) {
+  void _startNew(BuildContext context) {
     if (!ref.read(livesProvider.notifier).canPlay) {
       Navigator.push(
         context,
@@ -118,7 +158,7 @@ class _RankingButton extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: null, // Fase 3
+              onPressed: null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white24,
                 foregroundColor: Colors.white38,
