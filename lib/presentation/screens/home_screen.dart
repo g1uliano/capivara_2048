@@ -12,6 +12,7 @@ import '../widgets/game_background.dart';
 import '../widgets/lives_indicator.dart';
 import 'game/game_screen.dart';
 import 'no_lives_screen.dart';
+import '../widgets/game_title_image.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -22,10 +23,12 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool _toastShown = false;
+  late final String _titleAsset;
 
   @override
   void initState() {
     super.initState();
+    _titleAsset = GameTitleImage.pickAsset();
     WidgetsBinding.instance.addPostFrameCallback((_) => _maybeShowToast());
   }
 
@@ -68,7 +71,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ],
                 ),
                 const Spacer(),
-                const SizedBox(height: 220),
+                GameTitleImage(asset: _titleAsset, height: 220),
                 const SizedBox(height: 32),
                 _HomeButton(
                   label: 'Novo Jogo',
