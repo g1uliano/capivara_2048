@@ -2,9 +2,9 @@
 
 > Documento de especificação para desenvolvimento. Pensado para ser alimentado em ferramentas como Claude Code para implementação iterativa.
 >
-> **Status atual:** Fase 2.3.12 concluída ✅ (v0.8.4+21) — `LivesIndicator` centralizado, `HostBanner` flush-left sem padding (colado à borda esquerda do header, simétrico ao `PauseButtonTile` flush-right), timer de regen de vidas implementado (`Timer.periodic` + `AppLifecycleListener`), PNGs finais do inventário integrados — **PNG ocupa o slot 56×56 inteiro (o PNG é o botão)**, sem fundo verde, com fallback `Material`+`Icon` se o asset falhar.
+> **Status atual:** Fase 2.4 concluída ✅ (v0.9.0+22) — Recompensas Diárias (ciclo 7 dias) implementadas: `DailyRewardsState` (Hive typeId=3), engine puro `daily_rewards_engine.dart` com `computeDailyRewardStatus`/`applyClaim`/`applyStreakReset`/`rewardForDay`, `DailyRewardsNotifier` com entrega via `livesProvider`+`inventoryProvider`, `DailyRewardsScreen` (grid 7 dias, 4 estados: available/alreadyClaimed/streakBroken/cycleCompleted, countdown até meia-noite, overlay dobrar recompensa via `FakeAdService`, diálogo de cap de vidas), `DailyRewardEntryTile` com badge vermelho na `HomeScreen`, toast na primeira abertura do dia. 193 testes passando.
 >
-> **Próximo:** **Fase 2.4 — Recompensas Diárias** (a antiga Fase 2.4 — Áudio foi reposicionada para o final do roadmap como **Fase 5 — Áudio**, junto da arte adicional e antes do lançamento; o jogo é desenvolvido sem áudio até lá).
+> **Próximo:** **Fase 2.5 — Tela Home + Coleção + Configurações** (a antiga Fase 2.4 — Áudio foi reposicionada para o final do roadmap como **Fase 5 — Áudio**, junto da arte adicional e antes do lançamento; o jogo é desenvolvido sem áudio até lá).
 
 ---
 
@@ -942,14 +942,15 @@ class ShareCode {
 >
 > **Por que foi movida:** os sons dos animais e UI dependem da identidade visual final, e o sound design ainda não foi feito. Implementar antes da arte final corre risco de retrabalho. O jogo é desenvolvido **sem áudio** até a Fase 5 — todos os controles de volume nas Configurações (Fase 2.5) ficam desabilitados/ocultos até lá.
 
-### 🔜 Fase 2.4 — Recompensas diárias (3 dias) — **PRÓXIMA**
-- Tela de recompensas com grid 7 dias
-- Lógica de streak (reseta se pular dia)
-- Coleta com confirmação
-- Mock do "dobrar via anúncio"
-- Persistência local
+### ✅ Fase 2.4 — Recompensas diárias (v0.9.0) — **CONCLUÍDA**
+- `DailyRewardsState` (Hive typeId=3): `currentDay` (1–7), `lastClaimedDate`, `claimedThisCycle`
+- Engine puro `daily_rewards_engine.dart`: `computeDailyRewardStatus`, `applyClaim`, `applyStreakReset`, `rewardForDay`, `kDailyRewards` (7 dias)
+- `DailyRewardsNotifier`: `claim()` (trata available/streakBroken/cycleCompleted), `claimDouble()`, integrado com `livesProvider`+`inventoryProvider`
+- `DailyRewardsScreen`: grid 7 dias, 4 estados UI, countdown até meia-noite, diálogo de cap de vidas, overlay "dobrar via anúncio" (`FakeAdService`)
+- `DailyRewardEntryTile` na `HomeScreen` com badge vermelho + toast na primeira sessão do dia
+- 193 testes passando (14 engine, 6 notifier, 4 widget, 3 repositório)
 
-### 🔜 Fase 2.5 — Tela Home + Coleção + Configurações (1 semana)
+### 🔜 Fase 2.5 — Tela Home + Coleção + Configurações (1 semana) — **PRÓXIMA**
 - Home com todos os botões e indicadores
 - Tela de Coleção (silhuetas para não desbloqueados, card detalhado para desbloqueados — usa `backgroundBaseColor` do Animal)
 - Configurações (haptic, idioma) — sliders de volume SFX/música ficam desabilitados/ocultos até a Fase 5
