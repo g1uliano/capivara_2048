@@ -29,7 +29,10 @@ const List<DailyReward> kDailyRewards = [
   DailyReward(lives: 2, undo1: 2, bomb2: 2), // Dia 7
 ];
 
-DailyReward rewardForDay(int day) => kDailyRewards[day - 1];
+DailyReward rewardForDay(int day) {
+  assert(day >= 1 && day <= kDailyRewards.length, 'day must be 1–${kDailyRewards.length}');
+  return kDailyRewards[day - 1];
+}
 
 DailyRewardStatus computeDailyRewardStatus(DateTime now, DailyRewardsState state) {
   final today = DateTime(now.year, now.month, now.day);
