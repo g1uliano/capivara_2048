@@ -1,9 +1,6 @@
 import 'package:capivara_2048/data/models/daily_rewards_state.dart';
 import 'package:capivara_2048/data/models/daily_rewards_state_adapter.dart';
-import 'package:capivara_2048/data/models/inventory.dart';
 import 'package:capivara_2048/data/models/inventory_hive_adapter.dart';
-import 'package:capivara_2048/data/models/item_type.dart';
-import 'package:capivara_2048/data/models/lives_state.dart';
 import 'package:capivara_2048/data/models/lives_state_adapter.dart';
 import 'package:capivara_2048/data/repositories/daily_rewards_repository.dart';
 import 'package:capivara_2048/data/repositories/inventory_repository.dart';
