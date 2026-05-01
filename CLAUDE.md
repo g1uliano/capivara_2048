@@ -52,15 +52,15 @@ lib/
 
 ## Fases do roadmap
 
-Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 2.3.12 concluída (v0.8.4) — próximo: Fase 2.4 (áudio)**.
+Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 2.3.12 concluída (v0.8.4) — próximo: Fase 2.4 (Recompensas Diárias)**. O áudio foi reposicionado para a **Fase 5** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
 
 | Fase | Foco |
 |------|------|
 | 1 | Setup, game engine puro, tela básica com placeholders |
-| 2 | Identidade visual, paleta, tipografia, animações |
-| 3 | Arte final dos 11 animais |
-| 4 | Áudio e música |
-| 5 | Coleção e Desafio Diário |
+| 2 | Identidade visual, paleta, tipografia, animações, vidas, inventário, recompensas, coleção, loja mock |
+| 3 | Backend, ranking, monetização |
+| 4 | Arte adicional e polimento visual (logo, ícone, splash final) |
+| 5 | Áudio (sound design dos 11 animais, SFX, música) |
 | 6 | Polimento, l10n, acessibilidade, lançamento |
 
 ## Release checklist

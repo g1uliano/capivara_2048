@@ -4,7 +4,7 @@
 >
 > **Status atual:** Fase 2.3.12 concluída ✅ (v0.8.4+21) — `LivesIndicator` centralizado, `HostBanner` flush-left sem padding (colado à borda esquerda do header, simétrico ao `PauseButtonTile` flush-right), timer de regen de vidas implementado (`Timer.periodic` + `AppLifecycleListener`), PNGs finais do inventário integrados — **PNG ocupa o slot 56×56 inteiro (o PNG é o botão)**, sem fundo verde, com fallback `Material`+`Icon` se o asset falhar.
 >
-> **Próximo:** **Fase 2.4 — Áudio e música**.
+> **Próximo:** **Fase 2.4 — Recompensas Diárias** (a antiga Fase 2.4 — Áudio foi reposicionada para o final do roadmap como **Fase 5 — Áudio**, junto da arte adicional e antes do lançamento; o jogo é desenvolvido sem áudio até lá).
 
 ---
 
@@ -45,7 +45,7 @@
 | Estado | `flutter_riverpod` | Gerenciamento de estado |
 | ID | `uuid` | IDs dos tiles para animação |
 | Animações | `flutter_animate` | Transições suaves |
-| Áudio | `audioplayers` ou `just_audio` | Sons e música (Fase 4.5) |
+| Áudio | `audioplayers` ou `just_audio` | Sons e música (Fase 5) |
 | Persistência | `hive` + `shared_preferences` | Local |
 | Tipografia | `google_fonts` | Fredoka, Nunito |
 | Imagens | `Image.asset` (Flutter nativo) | PNGs dos animais e ícones |
@@ -121,9 +121,9 @@ assets/
 │   ├── bomb_3.png   ← Bomba 3 — tema **Mico-leão-dourado**
 │   ├── undo_1.png   ← Desfazer 1 — tema **Capivara**
 │   └── undo_3.png   ← Desfazer 3 — tema **Onça-pintada**
-├── sounds/animals/                   ← Fase 4.5
-├── sounds/ui/                        ← Fase 4.5
-├── music/                            ← Fase 4.5
+├── sounds/animals/                   ← Fase 5
+├── sounds/ui/                        ← Fase 5
+├── music/                            ← Fase 5
 └── fonts/
 ```
 
@@ -538,7 +538,7 @@ users/{userId}/personalRecords
 ---
 
 ## 11. Sons e Música
-*(Implementação na Fase 4.5 — depois de toda a arte e polimento visual, antes do lançamento)*
+*(Implementação na Fase 5 — depois de toda a arte e polimento visual, antes do lançamento)*
 
 ### 11.1 Sons dos animais
 | Animal | Som sugerido |
@@ -703,7 +703,7 @@ class Animal {
   final String soundPath;
   final Color borderColor;
   final String? funFact;
-  final Color backgroundBaseColor;      // usado apenas na Coleção (fase 2.6); ignorado no jogo
+  final Color backgroundBaseColor;      // usado apenas na Coleção (fase 2.5); ignorado no jogo
 }
 ```
 
@@ -938,26 +938,23 @@ class ShareCode {
 
 ---
 
-### 🔀 Fase 2.4 — Áudio (movida para Fase 4.5)
-**Esta fase foi movida pra perto do final do desenvolvimento, antes do lançamento.** Ver **Fase 4.5** logo abaixo no roadmap pra detalhes da implementação.
+> **Nota histórica:** a antiga **Fase 2.4 — Áudio** foi reposicionada pra perto do final do desenvolvimento, antes do lançamento. Ver **Fase 5 — Áudio** mais abaixo. As fases seguintes deste bloco foram renumeradas (antiga 2.5 → 2.4, antiga 2.6 → 2.5, antiga 2.7 → 2.6).
+>
+> **Por que foi movida:** os sons dos animais e UI dependem da identidade visual final, e o sound design ainda não foi feito. Implementar antes da arte final corre risco de retrabalho. O jogo é desenvolvido **sem áudio** até a Fase 5 — todos os controles de volume nas Configurações (Fase 2.5) ficam desabilitados/ocultos até lá.
 
-**Por que foi movida:** os sons dos animais e UI dependem da identidade visual final. Implementar antes da Fase 4 (arte adicional) corre risco de retrabalho se a paleta/tom do jogo mudar. A posição na Fase 4.5 garante que o áudio seja a última camada de polimento antes do lançamento.
-
-> O slot **2.4** é mantido aqui pra preservar a numeração histórica do roadmap e deixar explícito que a fase foi reposicionada (não removida).
-
-### 🔜 Fase 2.5 — Recompensas diárias (3 dias)
+### 🔜 Fase 2.4 — Recompensas diárias (3 dias) — **PRÓXIMA**
 - Tela de recompensas com grid 7 dias
 - Lógica de streak (reseta se pular dia)
 - Coleta com confirmação
 - Mock do "dobrar via anúncio"
 - Persistência local
 
-### 🔜 Fase 2.6 — Tela Home + Coleção + Configurações (1 semana)
+### 🔜 Fase 2.5 — Tela Home + Coleção + Configurações (1 semana)
 - Home com todos os botões e indicadores
 - Tela de Coleção (silhuetas para não desbloqueados, card detalhado para desbloqueados — usa `backgroundBaseColor` do Animal)
-- Configurações (volume SFX, volume música, haptic, idioma) — sliders de áudio ficam desabilitados/ocultos até a Fase 4.5
+- Configurações (haptic, idioma) — sliders de volume SFX/música ficam desabilitados/ocultos até a Fase 5
 
-### 🔜 Fase 2.7 — Loja mock (3 dias)
+### 🔜 Fase 2.6 — Loja mock (3 dias)
 - Tela com os 6 pacotes
 - Cards com "De/Por" e badges de desconto
 - Botão "Comprar" simulado
@@ -981,18 +978,19 @@ class ShareCode {
 - Splash screen final
 - Validação visual completa
 
-### 🔜 Fase 4.5 — Áudio (1–2 semanas)
-**Sons dos 11 animais e UI + música ambiente.** Esta fase entra **depois** de toda a arte e polimento visual e **antes** do lançamento — quando todos os assets visuais finais estão consolidados, os sons casarão exatamente com os elementos.
+### 🔜 Fase 5 — Áudio (1–2 semanas)
+**Sons dos 11 animais e UI + música ambiente.** Esta fase entra **depois** de toda a arte e polimento visual e **antes** do lançamento — quando todos os assets visuais finais estão consolidados, os sons casarão exatamente com os elementos. O sound design dos 11 animais ainda precisa ser feito; até esta fase, o jogo roda sem áudio.
 
+- Sound design dos 11 animais (definir tom/duração/estilo) e produção dos clipes
 - Sons dos 11 animais (~50KB cada, OGG/M4A/MP3) — ver tabela 11.1
 - Sons de UI completos — ver lista 11.2
 - Música ambiente: loop de floresta com flautas + marimba
 - Integrar com `audioplayers` ou `just_audio` (decidir qual)
 - Pool de AudioPlayers (evita latência no merge)
-- Mixer simples nas Configurações (slider SFX + slider música + mute persistente) — habilitar os controles que ficaram desabilitados na Fase 2.6
+- Mixer simples nas Configurações (slider SFX + slider música + mute persistente) — habilitar os controles que ficaram desabilitados na Fase 2.5
 - Pré-carregar tudo no início do app
 
-### 🔜 Fase 5 — Polimento + Lançamento
+### 🔜 Fase 6 — Polimento + Lançamento
 - Localização PT-BR / EN
 - Acessibilidade (contraste, leitor de tela, fonte ajustável)
 - Modo escuro (opcional)
@@ -1021,7 +1019,7 @@ class ShareCode {
 - `const` e Riverpod selectors
 - PNGs em vez de SVGs (Fase 2.3.8 item A) — gargalo removido
 - `precacheImage` pra os 22 PNGs dos animais + 4 do inventário + `fundo.png` no boot
-- Pool de AudioPlayers (Fase 4.5)
+- Pool de AudioPlayers (Fase 5)
 - 60fps em Snapdragon 660+ / iPhone 8+
 - `RepaintBoundary` no `GameBackground`
 - `BackdropFilter` no `PauseOverlay` é o único custo significativo de UI — fallback se ficar < 50fps
@@ -1047,70 +1045,87 @@ class ShareCode {
 
 ---
 
-## 17. Prompt Sugerido para o Claude Code (Fase 2.3.12 — via skill superpowers)
+## 17. Prompt Sugerido para o Claude Code (Fase 2.4 — via skill superpowers)
 
-> O prompt abaixo entra no fluxo do **superpowers/brainstorming**. O resultado esperado é uma **spec detalhada da Fase 2.3.12** (refinada via brainstorm), que depois alimenta o **superpowers/writing-plans** pra gerar o plano executável. Nada de código nesta etapa — apenas elicitação, refinamento de design e plano.
+> O prompt abaixo entra no fluxo do **superpowers/brainstorming**. O resultado esperado é uma **spec detalhada da Fase 2.4** (refinada via brainstorm), que depois alimenta o **superpowers/writing-plans** pra gerar o plano executável. Nada de código nesta etapa — apenas elicitação, refinamento de design e plano.
 
 ---
 
 > Use a skill `superpowers/brainstorming` pra refinar o design da próxima fase do projeto **Capivara 2048** (Flutter).
 >
-> **Contexto:** Estamos no projeto Capivara 2048. Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente seções 4.2, 4.5, 5.6, 12.3 e 15 — Fase 2.3.12).
+> **Contexto:** Estamos no projeto Capivara 2048. Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente seções **8.1** — tabela de recompensas diárias, **12.6** — Tela de Recompensas Diárias, **5** — Sistema de Vidas (cap "ganho" de 15), **6** — Itens/Inventário (Desfazer e Bomba), **13** — Modelos de dados, **14.1** — Hive, e **15 — Fase 2.4**).
 >
-> **Fases concluídas:**
-> - Fase 1 a 2.3.10
-> - **Fase 2.3.11** — Tanajura como anfitrião desde o boot (`highestLevelReached` inicia em 1), `_Placeholder` removido, `fundo.png` aplicado também na `HomeScreen`.
+> **Fases concluídas:** Fase 1 a 2.3.12 (v0.8.4). Áudio foi reposicionado pra **Fase 5** — o jogo é desenvolvido sem áudio até lá; ignorar SFX/música nesta fase.
 >
-> **Tópico do brainstorm:** desenhar a **Fase 2.3.12 — Bugfixes de layout, regen e ícones do inventário**. Quatro correções identificadas em uso real após a 2.3.11:
+> **Tópico do brainstorm:** desenhar a **Fase 2.4 — Recompensas Diárias (ciclo de 7 dias)**. O escopo da fase é:
 >
-> **A — Centralizar `LivesIndicator` no topo:** atualmente está desalinhado (provavelmente à esquerda). Ajustar `game_screen.dart` e `home_screen.dart` pra garantir centralização horizontal usando `Row` com `mainAxisAlignment: center` ou `Center` widget.
+> **A — Modelo e persistência (Hive):**
+> - Criar `DailyRewardsState` (Hive typeId novo, sem colisão com `LivesState=1` e `Inventory=2`) com campos: `currentDay` (1–7), `lastClaimedDate` (DateTime, dia local), `claimedThisCycle` (bool — se o dia atual já foi coletado), e qualquer auxiliar pra detectar streak quebrada.
+> - Repositório local (`DailyRewardsRepository`) com `load()`, `save()`, `reset()`.
+> - Decidir: a "meia-noite" pra liberar a próxima recompensa é local do dispositivo ou UTC? (provavelmente local — confirmar)
 >
-> **B — Colar `HostBanner` à coluna 1 (eliminar gap à esquerda):** o anfitrião **já está à esquerda** desde decisão tomada em brainstorm anterior, e o `PauseButtonTile` já está à direita abaixo do cronômetro. Mas o `HostBanner` não está colado à borda esquerda — existe um gap visível entre a borda esquerda do tabuleiro e a borda esquerda do anfitrião. Investigar `game_header.dart` pra identificar a fonte do gap (padding interno do `Row`, margin do widget, ou padding externo do `GameHeader` que não bate com o tabuleiro) e ajustar pra que as duas bordas formem uma linha vertical contínua.
+> **B — Lógica de streak/ciclo (domínio puro, testável):**
+> - Função pura `computeDailyRewardStatus(now, state) → DailyRewardStatus` retornando: `available | alreadyClaimed | streakBroken | cycleCompleted`.
+> - Regra: se `now.day - lastClaimedDate.day > 1` (em dias locais), streak quebra → reseta para Dia 1.
+> - Regra: se coletou Dia 7, próximo ciclo recomeça em Dia 1 no dia seguinte.
+> - Edge cases: jogador atravessa fuso horário; jogador muda relógio do device manualmente (anti-cheat simples — não retroceder data); coletar exatamente em 23:59:59 e abrir 00:00:01 do dia seguinte deve mostrar Dia 2 disponível.
+> - Cobertura de testes unitários alta (sem dependência Flutter).
 >
-> **C — Implementar cronômetro de regeneração de vidas:** o `LivesStatusBanner` mostra "Restando MM:SS" mas o número não decrementa visualmente. Auditar `LivesNotifier` pra confirmar se há `Timer.periodic` ativo, implementar se não tiver. UI consome `StreamProvider<DateTime>` ou Timer próprio pra atualizar a cada segundo. Lidar com app em background (recalcular vidas geradas offline ao retornar).
+> **C — Tela `DailyRewardsScreen` (12.6):**
+> - Grid 7 dias com recompensa de cada dia (ver tabela 8.1) — usar ícones do `assets/icons/inventory/` pra Desfazer/Bomba e ícone de coração pra vidas.
+> - Dia atual destacado (anel/borda animada, glow sutil); dias passados marcados como recebidos (check verde + opacity reduzida); dias futuros com tom neutro.
+> - Botão "Coletar" centralizado, habilitado só se `status == available`.
+> - Pós-coleta: animação de entrega (tile escalando + fade) e overlay com oferta "Dobrar (mock anúncio 30s)" — botão mock que apenas multiplica a recompensa por 2 sem reproduzir anúncio real (reservado para Fase 3).
+> - Estado vazio/coletado: mensagem "Volte amanhã" com timer regressivo HH:MM:SS até a próxima meia-noite local (similar ao timer de regen de vidas implementado na 2.3.12 item C — reaproveitar padrão `Timer.periodic`).
 >
-> **D — Integrar PNGs finais dos ícones do inventário:** os 4 PNGs (temas Sucuri/Mico-leão/Capivara/Onça) já estão em `assets/icons/inventory/` mas o `InventoryItemButton` continua usando ícones antigos/placeholder. Atualizar paths, adicionar ao `precacheImage` do boot, validar estado disabled (acinzentado) e badge de contador sobre o novo ícone. Sincronizar com `ConfirmUseDialog` pra mostrar o mesmo asset.
+> **D — Integração com vidas e inventário:**
+> - Vidas recebidas via diária **contam como "ganhas"** (entram no cap de 15 — `earnedCap`, conforme §5 e §13.4). Validar que `LivesNotifier.addEarnedLives(n)` respeita o cap.
+> - Itens (Desfazer/Bomba) entram no inventário via método existente do `InventoryNotifier` (sem cap, conforme 2.3.8 item G).
+> - Toda a entrega deve ser **atômica**: ou todas as recompensas do dia entram, ou nenhuma (se uma falhar, rollback ou retry).
+>
+> **E — Entry point e indicação visual:**
+> - Botão "Recompensa diária" na `HomeScreen` (a Home definitiva entra na Fase 2.5; nesta fase, adicionar um botão temporário ou na barra superior).
+> - Badge vermelho com "!" quando há recompensa disponível pra coletar — visível também na entrada do app (decidir onde: ícone na home, badge no menu pause, ou ambos).
+> - Auto-abrir a tela de recompensas na primeira sessão do dia? Ou só badge + clique manual? (decidir no brainstorm)
 >
 > **Pontos abertos pra explorar no brainstorm (elicitação esperada):**
 >
-> Sobre o item A (centralizar LivesIndicator):
-> - Verificar se o problema é técnico (faltou `mainAxisAlignment`) ou de design (`LivesIndicator` está dentro de um container com `padding` assimétrico)?
-> - A correção vale só pra `GameScreen` ou também pra `HomeScreen`? Provavelmente as duas, mas confirmar.
-> - Se o `LivesIndicator` continuar desalinhado em alguma tela, vale adicionar regression test que falha se ele sair do centro?
+> Sobre **A (modelo/persistência):**
+> - Reaproveitar formato de `lastClaimedDate` como `DateTime` ou armazenar `int dayEpoch` (dias desde 1970-01-01 local) pra simplificar comparação? Qual encaixa melhor com Hive serialization e testes determinísticos?
+> - typeId do Hive: usar 3 (próximo livre)? Conferir se não há colisão com algum adapter futuro previsto.
 >
-> Sobre o item B (colar HostBanner à coluna 1):
-> - Diagnóstico do gap: o problema é (a) padding interno do `Row` da Linha C, (b) margin do `HostBanner` widget, (c) `mainAxisAlignment` errado da `Row`, (d) padding externo do `GameHeader` que não bate com o tabuleiro, ou (e) algum `Center`/`Align` indevido? Vale investigar antes de propor solução.
-> - Pixel-perfect: a borda esquerda do `HostBanner` deve ficar exatamente alinhada com a borda esquerda da coluna 1 do tabuleiro? Ou pode haver tolerância de 1-2px? Como medir/testar isso de forma confiável?
-> - Se o `GameHeader` e o `BoardWidget` estão ambos dentro de um container com padding horizontal externo, basta garantir que ambos consomem o mesmo padding. Se estiverem em containers diferentes, vale unificar?
-> - O `PauseButtonTile` à direita continua na posição atual (sem mudança) — confirmar que a correção do anfitrião não desloca acidentalmente o pause.
+> Sobre **B (lógica de streak):**
+> - Como testar "passagem de dias" de forma determinística? `Clock` injetável (`package:clock`) ou parâmetro `now` em todas as funções puras? Padrão consistente com o resto do domínio.
+> - Política anti-retrocesso de relógio: se `now < lastClaimedDate`, o que fazer? (sugestão: tratar como mesmo dia — não punir o usuário, mas também não liberar nova recompensa).
+> - Detalhe: streak quebra a partir de **2 dias** de gap (ex: coletou seg, voltou qua = quebra) ou mantém tolerância? Confirmar.
 >
-> Sobre o item C (regen timer):
-> - Tradeoff `Timer.periodic` vs `Stream.periodic`: qual encaixa melhor no padrão Riverpod do projeto? Vale usar `StreamProvider`?
-> - Frequência do tick: 1 segundo é o ideal, ou 1 minuto seria suficiente (já que o display é MM:SS, mas o usuário pode olhar e esperar a transição da contagem)?
-> - Recálculo offline: ao voltar do background, calcular `min(elapsedTime / 30min, regenCap - current)` vidas adicionadas. Edge case: se o jogador ficou 6 horas fora, com `current = 0`, deve voltar com 5 (regenCap atingido) e `nextRegenAt = null`.
-> - O `LivesNotifier` precisa ter um método `pauseRegen()`/`resumeRegen()` pra lifecycle do app (em background → pausa Timer; em foreground → retoma e recalcula)?
-> - A faixa "Restando" exibe MM:SS — quando faltam ≥60min (ex: jogador comprou pacote enorme e perdeu várias vidas), mostrar HH:MM:SS, ou continua MM:SS truncando? Edge case raro, mas vale decidir.
-> - Animação ao chegar em "00:00" e a regen disparar: a faixa muda pra "Completo" (ou "Restando MM:SS" se ainda < 5) com animação fade+scale (já existente da 2.3.9 item A) — confirmar que continua funcionando.
+> Sobre **C (UI/UX):**
+> - Layout do grid 7 dias: 7 colunas (uma linha) ou 4+3 (duas linhas)? Em telas estreitas (mobile retrato), provavelmente 4+3 ou 7 verticais empilhados — confirmar com mock.
+> - Dia 7 (recompensa combinada) tem destaque visual extra (ex: borda dourada)?
+> - Animação de coleta: usar `flutter_animate` (já no projeto) ou um `AnimationController` dedicado? Reaproveitar padrão da 2.3.9 (fade+scale do `LivesStatusBanner`).
+> - Mock do botão "Dobrar via anúncio": qual texto exato? Apenas botão "Assistir 30s e dobrar" → fake delay 1s + entrega 2x? Ou já preparar interface `AdService` com implementação fake (preparando Fase 3)?
 >
-> Sobre o item D (PNGs do inventário):
-> - Os PNGs novos têm fundo transparente e tema dos animais (Sucuri/Mico-leão/Capivara/Onça). Vão competir com o número/badge de contador que fica em cima? Vale revisar contraste em estado disabled (com Opacity 0.4)?
-> - Os ícones antigos (placeholder Material/Lucide ou versões anteriores) — vale apagar de vez do código, ou manter como fallback (similar ao que foi feito com SVGs antigos no inventário)?
-> - O `BoxFit.contain` no slot do `InventoryItemButton` preserva proporção mas pode deixar barras laterais. Faz sentido ou vale `BoxFit.cover` (consistente com `HostArtwork` da 2.3.10)?
-> - Sincronização visual com `ConfirmUseDialog`: o ícone grande do dialog também passa a usar o PNG novo? Tamanho diferente (ex: 64x64) — o PNG 1024x1024 vai ser redimensionado automaticamente pelo Flutter, ou vale forçar `cacheWidth: 64`?
-> - Estado disabled (contador 0): `Opacity(0.4)` simples, ou `ColorFilter.matrix` pra dessaturar pra escala de cinza? Qual fica mais reconhecível com PNG colorido?
+> Sobre **D (integração):**
+> - O que acontece se o jogador está com 15 vidas (cap) e a recompensa do dia inclui +2 vidas? Política: descartar excedente silenciosamente (mais seguro), ou avisar antes ("Cap atingido, vai perder X vidas — coletar mesmo assim?")? Definir.
+> - Idempotência: se o app crashar entre marcar `claimedThisCycle = true` e adicionar as recompensas, qual lado é confiável? Sugestão: gravar Hive **depois** de adicionar tudo, ou usar transação lógica (snapshot do estado antes, rollback se falhar).
 >
-> Sobre integração:
-> - Ordem das entregas: A primeiro (mais simples), B depois (refator de layout), C por último (mais complexo) — confirma a sequência?
-> - Testes existentes: snapshots da `GameScreen` e `HomeScreen` (pelo menos 5-10 testes) precisam ser regenerados depois de A e B. Refazer ou ajustar?
-> - Vale tirar screenshots/vídeo do antes/depois pra validar visualmente?
-> - Sobre o item C: vale escrever um teste de integração que simula 30 minutos passando (com `FakeAsync` ou similar) pra validar regen end-to-end?
+> Sobre **E (entry point):**
+> - Onde colocar o botão até a Fase 2.5 chegar? Sugestão: tile no canto da `HomeScreen` (mesmo padrão do `LivesIndicator`) — provisório, será reposicionado.
+> - Auto-abrir na primeira sessão do dia: pode ser intrusivo. Sugestão: só badge + um pequeno toast "Recompensa disponível!" na primeira abertura.
+>
+> Sobre **integração geral:**
+> - Ordem das entregas: A → B → D → C → E (modelo + lógica + integração + UI + entry) é a sequência natural pra TDD (testes de domínio antes de UI). Confirmar.
+> - Snapshots/widget tests: criar testes de `DailyRewardsScreen` cobrindo os 4 estados (available, alreadyClaimed, streakBroken, cycleCompleted).
+> - Testes de integração: simular 7 dias consecutivos com `FakeAsync`/`Clock` e validar que ciclo completa e reseta corretamente.
+> - Localização: textos em PT-BR direto nesta fase (l10n entra na Fase 6) — manter strings em constantes pra facilitar extração futura.
 >
 > **Output esperado do brainstorm:**
-> Uma **spec detalhada da Fase 2.3.12** (markdown, tipo `FASE_2_3_12_SPEC.md`) com:
+> Uma **spec detalhada da Fase 2.4** (markdown, tipo `FASE_2_4_SPEC.md`) com:
 > - Decisões tomadas em cada ponto aberto
-> - Para cada uma das 4 sub-entregas: arquivos a criar/modificar, mudança exata, casos de teste obrigatórios, critérios de aceite
-> - Estratégia de implementação do regen timer (item C — Timer vs Stream, lifecycle, offline recalc)
-> - Lista de testes existentes que precisam ser ajustados (snapshots de layout)
+> - Para cada sub-entrega (A–E): arquivos a criar/modificar, contratos exatos (assinaturas de funções, campos de modelos), casos de teste obrigatórios, critérios de aceite
+> - Estratégia de teste do componente de tempo (`Clock` injetável, `FakeAsync`, edge cases)
+> - Diagramas/mocks rápidos do layout do grid 7 dias e dos 4 estados visuais
+> - Lista de pontos a sincronizar com a Fase 2.5 (Home definitiva) — pra evitar retrabalho do entry point
 >
 > Esse documento será depois consumido pela skill `superpowers/writing-plans` pra gerar o plano executável (TDD-friendly, com checkpoints).
 >
