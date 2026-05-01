@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:io';
 import 'package:capivara_2048/data/models/daily_rewards_state_adapter.dart';
 import 'package:capivara_2048/data/models/inventory_hive_adapter.dart';
 import 'package:capivara_2048/data/models/lives_state_adapter.dart';
