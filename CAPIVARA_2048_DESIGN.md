@@ -4,13 +4,15 @@
 >
 > **Status atual:** Fase 2.4 concluída ✅ (v0.9.0+22) — Recompensas Diárias (ciclo 7 dias) implementadas: `DailyRewardsState` (Hive typeId=3), engine puro `daily_rewards_engine.dart` com `computeDailyRewardStatus`/`applyClaim`/`applyStreakReset`/`rewardForDay`, `DailyRewardsNotifier` com entrega via `livesProvider`+`inventoryProvider`, `DailyRewardsScreen` (grid 7 dias, 4 estados: available/alreadyClaimed/streakBroken/cycleCompleted, countdown até meia-noite, overlay dobrar recompensa via `FakeAdService`, diálogo de cap de vidas), `DailyRewardEntryTile` com badge vermelho na `HomeScreen`, toast na primeira abertura do dia. 193 testes passando.
 >
-> **Próximo:** **Fase 2.5 — Tela Home + Coleção + Configurações** (a antiga Fase 2.4 — Áudio foi reposicionada para o final do roadmap como **Fase 5 — Áudio**, junto da arte adicional e antes do lançamento; o jogo é desenvolvido sem áudio até lá).
+> **Renomeação do jogo:** o nome do jogo passa de **"Capivara 2048"** para **"Olha o Bichim!"**. As referências antigas em seções abaixo serão atualizadas progressivamente; durante a transição, considere "Olha o Bichim!" o nome canônico do produto. O *codename* interno do repositório (`capivara_2048`) permanece — apenas o nome de exibição muda.
+>
+> **Próximo:** **Fase 2.5 — Identidade do Jogo (rebranding "Olha o Bichim!" + título na Home + ícone do app + nome no launcher)**. As fases seguintes foram renumeradas: Tela Home + Coleção + Configurações → Fase 2.6; Loja mock → Fase 2.7. (Áudio segue em **Fase 5**, junto da arte adicional e antes do lançamento; o jogo é desenvolvido sem áudio até lá.)
 
 ---
 
 ## 1. Visão Geral
 
-**Capivara 2048** é um puzzle game multiplataforma inspirado na mecânica clássica do 2048, onde os números tradicionais são acompanhados por animais da fauna brasileira. O objetivo final é alcançar a **Capivara Lendária**, o "2048" do jogo, no menor tempo possível ou com o maior número.
+**Olha o Bichim!** (anteriormente "Capivara 2048") é um puzzle game multiplataforma inspirado na mecânica clássica do 2048, onde os números tradicionais são acompanhados por animais da fauna brasileira. O objetivo final é alcançar a **Capivara Lendária**, o "2048" do jogo, no menor tempo possível ou com o maior número.
 
 ### 1.1 Pitch em uma frase
 "Combine animais brasileiros em um tabuleiro 4x4, descubra a Capivara Lendária e dispute o ranking global."
@@ -40,22 +42,22 @@
 **Flutter 3.x** (Dart) — multiplataforma único para iOS, Android, Web e Desktop.
 
 ### 2.2 Bibliotecas recomendadas
-| Categoria | Biblioteca | Uso |
-|---|---|---|
-| Estado | `flutter_riverpod` | Gerenciamento de estado |
-| ID | `uuid` | IDs dos tiles para animação |
-| Animações | `flutter_animate` | Transições suaves |
-| Áudio | `audioplayers` ou `just_audio` | Sons e música (Fase 5) |
-| Persistência | `hive` + `shared_preferences` | Local |
-| Tipografia | `google_fonts` | Fredoka, Nunito |
-| Imagens | `Image.asset` (Flutter nativo) | PNGs dos animais e ícones |
-| Haptic | `flutter` nativo (HapticFeedback) | Vibração |
-| Localização | `flutter_localizations` + `intl` | PT-BR / EN |
-| Backend | `firebase_core` + `cloud_firestore` + `firebase_auth` | Ranking, contas |
-| Anúncios | `google_mobile_ads` | Recompensados de 30s |
-| Compras | `in_app_purchase` | Loja |
-| Compartilhamento | `share_plus` + `app_links` | Códigos de resgate |
-| Blur (UI) | `flutter` nativo (`BackdropFilter` + `ImageFilter.blur`) | Efeito vidro fosco |
+| Categoria        | Biblioteca                                               | Uso                         |
+| ---------------- | -------------------------------------------------------- | --------------------------- |
+| Estado           | `flutter_riverpod`                                       | Gerenciamento de estado     |
+| ID               | `uuid`                                                   | IDs dos tiles para animação |
+| Animações        | `flutter_animate`                                        | Transições suaves           |
+| Áudio            | `audioplayers` ou `just_audio`                           | Sons e música (Fase 5)      |
+| Persistência     | `hive` + `shared_preferences`                            | Local                       |
+| Tipografia       | `google_fonts`                                           | Fredoka, Nunito             |
+| Imagens          | `Image.asset` (Flutter nativo)                           | PNGs dos animais e ícones   |
+| Haptic           | `flutter` nativo (HapticFeedback)                        | Vibração                    |
+| Localização      | `flutter_localizations` + `intl`                         | PT-BR / EN                  |
+| Backend          | `firebase_core` + `cloud_firestore` + `firebase_auth`    | Ranking, contas             |
+| Anúncios         | `google_mobile_ads`                                      | Recompensados de 30s        |
+| Compras          | `in_app_purchase`                                        | Loja                        |
+| Compartilhamento | `share_plus` + `app_links`                               | Códigos de resgate          |
+| Blur (UI)        | `flutter` nativo (`BackdropFilter` + `ImageFilter.blur`) | Efeito vidro fosco          |
 
 ### 2.3 Estrutura de pastas
 ```
@@ -157,14 +159,14 @@ assets/
 ### 3.4 Regra crítica: quando uma vida é consumida
 **A vida é consumida APENAS no momento do Game Over.**
 
-| Ação | Consome vida? |
-|---|---|
-| Iniciar nova partida | ❌ Não |
-| Sair pro menu durante partida | ❌ Não |
-| Continuar partida salva | ❌ Não |
-| Reiniciar partida em andamento | ❌ Não |
+| Ação                             | Consome vida?     |
+| -------------------------------- | ----------------- |
+| Iniciar nova partida             | ❌ Não             |
+| Sair pro menu durante partida    | ❌ Não             |
+| Continuar partida salva          | ❌ Não             |
+| Reiniciar partida em andamento   | ❌ Não             |
 | **Tabuleiro tranca (Game Over)** | ✅ **Sim, 1 vida** |
-| Atingir 2048 (vitória) | ❌ Não |
+| Atingir 2048 (vitória)           | ❌ Não             |
 
 > **Limite pra iniciar:** ≥1 vida disponível.
 
@@ -172,19 +174,19 @@ assets/
 
 ## 4. Os Animais (Tiles)
 
-| Nível | Valor | Animal | Justificativa | Cor (contorno) | PNG tile | PNG host |
-|---|---|---|---|---|---|---|
-| 1 | 2 | **Tanajura** | A famosa rainha alada que anuncia as chuvas | `#C0392B` | `tile/Tanajura.png` | `host/Tanajura.png` |
-| 2 | 4 | **Lobo-guará** | Ícone do cerrado, estrela da nota de R$ 200 | `#E67E22` | `tile/LoboGuara.png` | `host/LoboGuara.png` |
-| 3 | 8 | **Sapo-cururu** | Guardião noturno, figura clássica do folclore | `#8D6E63` | `tile/Cururu.png` | `host/Cururu.png` |
-| 4 | 16 | **Tucano** | Embaixador visual das matas brasileiras | `#FFB300` | `tile/Tucano.png` | `host/Tucano.png` |
-| 5 | 32 | **Sagui** | Pequeno primata curioso, ágil e expressivo | `#A0826D` | `tile/Sagui.png` | `host/Sagui.png` |
-| 6 | 64 | **Preguiça** | Mestre zen da copa das árvores | `#BCAAA4` | `tile/Preguica.png` | `host/Preguica.png` |
-| 7 | 128 | **Mico-leão-dourado** | Ícone absoluto da conservação brasileira | `#FF8F00` | `tile/MicoLeao.png` | `host/MicoLeao.png` |
-| 8 | 256 | **Boto-cor-de-rosa** | Misticismo dos rios, paleta única | `#F48FB1` | `tile/Boto.png` | `host/Boto.png` |
-| 9 | 512 | **Onça-pintada** | Predador alfa supremo | `#FBC02D` | `tile/Onca.png` | `host/Onca.png` |
-| 10 | 1024 | **Sucuri** | Gigante das águas profundas | `#2E7D32` | `tile/Sucuri.png` | `host/Sucuri.png` |
-| 11 | 2048 | **🏆 Capivara Lendária** | "Diplomata da natureza" — fofura suprema | `#FFD54F` | `tile/Capivara.png` | `host/Capivara.png` |
+| Nível | Valor | Animal                  | Justificativa                                 | Cor (contorno) | PNG tile             | PNG host             |
+| ----- | ----- | ----------------------- | --------------------------------------------- | -------------- | -------------------- | -------------------- |
+| 1     | 2     | **Tanajura**            | A famosa rainha alada que anuncia as chuvas   | `#C0392B`      | `tile/Tanajura.png`  | `host/Tanajura.png`  |
+| 2     | 4     | **Lobo-guará**          | Ícone do cerrado, estrela da nota de R$ 200   | `#E67E22`      | `tile/LoboGuara.png` | `host/LoboGuara.png` |
+| 3     | 8     | **Sapo-cururu**         | Guardião noturno, figura clássica do folclore | `#8D6E63`      | `tile/Cururu.png`    | `host/Cururu.png`    |
+| 4     | 16    | **Tucano**              | Embaixador visual das matas brasileiras       | `#FFB300`      | `tile/Tucano.png`    | `host/Tucano.png`    |
+| 5     | 32    | **Sagui**               | Pequeno primata curioso, ágil e expressivo    | `#A0826D`      | `tile/Sagui.png`     | `host/Sagui.png`     |
+| 6     | 64    | **Preguiça**            | Mestre zen da copa das árvores                | `#BCAAA4`      | `tile/Preguica.png`  | `host/Preguica.png`  |
+| 7     | 128   | **Mico-leão-dourado**   | Ícone absoluto da conservação brasileira      | `#FF8F00`      | `tile/MicoLeao.png`  | `host/MicoLeao.png`  |
+| 8     | 256   | **Boto-cor-de-rosa**    | Misticismo dos rios, paleta única             | `#F48FB1`      | `tile/Boto.png`      | `host/Boto.png`      |
+| 9     | 512   | **Onça-pintada**        | Predador alfa supremo                         | `#FBC02D`      | `tile/Onca.png`      | `host/Onca.png`      |
+| 10    | 1024  | **Sucuri**              | Gigante das águas profundas                   | `#2E7D32`      | `tile/Sucuri.png`    | `host/Sucuri.png`    |
+| 11    | 2048  | **🏆 Capivara Lendária** | "Diplomata da natureza" — fofura suprema      | `#FFD54F`      | `tile/Capivara.png`  | `host/Capivara.png`  |
 
 > Caminhos relativos a `assets/images/animals/`. Nível 5 = Sagui (substituiu Arara-azul na Fase 2.3.7).
 
@@ -236,22 +238,22 @@ assets/
 - **Mínimo pra jogar:** 1 vida disponível
 
 ### 5.2 Resumo visual (caps de armazenamento)
-| Origem | Cap de armazenamento |
-|---|---|
-| Iniciais (instalação) | 5 |
-| Regeneração automática | até 5 (não excede) |
-| Recompensas (diárias, ranking, recorde, convite) | até 15 |
-| **Compras (loja)** | **ilimitado** |
+| Origem                                           | Cap de armazenamento |
+| ------------------------------------------------ | -------------------- |
+| Iniciais (instalação)                            | 5                    |
+| Regeneração automática                           | até 5 (não excede)   |
+| Recompensas (diárias, ranking, recorde, convite) | até 15               |
+| **Compras (loja)**                               | **ilimitado**        |
 
 > **Atenção (única limitação de inventário):** apenas vidas têm cap de armazenamento. Bombas e desfazer **não têm cap** — o jogador pode acumular quantos quiser.
 
 ### 5.3 Estados visuais da faixa do `LivesIndicator` (Fase 2.3.9)
-| Faixa | Condição | Cor |
-|---|---|---|
-| **"Completo"** | `current == 5` | Verde-folha `#66BB6A` |
-| **"Bônus"** | `current > 5` | Dourado `#FFD54F` |
+| Faixa                | Condição          | Cor                     |
+| -------------------- | ----------------- | ----------------------- |
+| **"Completo"**       | `current == 5`    | Verde-folha `#66BB6A`   |
+| **"Bônus"**          | `current > 5`     | Dourado `#FFD54F`       |
 | **"Restando MM:SS"** | `0 < current < 5` | Laranja-aviso `#FFA726` |
-| **"Sem vidas"** | `current == 0` | Vermelho `#EF5350` |
+| **"Sem vidas"**      | `current == 0`    | Vermelho `#EF5350`      |
 
 Animações: fade 300ms entre estados + scale 1→1.1→1 (200ms) em transições positivas (vida ganha).
 
@@ -285,12 +287,12 @@ class LivesState {
 ## 6. Itens e Power-ups
 
 ### 6.1 Tipos
-| Item | Efeito | Origem |
-|---|---|---|
-| **Bomba 2** | Explode 2 casas adjacentes escolhidas | Loja, recompensas |
-| **Bomba 3** | Explode 3 casas escolhidas (categoria separada) | Apenas loja |
-| **Desfazer 1** | Desfaz a última jogada | Loja, recompensas |
-| **Desfazer 3** | Desfaz as últimas 3 jogadas (categoria separada) | Apenas loja |
+| Item           | Efeito                                           | Origem            |
+| -------------- | ------------------------------------------------ | ----------------- |
+| **Bomba 2**    | Explode 2 casas adjacentes escolhidas            | Loja, recompensas |
+| **Bomba 3**    | Explode 3 casas escolhidas (categoria separada)  | Apenas loja       |
+| **Desfazer 1** | Desfaz a última jogada                           | Loja, recompensas |
+| **Desfazer 3** | Desfaz as últimas 3 jogadas (categoria separada) | Apenas loja       |
 
 > **Sem cap de armazenamento:** bombas e desfazer podem ser acumulados sem limite. Apenas vidas têm cap (ver 5.2).
 
@@ -358,14 +360,14 @@ class Inventory {
 ## 7. Loja de Itens
 
 ### 7.1 Pacotes
-| # | Nome | Conteúdo | De | Por | Desconto |
-|---|---|---|---|---|---|
-| 01 | **4× Bomba 3** | 4 bombas que explodem 3 casas | R$ 7,99 | **R$ 3,99** | 50% |
-| 02 | **4× Desfazer 3** | 4 desfazer de 3 jogadas | R$ 3,99 | **R$ 1,99** | 50% |
-| 03 | **6 vidas** | Direto no inventário (sem cap por ser compra) | R$ 9,99 | **R$ 2,49** | 75% |
-| 04 | **10 vidas** | Direto no inventário (sem cap por ser compra) | R$ 19,99 | **R$ 4,99** | 75% |
-| 05 | **Combo Mata Atlântica** | 6 vidas + 2 bombas + 2 desfazer | R$ 10,99 | **R$ 4,99** | 50% |
-| 06 | **Combo Floresta Amazônica** | 10 vidas + 4 bombas + 4 desfazer | R$ 31,99 | **R$ 9,99** | 50% |
+| #   | Nome                         | Conteúdo                                      | De       | Por         | Desconto |
+| --- | ---------------------------- | --------------------------------------------- | -------- | ----------- | -------- |
+| 01  | **4× Bomba 3**               | 4 bombas que explodem 3 casas                 | R$ 7,99  | **R$ 3,99** | 50%      |
+| 02  | **4× Desfazer 3**            | 4 desfazer de 3 jogadas                       | R$ 3,99  | **R$ 1,99** | 50%      |
+| 03  | **6 vidas**                  | Direto no inventário (sem cap por ser compra) | R$ 9,99  | **R$ 2,49** | 75%      |
+| 04  | **10 vidas**                 | Direto no inventário (sem cap por ser compra) | R$ 19,99 | **R$ 4,99** | 75%      |
+| 05  | **Combo Mata Atlântica**     | 6 vidas + 2 bombas + 2 desfazer               | R$ 10,99 | **R$ 4,99** | 50%      |
+| 06  | **Combo Floresta Amazônica** | 10 vidas + 4 bombas + 4 desfazer              | R$ 31,99 | **R$ 9,99** | 50%      |
 
 ### 7.2 Compartilhamento com amigos
 Toda compra gera código único; amigo recebe metade. Código vale 1× pra 1 jogador. Resgate oferece dobrar via anúncio.
@@ -382,15 +384,15 @@ shareCodes/{code}
 ## 8. Recompensas
 
 ### 8.1 Diárias (ciclo 7 dias)
-| Dia | Recompensa |
-|---|---|
-| 1 | 1× Desfazer 1 |
-| 2 | 1× Bomba 2 |
-| 3 | 1 vida |
-| 4 | 2× Desfazer 1 |
-| 5 | 2× Bomba 2 |
-| 6 | 2 vidas |
-| 7 | 2× Desfazer 1 + 2× Bomba 2 + 2 vidas |
+| Dia | Recompensa                           |
+| --- | ------------------------------------ |
+| 1   | 1× Desfazer 1                        |
+| 2   | 1× Bomba 2                           |
+| 3   | 1 vida                               |
+| 4   | 2× Desfazer 1                        |
+| 5   | 2× Bomba 2                           |
+| 6   | 2 vidas                              |
+| 7   | 2× Desfazer 1 + 2× Bomba 2 + 2 vidas |
 
 - Ao receber: oferta de **dobrar** assistindo 30s de anúncio (opcional)
 - **Streak quebrada:** se o jogador perde um dia, volta ao Dia 1
@@ -398,18 +400,18 @@ shareCodes/{code}
 - **Vidas recebidas aqui contam como "ganhas"** — entram no cap de 15
 
 ### 8.2 Ranking global (cada 7 dias)
-| Posição | Recompensa |
-|---|---|
-| 1º | 10 vidas + 10 desfazer + 10 bombas |
-| 2º | 5 vidas + 5 desfazer + 5 bombas |
-| 3º | 3 vidas + 3 desfazer + 3 bombas |
-| 4º | 3 vidas + 3 bombas |
-| 5º | 3 vidas + 3 bombas |
-| 6º | 3 vidas + 3 bombas |
-| 7º | 3 vidas + 3 desfazer |
-| 8º | 3 vidas + 3 desfazer |
-| 9º | 3 vidas + 3 desfazer |
-| 10º | 3 vidas |
+| Posição | Recompensa                         |
+| ------- | ---------------------------------- |
+| 1º      | 10 vidas + 10 desfazer + 10 bombas |
+| 2º      | 5 vidas + 5 desfazer + 5 bombas    |
+| 3º      | 3 vidas + 3 desfazer + 3 bombas    |
+| 4º      | 3 vidas + 3 bombas                 |
+| 5º      | 3 vidas + 3 bombas                 |
+| 6º      | 3 vidas + 3 bombas                 |
+| 7º      | 3 vidas + 3 desfazer               |
+| 8º      | 3 vidas + 3 desfazer               |
+| 9º      | 3 vidas + 3 desfazer               |
+| 10º     | 3 vidas                            |
 
 - Ao receber: oferta de **dobrar** via anúncio (opcional)
 - Vidas recebidas aqui contam como "ganhas" (cap de 15)
@@ -435,12 +437,12 @@ A cada amigo convidado que **criar conta E jogar pelo menos 1 partida**:
 ## 9. Ranking
 
 ### 9.1 Tipos
-| Tipo | Métrica | Persistência |
-|---|---|---|
-| **Pessoal** | Melhores tempos para chegar ao 2048 | Histórico vitalício |
-| **Pessoal (alt)** | Maior número alcançado | Histórico vitalício |
-| **Global** | Melhores tempos para o 2048 entre todos | **Reseta a cada 7 dias** |
-| **Global (alt)** | Maior número alcançado entre todos | **Reseta a cada 7 dias** |
+| Tipo              | Métrica                                 | Persistência             |
+| ----------------- | --------------------------------------- | ------------------------ |
+| **Pessoal**       | Melhores tempos para chegar ao 2048     | Histórico vitalício      |
+| **Pessoal (alt)** | Maior número alcançado                  | Histórico vitalício      |
+| **Global**        | Melhores tempos para o 2048 entre todos | **Reseta a cada 7 dias** |
+| **Global (alt)**  | Maior número alcançado entre todos      | **Reseta a cada 7 dias** |
 
 ### 9.2 Marco zero do ranking global
 - **Reset toda semana, sábado às 18:00 (horário de Brasília)**
@@ -480,25 +482,25 @@ users/{userId}/personalRecords
 - Outline opcional fino e escuro
 
 ### 10.2 Paleta principal
-| Uso | Cor | Hex |
-|---|---|---|
-| **Fundo do jogo (Fase 2.3.9)** | **`assets/images/fundo.png`** | — (PNG) |
-| Fundo (fallback se PNG falhar) | Verde-menta claro | `#D4F1DE` |
-| Fundo (folhagem alternativa) | Verde-floresta médio | `#3FA968` |
-| Tabuleiro | Madeira clara | `#E8D5B7` |
-| Célula vazia | Madeira sombreada | `#C9B79C` |
-| Tile preenchido | Branco | `#FFFFFF` |
-| Acento (UI) | Laranja-tucano | `#FF8C42` |
-| Texto principal | Marrom escuro | `#3E2723` |
-| Texto sobre cor | Branco-creme | `#FFF8E7` |
-| Contorno de texto | Preto | `#000000` |
-| Sucesso / "Completo" | Verde-folha | `#66BB6A` |
-| "Bônus" (faixa de vidas) | Dourado | `#FFD54F` |
-| "Restando" (faixa de vidas) | Laranja-aviso | `#FFA726` |
-| "Sem vidas" (faixa de vidas) | Vermelho | `#EF5350` |
-| Alerta | Vermelho-açaí | `#C0392B` |
-| Coração de vidas | Vermelho-coração | `#E53935` |
-| Premium/dourado | Dourado | `#FFD54F` |
+| Uso                            | Cor                           | Hex       |
+| ------------------------------ | ----------------------------- | --------- |
+| **Fundo do jogo (Fase 2.3.9)** | **`assets/images/fundo.png`** | — (PNG)   |
+| Fundo (fallback se PNG falhar) | Verde-menta claro             | `#D4F1DE` |
+| Fundo (folhagem alternativa)   | Verde-floresta médio          | `#3FA968` |
+| Tabuleiro                      | Madeira clara                 | `#E8D5B7` |
+| Célula vazia                   | Madeira sombreada             | `#C9B79C` |
+| Tile preenchido                | Branco                        | `#FFFFFF` |
+| Acento (UI)                    | Laranja-tucano                | `#FF8C42` |
+| Texto principal                | Marrom escuro                 | `#3E2723` |
+| Texto sobre cor                | Branco-creme                  | `#FFF8E7` |
+| Contorno de texto              | Preto                         | `#000000` |
+| Sucesso / "Completo"           | Verde-folha                   | `#66BB6A` |
+| "Bônus" (faixa de vidas)       | Dourado                       | `#FFD54F` |
+| "Restando" (faixa de vidas)    | Laranja-aviso                 | `#FFA726` |
+| "Sem vidas" (faixa de vidas)   | Vermelho                      | `#EF5350` |
+| Alerta                         | Vermelho-açaí                 | `#C0392B` |
+| Coração de vidas               | Vermelho-coração              | `#E53935` |
+| Premium/dourado                | Dourado                       | `#FFD54F` |
 
 ### 10.3 Tipografia
 - **Títulos**: `Fredoka` (arredondada, divertida)
@@ -514,26 +516,26 @@ users/{userId}/personalRecords
 - Botões grandes (≥48x48dp) com sombra inferior
 
 ### 10.5 Animações
-| Evento | Animação |
-|---|---|
-| Spawn de tile | Scale 0 → 1.1 → 1, bounce, 200ms |
-| Movimento | Translate suave, easing cubicOut, 150ms |
-| Merge | Pop (scale 1 → 1.2 → 1), 250ms |
-| Merge da Capivara | Flash dourado, partículas de folhas, zoom out, 1500ms |
-| Troca de anfitrião | Fade + scale, 400ms |
-| Game Over | Tabuleiro escurece, modal slide+fade |
-| Botão pressionado | Scale 1 → 0.95 → 1, 100ms |
-| Pause overlay (entrada) | Fade do blur 0 → max + scale do conteúdo, 250ms |
-| Pause overlay (saída) | Reverso, 200ms |
-| Bomba explodindo | Onda + partículas, 500ms |
-| Desfazer | Reversão suave, 300ms |
-| Bomba — modo seleção (entrada) | Pulse no tabuleiro + dim no resto, 200ms |
-| Bomba — célula selecionada | Pulsa loop infinito, opacidade 0.7 ↔ 1.0, 600ms |
-| `LivesIndicator` — vida ganha | Coração pulsa (scale 1 → 1.15 → 1), 300ms |
-| `LivesIndicator` — vida perdida | Coração tremula (rotate ±5°), 200ms |
+| Evento                                   | Animação                                                               |
+| ---------------------------------------- | ---------------------------------------------------------------------- |
+| Spawn de tile                            | Scale 0 → 1.1 → 1, bounce, 200ms                                       |
+| Movimento                                | Translate suave, easing cubicOut, 150ms                                |
+| Merge                                    | Pop (scale 1 → 1.2 → 1), 250ms                                         |
+| Merge da Capivara                        | Flash dourado, partículas de folhas, zoom out, 1500ms                  |
+| Troca de anfitrião                       | Fade + scale, 400ms                                                    |
+| Game Over                                | Tabuleiro escurece, modal slide+fade                                   |
+| Botão pressionado                        | Scale 1 → 0.95 → 1, 100ms                                              |
+| Pause overlay (entrada)                  | Fade do blur 0 → max + scale do conteúdo, 250ms                        |
+| Pause overlay (saída)                    | Reverso, 200ms                                                         |
+| Bomba explodindo                         | Onda + partículas, 500ms                                               |
+| Desfazer                                 | Reversão suave, 300ms                                                  |
+| Bomba — modo seleção (entrada)           | Pulse no tabuleiro + dim no resto, 200ms                               |
+| Bomba — célula selecionada               | Pulsa loop infinito, opacidade 0.7 ↔ 1.0, 600ms                        |
+| `LivesIndicator` — vida ganha            | Coração pulsa (scale 1 → 1.15 → 1), 300ms                              |
+| `LivesIndicator` — vida perdida          | Coração tremula (rotate ±5°), 200ms                                    |
 | Faixa de vidas — transição entre estados | Fade entre cores 300ms + scale 1→1.1→1 (200ms) em transições positivas |
-| `ConfirmUseDialog` (entrada) | Fade + slide-up, 200ms |
-| Botão pause tile-sized — pressionado | Scale 1 → 0.95 → 1, 100ms |
+| `ConfirmUseDialog` (entrada)             | Fade + slide-up, 200ms                                                 |
+| Botão pause tile-sized — pressionado     | Scale 1 → 0.95 → 1, 100ms                                              |
 
 ---
 
@@ -541,19 +543,19 @@ users/{userId}/personalRecords
 *(Implementação na Fase 5 — depois de toda a arte e polimento visual, antes do lançamento)*
 
 ### 11.1 Sons dos animais
-| Animal | Som sugerido |
-|---|---|
-| **Tanajura** | Zumbido leve + "tlec" |
-| **Lobo-guará** | Uivo curto agudo |
-| **Sapo-cururu** | "Croac" grave característico |
-| **Tucano** | "Tac-tac" do bico + assobio |
-| **Sagui** | Trinado curto agudo (chamado típico do sagui) |
-| **Preguiça** | Bocejo lento e fofo |
-| **Mico-leão-dourado** | Guincho agudo / piado |
-| **Boto-cor-de-rosa** | Sopro d'água + assobio místico |
-| **Onça-pintada** | Rosnado curto |
-| **Sucuri** | Chiado grave |
-| **🏆 Capivara Lendária** | "Wheek" característico + fanfarra dourada |
+| Animal                  | Som sugerido                                  |
+| ----------------------- | --------------------------------------------- |
+| **Tanajura**            | Zumbido leve + "tlec"                         |
+| **Lobo-guará**          | Uivo curto agudo                              |
+| **Sapo-cururu**         | "Croac" grave característico                  |
+| **Tucano**              | "Tac-tac" do bico + assobio                   |
+| **Sagui**               | Trinado curto agudo (chamado típico do sagui) |
+| **Preguiça**            | Bocejo lento e fofo                           |
+| **Mico-leão-dourado**   | Guincho agudo / piado                         |
+| **Boto-cor-de-rosa**    | Sopro d'água + assobio místico                |
+| **Onça-pintada**        | Rosnado curto                                 |
+| **Sucuri**              | Chiado grave                                  |
+| **🏆 Capivara Lendária** | "Wheek" característico + fanfarra dourada     |
 
 ### 11.2 Sons de UI
 - Botão clicado: pop suave
@@ -735,16 +737,16 @@ class GameState {
 ```
 
 ### 13.4 LivesState (Hive, typeId: 1)
-| Campo | Tipo | Descrição |
-|---|---|---|
-| current | int | vidas atuais (0..∞ — pode passar de 15 com compras) |
-| regenCap | int | 5 (constante, regen para neste valor) |
-| earnedCap | int | 15 (cap das vidas ganhas via recompensa) |
-| nextRegenAt | DateTime? | timestamp da próxima vida por regen; null se current ≥ regenCap |
-| adWatchesToday | int | contador diário de anúncios mock (0..40) |
-| adCounterDate | DateTime | data do contador (reset à meia-noite local) |
-| userId | String? | null = local; preenchido na fase de backend |
-| lastSyncedAt | DateTime? | null = nunca sincronizado |
+| Campo          | Tipo      | Descrição                                                       |
+| -------------- | --------- | --------------------------------------------------------------- |
+| current        | int       | vidas atuais (0..∞ — pode passar de 15 com compras)             |
+| regenCap       | int       | 5 (constante, regen para neste valor)                           |
+| earnedCap      | int       | 15 (cap das vidas ganhas via recompensa)                        |
+| nextRegenAt    | DateTime? | timestamp da próxima vida por regen; null se current ≥ regenCap |
+| adWatchesToday | int       | contador diário de anúncios mock (0..40)                        |
+| adCounterDate  | DateTime  | data do contador (reset à meia-noite local)                     |
+| userId         | String?   | null = local; preenchido na fase de backend                     |
+| lastSyncedAt   | DateTime? | null = nunca sincronizado                                       |
 
 ### 13.5 Inventory (Hive, typeId: 2)
 ```dart
@@ -819,28 +821,28 @@ class ShareCode {
 ## 14. Persistência (Hive + Firestore)
 
 ### 14.1 Hive (local)
-| Chave | Conteúdo |
-|---|---|
-| `current_game` | GameState serializado (auto-save) |
-| `lives_state` | LivesState |
-| `inventory` | Inventory |
-| `personal_records` | PersonalRecords |
-| `daily_streak` | int + lastClaimDate |
-| `unlocked_animals` | List<int> (níveis vistos) |
-| `settings.sound_volume` | double 0–1 |
-| `settings.music_volume` | double 0–1 |
-| `settings.haptic_enabled` | bool |
-| `settings.locale` | String "pt_BR" \| "en_US" |
-| `ad_counter` | { date, count } |
+| Chave                     | Conteúdo                          |
+| ------------------------- | --------------------------------- |
+| `current_game`            | GameState serializado (auto-save) |
+| `lives_state`             | LivesState                        |
+| `inventory`               | Inventory                         |
+| `personal_records`        | PersonalRecords                   |
+| `daily_streak`            | int + lastClaimDate               |
+| `unlocked_animals`        | List<int> (níveis vistos)         |
+| `settings.sound_volume`   | double 0–1                        |
+| `settings.music_volume`   | double 0–1                        |
+| `settings.haptic_enabled` | bool                              |
+| `settings.locale`         | String "pt_BR" \| "en_US"         |
+| `ad_counter`              | { date, count }                   |
 
 ### 14.2 Firestore (remoto, requer login)
-| Coleção | Conteúdo |
-|---|---|
-| `users/{userId}` | PlayerProfile (sincronizado) |
-| `rankings/{weekId}/entries/{userId}` | Entrada de ranking semanal |
-| `shareCodes/{code}` | Códigos de compartilhamento |
-| `invites/{inviterId}` | Lista de convidados e status |
-| `purchases/{userId}/{purchaseId}` | Histórico de compras |
+| Coleção                              | Conteúdo                     |
+| ------------------------------------ | ---------------------------- |
+| `users/{userId}`                     | PlayerProfile (sincronizado) |
+| `rankings/{weekId}/entries/{userId}` | Entrada de ranking semanal   |
+| `shareCodes/{code}`                  | Códigos de compartilhamento  |
+| `invites/{inviterId}`                | Lista de convidados e status |
+| `purchases/{userId}/{purchaseId}`    | Histórico de compras         |
 
 ---
 
@@ -940,7 +942,7 @@ class ShareCode {
 
 > **Nota histórica:** a antiga **Fase 2.4 — Áudio** foi reposicionada pra perto do final do desenvolvimento, antes do lançamento. Ver **Fase 5 — Áudio** mais abaixo. As fases seguintes deste bloco foram renumeradas (antiga 2.5 → 2.4, antiga 2.6 → 2.5, antiga 2.7 → 2.6).
 >
-> **Por que foi movida:** os sons dos animais e UI dependem da identidade visual final, e o sound design ainda não foi feito. Implementar antes da arte final corre risco de retrabalho. O jogo é desenvolvido **sem áudio** até a Fase 5 — todos os controles de volume nas Configurações (Fase 2.5) ficam desabilitados/ocultos até lá.
+> **Por que foi movida:** os sons dos animais e UI dependem da identidade visual final, e o sound design ainda não foi feito. Implementar antes da arte final corre risco de retrabalho. O jogo é desenvolvido **sem áudio** até a Fase 5 — todos os controles de volume nas Configurações (Fase 2.6) ficam desabilitados/ocultos até lá.
 
 ### ✅ Fase 2.4 — Recompensas diárias (v0.9.0) — **CONCLUÍDA**
 - `DailyRewardsState` (Hive typeId=3): `currentDay` (1–7), `lastClaimedDate`, `claimedThisCycle`
@@ -950,12 +952,69 @@ class ShareCode {
 - `DailyRewardEntryTile` na `HomeScreen` com badge vermelho + toast na primeira sessão do dia
 - 193 testes passando (14 engine, 6 notifier, 4 widget, 3 repositório)
 
-### 🔜 Fase 2.5 — Tela Home + Coleção + Configurações (1 semana) — **PRÓXIMA**
-- Home com todos os botões e indicadores
+### 🔜 Fase 2.5 — Identidade do Jogo: rebranding "Olha o Bichim!" + título na Home + ícone do app — **PRÓXIMA**
+
+Esta fase consolida a nova identidade do produto antes de avançar com novas telas. Não há lógica de jogo nova — só rebranding, integração de assets de identidade já preparados e ajustes de plataforma.
+
+**Assets já preparados (não criar de novo):**
+- `assets/images/title/title_orange.png` (1200×639, transparente) — variante laranja do logotipo "Olha o Bichim!"
+- `assets/images/title/title_brown.png` (1200×638, transparente) — variante marrom do logotipo "Olha o Bichim!"
+- `assets/images/icon/app_icon.png` (1024×1024, transparente, quadrado) — arte oficial do ícone do app
+- `pubspec.yaml` já tem `assets/images/title/` registrado (não precisa adicionar de novo). `assets/images/icon/` precisa ser adicionado quando a fase começar.
+
+**Entregas:**
+
+**A — Rebranding "Olha o Bichim!" no app**
+- Substituir todas as referências de string "Capivara 2048" exibidas ao usuário por "Olha o Bichim!" (telas, diálogos, splash placeholder, textos de Game Over, "Sobre", etc.).
+- O *codename* interno do projeto (`capivara_2048` em `pubspec.yaml`, package Android, paths Dart) **permanece inalterado** — apenas labels de exibição mudam.
+- Buscar com grep no código por: `Capivara 2048`, `capivara 2048` (case-insensitive). Cada ocorrência decide caso a caso: se é nome de exibição → trocar; se é identificador técnico → manter.
+
+**B — Logotipo na Home (`GameTitleImage`)**
+- Criar `lib/presentation/widgets/game_title_image.dart` com `StatelessWidget` que escolhe **aleatoriamente** entre `title_orange.png` e `title_brown.png` no `build()` usando `Random().nextInt(2)`.
+- API: `GameTitleImage({Key? key, double? height})` — `fit: BoxFit.contain`, `semanticLabel: 'Olha o Bichim!'`.
+- Expor método `@visibleForTesting static String pickAsset({Random? random})` pra teste determinístico (passando `Random(0)` ou similar).
+- Integrar na `HomeScreen` substituindo o atual `SizedBox(height: 220)` (antes dos botões) por `GameTitleImage(height: 220)`.
+- Resultado esperado: a cada abertura da Home, o usuário vê uma das duas variantes do logo. Sem persistência de qual foi mostrado por último — aleatório puro.
+- **Decisão aberta pra brainstorm:** alternar a cada `build` (rebuild da Home muda a cor) ou fixar por sessão (sortear uma vez no `initState` e manter)? A primeira é mais "vivo"; a segunda evita flicker se a Home reconstruir várias vezes. Sugestão: **fixar por sessão** (sorteio em `initState` da Home, passando como prop).
+- Teste: widget test garantindo que o asset renderizado é um dos dois caminhos válidos; teste do `pickAsset` com `Random` injetado.
+
+**C — Ícone do app (`flutter_launcher_icons`)**
+- Adicionar `flutter_launcher_icons` em `dev_dependencies` no `pubspec.yaml`.
+- Configurar bloco `flutter_launcher_icons:` apontando pra `assets/images/icon/app_icon.png` cobrindo Android (com `adaptive_icon_background: '#D4F1DE'` — mesma cor do fundo do jogo, ver 4.3 — e `adaptive_icon_foreground: assets/images/icon/app_icon.png`), iOS, Web e Windows.
+- Rodar `dart run flutter_launcher_icons` e verificar os arquivos gerados em `android/app/src/main/res/mipmap-*/` e `ios/Runner/Assets.xcassets/AppIcon.appiconset/`.
+- **Decisão aberta:** se o ícone tiver bordas transparentes muito largas, pode ficar "pequeno" no launcher Android com adaptive icons. Solução: gerar versão "tight crop" pra adaptive foreground (mantendo `app_icon.png` original como referência fonte). Validar em emulador antes de fechar.
+- Commitar os arquivos gerados (são fonte do build, devem ir pro git).
+
+**D — Nome do app no launcher**
+- **Android:** alterar `android:label` em `android/app/src/main/AndroidManifest.xml` de `"capivara_2048"` para `"Olha o Bichim!"`.
+- **iOS:** alterar `CFBundleDisplayName` (e/ou `CFBundleName`) em `ios/Runner/Info.plist` para `"Olha o Bichim!"`.
+- **Web:** alterar `<title>` em `web/index.html` e `name`/`short_name` em `web/manifest.json`.
+- O nome técnico do package/bundle (ex: `com.example.capivara_2048`) **não é alterado** nesta fase — mudar bundle id quebraria atualização para usuários existentes (não há ainda, mas mantemos a convenção).
+
+**E — README, CHANGELOG e atualizações documentais**
+- Atualizar título do `README.md` para "Olha o Bichim!" (mantendo subtítulo "antigo Capivara 2048" pra contexto).
+- Adicionar entrada no `CHANGELOG.md` para a Fase 2.5 quando concluída.
+- Atualizar `CLAUDE.md` (linha de fase atual) ao fechar.
+- Atualizar este design doc removendo "(anteriormente Capivara 2048)" da Seção 1 quando a transição estiver consolidada (passo final da fase).
+
+**Pontos a sincronizar com a Fase 2.6 (Home definitiva):**
+- A `HomeScreen` redesenhada da Fase 2.6 deve preservar o `GameTitleImage` no mesmo "slot" lógico (área central acima dos botões).
+- Decidir nesta fase se o logo terá animação de entrada (`flutter_animate` fade+scale) ou se entra estático — recomendado: estático nesta fase, animar na 2.6 quando a Home for redesenhada por completo.
+
+**Critérios de aceite:**
+- Build Android instala como "Olha o Bichim!" no launcher (`adb shell pm list packages` mantém `capivara_2048` como package name).
+- Ícone do app aparece corretamente em launchers Android (adaptive) e iOS (1024 + escalas).
+- Home alterna logotipo entre laranja e marrom em sessões consecutivas (testar abrindo/fechando o app várias vezes).
+- Nenhuma string visível ao usuário diz mais "Capivara 2048".
+- Testes existentes continuam passando; pelo menos 1 widget test novo cobrindo `GameTitleImage` (escolha entre os 2 assets).
+- `flutter analyze` zero issues.
+
+### 🔜 Fase 2.6 — Tela Home + Coleção + Configurações (1 semana)
+- Home com todos os botões e indicadores (já consumindo `GameTitleImage` da 2.5)
 - Tela de Coleção (silhuetas para não desbloqueados, card detalhado para desbloqueados — usa `backgroundBaseColor` do Animal)
 - Configurações (haptic, idioma) — sliders de volume SFX/música ficam desabilitados/ocultos até a Fase 5
 
-### 🔜 Fase 2.6 — Loja mock (3 dias)
+### 🔜 Fase 2.7 — Loja mock (3 dias)
 - Tela com os 6 pacotes
 - Cards com "De/Por" e badges de desconto
 - Botão "Comprar" simulado
@@ -988,7 +1047,7 @@ class ShareCode {
 - Música ambiente: loop de floresta com flautas + marimba
 - Integrar com `audioplayers` ou `just_audio` (decidir qual)
 - Pool de AudioPlayers (evita latência no merge)
-- Mixer simples nas Configurações (slider SFX + slider música + mute persistente) — habilitar os controles que ficaram desabilitados na Fase 2.5
+- Mixer simples nas Configurações (slider SFX + slider música + mute persistente) — habilitar os controles que ficaram desabilitados na Fase 2.6
 - Pré-carregar tudo no início do app
 
 ### 🔜 Fase 6 — Polimento + Lançamento
@@ -1039,94 +1098,98 @@ class ShareCode {
 - Atenção à apropriação cultural
 
 ### 16.5 SEO e App Store
-- Nome: "Capivara 2048" (BR) / "Brazil Animals 2048" (EN)
-- Keywords: 2048, puzzle, capivara, animais, brasil, fofo, casual, fauna
+- Nome: "Olha o Bichim!" (BR) / "Olha o Bichim! — Brazil Animals 2048" (EN, fallback descritivo)
+- Keywords: 2048, puzzle, capivara, animais, brasil, fofo, casual, fauna, bichim
 - Screenshots destacando a Capivara
 - Vídeo de gameplay de 30s
 
 ---
 
-## 17. Prompt Sugerido para o Claude Code (Fase 2.4 — via skill superpowers)
+## 17. Prompt Sugerido para o Claude Code (Fase 2.5 — via skill superpowers)
 
-> O prompt abaixo entra no fluxo do **superpowers/brainstorming**. O resultado esperado é uma **spec detalhada da Fase 2.4** (refinada via brainstorm), que depois alimenta o **superpowers/writing-plans** pra gerar o plano executável. Nada de código nesta etapa — apenas elicitação, refinamento de design e plano.
+> O prompt abaixo entra no fluxo do **superpowers/brainstorming**. O resultado esperado é uma **spec detalhada da Fase 2.5** (refinada via brainstorm), que depois alimenta o **superpowers/writing-plans** pra gerar o plano executável. Nada de código nesta etapa — apenas elicitação, refinamento de design e plano.
 
 ---
 
-> Use a skill `superpowers/brainstorming` pra refinar o design da próxima fase do projeto **Capivara 2048** (Flutter).
+> Use a skill `superpowers/brainstorming` pra refinar o design da próxima fase do projeto **Olha o Bichim!** (antigo "Capivara 2048", Flutter).
 >
-> **Contexto:** Estamos no projeto Capivara 2048. Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente seções **8.1** — tabela de recompensas diárias, **12.6** — Tela de Recompensas Diárias, **5** — Sistema de Vidas (cap "ganho" de 15), **6** — Itens/Inventário (Desfazer e Bomba), **13** — Modelos de dados, **14.1** — Hive, e **15 — Fase 2.4**).
+> **Contexto:** Estamos no projeto cujo *codename* interno é `capivara_2048` mas que passa a ter o nome de exibição **"Olha o Bichim!"**. Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente seções **1** — Visão Geral, **10** — Identidade Visual, **12.2** — Tela Home, **15 — Fase 2.5** — entregas A–E, e **16.5** — SEO/App Store).
 >
-> **Fases concluídas:** Fase 1 a 2.3.12 (v0.8.4). Áudio foi reposicionado pra **Fase 5** — o jogo é desenvolvido sem áudio até lá; ignorar SFX/música nesta fase.
+> **Fases concluídas:** Fases 1 a 2.4 (v0.9.0+22, 193 testes passando). Áudio segue na **Fase 5**.
 >
-> **Tópico do brainstorm:** desenhar a **Fase 2.4 — Recompensas Diárias (ciclo de 7 dias)**. O escopo da fase é:
+> **Tópico do brainstorm:** desenhar a **Fase 2.5 — Identidade do Jogo: rebranding "Olha o Bichim!" + título na Home + ícone do app + nome no launcher**. O escopo da fase está descrito na §15. Esta é uma fase de **identidade/branding**, sem nova lógica de jogo.
 >
-> **A — Modelo e persistência (Hive):**
-> - Criar `DailyRewardsState` (Hive typeId novo, sem colisão com `LivesState=1` e `Inventory=2`) com campos: `currentDay` (1–7), `lastClaimedDate` (DateTime, dia local), `claimedThisCycle` (bool — se o dia atual já foi coletado), e qualquer auxiliar pra detectar streak quebrada.
-> - Repositório local (`DailyRewardsRepository`) com `load()`, `save()`, `reset()`.
-> - Decidir: a "meia-noite" pra liberar a próxima recompensa é local do dispositivo ou UTC? (provavelmente local — confirmar)
+> **Assets de identidade já preparados (não recriar):**
+> - `assets/images/title/title_orange.png` (1200×639, transparente) e `title_brown.png` (1200×638, transparente) — duas variantes do logotipo "Olha o Bichim!" (fundo branco já removido via removal.ai).
+> - `assets/images/icon/app_icon.png` (1024×1024, transparente, quadrado) — arte oficial do ícone do app (fundo branco já removido).
+> - O `pubspec.yaml` já tem `assets/images/title/` registrado. Falta registrar `assets/images/icon/`.
 >
-> **B — Lógica de streak/ciclo (domínio puro, testável):**
-> - Função pura `computeDailyRewardStatus(now, state) → DailyRewardStatus` retornando: `available | alreadyClaimed | streakBroken | cycleCompleted`.
-> - Regra: se `now.day - lastClaimedDate.day > 1` (em dias locais), streak quebra → reseta para Dia 1.
-> - Regra: se coletou Dia 7, próximo ciclo recomeça em Dia 1 no dia seguinte.
-> - Edge cases: jogador atravessa fuso horário; jogador muda relógio do device manualmente (anti-cheat simples — não retroceder data); coletar exatamente em 23:59:59 e abrir 00:00:01 do dia seguinte deve mostrar Dia 2 disponível.
-> - Cobertura de testes unitários alta (sem dependência Flutter).
+> **Sub-entregas (ver §15 — Fase 2.5):**
 >
-> **C — Tela `DailyRewardsScreen` (12.6):**
-> - Grid 7 dias com recompensa de cada dia (ver tabela 8.1) — usar ícones do `assets/icons/inventory/` pra Desfazer/Bomba e ícone de coração pra vidas.
-> - Dia atual destacado (anel/borda animada, glow sutil); dias passados marcados como recebidos (check verde + opacity reduzida); dias futuros com tom neutro.
-> - Botão "Coletar" centralizado, habilitado só se `status == available`.
-> - Pós-coleta: animação de entrega (tile escalando + fade) e overlay com oferta "Dobrar (mock anúncio 30s)" — botão mock que apenas multiplica a recompensa por 2 sem reproduzir anúncio real (reservado para Fase 3).
-> - Estado vazio/coletado: mensagem "Volte amanhã" com timer regressivo HH:MM:SS até a próxima meia-noite local (similar ao timer de regen de vidas implementado na 2.3.12 item C — reaproveitar padrão `Timer.periodic`).
+> **A — Rebranding "Olha o Bichim!" no app:**
+> - Substituir todas as strings exibidas ao usuário "Capivara 2048" → "Olha o Bichim!".
+> - Manter codename interno (`pubspec.yaml name`, package Android, paths Dart) — só labels mudam.
 >
-> **D — Integração com vidas e inventário:**
-> - Vidas recebidas via diária **contam como "ganhas"** (entram no cap de 15 — `earnedCap`, conforme §5 e §13.4). Validar que `LivesNotifier.addEarnedLives(n)` respeita o cap.
-> - Itens (Desfazer/Bomba) entram no inventário via método existente do `InventoryNotifier` (sem cap, conforme 2.3.8 item G).
-> - Toda a entrega deve ser **atômica**: ou todas as recompensas do dia entram, ou nenhuma (se uma falhar, rollback ou retry).
+> **B — Logotipo na Home (`GameTitleImage`):**
+> - Widget que escolhe **aleatoriamente** entre `title_orange.png` e `title_brown.png` na exibição.
+> - Integrar na `HomeScreen` no slot que hoje é `SizedBox(height: 220)` antes dos botões.
+> - API: `GameTitleImage({double? height})` + `@visibleForTesting static String pickAsset({Random? random})`.
 >
-> **E — Entry point e indicação visual:**
-> - Botão "Recompensa diária" na `HomeScreen` (a Home definitiva entra na Fase 2.5; nesta fase, adicionar um botão temporário ou na barra superior).
-> - Badge vermelho com "!" quando há recompensa disponível pra coletar — visível também na entrada do app (decidir onde: ícone na home, badge no menu pause, ou ambos).
-> - Auto-abrir a tela de recompensas na primeira sessão do dia? Ou só badge + clique manual? (decidir no brainstorm)
+> **C — Ícone do app:**
+> - Usar `flutter_launcher_icons` apontando pra `assets/images/icon/app_icon.png`.
+> - Adaptive icon Android com `adaptive_icon_background: '#D4F1DE'` (cor do fundo do jogo).
+> - Cobrir Android, iOS, Web e Windows.
+>
+> **D — Nome do app no launcher:**
+> - Android: `android:label` em `AndroidManifest.xml`.
+> - iOS: `CFBundleDisplayName` (e `CFBundleName`) em `Info.plist`.
+> - Web: `<title>` em `index.html` + `manifest.json`.
+> - Bundle id / package name **não muda**.
+>
+> **E — README, CHANGELOG, CLAUDE.md, design doc:**
+> - Atualizar referências documentais ao fechar a fase.
 >
 > **Pontos abertos pra explorar no brainstorm (elicitação esperada):**
 >
-> Sobre **A (modelo/persistência):**
-> - Reaproveitar formato de `lastClaimedDate` como `DateTime` ou armazenar `int dayEpoch` (dias desde 1970-01-01 local) pra simplificar comparação? Qual encaixa melhor com Hive serialization e testes determinísticos?
-> - typeId do Hive: usar 3 (próximo livre)? Conferir se não há colisão com algum adapter futuro previsto.
+> Sobre **A (rebranding):**
+> - Lista exaustiva de strings a trocar (mapa grep): rodar `grep -rni "capivara 2048" lib/ test/ android/ ios/ web/` e classificar cada hit em "exibição" vs "técnico" — montar tabela.
+> - Há referências a "capivara 2048" em logs/analytics/eventos? Se sim, manter como técnico ou trocar?
+> - Splash screen / launch screen existem? Se sim, atualizar texto também.
 >
-> Sobre **B (lógica de streak):**
-> - Como testar "passagem de dias" de forma determinística? `Clock` injetável (`package:clock`) ou parâmetro `now` em todas as funções puras? Padrão consistente com o resto do domínio.
-> - Política anti-retrocesso de relógio: se `now < lastClaimedDate`, o que fazer? (sugestão: tratar como mesmo dia — não punir o usuário, mas também não liberar nova recompensa).
-> - Detalhe: streak quebra a partir de **2 dias** de gap (ex: coletou seg, voltou qua = quebra) ou mantém tolerância? Confirmar.
+> Sobre **B (`GameTitleImage`):**
+> - **Aleatorização: por sessão (sorteio em `initState`) ou por build (sorteio no `build`)?** Recomendação inicial: por sessão (sem flicker em rebuilds). Confirmar.
+> - Como tornar testável: `Random` injetável vs gerador estático overridable. Padrão consistente com o resto do projeto.
+> - Animação de entrada: estática nesta fase, animar na 2.6? Ou já entrar com fade+scale do `flutter_animate`?
+> - Comportamento em telas muito estreitas (landscape, tablets pequenos): `BoxFit.contain` resolve, mas validar com tamanhos extremos.
 >
-> Sobre **C (UI/UX):**
-> - Layout do grid 7 dias: 7 colunas (uma linha) ou 4+3 (duas linhas)? Em telas estreitas (mobile retrato), provavelmente 4+3 ou 7 verticais empilhados — confirmar com mock.
-> - Dia 7 (recompensa combinada) tem destaque visual extra (ex: borda dourada)?
-> - Animação de coleta: usar `flutter_animate` (já no projeto) ou um `AnimationController` dedicado? Reaproveitar padrão da 2.3.9 (fade+scale do `LivesStatusBanner`).
-> - Mock do botão "Dobrar via anúncio": qual texto exato? Apenas botão "Assistir 30s e dobrar" → fake delay 1s + entrega 2x? Ou já preparar interface `AdService` com implementação fake (preparando Fase 3)?
+> Sobre **C (ícone):**
+> - Versão "tight crop" do ícone pra evitar que adaptive icon Android fique muito pequeno (bordas transparentes do PNG fonte podem ser excessivas). Decidir se é necessário gerar e como (ImageMagick auto-trim + padding fixo, ou crop manual).
+> - Cor de fundo adaptive: `#D4F1DE` (fundo do jogo) ou outra escolha que destaque mais o ícone? Confirmar.
+> - iOS: gerar todas as escalas (20pt @1x/2x/3x até 1024×1024 marketing) — `flutter_launcher_icons` cobre, validar.
+> - Commit: gerados em `android/app/src/main/res/mipmap-*` e `ios/Runner/Assets.xcassets/AppIcon.appiconset/` vão pro git.
 >
-> Sobre **D (integração):**
-> - O que acontece se o jogador está com 15 vidas (cap) e a recompensa do dia inclui +2 vidas? Política: descartar excedente silenciosamente (mais seguro), ou avisar antes ("Cap atingido, vai perder X vidas — coletar mesmo assim?")? Definir.
-> - Idempotência: se o app crashar entre marcar `claimedThisCycle = true` e adicionar as recompensas, qual lado é confiável? Sugestão: gravar Hive **depois** de adicionar tudo, ou usar transação lógica (snapshot do estado antes, rollback se falhar).
->
-> Sobre **E (entry point):**
-> - Onde colocar o botão até a Fase 2.5 chegar? Sugestão: tile no canto da `HomeScreen` (mesmo padrão do `LivesIndicator`) — provisório, será reposicionado.
-> - Auto-abrir na primeira sessão do dia: pode ser intrusivo. Sugestão: só badge + um pequeno toast "Recompensa disponível!" na primeira abertura.
+> Sobre **D (launcher name):**
+> - Caracter especial "!" no `android:label` precisa de escape XML? (`&#33;` ou apenas `!`? — apenas `!` funciona no Android, mas validar).
+> - iOS aceita "Olha o Bichim!" sem truncar em launchers? Limite usual é ~12 caracteres antes de "..." — "Olha o Bichim!" tem 14, validar visualmente em devices reais ou simulador.
+> - Web `manifest.json`: `name` (longo) vs `short_name` (curto, ≤12) — definir os dois.
 >
 > Sobre **integração geral:**
-> - Ordem das entregas: A → B → D → C → E (modelo + lógica + integração + UI + entry) é a sequência natural pra TDD (testes de domínio antes de UI). Confirmar.
-> - Snapshots/widget tests: criar testes de `DailyRewardsScreen` cobrindo os 4 estados (available, alreadyClaimed, streakBroken, cycleCompleted).
-> - Testes de integração: simular 7 dias consecutivos com `FakeAsync`/`Clock` e validar que ciclo completa e reseta corretamente.
-> - Localização: textos em PT-BR direto nesta fase (l10n entra na Fase 6) — manter strings em constantes pra facilitar extração futura.
+> - Ordem de execução natural: A (rebranding strings) → B (`GameTitleImage`) → D (launcher names) → C (ícones gerados). E (docs) é o passo final. Confirmar TDD-friendliness.
+> - Testes obrigatórios: widget test de `GameTitleImage` (escolha entre 2 assets via `Random` injetado); golden test de `HomeScreen` com cada variante (opcional, se equipe quiser cobertura visual).
+> - Validação manual: build Android + iOS + Web e abrir → conferir launcher name, ícone, e logo na Home alternando.
+> - Critérios de aceite duros: `flutter analyze` zero issues; nenhum hit de "Capivara 2048" em strings exibidas (grep limpo); ícone visível em launcher Android e iOS; logo aparece nos dois sabores ao longo de N sessões.
+>
+> Sobre **sincronização com Fase 2.6:**
+> - A Fase 2.6 redesenha a Home — definir um "contrato visual" pra `GameTitleImage` (área disponível, padding) que sobreviva ao redesign sem retrabalho.
+> - Animação de entrada do logo: deixar pra 2.6 com o resto da Home polida.
 >
 > **Output esperado do brainstorm:**
-> Uma **spec detalhada da Fase 2.4** (markdown, tipo `FASE_2_4_SPEC.md`) com:
-> - Decisões tomadas em cada ponto aberto
-> - Para cada sub-entrega (A–E): arquivos a criar/modificar, contratos exatos (assinaturas de funções, campos de modelos), casos de teste obrigatórios, critérios de aceite
-> - Estratégia de teste do componente de tempo (`Clock` injetável, `FakeAsync`, edge cases)
-> - Diagramas/mocks rápidos do layout do grid 7 dias e dos 4 estados visuais
-> - Lista de pontos a sincronizar com a Fase 2.5 (Home definitiva) — pra evitar retrabalho do entry point
+> Uma **spec detalhada da Fase 2.5** (markdown, tipo `FASE_2_5_SPEC.md`) com:
+> - Decisões tomadas em cada ponto aberto (especialmente: aleatorização por sessão vs build; necessidade de "tight crop" do ícone; escapes/limites do launcher name).
+> - Para cada sub-entrega (A–E): arquivos a criar/modificar, contratos exatos (assinaturas de widget/funções, configuração `flutter_launcher_icons`, paths de manifest), casos de teste obrigatórios, critérios de aceite.
+> - Tabela de "strings exibidas vs técnicas" produzida via grep + classificação.
+> - Lista de pontos a sincronizar com a Fase 2.6 (Home definitiva) — pra evitar retrabalho do `GameTitleImage` quando a Home for redesenhada.
+> - Plano de validação manual (em quais devices/emuladores conferir o ícone e o launcher name).
 >
 > Esse documento será depois consumido pela skill `superpowers/writing-plans` pra gerar o plano executável (TDD-friendly, com checkpoints).
 >
