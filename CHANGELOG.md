@@ -7,6 +7,15 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.9.1] — 2026-05-01
+
+### Fase 2.5 — Identidade "Olha o Bichim!"
+- Rebranding: strings de exibição "Capivara 2048" → "Olha o Bichim!" (app title, Info.plist, README)
+- Novo widget `GameTitleImage` com sorteio por sessão entre variante orange e brown
+- Logo na HomeScreen substituindo placeholder SizedBox(height: 220)
+- Launcher name "Olha o Bichim!" em Android, iOS, Web
+- Ícone do app gerado via flutter_launcher_icons com adaptive icon background #D4F1DE
+
 ## [0.8.4] — 2026-04-30
 
 ### Changed

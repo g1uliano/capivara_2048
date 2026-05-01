@@ -52,12 +52,13 @@ lib/
 
 ## Fases do roadmap
 
-Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 2.4 concluída (v0.9.0) — próximo: Fase 2.5 ou Fase 3**. O áudio foi reposicionado para a **Fase 5** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
+Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 2.5 concluída (v0.9.1) — próximo: Fase 2.6**. O áudio foi reposicionado para a **Fase 5** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
 
 | Fase | Foco |
 |------|------|
 | 1 | Setup, game engine puro, tela básica com placeholders |
 | 2 | Identidade visual, paleta, tipografia, animações, vidas, inventário, recompensas, coleção, loja mock |
+| 2.5 ✅ | Rebranding "Olha o Bichim!", GameTitleImage, ícone do app, launcher name |
 | 3 | Backend, ranking, monetização |
 | 4 | Arte adicional e polimento visual (logo, ícone, splash final) |
 | 5 | Áudio (sound design dos 11 animais, SFX, música) |
