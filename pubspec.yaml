@@ -37,6 +37,7 @@ dependencies:
   hive_flutter: ^1.1.0
   shared_preferences: ^2.3.2
   flutter_animate: ^4.5.0
+  package_info_plus: ^8.1.2
 
 dev_dependencies:
   flutter_test:

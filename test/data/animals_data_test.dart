@@ -81,5 +81,35 @@ void main() {
       final names = animals.map((a) => a.name).toList();
       expect(names, isNot(contains('Arara-azul')));
     });
+
+    test('all 11 animals have scientificName populated', () {
+      for (final animal in animals) {
+        expect(
+          animal.scientificName,
+          isNotNull,
+          reason: '${animal.name} (level ${animal.level}) is missing scientificName',
+        );
+        expect(
+          animal.scientificName!.isNotEmpty,
+          isTrue,
+          reason: '${animal.name} has empty scientificName',
+        );
+      }
+    });
+
+    test('all 11 animals have funFact populated', () {
+      for (final animal in animals) {
+        expect(
+          animal.funFact,
+          isNotNull,
+          reason: '${animal.name} (level ${animal.level}) is missing funFact',
+        );
+        expect(
+          animal.funFact!.isNotEmpty,
+          isTrue,
+          reason: '${animal.name} has empty funFact',
+        );
+      }
+    });
   });
 }
