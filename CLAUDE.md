@@ -2,7 +2,7 @@
 
 ## Projeto
 
-Flutter puzzle game estilo 2048 com animais amazônicos. Spec completa em `CAPIVARA_2048_DESIGN.md`.
+Flutter puzzle game estilo 2048 com animais amazônicos. Spec completa em `CAPIVARA_2048_DESIGN.md` (design doc).
 
 ## Stack
 
@@ -52,7 +52,7 @@ lib/
 
 ## Fases do roadmap
 
-Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 2.8 concluída (v0.9.4) — próximo: Fase 3**. O áudio foi reposicionado para a **Fase 5** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
+Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 2.9 concluída (v0.9.9) — próximo: Fase 3**. O áudio foi reposicionado para a **Fase 5** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
 
 | Fase | Foco |
 |------|------|
@@ -76,3 +76,68 @@ Sempre que lançar uma nova versão (merge + push):
 ## Animais (referência rápida)
 
 Níveis 1–11: Tanajura → Lobo-guará → Sapo-cururu → Tucano → **Sagui** → Preguiça → Mico-leão-dourado → Boto-cor-de-rosa → Onça-pintada → Sucuri → **Capivara Lendária (2048)**.
+
+Diretrizes comportamentais para reduzir erros comuns de LLMs. Mesclar com as instruções específicas do projeto conforme necessário.
+
+**Trade-off:** Estas diretrizes priorizam cautela em vez de velocidade. Para tarefas triviais, use o bom senso.
+
+## 1. Pense Antes de Codar
+
+**Não assuma. Não esconda confusão. Exponha trade-offs.**
+
+Antes de implementar:
+- Declare suas suposições explicitamente. Se incerto, pergunte.
+- Se houver múltiplas interpretações, apresente-as — não escolha silenciosamente.
+- Se existir uma abordagem mais simples, diga. Questione quando justificado.
+- Se algo estiver obscuro, pare. Nomeie o que está confuso. Pergunte.
+
+## 2. Simplicidade Primeiro
+
+**Código mínimo que resolve o problema. Nada especulativo.**
+
+- Nenhuma feature além do que foi pedido.
+- Nenhuma abstração para código de uso único.
+- Nenhuma "flexibilidade" ou "configurabilidade" não solicitada.
+- Nenhum tratamento de erros para cenários impossíveis.
+- Se você escrever 200 linhas e pudesse ser 50, reescreva.
+
+Pergunte a si mesmo: "Um engenheiro sênior diria que isso está overcomplicated?" Se sim, simplifique.
+
+## 3. Mudanças Cirúrgicas
+
+**Toque apenas o necessário. Limpe apenas sua própria bagunça.**
+
+Ao editar código existente:
+- Não "melhore" código adjacente, comentários ou formatação.
+- Não refatore coisas que não estão quebradas.
+- Siga o estilo existente, mesmo que você faria diferente.
+- Se notar código morto não relacionado, mencione — não delete.
+
+Quando suas mudanças criarem órfãos:
+- Remova imports/variáveis/funções que SUAS mudanças tornaram desnecessários.
+- Não remova código morto pré-existente a menos que solicitado.
+
+O teste: cada linha alterada deve rastrear diretamente ao pedido do usuário.
+
+## 4. Execução Orientada a Objetivos
+
+**Defina critérios de sucesso. Itere até verificar.**
+
+Transforme tarefas em objetivos verificáveis:
+- "Adicionar validação" → "Escrever testes para entradas inválidas, depois fazê-los passar"
+- "Corrigir o bug" → "Escrever um teste que o reproduza, depois fazê-lo passar"
+- "Refatorar X" → "Garantir que os testes passem antes e depois"
+
+Para tarefas de múltiplos passos, declare um plano breve:
+```
+1. [Passo] → verificar: [checagem]
+2. [Passo] → verificar: [checagem]
+3. [Passo] → verificar: [checagem]
+```
+
+Critérios de sucesso fortes permitem iterar de forma independente. Critérios fracos ("fazer funcionar") exigem clarificações constantes.
+
+---
+
+**Estas diretrizes estão funcionando se:** menos mudanças desnecessárias nos diffs, menos reescritas por complicação excessiva, e perguntas de clarificação vêm antes da implementação, não depois dos erros.
+

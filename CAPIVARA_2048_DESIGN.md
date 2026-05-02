@@ -2,9 +2,9 @@
 
 > Documento de especificação para desenvolvimento. Pensado para ser alimentado em ferramentas como Claude Code para implementação iterativa.
 >
-> **Status atual:** Fase 2.6 concluída ✅ (v0.9.2) — Home redesenhada, Tela de Coleção, Tela de Configurações. Fases 2.4 (Recompensas Diárias) e 2.5 (Identidade "Olha o Bichim!") também concluídas.
+> **Status atual:** Fase 2.9 concluída ✅ (v0.9.9) — Splash Screen, Game Over redesenhado, Inventário maior e Orientação bloqueada. Fases 2.4 (Recompensas Diárias), 2.5 (Identidade "Olha o Bichim!"), 2.6 (Home redesenhada, Tela de Coleção, Tela de Configurações), 2.7 (Bugfixes visuais de interface) e 2.8 (Loja Mock) também concluídas.
 >
-> **Próximo:** **Fase 2.7 — Bugfixes visuais de interface** — 4 correções identificadas em uso real pós-2.6: botão de Recompensa Diária com tamanho inconsistente quando badge está visível, textos ilegíveis nos menus sobre fundo dinâmico, Bottom Overflow em telas com fundo do jogo, textos de Configurações ilegíveis sobre fundo dinâmico.
+> **Próximo:** **Fase 3 — Backend, ranking e monetização**
 >
 > **Renomeação do jogo:** o nome do jogo passa de **"Capivara 2048"** para **"Olha o Bichim!"**. As referências antigas em seções abaixo serão atualizadas progressivamente; durante a transição, considere "Olha o Bichim!" o nome canônico do produto. O *codename* interno do repositório (`capivara_2048`) permanece — apenas o nome de exibição muda.
 >
@@ -60,6 +60,8 @@
 | Compras | `in_app_purchase` | Loja |
 | Compartilhamento | `share_plus` + `app_links` | Códigos de resgate |
 | Blur (UI) | `flutter` nativo (`BackdropFilter` + `ImageFilter.blur`) | Efeito vidro fosco |
+| Splash Screen | `flutter_native_splash` | Splash screen nativa (Fase 2.9) |
+| Orientação | `flutter` nativo (`SystemChrome.setPreferredOrientations`) | Bloqueio portrait-only (Fase 2.9) |
 
 ### 2.3 Estrutura de pastas
 ```
@@ -87,7 +89,7 @@ lib/
 │   │   ├── home/           ✅
 │   │   ├── game/           ✅
 │   │   ├── debug/          ✅ (galeria de animais)
-│   │   ├── shop/
+│   │   ├── shop/           ✅ (Fase 2.8)
 │   │   ├── ranking/
 │   │   ├── collection/     ✅ (Fase 2.6)
 │   │   ├── daily_rewards/  ✅ (Fase 2.4)
@@ -113,12 +115,14 @@ lib/
 │   │   ├── inventory_item_button.dart   ✅
 │   │   ├── confirm_use_dialog.dart      ✅
 │   │   ├── bomb_selection_overlay.dart  ✅
+│   │   ├── game_over_item_screen.dart   ← novo (Fase 2.9)
 │   │   └── animal_card.dart
 │   └── controllers/
 └── assets_manifest.dart
 assets/
 ├── images/
 │   ├── fundo.png                     ✅
+│   ├── splash/splash_logo.png        ← novo (Fase 2.9)
 │   ├── title/title_orange.png        ✅ (Fase 2.5)
 │   ├── title/title_brown.png         ✅ (Fase 2.5)
 │   ├── icon/app_icon.png             ✅ (Fase 2.5)
@@ -144,7 +148,7 @@ assets/
 - Swipe nas 4 direções: ↑ ↓ ← →
 - Peças iguais que colidem se fundem em uma de nível superior
 - Nova peça a cada movimento válido (90% nível 1, 10% nível 2)
-- **Game Over:** tabuleiro cheio sem movimentos — consome 1 vida (ver 3.4)
+- **Game Over:** tabuleiro cheio sem movimentos — inicia o fluxo de salvamento por itens (ver 3.5); vida consumida apenas se o jogador confirmar Game Over sem usar itens
 - **Vitória:** Capivara Lendária (nível 11) formada — pode continuar
 
 ### 3.2 Pontuação e tempo
@@ -163,7 +167,7 @@ assets/
 3. Verificar game over e vitória
 
 ### 3.4 Regra crítica: quando uma vida é consumida
-**A vida é consumida APENAS no momento do Game Over.**
+**A vida é consumida APENAS quando o jogador confirma o Game Over sem usar nenhum item de salvamento.**
 
 | Ação | Consome vida? |
 |---|---|
@@ -171,10 +175,49 @@ assets/
 | Sair pro menu durante partida | ❌ Não |
 | Continuar partida salva | ❌ Não |
 | Reiniciar partida em andamento | ❌ Não |
-| **Tabuleiro tranca (Game Over)** | ✅ **Sim, 1 vida** |
+| **Tabuleiro tranca → jogador recusa todos os itens e confirma Game Over** | ✅ **Sim, 1 vida** |
+| Usar item de salvamento e continuar a partida | ❌ Não |
 | Atingir 2048 (vitória) | ❌ Não |
 
 > **Limite pra iniciar:** ≥1 vida disponível.
+
+### 3.5 Fluxo de Game Over com itens de salvamento (Fase 2.9)
+
+Quando o tabuleiro trava (sem movimentos possíveis), o jogo **não encerra imediatamente**. Em vez disso, inicia o fluxo de salvamento:
+
+**Passo 1 — Detecção:** o engine detecta que não há movimentos possíveis.
+
+**Passo 2 — Análise de inventário:** o sistema verifica quais itens do inventário do jogador são capazes de desbloquear a partida:
+- **Desfazer (1 ou 3):** sempre é capaz de salvar — volta o estado antes do travamento
+- **Bomba (2 ou 3):** é capaz de salvar — remove tiles e libera espaço
+
+**Passo 3 — Apresentação na `GameOverItemScreen`:** se o jogador possui ao menos 1 item que pode salvar a partida, a tela `GameOverItemScreen` é exibida em tela cheia. A tela:
+- Exibe **um item por vez**, em destaque, com seu ícone PNG grande (≥120×120dp) centralizado na tela
+- Exibe a mensagem clara no padrão: `"Deseja usar o item [Nome do Item] para [descrição do efeito]?"` — ex: `"Deseja usar o item Desfazer 3x para voltar 3 movimentos do jogo?"` ou `"Deseja usar o item Bomba 2 para explodir 2 tiles e liberar espaço?"`
+- Exibe o contador atual do item: `"Você tem X deste item"`
+- Exibe dois botões: **"Usar item"** (destaque, cor primária do app) e **"Próximo item"** (secundário, cinza)
+- Se houver mais de 1 tipo de item disponível, ao tocar em "Próximo item" o sistema exibe o próximo item disponível (ciclo entre os itens que o jogador possui)
+- O item exibido primeiro segue a seguinte **ordem de prioridade**: Desfazer 3 → Desfazer 1 → Bomba 3 → Bomba 2 (do mais poderoso para o menos poderoso)
+- O tabuleiro atual fica visível ao fundo, levemente escurecido (overlay semi-transparente), para que o jogador possa contextualizar a situação
+
+**Passo 4a — Jogador usa o item:**
+- Ao tocar em "Usar item": executa o item diretamente (Desfazer: aplica o undo imediatamente; Bomba: entra no `BombSelectionOverlay` sobre o tabuleiro)
+- Decrementa o contador do item no inventário
+- Fecha a `GameOverItemScreen`
+- A partida continua normalmente — **nenhuma vida é consumida**
+
+**Passo 4b — Jogador recusa todos os itens:**
+- Ao tocar em "Próximo item" no último item disponível (ou se não houver mais itens após ciclagem), o botão muda para **"Desistir"** (vermelho)
+- Ao tocar em "Desistir": exibe `AlertDialog` de confirmação: `"Tem certeza? Você perderá 1 vida e a partida será encerrada."` com botões "Cancelar" e "Confirmar"
+- Ao confirmar: consome 1 vida, encerra a partida, exibe o modal padrão de resultados de Game Over (pontuação, recorde, opções)
+
+**Passo 5 — Sem itens no inventário:**
+- Se o jogador não possui nenhum item que possa salvar a partida, a `GameOverItemScreen` **não é exibida**
+- O fluxo vai direto para: oferta de anúncio recompensado para ganhar 1 item gratuito → se recusar → modal padrão de Game Over com 1 vida consumida
+
+**Regra de exibição:**
+- A `GameOverItemScreen` substitui completamente o modal antigo de Game Over enquanto há itens disponíveis
+- Apenas após o jogador confirmar desistência (ou não ter itens) é que o modal padrão de Game Over aparece
 
 ---
 
@@ -241,7 +284,7 @@ assets/
 - **Cap de armazenamento (vidas GANHAS):** 15 — vidas obtidas via recompensas (ranking, recorde, convite, diária) não passam de 15
 - **Cap de armazenamento (vidas COMPRADAS):** **ilimitado** — compras na loja se acumulam mesmo se já tiver 15 ou mais vidas
 - **Regeneração:** +1 vida a cada **30 minutos**, parando ao atingir 5
-- **Consumo:** 1 vida só no Game Over (ver 3.4)
+- **Consumo:** 1 vida só quando o jogador confirma Game Over sem usar itens de salvamento (ver 3.4 e 3.5)
 - **Mínimo pra jogar:** 1 vida disponível
 
 ### 5.2 Resumo visual (caps de armazenamento)
@@ -309,6 +352,7 @@ class LivesState {
 - **`InventoryBar`** no rodapé da tela de jogo, abaixo do tabuleiro
 - Mostra cada item com **ícone PNG**, **contador (badge)** e **estado**
 - Itens com contador 0 ficam **acinzentados e desabilitados**, mas continuam visíveis
+- **Tamanho dos ícones (Fase 2.9):** ícones aumentados para 72×72dp (era 56×56dp); o espaçamento vertical entre a borda inferior do tabuleiro e o topo da `InventoryBar` é reduzido de 12dp para 4dp, para que os ícones maiores não empurrem o layout para fora da tela
 
 #### Ícones do inventário
 PNGs finais (1024×1024, fundo transparente) em `assets/icons/inventory/`:
@@ -317,12 +361,12 @@ PNGs finais (1024×1024, fundo transparente) em `assets/icons/inventory/`:
 - `undo_1.png` — Desfazer 1, tema **Capivara** (segurando relógio com seta de retorno)
 - `undo_3.png` — Desfazer 3, tema **Onça-pintada**
 
-**Visual do botão (Fase 2.3.12):** o PNG ocupa o slot 56×56 inteiro — o PNG **é** o botão. Sem fundo verde nem `Material`. Fallback automático para `Material(#4CAF50)` + `Icon` branco se o asset falhar ao carregar.
+**Visual do botão (Fase 2.3.12 / atualizado na 2.9):** o PNG ocupa o slot inteiro do botão — o PNG **é** o botão. Sem fundo verde nem `Material`. Fallback automático para `Material(#4CAF50)` + `Icon` branco se o asset falhar ao carregar. A partir da Fase 2.9, o slot é 72×72dp.
 
 #### Confirmação universal antes do uso (Fase 2.3.8)
-**TODOS os itens do inventário exigem confirmação antes de serem usados.**
+**TODOS os itens do inventário exigem confirmação antes de serem usados** — exceto quando acionados pela `GameOverItemScreen` (Fase 2.9), onde a confirmação já está embutida no próprio fluxo da tela.
 
-**Fluxo unificado:**
+**Fluxo unificado (uso durante a partida, fora do Game Over):**
 1. Tap no ícone do item → abre `ConfirmUseDialog` com:
    - Ícone grande do item
    - Texto: "Usar [nome do item]?"
@@ -340,12 +384,13 @@ PNGs finais (1024×1024, fundo transparente) em `assets/icons/inventory/`:
 - Não pode explodir células vazias: feedback "Selecione um tile"
 - Cancelar no `BombSelectionOverlay` não consome o item
 
-### 6.3 Game over com itens disponíveis
-1. Modal de Game Over checa `Inventory`
-2. Se desfazer ≥1: oferece "Desfazer última jogada" (passa pelo `ConfirmUseDialog`)
-3. Se bomba ≥1: oferece "Usar bomba" (passa pelo `ConfirmUseDialog`)
-4. Se sem itens: oferece anúncio recompensado pra item grátis
-5. Sempre oferece link pra loja
+### 6.3 Game over com itens disponíveis (redesenhado na Fase 2.9)
+O fluxo completo está descrito em §3.5. Resumo:
+1. Tabuleiro trava → sistema analisa inventário
+2. Se há itens: exibe `GameOverItemScreen` (tela dedicada, item em destaque, mensagem explicativa)
+3. Jogador usa item → partida continua, sem consumo de vida
+4. Jogador recusa todos → confirmação → 1 vida consumida → modal de resultados
+5. Sem itens: vai direto para oferta de anúncio → recusa → modal de resultados com 1 vida consumida
 
 ### 6.4 Modelo de dados
 ```dart
@@ -508,6 +553,7 @@ users/{userId}/personalRecords
 | Alerta | Vermelho-açaí | `#C0392B` |
 | Coração de vidas | Vermelho-coração | `#E53935` |
 | Premium/dourado | Dourado | `#FFD54F` |
+| Botão "Desistir" (Game Over) | Vermelho | `#EF5350` |
 
 ### 10.3 Tipografia
 - **Títulos**: `Fredoka` (arredondada, divertida)
@@ -517,6 +563,7 @@ users/{userId}/personalRecords
 - **Texto da faixa de vidas (Completo/Bônus/Restando/Sem vidas)**: `Fredoka SemiBold`, ~13sp, com `OutlinedText`
 - **Nome do anfitrião 2x2**: `Fredoka SemiBold`, 16sp (definido na 2.3.10), com `OutlinedText` e `maxLines: 2`
 - **Texto branco sobre fundo dinâmico**: contorno preto 1–1.5px com anti-aliasing (ver 4.4)
+- **Mensagem da `GameOverItemScreen`**: `Fredoka SemiBold`, 20sp, com `OutlinedText` ou dentro de card branco semi-opaco
 
 ### 10.4 Iconografia
 - Ícones com traço arredondado (Phosphor/Lucide "duotone")
@@ -530,7 +577,7 @@ users/{userId}/personalRecords
 | Merge | Pop (scale 1 → 1.2 → 1), 250ms |
 | Merge da Capivara | Flash dourado, partículas de folhas, zoom out, 1500ms |
 | Troca de anfitrião | Fade + scale, 400ms |
-| Game Over | Tabuleiro escurece, modal slide+fade |
+| Game Over | Tabuleiro escurece levemente, `GameOverItemScreen` slide-up, 300ms |
 | Botão pressionado | Scale 1 → 0.95 → 1, 100ms |
 | Pause overlay (entrada) | Fade do blur 0 → max + scale do conteúdo, 250ms |
 | Pause overlay (saída) | Reverso, 200ms |
@@ -543,6 +590,9 @@ users/{userId}/personalRecords
 | Faixa de vidas — transição entre estados | Fade entre cores 300ms + scale 1→1.1→1 (200ms) em transições positivas |
 | `ConfirmUseDialog` (entrada) | Fade + slide-up, 200ms |
 | Botão pause tile-sized — pressionado | Scale 1 → 0.95 → 1, 100ms |
+| `GameOverItemScreen` (entrada) | Slide-up + fade, 300ms |
+| `GameOverItemScreen` — trocar item | Fade-out item atual + fade-in próximo, 200ms |
+| Splash screen (entrada) | Logo fade-in + leve scale, 600ms; saída fade-out, 400ms |
 
 ---
 
@@ -581,6 +631,10 @@ users/{userId}/personalRecords
 - Bomba — célula selecionada: click + leve pulso
 - Pause overlay — abrir: whoosh suave (efeito vidro)
 - Pause overlay — fechar: whoosh reverso
+- `GameOverItemScreen` — abrir: som de alerta suave / suspense
+- `GameOverItemScreen` — usar item: whoosh de salvamento
+- `GameOverItemScreen` — desistir: nota descendente
+- Splash screen: jingle curto de entrada (1–2s)
 
 ### 11.3 Música ambiente
 - Loop suave de floresta (pássaros, água, vento)
@@ -600,7 +654,7 @@ users/{userId}/personalRecords
 
 ### 12.1 Mapa de telas
 ```
-[Splash]
+[Splash Screen]       ← novo (Fase 2.9)
    ↓
 [Login/Cadastro]  (apenas primeira vez ou se quiser ranking global)
    ↓
@@ -610,12 +664,14 @@ users/{userId}/personalRecords
    │      ├── (StatusPanel: cronômetro + pontuação + recorde — sem pause)
    │      ├── (linha intermediária: Anfitrião 2x2 à esquerda colado, PauseButtonTile à direita)
    │      ├── (tabuleiro 4x4)
-   │      ├── (inventário no rodapé)
-   │      └── [Game Over Modal]
-   │              ├── Usar item (com ConfirmUseDialog)
-   │              ├── Anúncio para item grátis
-   │              ├── Loja
-   │              └── Voltar ao Menu
+   │      ├── (inventário no rodapé — ícones 72×72dp)
+   │      └── [GameOverItemScreen]       ← redesenhado (Fase 2.9)
+   │              ├── Item em destaque (ícone ≥120×120dp)
+   │              ├── Mensagem explicativa do efeito
+   │              ├── "Usar item" → continua partida
+   │              ├── "Próximo item" → cicla pelos itens disponíveis
+   │              ├── "Desistir" → confirmação → Game Over real (1 vida)
+   │              └── [Se sem itens] → oferta de anúncio → loja → Game Over
    ├── [Loja]
    ├── [Ranking]
    ├── [Recompensas Diárias]
@@ -626,7 +682,28 @@ users/{userId}/personalRecords
    └── [Como Jogar]
 ```
 
-### 12.2 Tela: Home
+### 12.2 Tela: Splash Screen (Fase 2.9)
+- Exibida na abertura do app, antes de qualquer navegação
+- **Fundo:** cor sólida `#D4F1DE` (verde-menta — cor de fallback do app) ou uma variante do `fundo.png` centralizada e levemente escurecida
+- **Conteúdo:** `splash_logo.png` centralizado na tela — pode ser a `GameTitleImage` em alta resolução ou uma versão especial do logo "Olha o Bichim!" com a Capivara
+- **Duração:** mínimo 1,5s; máximo o tempo necessário para o app inicializar (carregar Hive, `precacheImage`, verificar estado de login, etc.)
+- **Comportamento:** a splash desaparece (fade-out 400ms) assim que a inicialização terminar E o tempo mínimo tiver passado
+- **Implementação:** `flutter_native_splash` para a splash nativa (exibida antes do Flutter estar pronto) + `SplashScreen` widget Flutter para a transição animada logo após
+- **Configuração `flutter_native_splash`:**
+  ```yaml
+  flutter_native_splash:
+    color: "#D4F1DE"
+    image: assets/images/splash/splash_logo.png
+    android_12:
+      color: "#D4F1DE"
+      image: assets/images/splash/splash_logo.png
+    ios: true
+    web: false
+  ```
+- **`SplashScreen` Flutter (widget):** exibida imediatamente após o Flutter estar pronto; executa a inicialização do app em background (Hive, precache, verificação de login); ao terminar, navega para `HomeScreen` com `Navigator.pushReplacement`
+- **Sem interação:** a splash não aceita taps nem swipes — é apenas apresentação
+
+### 12.3 Tela: Home
 - **Fundo:** mesmo `assets/images/fundo.png` da `GameScreen` (Fase 2.3.11) — `BoxFit.cover`, fallback `#D4F1DE`
 - `GameTitleImage` alternando entre variante laranja e marrom por sessão (Fase 2.5)
 - **Indicador de vidas** centralizado no topo (coração + faixa "Completo/Bônus/Restando/Sem vidas")
@@ -634,7 +711,7 @@ users/{userId}/personalRecords
 - Cards: Loja, Ranking, Recompensa Diária (com badge vermelho quando disponível), Convidar
 - Ícones menores: Coleção, Configurações, Como Jogar
 
-### 12.3 Tela: Jogo (Fase 2.3.10; reordenada na 2.3.12)
+### 12.4 Tela: Jogo (Fase 2.3.10; reordenada na 2.3.12; InventoryBar atualizado na 2.9)
 **Layout (de cima pra baixo):**
 
 1. **Topo:** `LivesIndicator` (coração + faixa estilizada) — **horizontalmente centralizado** (Fase 2.3.12)
@@ -643,20 +720,20 @@ users/{userId}/personalRecords
    - **Lado esquerdo (sobre colunas 1-2), colado à coluna 1:** `HostBanner` 2x2 com Tanajura desde o início
    - **Lado direito (sobre colunas 3-4):** `PauseButtonTile` (1 tile, alinhado à direita em slot 152×72dp via `Align(centerRight)`)
 4. **Centro:** tabuleiro 4x4
-5. **Rodapé:** `InventoryBar` (4 itens com ícones PNG + badges de contador)
+5. **Rodapé:** `InventoryBar` — espaçamento de 4dp acima (era 12dp), ícones 72×72dp (era 56×56dp)
 
 > **Nota de layout (Fase 2.3.12):** o cabeçalho tem 3 linhas distintas empilhadas:
 > - Linha A: `LivesIndicator` (`Center`) — horizontalmente centralizado
 > - Linha B: `StatusPanel` (largura total, sem pause integrado)
 > - Linha C: `Row(HostBanner flush-left | Spacer | Column(StatusPanel+PauseButtonTile) flush-right)` — sem padding à esquerda, `HostBanner` colado à borda esquerda do header
 
-#### 12.3.1 Posicionamento do botão pause (Fase 2.3.10; sem mudança na 2.3.12)
+#### 12.4.1 Posicionamento do botão pause (Fase 2.3.10; sem mudança na 2.3.12)
 - **Tile-sized 1×1, fixo, separado do StatusPanel**
-- Posicionado na linha intermediária do cabeçalho, alinhado à **direita** do tabuleiro (posição definida em brainstorm anterior — sem mudança na 2.3.12)
+- Posicionado na linha intermediária do cabeçalho, alinhado à **direita** do tabuleiro
 - Ícone de pausa centralizado + texto "Pausar" embaixo
 - Animação de tap: scale 1 → 0.95 → 1 (100ms)
 
-#### 12.3.2 Pause overlay — vidro fosco cobrindo o tabuleiro
+#### 12.4.2 Pause overlay — vidro fosco cobrindo o tabuleiro
 **Regra crítica:** quando o jogo está pausado, o jogador não pode estudar o tabuleiro.
 
 - **Cobertura:** overlay cobre 100% do tabuleiro + 80–90% da tela útil (mantém visíveis o `LivesIndicator` no topo e o `InventoryBar` no rodapé)
@@ -666,18 +743,50 @@ users/{userId}/personalRecords
 - **Animação:** entrada com fade+scale (250ms), saída reverso (200ms)
 - **Texto:** TODOS os textos brancos do overlay usam `OutlinedText`
 
-### 12.4 Tela: Loja
+### 12.5 Tela: GameOverItemScreen (Fase 2.9)
+Tela dedicada ao fluxo de salvamento quando o tabuleiro trava. Substitui o modal antigo de Game Over enquanto há itens disponíveis.
+
+**Layout:**
+```
+Stack
+├── GameBackground() — fundo.png em tela cheia
+├── Tabuleiro levemente visível ao fundo (opacidade 0.35) — contexto visual para o jogador
+└── SafeArea
+    └── Column (centralizado verticalmente)
+        ├── OutlinedText("Oh não! O tabuleiro travou!", Fredoka 22, branco)
+        ├── SizedBox(16)
+        ├── Container (card branco semi-opaco, borderRadius 20, padding 24)
+        │   ├── Image.asset(itemPngPath, width: 120, height: 120)
+        │   ├── SizedBox(12)
+        │   ├── Text(mensagemItem, Fredoka SemiBold 20, #3E2723)
+        │   │     ex: "Deseja usar o item Desfazer 3x\npara voltar 3 movimentos do jogo?"
+        │   ├── SizedBox(8)
+        │   └── Text("Você tem $count deste item", Nunito 14, cinza)
+        ├── SizedBox(24)
+        ├── ElevatedButton("Usar item", destaque, #FF8C42, largura total)
+        ├── SizedBox(8)
+        └── TextButton("Próximo item →" ou "Desistir", cinza ou #EF5350)
+```
+
+**Comportamento do botão inferior:**
+- Enquanto houver mais itens disponíveis não exibidos: exibe "Próximo item →"
+- Quando todos os itens foram apresentados uma vez: exibe **"Desistir"** em vermelho `#EF5350`
+- Ao tocar em "Desistir": `AlertDialog` de confirmação antes de encerrar
+
+**Sem `AppBar`:** a tela não tem barra de navegação superior — a única saída é usar um item ou confirmar desistência.
+
+### 12.6 Tela: Loja
 - Lista dos 6 pacotes em cards grandes
 - Cada card: imagem, conteúdo, "De R$X" (riscado) "Por R$Y" (destaque), badge de desconto
 - Após compra: tela de "Código para presentear amigo" com botão de compartilhar
 
-### 12.5 Tela: Ranking
+### 12.7 Tela: Ranking
 - Tabs: **Global Semanal** | **Pessoal**
 - Pódio (1º, 2º, 3º) destacado no topo
 - Lista paginada
 - Tempo até reset (se Global): contador regressivo até sábado 18h
 
-### 12.6 Tela: Recompensas Diárias (Fase 2.4 — concluída)
+### 12.8 Tela: Recompensas Diárias (Fase 2.4 — concluída)
 - Grid 7 dias (1–7) com recompensa de cada dia
 - 4 estados: available / alreadyClaimed / streakBroken / cycleCompleted
 - Countdown até meia-noite
@@ -686,17 +795,17 @@ users/{userId}/personalRecords
 - Diálogo de cap de vidas quando aplicável
 - `DailyRewardEntryTile` na `HomeScreen` com badge vermelho + toast na primeira sessão do dia
 
-### 12.7 Tela: Convidar Amigos
+### 12.9 Tela: Convidar Amigos
 - Botão "Gerar link de convite" → compartilha via `share_plus`
 - Lista de amigos convidados (status: pendente / completo / recompensa entregue)
 - Total de combos ganhos por convites
 
-### 12.8 Tela: Resgatar Código
+### 12.10 Tela: Resgatar Código
 - Campo de texto para código
 - Botão "Resgatar"
 - Após resgate: oferta de dobrar via anúncio
 
-### 12.9 Tela: Debug — Galeria de Animais
+### 12.11 Tela: Debug — Galeria de Animais
 Tela acessível apenas em build de debug (via `kDebugMode`). Mostra os 11 animais lado a lado em 3 modos: tile, host 1x1 (legado da 2.3.7) e host 2x2 (atualizada na 2.3.10).
 
 ---
@@ -972,273 +1081,295 @@ class ShareCode {
 - Configurações: haptic toggle, dropdown de idioma, sliders de áudio desabilitados/ocultos até Fase 5
 - Stubs de navegação criados: `ShopScreen`, `InviteFriendsScreen`, `RedeemCodeScreen`
 
----
-
 ### ✅ Fase 2.7 — Bugfixes visuais de interface (v0.9.3)
 
 **Objetivo:** quatro correções de legibilidade e layout identificadas em uso real pós-2.6. Nenhuma mudança de lógica de jogo — só UI.
 
-**Estimativa:** 1–2 dias.
-
 #### A — Botão "Recompensa Diária" com tamanho inconsistente quando badge está visível
-
-**Bug atual:** o card/botão de Recompensa Diária na `HomeScreen` muda de tamanho (ou desalinha) quando o badge vermelho de "recompensa disponível" aparece no canto superior direito. Os outros cards do grid permanecem com tamanho fixo, mas este cresce ou encolhe.
-
-**Causa provável:** o `Stack` que contém o botão e o badge não tem tamanho fixo — quando o badge é adicionado, o `Stack` expande pra acomodar o badge que extrapola as bordas, aumentando o bounding box do widget e quebrando o alinhamento do grid.
-
-**Mudanças:**
-- Auditar o widget do card de Recompensa Diária (provavelmente em `home_screen.dart` ou `daily_reward_entry_tile.dart`)
-- Garantir que o `Stack` que contém o botão + badge usa `clipBehavior: Clip.none` com tamanho fixado via `SizedBox` ou `ConstrainedBox` — o badge pode extrapolar visualmente sem afetar o tamanho do pai
-- Estrutura recomendada:
-  ```dart
-  SizedBox(
-    width: kCardWidth,   // mesmo tamanho dos outros cards
-    height: kCardHeight,
-    child: Stack(
-      clipBehavior: Clip.none,
-      children: [
-        _CardButton(...),
-        if (hasReward)
-          Positioned(top: -6, right: -6, child: _RedBadge()),
-      ],
-    ),
-  )
-  ```
-- Validar que o grid da Home mantém alinhamento uniforme com e sem badge visível
+- Auditar widget do card de Recompensa Diária
+- Garantir `Stack` com `clipBehavior: Clip.none` e tamanho fixo via `SizedBox`/`ConstrainedBox`
+- Badge extrapola visualmente sem afetar tamanho do pai
 - Validar em telas 360px, 412px e tablet
 
-**Casos de teste obrigatórios:**
-- Snapshot test da Home com badge visível: card de Recompensa tem mesma largura/altura dos outros cards
-- Snapshot test da Home sem badge: idem
-- Tap no card de Recompensa navega corretamente pra `/daily_rewards` em ambos os estados
-
 #### B — Textos ilegíveis nos menus sobre fundo dinâmico
-
-**Bug atual:** textos de labels, títulos e descrições em telas como Coleção (`CollectionScreen`) aparecem com cor padrão (preto ou cinza escuro) diretamente sobre o `fundo.png`, ficando ilegíveis porque o fundo tem tonalidades escuras e variadas.
-
-**Decisão de design:** todos os textos exibidos diretamente sobre `fundo.png` (sem container branco por trás) devem usar `OutlinedText` — texto branco com contorno preto sutil, 8 sombras radiais blur 0.8–1.0 — o mesmo padrão já aplicado na `GameScreen`.
-
-**Mudanças:**
-- Auditar `CollectionScreen` e identificar todos os textos que estão sobre o fundo sem container (título da tela, nome de cada animal no grid, subtítulos soltos)
-- Substituir `Text(...)` solto por `OutlinedText(...)` (widget já existe em `outlined_text.dart`) com:
-  - `style: TextStyle(color: Colors.white, fontSize: ..., fontFamily: 'Fredoka')`
-  - `outlineColor: Colors.black`
-  - `outlineWidth: 1.2`
-- Textos que já estão dentro de cards com fundo branco **não precisam mudar**
-- Verificar `HomeScreen`: labels de cards soltos fora de containers opacos também precisam de `OutlinedText`
-- **Não alterar** textos dentro de `AlertDialog`, `BottomSheet` ou qualquer container com fundo sólido
-
-**Casos de teste obrigatórios:**
-- Snapshot tests da `CollectionScreen` após a correção (regenerar)
-- Snapshot tests da `HomeScreen` se labels forem ajustados
-- Verificação manual: abrir Coleção sobre `fundo.png` e confirmar legibilidade
+- Auditar `CollectionScreen` e `HomeScreen`
+- Substituir `Text(...)` solto por `OutlinedText(...)` onde aplicável
+- Textos dentro de cards com fundo branco não precisam mudar
 
 #### C — Bottom Overflow em telas com fundo do jogo
-
-**Bug atual:** em algumas telas, ao renderizar com `fundo.png` como fundo, aparece a área amarela listrada com "Bottom Overflow by N pixels". O conteúdo da tela ultrapassa a altura disponível e não está em um widget scrollável.
-
-**Causa provável:** `Column` raiz da tela tem altura fixa (ou não tem `Expanded`/`Flexible`) e o conteúdo total excede a tela.
-
-**Mudanças:**
-- Auditar todas as telas que usam `GameBackground` e identificar quais apresentam overflow (`CollectionScreen`, `SettingsScreen`, `DailyRewardsScreen`, `HomeScreen` são candidatas)
-- Para cada tela com overflow:
-  - Se conteúdo é naturalmente scrollável: envolver em `SingleChildScrollView` ou usar `ListView`/`CustomScrollView`
-  - Se é tela com poucos elementos fixos: usar `Column` com `Expanded` no widget que deve crescer
-- **Padrão recomendado** para telas com `GameBackground`:
-  ```dart
-  Scaffold(
-    body: Stack(
-      children: [
-        GameBackground(),
-        SafeArea(
-          child: Column(
-            children: [
-              // header fixo
-              Expanded(
-                child: SingleChildScrollView(
-                  child: /* conteúdo */,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  )
-  ```
-- Testar em telas pequenas (360×640dp)
-
-**Casos de teste obrigatórios:**
-- Telas afetadas renderizam sem erro de overflow em telas 360×640dp
-- `flutter test` não lança `RenderFlex overflowed` em nenhum widget test
-- Verificação manual em emulador pequeno
+- Auditar todas as telas que usam `GameBackground`
+- Envolver conteúdo em `SingleChildScrollView` ou usar `Expanded` conforme o caso
+- Testar em 360×640dp
 
 #### D — Textos de Configurações ilegíveis sobre fundo dinâmico
+- Agrupar controles em cards com `Colors.white.withOpacity(0.88)`, borderRadius 12
+- Sliders de áudio mantidos visíveis mas `enabled: false` com label "Disponível na Fase 5"
+- Cor de texto dentro dos cards: `#3E2723`
 
-**Bug atual:** a `SettingsScreen` renderiza seus controles (toggles, sliders desabilitados, labels de idioma) diretamente sobre o `fundo.png`, sem container de fundo, tornando os labels ilegíveis.
+### ✅ Fase 2.8 — Loja mock (v0.9.4)
 
-**Decisão de design:** os itens de configurações devem ser renderizados dentro de **cards com fundo branco semi-opaco** (`Colors.white.withOpacity(0.88)`, borderRadius 12, sombra suave). Este padrão é mais adequado para controles interativos do que `OutlinedText` isolado, pois garante contraste também para os widgets `Switch` e `DropdownButton`.
+**Objetivo:** `ShopScreen` com os 6 pacotes da §7.1, cards com preços De/Por e badge de desconto, botão "Comprar" simulado que entrega os itens localmente, e tela de "Código para presentear" gerada após a compra simulada. Sem integração real de pagamento (IAP real entra na Fase 3).
 
-**Estrutura recomendada:**
-```dart
-Container(
-  decoration: BoxDecoration(
-    color: Colors.white.withOpacity(0.88),
-    borderRadius: BorderRadius.circular(12),
-    boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 2))],
-  ),
-  child: Column(
-    children: [
-      // SwitchListTile, ListTile, DropdownButton, etc.
-    ],
-  ),
-)
-```
-
-**Mudanças:**
-- Auditar `settings_screen.dart` e identificar todos os controles/labels sem container
-- Agrupar controles em seções lógicas (ex: "Gameplay", "Idioma", "Áudio") — cada seção num card
-- Dentro dos cards: `SwitchListTile` para toggles, `ListTile` com trailing `DropdownButton` para idioma
-- Títulos de seção fora dos cards: `OutlinedText` branco (padrão do item B)
-- Sliders de áudio: manter visíveis mas `enabled: false`, com label "Disponível na Fase 5" dentro do card
-- Cor de texto dentro dos cards: `#3E2723` (marrom escuro — cor padrão de texto do app)
-
-**Casos de teste obrigatórios:**
-- Snapshot test da `SettingsScreen` após a correção (regenerar)
-- Todos os labels têm contraste AA (texto escuro em fundo branco dentro dos cards)
-- Toggle de haptic funciona (regressão)
-- Dropdown de idioma funciona (regressão)
-- Sliders de áudio desabilitados com label explicativo visível
-- Sem overflow na `SettingsScreen` (regressão do item C)
-
-#### Ordem de execução recomendada
-1. **C primeiro** (overflow) — bloqueia visualização das outras telas; resolver antes de validar B e D
-2. **A** (badge inconsistente) — isolado, rápido, não depende de C
-3. **B** (textos menus) — aplicar `OutlinedText` nas telas afetadas
-4. **D por último** (cards de Configurações) — mais trabalhoso, depende do padrão estabelecido em B
+- `ShopScreen`: substituir stub da Fase 2.6 com `ListView` de 6 `_ShopPackageCard`
+- Cada card: nome + badge desconto (círculo laranja `#FF8C42`), descrição, preço De (riscado) / Por (destaque verde), botão "Comprar"
+- `_GiftCodeSheet`: bottom sheet com código UUID local, botão de copiar para clipboard, descrição do presente
+- `shop_data.dart`: lista estática dos 6 pacotes com preços e conteúdos conforme §7.1
+- `generatedShareCodesProvider`: `StateNotifierProvider` com persistência em `SharedPreferences`
+- Compra simulada entrega itens ao `inventoryProvider` e `livesProvider` imediatamente
+- Sem integração IAP real (Fase 3)
 
 ---
 
-### ✅ Fase 2.8 — Loja mock (3 dias)
+### ✅ Fase 2.9 — Splash Screen, Game Over redesenhado, Inventário maior e Orientação bloqueada (v0.9.9)
 
-**Objetivo:** implementar a `ShopScreen` com os 6 pacotes da §7.1, cards com preços De/Por e badge de desconto, botão "Comprar" simulado que entrega os itens localmente, e tela de "Código para presentear" gerada após a compra simulada. Sem integração real de pagamento (IAP real entra na Fase 3).
+**Objetivo:** quatro requisitos de produto que melhoram a experiência geral do app: apresentação profissional na abertura, fluxo de Game Over mais estratégico que valoriza o uso de itens, ícones do inventário maiores e mais acessíveis, e bloqueio de rotação de tela para manter a experiência portrait-only.
 
-#### Sub-entregas
+**Estimativa:** 2–3 dias.
 
-**A — ShopScreen (conteúdo)**
+---
 
-Substituir o stub criado na Fase 2.6 pelo conteúdo real.
+#### A — Splash Screen
 
-Arquivos:
-- `lib/presentation/screens/shop_screen.dart` — reescrever
-- `lib/data/shop_data.dart` — criar (lista dos 6 `ShopPackage`)
-- `lib/presentation/controllers/shop_notifier.dart` — criar
+**Objetivo:** apresentar o app de forma profissional na abertura, enquanto a inicialização ocorre em background.
 
-Layout:
-```
-Scaffold
-└── GameBackground()
-    └── Column
-        ├── AppBar("Loja", Fredoka 22, #3FA968, BackButton)
-        └── Expanded
-            └── ListView
-                // 6 _ShopPackageCard, ordem da tabela §7.1
-```
+**Mudanças:**
 
-**`_ShopPackageCard`**
+**A1 — Splash nativa (`flutter_native_splash`)**
+- Adicionar `flutter_native_splash: ^2.x` ao `pubspec.yaml`
+- Criar `assets/images/splash/splash_logo.png` (logo "Olha o Bichim!" em alta resolução, fundo transparente, dimensões ≥512×512px)
+- Configurar `flutter_native_splash.yaml`:
+  ```yaml
+  flutter_native_splash:
+    color: "#D4F1DE"
+    image: assets/images/splash/splash_logo.png
+    android_12:
+      color: "#D4F1DE"
+      image: assets/images/splash/splash_logo.png
+    ios: true
+    web: false
+  ```
+- Rodar `dart run flutter_native_splash:create`
+- Resultado: splash nativa exibida pelo SO antes mesmo do Flutter estar pronto
+
+**A2 — `SplashScreen` widget Flutter**
+- Criar `lib/presentation/screens/splash/splash_screen.dart`
+- Exibida imediatamente após o Flutter estar pronto, antes da `HomeScreen`
+- Fundo: `GameBackground()` (fundo.png)
+- Conteúdo: `GameTitleImage` centralizado + `CircularProgressIndicator` discreto na base
+- Executa em background durante a exibição:
+  - Inicialização do Hive
+  - `precacheImage` para os 22 PNGs dos animais + 4 do inventário + `fundo.png` + 2 title PNGs
+  - Verificação do estado de login (local)
+  - Verificação de recompensa diária disponível
+- Duração mínima: 1500ms (para garantir a animação de entrada seja visível)
+- Ao finalizar tudo: navega para `HomeScreen` com `Navigator.pushReplacement` e fade de 400ms
+- **Sem interação:** nenhum tap aceito durante a splash
+
+**A3 — Integração no `main.dart`**
+- Definir `SplashScreen` como rota inicial do `MaterialApp`
+- Remover qualquer lógica de inicialização que esteja em `HomeScreen` (mover para `SplashScreen`)
+
+**Casos de teste obrigatórios:**
+- `splash_screen_test.dart`:
+  - Widget renderiza `GameBackground` e `GameTitleImage`
+  - Após `Future.delayed` simulado com mock de inicialização: navega para `HomeScreen`
+  - Sem botão de navegação (usuário não pode pular)
+  - `CircularProgressIndicator` presente enquanto inicialização pendente
+
+---
+
+#### B — Game Over redesenhado com `GameOverItemScreen`
+
+**Objetivo:** quando o tabuleiro trava, oferecer ativamente ao jogador uma chance de usar seus itens para salvar a partida, com uma tela dedicada e clara para cada item disponível.
+
+**Arquivos novos:**
+- `lib/presentation/screens/game/game_over_item_screen.dart`
+
+**Arquivos modificados:**
+- `lib/presentation/screens/game/game_screen.dart` — detectar game over e redirecionar para o novo fluxo
+- `lib/domain/game_engine/game_notifier.dart` — adicionar estado `isAwaitingGameOverResolution`
+- `lib/presentation/widgets/inventory_bar.dart` — desabilitar tap durante `GameOverItemScreen`
+
+**Lógica de prioridade dos itens exibidos:**
 ```dart
-_ShopPackageCard({required ShopPackage package})
-// Container: borderRadius 16, sombra inferior, fundo branco leve
-// Conteúdo:
-//   Row: nome (Fredoka 18) + badge desconto (círculo laranja #FF8C42: "50%" ou "75%")
-//   Text(description, Nunito 14, cor cinza)
-//   Row: Text("De R$ X,XX", Nunito 14, riscado, cinza) + Text("Por R$ X,XX", Fredoka 20, #3FA968)
-//   ElevatedButton("Comprar", onTap: _onBuy)
+List<ItemType> _getAvailableSavingItems(Inventory inv) {
+  final items = <ItemType>[];
+  if (inv.undo3 > 0) items.add(ItemType.undo3);
+  if (inv.undo1 > 0) items.add(ItemType.undo1);
+  if (inv.bomb3 > 0) items.add(ItemType.bomb3);
+  if (inv.bomb2 > 0) items.add(ItemType.bomb2);
+  return items; // ordem: mais poderoso primeiro
+}
 ```
 
-**`_onBuy` — fluxo de compra simulada**
-1. Mostrar `AlertDialog` de confirmação: "Comprar [nome] por R$ X,XX?"
-2. Ao confirmar: `inventoryProvider.add(package.contents)` + `livesProvider.add(package.contents.lives)`
-3. Mostrar `_GiftCodeSheet` com o código gerado (`ShareCode` local, sem backend)
-4. `ShareCode` gerado localmente com UUID, status `pending`, armazenado em `SharedPreferences`
+**Mensagens por item:**
+```dart
+String _messageForItem(ItemType type) => switch (type) {
+  ItemType.undo3 => 'Deseja usar o item Desfazer 3x\npara voltar 3 movimentos do jogo?',
+  ItemType.undo1 => 'Deseja usar o item Desfazer 1x\npara voltar 1 movimento do jogo?',
+  ItemType.bomb3 => 'Deseja usar o item Bomba 3\npara explodir 3 tiles e liberar espaço?',
+  ItemType.bomb2 => 'Deseja usar o item Bomba 2\npara explodir 2 tiles e liberar espaço?',
+};
+```
 
-**B — `_GiftCodeSheet` (bottom sheet)**
+**Estado no `GameNotifier`:**
+```dart
+// Novo campo em GameState ou no notifier:
+bool isAwaitingGameOverResolution = false;
+// true: tabuleiro travou, aguardando decisão do jogador
+// false: jogo em andamento ou game over confirmado
+```
+
+**Fluxo de navegação:**
+1. Engine detecta game over → `gameNotifier.setAwaitingResolution(true)`
+2. `GameScreen` observa `isAwaitingGameOverResolution == true`
+3. Se inventário tem itens salvadores: `Navigator.push(GameOverItemScreen(availableItems))`
+4. Se não tem itens: mostrar `AlertDialog` de oferta de anúncio → recusa → modal padrão de game over → `livesNotifier.consume(1)`
+5. `GameOverItemScreen` retorna `GameOverResolution`:
+   - `.itemUsed(ItemType)` → `gameNotifier.applyItem(type)` → `gameNotifier.setAwaitingResolution(false)` → pop
+   - `.forfeit` → `livesNotifier.consume(1)` → modal padrão de game over → `gameNotifier.setAwaitingResolution(false)` → pop
+
+**Casos de teste obrigatórios:**
+- `game_over_item_screen_test.dart`:
+  - Exibe item correto na ordem de prioridade (undo3 primeiro)
+  - Mensagem correta para cada tipo de item
+  - Contador correto ("Você tem X deste item")
+  - "Próximo item" cicla pelo próximo item disponível
+  - Após último item: botão muda para "Desistir" (vermelho)
+  - "Desistir" abre `AlertDialog` de confirmação
+  - Cancelar no `AlertDialog` retorna à `GameOverItemScreen`
+  - Confirmar no `AlertDialog` retorna `.forfeit`
+  - "Usar item" retorna `.itemUsed(type)` correto
+- `game_notifier_test.dart`:
+  - `setAwaitingResolution` altera estado corretamente
+  - `applyItem(undo3)` chama `undo(3)` e decrementa inventário
+  - `applyItem(bomb2)` entra em modo de seleção de bomba
+- `game_screen_test.dart`:
+  - Ao game over com itens: navega para `GameOverItemScreen`
+  - Ao game over sem itens: exibe `AlertDialog` de anúncio
+
+---
+
+#### C — Inventário maior com espaçamento reduzido
+
+**Objetivo:** ícones do inventário mais fáceis de tocar, sem comprometer o layout geral da tela de jogo.
+
+**Arquivos modificados:**
+- `lib/presentation/widgets/inventory_bar.dart`
+- `lib/presentation/widgets/inventory_item_button.dart`
+- `lib/core/constants/game_constants.dart` (ou onde estiverem as constantes de layout)
+
+**Mudanças específicas:**
 
 ```dart
-// DraggableScrollableSheet, initialChildSize: 0.5
-// Conteúdo:
-//   Text("Presente gerado!", Fredoka 24)
-//   Text("Compartilhe este código com um amigo:", Nunito 14)
-//   Container com código em Fredoka Bold 28
-//   IconButton(Icons.copy) — copia para clipboard
-//   Text("Seu amigo recebe: [conteúdo do giftContents]", Nunito 14)
-//   ElevatedButton("Fechar")
+// Antes:
+static const double inventoryIconSize = 56.0;
+static const double boardToInventorySpacing = 12.0;
+
+// Depois (Fase 2.9):
+static const double inventoryIconSize = 72.0;
+static const double boardToInventorySpacing = 4.0;
 ```
 
-**C — Dados `shop_data.dart`**
+- Em `inventory_item_button.dart`: alterar `SizedBox(width: 56, height: 56)` para `SizedBox(width: 72, height: 72)`
+- Em `inventory_bar.dart`: alterar `SizedBox(height: 12)` (espaçamento acima da barra) para `SizedBox(height: 4)`
+- O badge de contador deve ser reposicionado proporcionalmente ao novo tamanho: `Positioned(top: -4, right: -4)` em vez de `Positioned(top: -3, right: -3)`
+- Verificar que a altura total da `InventoryBar` não ultrapassa o espaço disponível em telas 360×640dp
+- Verificar que o `ConfirmUseDialog` ainda exibe o ícone do item em 40×40dp (não muda)
 
+**Casos de teste obrigatórios:**
+- Snapshot test da `GameScreen` com ícones em 72×72dp
+- Espaçamento de 4dp entre tabuleiro e `InventoryBar` confirmado no widget tree
+- Sem overflow em 360×640dp com os novos tamanhos
+- Tap area de cada ícone ≥72×72dp (acessibilidade)
+
+---
+
+#### D — Bloqueio de orientação (portrait only)
+
+**Objetivo:** garantir que o app só funcione em modo retrato, como a grande maioria dos jogos casuais mobile, evitando problemas de layout em landscape.
+
+**Arquivos modificados:**
+- `lib/main.dart`
+- `android/app/src/main/AndroidManifest.xml`
+- `ios/Runner/Info.plist`
+
+**Mudanças:**
+
+**D1 — Bloqueio programático via Flutter (all platforms):**
 ```dart
-// Lista dos 6 ShopPackage conforme §7.1:
-// [01] 4× Bomba 3 — De R$7,99 / Por R$3,99 / 50%
-// [02] 4× Desfazer 3 — De R$3,99 / Por R$1,99 / 50%
-// [03] 6 vidas — De R$9,99 / Por R$2,49 / 75%
-// [04] 10 vidas — De R$19,99 / Por R$4,99 / 75%
-// [05] Combo Mata Atlântica (6v+2b+2d) — De R$10,99 / Por R$4,99 / 50%
-// [06] Combo Floresta Amazônica (10v+4b+4d) — De R$31,99 / Por R$9,99 / 50%
+// em main.dart, antes de runApp():
+await WidgetsFlutterBinding.ensureInitialized();
+await SystemChrome.setPreferredOrientations([
+  DeviceOrientation.portraitUp,
+  DeviceOrientation.portraitDown,
+]);
+runApp(const ProviderScope(child: App()));
 ```
 
-**D — Persistência local de `ShareCode`**
-
-```dart
-// SharedPreferences key: 'generated_share_codes'
-// Valor: List<String> de JSON serializado dos ShareCode gerados
-// Fase 3 migra para Firestore (mesma estrutura ShareCode)
+**D2 — Bloqueio nativo Android (`AndroidManifest.xml`):**
+```xml
+<activity
+  android:name=".MainActivity"
+  android:screenOrientation="portrait"
+  ...>
 ```
 
-**E — Documentação**
-- `CHANGELOG.md`: entrada v0.9.3
-- `README.md`: Fase 2.8 ✅
-- `CLAUDE.md`: fase atual → "Fase 2.8 concluída — próximo: Fase 3"
-- `CAPIVARA_2048_DESIGN.md` §15: marcar Fase 2.8 ✅
-- `CAPIVARA_2048_DESIGN.md` §17: substituir pelo prompt da Fase 3
-
-#### Providers
-
-| Provider | Tipo | Novo? |
-|---|---|---|
-| `shopPackagesProvider` | `Provider<List<ShopPackage>>` | Sim — lista estática de `shop_data.dart` |
-| `generatedShareCodesProvider` | `StateNotifierProvider<...>` | Sim — lista local de `ShareCode` gerados, persistida em `SharedPreferences` |
-| `inventoryProvider` | já existe | Reusar — `add()` com `package.contents` |
-| `livesProvider` | já existe | Reusar — `add(package.contents.lives)` |
-
-#### Testes obrigatórios
-
-```dart
-// shop_screen_test.dart
-testWidgets('6 cards de pacotes presentes no widget tree', ...)
-testWidgets('cada card exibe nome, preço De, preço Por, badge desconto', ...)
-testWidgets('tap Comprar → AlertDialog de confirmação', ...)
-testWidgets('confirmar compra → inventoryProvider atualizado', ...)
-testWidgets('confirmar compra → _GiftCodeSheet aparece com código', ...)
-testWidgets('botão copiar → código no clipboard', ...)
+**D3 — Bloqueio nativo iOS (`Info.plist`):**
+```xml
+<key>UISupportedInterfaceOrientations</key>
+<array>
+  <string>UIInterfaceOrientationPortrait</string>
+</array>
+<key>UISupportedInterfaceOrientations~ipad</key>
+<array>
+  <string>UIInterfaceOrientationPortrait</string>
+  <string>UIInterfaceOrientationPortraitUpsideDown</string>
+</array>
 ```
 
-#### Critérios de aceite
-- 6 pacotes visíveis em scroll sem overflow
-- Badge de desconto correto (50% / 75%) em cada card
-- Preço "De" riscado, preço "Por" em destaque verde
-- Compra simulada entrega itens no inventário imediatamente
-- Código de presente gerado e copiável
-- Sem integração IAP real (Fase 3)
+> **Nota iPad:** iPads geralmente esperam suporte a múltiplas orientações. A configuração acima restringe apenas para portrait no iPhone/Android e permite portrait + portrait-upsidedown no iPad. Se o jogo não tiver versão iPad, pode-se restringir totalmente.
 
-#### Sincronização com Fase 3
+**D4 — Web (se aplicável):**
+- Em Web, `SystemChrome.setPreferredOrientations` não tem efeito
+- Adicionar meta tag `<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">` no `web/index.html` (já deve existir)
+- O layout em Web é responsivo e não se aplica a essa restrição
 
-| Slot criado na 2.7 | O que a Fase 3 faz |
+**Casos de teste obrigatórios:**
+- `main_test.dart`: verificar que `SystemChrome.setPreferredOrientations` é chamado com `[portraitUp, portraitDown]` na inicialização
+- Verificação manual: rotacionar dispositivo físico durante jogo — tela não deve girar
+- Verificação manual: rotacionar dispositivo em todas as telas (Home, Jogo, Loja, Coleção) — portrait mantido
+
+---
+
+#### Ordem de execução recomendada
+
+1. **D primeiro** (orientação) — mudança de 2 linhas, sem riscos, resolve problema imediatamente em todos os builds
+2. **C** (inventário maior) — isolado, rápido, não depende de outras mudanças
+3. **A** (splash screen) — independente das demais, adiciona asset e lógica de inicialização
+4. **B por último** (Game Over redesenhado) — mais complexo, envolve novo estado no engine, nova tela e integração com inventário
+
+---
+
+#### Critérios de aceite da Fase 2.9
+
+| Item | Critério |
 |---|---|
-| `_onBuy` mock (entrega local) | Substituir por `in_app_purchase` real |
-| `ShareCode` em SharedPreferences | Migrar para Firestore |
-| `_GiftCodeSheet` com código local | Conectar ao backend para validação |
-| `RedeemCodeScreen` (stub criado na 2.6) | Recebe conteúdo na Fase 3 |
+| Splash | App exibe splash na abertura; desaparece após inicialização completa (mín. 1,5s) |
+| Splash | Splash nativa exibida antes do Flutter (via `flutter_native_splash`) |
+| Game Over | Ao travar o tabuleiro com itens: `GameOverItemScreen` exibida antes de qualquer consumo de vida |
+| Game Over | Mensagem correta e item em destaque para cada tipo de item |
+| Game Over | Ciclagem correta entre itens disponíveis; "Desistir" aparece somente após apresentar todos |
+| Game Over | Usar item: partida continua sem consumo de vida |
+| Game Over | Desistir + confirmar: 1 vida consumida, modal padrão exibido |
+| Game Over | Sem itens: fluxo antigo de anúncio → modal padrão |
+| Inventário | Ícones em 72×72dp visíveis e tocáveis |
+| Inventário | Espaçamento de 4dp entre tabuleiro e barra |
+| Inventário | Sem overflow em 360×640dp |
+| Orientação | App permanece em portrait em todas as telas e dispositivos |
+| Orientação | Bloqueio presente nativamente (AndroidManifest + Info.plist) e programaticamente |
+
+---
 
 ### 🔜 Fase 3 — Backend, ranking e monetização (3–4 semanas)
 - Setup Firebase (Auth, Firestore)
@@ -1292,20 +1423,23 @@ testWidgets('botão copiar → código no clipboard', ...)
 - `LivesIndicator` anunciado: "5 vidas, banco completo" / "8 vidas, bônus" / "3 vidas, próxima em 12 minutos" / "Sem vidas — aguarde 30 minutos"
 - `PauseButtonTile` anunciado: "Botão Pausar"
 - `HostBanner` anunciado: "Anfitrião: [nome do animal]"
+- `GameOverItemScreen` anunciada: "Salvamento disponível — [nome do item]"
 - Modo "alta visibilidade"
 - Tamanho de fonte ajustável
 - **Cards de Configurações (Fase 2.7):** `SwitchListTile` e `ListTile` anunciam estado automaticamente — nenhuma alteração necessária em `Semantics`
+- **Ícones do inventário 72×72dp (Fase 2.9):** tap area ≥72×72dp, atende guideline de 48dp mínimo com folga
 
 ### 16.2 Performance
 - `const` e Riverpod selectors
 - PNGs em vez de SVGs (Fase 2.3.8 item A) — gargalo removido
-- `precacheImage` pra os 22 PNGs dos animais + 4 do inventário + `fundo.png` + 2 title PNGs no boot
+- `precacheImage` pra os 22 PNGs dos animais + 4 do inventário + `fundo.png` + 2 title PNGs + `splash_logo.png` no boot (movido para `SplashScreen` na Fase 2.9)
 - Pool de AudioPlayers (Fase 5)
 - 60fps em Snapdragon 660+ / iPhone 8+
 - `RepaintBoundary` no `GameBackground`
 - `BackdropFilter` no `PauseOverlay` é o único custo significativo de UI — fallback se ficar < 50fps
 - **Timer de regeneração de vidas (Fase 2.3.12 item C):** `Timer.periodic` rodando a cada segundo é leve, mas garantir que o widget é desmontado corretamente (`dispose`) pra não vazar timers entre navegações
 - **Fase 2.7 item C:** overflow resolvido com `SingleChildScrollView` — leve, sem impacto de performance
+- **`SplashScreen` (Fase 2.9):** o `precacheImage` em background garante que todas as imagens estejam na memória antes da primeira frame da `HomeScreen`, eliminando jank de carregamento
 
 ### 16.3 LGPD / COPPA / Crianças
 - Conformidade COPPA (US) e LGPD (BR)
@@ -1327,45 +1461,45 @@ testWidgets('botão copiar → código no clipboard', ...)
 
 ---
 
-## 17. Prompt Sugerido para o Claude Code (Fase 2.8 — via skill superpowers)
+## 17. Prompt Sugerido para o Claude Code (Fase 2.9 — via skill superpowers)
 
-> O prompt abaixo entra no fluxo do **superpowers/brainstorming**. O resultado esperado é uma **spec detalhada da Fase 2.8** (refinada via brainstorm), que depois alimenta o **superpowers/writing-plans** pra gerar o plano executável. Nada de código nesta etapa — apenas elicitação, refinamento de design e plano.
+> O prompt abaixo entra no fluxo do **superpowers/brainstorming**. O resultado esperado é uma **spec detalhada da Fase 2.9** (refinada via brainstorm), que depois alimenta o **superpowers/writing-plans** pra gerar o plano executável. Nada de código nesta etapa — apenas elicitação, refinamento de design e plano.
 
 ---
 
 > Use a skill `superpowers/brainstorming` pra refinar o design da próxima fase do projeto **Olha o Bichim!** (Flutter, codename `capivara_2048`).
 >
-> **Contexto:** Fase 2.7 concluída (v0.9.3). Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente §7.1, §12.3 e §15 — Fase 2.8).
+> **Contexto:** Fase 2.8 concluída (v0.9.4). Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente §3.5, §6.2, §12.2, §12.5 e §15 — Fase 2.9).
 >
-> **Fases concluídas:** 1 a 2.7 (v0.9.3). Áudio na Fase 5. Backend na Fase 3.
+> **Fases concluídas:** 1 a 2.8 (v0.9.4). Áudio na Fase 5. Backend na Fase 3.
 >
-> **Tópico do brainstorm:** **Fase 2.8 — Loja Mock**. Implementar `ShopScreen` com os 6 pacotes da §7.1, cards com preços De/Por e badge de desconto, botão "Comprar" simulado que entrega os itens localmente, tela de "Código para presentear" gerada após compra simulada. Sem integração real de pagamento (IAP real entra na Fase 3).
+> **Tópico do brainstorm:** **Fase 2.9 — Splash Screen, Game Over redesenhado, Inventário maior e Orientação bloqueada**. Quatro requisitos de produto independentes entre si, todos de UI/UX, sem impacto em backend ou lógica de pontuação.
 >
 > **Quatro sub-entregas:**
 >
-> **A — ShopScreen:** substituir stub da Fase 2.6 com ListView de 6 `_ShopPackageCard`. Cada card: nome + badge desconto (círculo laranja `#FF8C42`), descrição, preço De (riscado) / Por (destaque verde), botão "Comprar".
+> **A — Splash Screen:** `flutter_native_splash` para splash nativa + widget `SplashScreen` Flutter com `precacheImage` e verificação de estado inicial. Duração mínima 1,5s.
 >
-> **B — `_GiftCodeSheet`:** bottom sheet exibido após compra com código UUID local, botão de copiar para clipboard, descrição do conteúdo do presente.
+> **B — `GameOverItemScreen`:** nova tela dedicada ao fluxo de salvamento por itens quando o tabuleiro trava. Item em destaque (ícone ≥120dp), mensagem explicativa, ciclagem entre itens disponíveis em ordem de prioridade, "Desistir" com confirmação. Vida só consumida após confirmação de desistência.
 >
-> **C — `shop_data.dart`:** lista estática dos 6 pacotes com preços e conteúdos conforme §7.1.
+> **C — Inventário maior:** ícones de 56→72dp, espaçamento tabuleiro-barra de 12→4dp. Validar sem overflow em 360×640dp.
 >
-> **D — Persistência local:** `ShareCode` em `SharedPreferences` (migração para Firestore na Fase 3).
+> **D — Orientação portrait-only:** `SystemChrome.setPreferredOrientations` no `main.dart` + `android:screenOrientation="portrait"` no `AndroidManifest` + `UISupportedInterfaceOrientations` no `Info.plist`.
 >
 > **Pontos abertos pra explorar no brainstorm:**
 >
-> - `ShopPackage` model: quais campos? (`id`, `name`, `description`, `originalPrice`, `salePrice`, `discountPercent`, `contents: PackageContents`, `giftContents: PackageContents`) — confirmar estrutura antes de criar `shop_data.dart`.
-> - `PackageContents`: `lives`, `bombs2`, `bombs3`, `undos1`, `undos3` — esses são os campos corretos baseado nos items existentes?
-> - `shop_notifier.dart`: precisa de estado próprio ou `_onBuy` pode ser função local na screen com acesso direto a `inventoryProvider` e `livesProvider`?
-> - `generatedShareCodesProvider`: `StateNotifierProvider` com persistência em `SharedPreferences` — o padrão já usado em `DailyRewardsNotifier` serve de referência?
-> - Bomba nos combos: são Bomba 2 ou Bomba 3? Confirmar no §7.1 ("2 bombas" — qual tipo?).
-> - Validação manual: rodar em 360×640 para garantir que os 6 cards scrollam sem overflow.
+> - `GameOverItemScreen`: a tela deve ser uma rota `Navigator.push` ou um overlay sobre a `GameScreen`? Impacto no comportamento do botão "voltar" do Android?
+> - O tabuleiro ao fundo da `GameOverItemScreen` deve ser interativo (permitir ver o estado atual) ou completamente bloqueado para toque?
+> - `isAwaitingGameOverResolution`: campo no `GameState` (imutável, persistido no Hive) ou flag volátil no `GameNotifier`? Impacto no auto-save?
+> - Bomba como item de salvamento: ao tocar "Usar item" para uma bomba, a `GameOverItemScreen` fecha e entra no `BombSelectionOverlay` — se o jogador cancelar a seleção de bomba, o que acontece? Volta para `GameOverItemScreen`?
+> - `splash_logo.png`: usar a `GameTitleImage` (título do jogo) ou uma ilustração exclusiva com a Capivara? Qual asset já existe que pode ser reutilizado?
+> - Inventário 72dp: verificar se há telas (360×568dp — iPhone SE 1ª geração) onde isso quebra o layout.
 >
 > **Output esperado do brainstorm:**
-> Uma **spec detalhada da Fase 2.8** (`docs/superpowers/specs/YYYY-MM-DD-fase-2-8-design.md`) com:
+> Uma **spec detalhada da Fase 2.9** (`docs/superpowers/specs/YYYY-MM-DD-fase-2-9-design.md`) com:
 > - Decisões tomadas em cada ponto aberto
 > - Para cada sub-entrega: arquivos a modificar, mudança exata, casos de teste obrigatórios, critérios de aceite
-> - Plano de validação manual
-> - Ao final: **prompt de brainstorm da Fase 3** (Backend — próxima após a Loja Mock) seguindo este mesmo padrão de cascata
+> - Plano de validação manual (dispositivos alvo: 360×640, 390×844, 412×915, iPad mini)
+> - Ao final: **prompt de brainstorm da Fase 3** (Backend — próxima grande fase) seguindo este mesmo padrão de cascata
 >
 > **Não escreva código nesta etapa.** Foque em refinar o design, fazer perguntas críticas e produzir a spec.
 

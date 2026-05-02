@@ -7,7 +7,16 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
-## [0.9.9] — 2026-05-02
+## [0.9.9] - 2026-05-02
+
+### Added
+- Splash screen: native splash + animated logo (Fase 2.9-A)
+- GameOverItemOverlay: "Continuar?" dialog when game ends, lets player use an inventory item (Fase 2.9-B)
+
+### Changed
+- Inventory icons enlarged from 56dp to 72dp (Fase 2.9-C)
+- Board-to-inventory spacing reduced from 12dp to 4dp (Fase 2.9-C)
+- App locked to portrait-only orientation (Fase 2.9-D)
 
 ### Fixed
 - Bomba: taps na grade de seleção não respondiam — BombDimOverlay envolvia tudo com
