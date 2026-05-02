@@ -32,56 +32,60 @@ class GameScreen extends ConsumerWidget {
     return Scaffold(
       body: GameBackground(
         child: SafeArea(
-          child: Stack(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Column(
-                  children: [
-                    GameHeader(
-                      onPauseTap: state.isPaused
-                          ? notifier.resume
-                          : notifier.pause,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              const headerH = 72.0;
+              const inventoryH = 64.0;
+              const verticalPad = 8.0;
+              final boardSide = min(
+                constraints.maxWidth - 24,
+                constraints.maxHeight - headerH - inventoryH - verticalPad,
+              );
+              return Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Column(
+                      children: [
+                        GameHeader(
+                          onPauseTap: state.isPaused
+                              ? notifier.resume
+                              : notifier.pause,
+                        ),
+                        Expanded(
+                          child: Center(
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onPanEnd: (details) {
+                                if (state.isPaused ||
+                                    isGameOver ||
+                                    hasWon ||
+                                    state.bombMode != null) return;
+                                final v = details.velocity.pixelsPerSecond;
+                                const threshold = 100.0;
+                                if (v.dx.abs() > v.dy.abs()) {
+                                  if (v.dx > threshold) {
+                                    notifier.onSwipe(Direction.right);
+                                  } else if (v.dx < -threshold) {
+                                    notifier.onSwipe(Direction.left);
+                                  }
+                                } else {
+                                  if (v.dy > threshold) {
+                                    notifier.onSwipe(Direction.down);
+                                  } else if (v.dy < -threshold) {
+                                    notifier.onSwipe(Direction.up);
+                                  }
+                                }
+                              },
+                              child: RepaintBoundary(child: BoardWidget(size: boardSide)),
+                            ),
+                          ),
+                        ),
+                        const InventoryBar(),
+                        const SizedBox(height: 8),
+                      ],
                     ),
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        final boardSide = min(
-                          constraints.maxWidth - 24,
-                          constraints.maxHeight - 140, // header + inventory estimado
-                        );
-                        return GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onPanEnd: (details) {
-                            if (state.isPaused ||
-                                isGameOver ||
-                                hasWon ||
-                                state.bombMode != null) return;
-                            final v = details.velocity.pixelsPerSecond;
-                            const threshold = 100.0;
-                            if (v.dx.abs() > v.dy.abs()) {
-                              if (v.dx > threshold) {
-                                notifier.onSwipe(Direction.right);
-                              } else if (v.dx < -threshold) {
-                                notifier.onSwipe(Direction.left);
-                              }
-                            } else {
-                              if (v.dy > threshold) {
-                                notifier.onSwipe(Direction.down);
-                              } else if (v.dy < -threshold) {
-                                notifier.onSwipe(Direction.up);
-                              }
-                            }
-                          },
-                          child: RepaintBoundary(child: BoardWidget(size: boardSide)),
-                        );
-                      },
-                    ),
-                    const Spacer(),
-                    const InventoryBar(),
-                    const SizedBox(height: 8),
-                  ],
-                ),
-              ),
+                  ),
               if (state.isPaused) const Positioned.fill(child: PauseOverlay()),
               if (state.bombMode != null)
                 const Positioned.fill(child: BombSelectionOverlay()),
@@ -91,7 +95,9 @@ class GameScreen extends ConsumerWidget {
               if (hasWon && !isGameOver)
                 const Positioned.fill(
                     child: GameOverModal(message: 'Capivara Lendária! 🎉')),
-            ],
+                ],
+              );
+            },
           ),
         ),
       ),

@@ -9,6 +9,8 @@ class DailyRewardDayTile extends StatelessWidget {
   final DailyReward reward;
   final DayTileState tileState;
   final bool isDay7;
+  final double width;
+  final double height;
 
   const DailyRewardDayTile({
     super.key,
@@ -16,6 +18,8 @@ class DailyRewardDayTile extends StatelessWidget {
     required this.reward,
     required this.tileState,
     required this.isDay7,
+    this.width = 64,
+    this.height = 80,
   });
 
   @override
@@ -24,8 +28,8 @@ class DailyRewardDayTile extends StatelessWidget {
     final isClaimed = tileState == DayTileState.claimed;
 
     return Container(
-      width: 64,
-      height: 80,
+      width: width,
+      height: height,
       margin: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: Colors.white12,
@@ -58,14 +62,14 @@ class DailyRewardDayTile extends StatelessWidget {
               children: [
                 Text(
                   'Dia $day',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
-                    fontSize: 11,
+                    fontSize: (width * 0.17).clamp(11, 16),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 4),
-                _RewardIcons(reward: reward),
+                _RewardIcons(reward: reward, iconSize: (width * 0.28).clamp(18, 28)),
               ],
             ),
             if (isClaimed)
@@ -88,19 +92,20 @@ class DailyRewardDayTile extends StatelessWidget {
 
 class _RewardIcons extends StatelessWidget {
   final DailyReward reward;
-  const _RewardIcons({required this.reward});
+  final double iconSize;
+  const _RewardIcons({required this.reward, this.iconSize = 18});
 
   @override
   Widget build(BuildContext context) {
     final items = <Widget>[];
     if (reward.undo1 > 0) {
-      items.add(_icon('assets/icons/inventory/undo_1.png', reward.undo1));
+      items.add(_icon('assets/icons/inventory/undo_1.png', reward.undo1, iconSize));
     }
     if (reward.bomb2 > 0) {
-      items.add(_icon('assets/icons/inventory/bomb_2.png', reward.bomb2));
+      items.add(_icon('assets/icons/inventory/bomb_2.png', reward.bomb2, iconSize));
     }
     if (reward.lives > 0) {
-      items.add(_liveIcon(reward.lives));
+      items.add(_liveIcon(reward.lives, iconSize));
     }
     return Wrap(
       spacing: 2,
@@ -108,21 +113,21 @@ class _RewardIcons extends StatelessWidget {
     );
   }
 
-  Widget _icon(String asset, int count) => Row(
+  Widget _icon(String asset, int count, double size) => Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Image.asset(asset, width: 18, height: 18),
+          Image.asset(asset, width: size, height: size),
           if (count > 1)
-            Text('×$count', style: const TextStyle(color: Colors.white, fontSize: 10)),
+            Text('×$count', style: TextStyle(color: Colors.white, fontSize: size * 0.55)),
         ],
       );
 
-  Widget _liveIcon(int count) => Row(
+  Widget _liveIcon(int count, double size) => Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.favorite, color: Colors.redAccent, size: 18),
+          Icon(Icons.favorite, color: Colors.redAccent, size: size),
           if (count > 1)
-            Text('×$count', style: const TextStyle(color: Colors.white, fontSize: 10)),
+            Text('×$count', style: TextStyle(color: Colors.white, fontSize: size * 0.55)),
         ],
       );
 }
