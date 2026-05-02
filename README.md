@@ -109,7 +109,10 @@ assets/
 - **Fase 2** — Identidade visual, HomeScreen, vidas, fundo dinâmico ✅ *(v0.3.5)*
   - 2.3.5 — Refinamento: vidas no game over, cores explícitas, transição sem flicker, OutlinedText, pause dinâmico ✅
   - 2.3.6 — Polimento UX + Inventário: Stack layout, frosted-glass PauseOverlay, Bomb 2/3, Undo 1/3, GameOverModal ✅ *(v0.3.6)*
-- **Fase 3** — Arte final: ilustrações dos 11 animais *(em andamento)*
+  - 2.5 — Rebranding "Olha o Bichim!", GameTitleImage, ícone e launcher name ✅ *(v0.9.1)*
+  - 2.6 — Home redesenhada, Coleção, Configurações, stubs de navegação ✅ *(v0.9.2)*
+- **Fase 2.7** — Loja mock 🔜
+- **Fase 3** — Arte final: ilustrações dos 11 animais
 - **Fase 4** — Áudio: sons e música
 - **Fase 5** — Coleção e Desafio Diário
 - **Fase 6** — Polimento e lançamento (iOS / Android / Web)

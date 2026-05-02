@@ -7,6 +7,18 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.9.2] — 2026-05-01
+
+### Added
+- Home redesenhada: grid 2×3 de cards (Loja, Ranking, Recompensa Diária, Coleção, Configurações, Como Jogar)
+- Animação de entrada do logo (`flutter_animate` fade + scale 400ms)
+- `CollectionScreen`: grid 2 colunas, 11 animais, cards desbloqueados/bloqueados, bottom sheet detalhado
+- `SettingsScreen`: toggle haptic (persistente), seleção de idioma (placeholder), sliders de áudio desabilitados, versão do app, "Olha o Bichim! © Catraia Aplicativos"
+- Stubs navegáveis: `ShopScreen`, `InviteFriendsScreen`, `RedeemCodeScreen`
+- `SettingsNotifier` com `SharedPreferences`; `maybeHaptic()` utilitário
+- `funFact` e `scientificName` preenchidos para todos os 11 animais
+- `package_info_plus` adicionado às dependências
+
 ## [0.9.1] — 2026-05-01
 
 ### Fase 2.5 — Identidade "Olha o Bichim!"
