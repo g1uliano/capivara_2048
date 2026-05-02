@@ -46,7 +46,9 @@ class GameNotifier extends StateNotifier<GameState> {
     final justLost = !before.isGameOver && after.isGameOver && !after.hasWon;
     state = justLost
         ? after.copyWith(isAwaitingGameOverResolution: true)
-        : after;
+        : after.isGameOver
+            ? after
+            : after.copyWith(isContinuingWithItem: false);
     if (boardChanged) {
       if (!_timerStarted) {
         _timerStarted = true;
@@ -101,6 +103,20 @@ class GameNotifier extends StateNotifier<GameState> {
     state = state.copyWith(isAwaitingGameOverResolution: value);
   }
 
+  void startContinueWithItem() {
+    state = state.copyWith(
+      isAwaitingGameOverResolution: false,
+      isContinuingWithItem: true,
+    );
+  }
+
+  void cancelContinueWithItem() {
+    state = state.copyWith(
+      isContinuingWithItem: false,
+      isAwaitingGameOverResolution: false,
+    );
+  }
+
   void enterBombMode(BombMode mode, ItemType itemType) {
     _bombSelection = [];
     _pendingBombItem = itemType;
@@ -144,9 +160,14 @@ class GameNotifier extends StateNotifier<GameState> {
   }
 
   void cancelBomb() {
+    final wasContinuing = state.isContinuingWithItem;
     _bombSelection = [];
     _pendingBombItem = null;
-    state = state.copyWith(bombMode: null, selectedBombTiles: const []);
+    if (wasContinuing) {
+      cancelContinueWithItem();
+    } else {
+      state = state.copyWith(bombMode: null, selectedBombTiles: const []);
+    }
   }
 
   List<(int, int)> get bombSelection => List.unmodifiable(_bombSelection);

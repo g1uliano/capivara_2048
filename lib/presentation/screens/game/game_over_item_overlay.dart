@@ -48,7 +48,7 @@ class GameOverItemOverlay extends ConsumerWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () => notifier.setAwaitingResolution(false),
+                      onPressed: () => notifier.startContinueWithItem(),
                       child: const Text('Usar item'),
                     ),
                   ),

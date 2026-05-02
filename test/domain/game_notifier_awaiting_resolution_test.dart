@@ -26,4 +26,15 @@ void main() {
     final state = container.read(gameProvider);
     expect(state.isAwaitingGameOverResolution, false);
   });
+
+  test('startContinueWithItem sets isContinuingWithItem true and isAwaitingGameOverResolution false', () {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    final notifier = container.read(gameProvider.notifier);
+    notifier.setAwaitingResolution(true);
+    notifier.startContinueWithItem();
+    final s = container.read(gameProvider);
+    expect(s.isContinuingWithItem, true);
+    expect(s.isAwaitingGameOverResolution, false);
+  });
 }

@@ -17,6 +17,9 @@ class GameState {
   // True only while the game-over item overlay is shown (set on first transition
   // to game-over; never persisted so loading a saved game-over state won't re-show).
   final bool isAwaitingGameOverResolution;
+  // True when player tapped "Usar item" and is now selecting from InventoryBar.
+  // Suppresses GameOverModal while keeping the board interactive.
+  final bool isContinuingWithItem;
 
   static const _bombSentinel = Object();
 
@@ -33,6 +36,7 @@ class GameState {
     this.bombMode,
     this.selectedBombTiles = const [],
     this.isAwaitingGameOverResolution = false,
+    this.isContinuingWithItem = false,
   }) : undoStack = List.unmodifiable(undoStack ?? const []);
 
   GameState copyWith({
@@ -48,6 +52,7 @@ class GameState {
     Object? bombMode = _bombSentinel,
     List<(int, int)>? selectedBombTiles,
     bool? isAwaitingGameOverResolution,
+    bool? isContinuingWithItem,
   }) {
     return GameState(
       board: board ?? this.board,
@@ -62,6 +67,7 @@ class GameState {
       bombMode: bombMode == _bombSentinel ? this.bombMode : bombMode as BombMode?,
       selectedBombTiles: selectedBombTiles ?? this.selectedBombTiles,
       isAwaitingGameOverResolution: isAwaitingGameOverResolution ?? this.isAwaitingGameOverResolution,
+      isContinuingWithItem: isContinuingWithItem ?? this.isContinuingWithItem,
     );
   }
 }
