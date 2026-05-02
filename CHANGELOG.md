@@ -7,6 +7,12 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.9.9.3] - 2026-05-02
+
+### Fixed
+- Splash screen no Android 12+: removida animação de saída (rotação/zoom) que distorcia a imagem antes do Flutter carregar
+- confirmBomb limpa isContinuingWithItem e reseta isGameOver para desbloquear o jogo após usar bomba no fluxo game-over
+
 ## [0.9.9.1] - 2026-05-02
 
 ### Fixed
