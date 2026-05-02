@@ -42,11 +42,11 @@ class BombGridOverlay extends ConsumerWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? Colors.red.withValues(alpha: 0.65)
-                            : Colors.white.withValues(alpha: 0.60),
+                            ? Colors.red.shade400
+                            : Colors.white,
                         border: Border.all(
-                          color: isSelected ? Colors.red.shade300 : Colors.white,
-                          width: isSelected ? 3 : 2,
+                          color: isSelected ? Colors.red.shade700 : Colors.grey.shade300,
+                          width: isSelected ? 3 : 1.5,
                         ),
                         borderRadius: BorderRadius.circular(8),
                       ),

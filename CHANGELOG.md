@@ -7,6 +7,15 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.9.9] — 2026-05-02
+
+### Fixed
+- Bomba: taps na grade de seleção não respondiam — BombDimOverlay envolvia tudo com
+  IgnorePointer(ignoring: false), bloqueando todos os eventos antes de chegarem ao grid.
+  Dim e label agora são IgnorePointer; apenas o botão Cancelar absorve eventos.
+- Bomba: células da grade agora são branco opaco (100%) nas não selecionadas e
+  vermelho sólido nas selecionadas, eliminando o problema de visibilidade.
+
 ## [0.9.8] — 2026-05-02
 
 ### Fixed
