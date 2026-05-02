@@ -7,6 +7,13 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.9.7] — 2026-05-02
+
+### Fixed
+- Bomba: células da grade de seleção estavam transparentes, impossível ver sobre os tiles.
+  Adicionado fundo branco semi-transparente (25%) e borda branca mais visível nas células
+  não selecionadas; selecionadas ficam vermelho 55%.
+
 ## [0.9.6] — 2026-05-02
 
 ### Fixed
