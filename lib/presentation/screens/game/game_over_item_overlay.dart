@@ -117,9 +117,7 @@ class _GameOverItemOverlayState extends ConsumerState<GameOverItemOverlay>
                     key: ValueKey(safeIndex),
                     onPlay: (c) => c.repeat(reverse: true),
                   )
-                  .fadeIn(duration: 400.ms, curve: Curves.easeInOut)
-                  .then()
-                  .fadeOut(duration: 400.ms, curve: Curves.easeInOut),
+                  .fade(begin: 1.0, end: 0.4, duration: 400.ms, curve: Curves.easeInOut),
               const SizedBox(height: 12),
               Text(
                 _nameFor(item),
