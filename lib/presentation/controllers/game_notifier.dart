@@ -42,7 +42,11 @@ class GameNotifier extends StateNotifier<GameState> {
         after.isGameOver != before.isGameOver ||
         after.hasWon != before.hasWon ||
         _boardDiffers(before.board, after.board);
-    state = after;
+    // Set isAwaitingGameOverResolution only on first transition to game-over
+    final justLost = !before.isGameOver && after.isGameOver && !after.hasWon;
+    state = justLost
+        ? after.copyWith(isAwaitingGameOverResolution: true)
+        : after;
     if (boardChanged) {
       if (!_timerStarted) {
         _timerStarted = true;
@@ -91,6 +95,10 @@ class GameNotifier extends StateNotifier<GameState> {
       elapsedMs: 0,
       isPaused: false,
     );
+  }
+
+  void setAwaitingResolution(bool value) {
+    state = state.copyWith(isAwaitingGameOverResolution: value);
   }
 
   void enterBombMode(BombMode mode, ItemType itemType) {
