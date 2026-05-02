@@ -38,7 +38,6 @@ class ShareCode {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is ShareCode &&
-          runtimeType == other.runtimeType &&
           code == other.code &&
           packageId == other.packageId &&
           giftContents == other.giftContents &&
