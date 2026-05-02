@@ -6,6 +6,7 @@ import 'package:capivara_2048/data/models/game_state.dart';
 import 'package:capivara_2048/domain/game_engine/game_engine.dart';
 import 'package:capivara_2048/presentation/controllers/game_notifier.dart';
 import 'package:capivara_2048/presentation/screens/collection_screen.dart';
+import 'package:capivara_2048/presentation/widgets/outlined_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -97,6 +98,19 @@ void main() {
     await tester.tap(find.text('???').first);
     await tester.pumpAndSettle();
     expect(find.text('Atta laevigata'), findsNothing);
+  });
+
+  testWidgets('contador usa OutlinedText (legível sobre fundo dinâmico)', (tester) async {
+    await tester.pumpWidget(_wrapWithMaxLevel(3));
+    await tester.pump();
+    expect(find.byType(OutlinedText), findsWidgets);
+    expect(
+      find.descendant(
+        of: find.byType(OutlinedText),
+        matching: find.textContaining('animais descobertos'),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('LinearProgressIndicator.value correto para maxLevel=5', (tester) async {

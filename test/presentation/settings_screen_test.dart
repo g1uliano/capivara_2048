@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:capivara_2048/presentation/screens/settings_screen.dart';
 import 'package:capivara_2048/presentation/controllers/settings_notifier.dart';
+import 'package:capivara_2048/presentation/widgets/outlined_text.dart';
 
 Widget _wrap(SettingsNotifier notifier) {
   return ProviderScope(
@@ -70,5 +71,30 @@ void main() {
     await tester.pump();
 
     expect(find.textContaining('Fase 5'), findsOneWidget);
+  });
+
+  testWidgets('títulos de seção usam OutlinedText', (tester) async {
+    final prefs = await SharedPreferences.getInstance();
+    final notifier = SettingsNotifier(prefs);
+    await tester.pumpWidget(_wrap(notifier));
+    await tester.pump();
+
+    expect(find.byType(OutlinedText), findsWidgets);
+    expect(
+      find.descendant(
+        of: find.byType(OutlinedText),
+        matching: find.text('Geral'),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('controles estão dentro de Cards brancos semi-opacos', (tester) async {
+    final prefs = await SharedPreferences.getInstance();
+    final notifier = SettingsNotifier(prefs);
+    await tester.pumpWidget(_wrap(notifier));
+    await tester.pump();
+
+    expect(find.byType(Card), findsWidgets);
   });
 }

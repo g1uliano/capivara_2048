@@ -6,6 +6,7 @@ import '../../data/animals_data.dart';
 import '../../data/models/animal.dart';
 import '../controllers/game_notifier.dart';
 import '../widgets/game_background.dart';
+import '../widgets/outlined_text.dart';
 
 class CollectionScreen extends ConsumerWidget {
   const CollectionScreen({super.key});
@@ -32,10 +33,9 @@ class CollectionScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '$highest/11 animais descobertos',
-                      style: GoogleFonts.fredoka(
-                          fontSize: 16, color: AppColors.primary),
+                    OutlinedText(
+                      text: '$highest/11 animais descobertos',
+                      style: GoogleFonts.fredoka(fontSize: 16),
                     ),
                     const SizedBox(height: 4),
                     LinearProgressIndicator(
