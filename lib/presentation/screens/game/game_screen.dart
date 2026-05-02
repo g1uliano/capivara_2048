@@ -37,11 +37,11 @@ class GameScreen extends ConsumerWidget {
           child: LayoutBuilder(
             builder: (context, constraints) {
               const headerH = 72.0;
-              const inventoryH = 80.0;
+              const inventoryH = 80.0; // inventoryIconSize (72) + SizedBox bottom (8)
               const verticalPad = 8.0;
               final boardSide = min(
                 constraints.maxWidth - 24,
-                constraints.maxHeight - headerH - inventoryH - verticalPad,
+                constraints.maxHeight - headerH - inventoryH - verticalPad - GameConstants.boardToInventorySpacing,
               );
               return Stack(
                 children: [
