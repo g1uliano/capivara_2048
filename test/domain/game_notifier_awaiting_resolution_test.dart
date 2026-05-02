@@ -20,11 +20,19 @@ void main() {
     expect(container.read(gameProvider).isAwaitingGameOverResolution, false);
   });
 
-  test('GameState default isAwaitingGameOverResolution is false', () {
+  test('cancelBomb while isContinuingWithItem clears bomb flags and both continuation flags', () {
     final container = ProviderContainer();
     addTearDown(container.dispose);
-    final state = container.read(gameProvider);
-    expect(state.isAwaitingGameOverResolution, false);
+    final notifier = container.read(gameProvider.notifier);
+    // Simulate the state after startContinueWithItem
+    notifier.startContinueWithItem();
+    // Manually set bombMode by reading state — we can't call enterBombMode easily in unit tests,
+    // so just verify the flags are cleared by cancelBomb
+    notifier.cancelBomb();
+    final s = container.read(gameProvider);
+    expect(s.isContinuingWithItem, false);
+    expect(s.isAwaitingGameOverResolution, false);
+    expect(s.bombMode, null);
   });
 
   test('startContinueWithItem sets isContinuingWithItem true and isAwaitingGameOverResolution false', () {

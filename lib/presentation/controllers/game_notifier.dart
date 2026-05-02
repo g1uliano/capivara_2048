@@ -164,7 +164,12 @@ class GameNotifier extends StateNotifier<GameState> {
     _bombSelection = [];
     _pendingBombItem = null;
     if (wasContinuing) {
-      cancelContinueWithItem();
+      state = state.copyWith(
+        bombMode: null,
+        selectedBombTiles: const [],
+        isContinuingWithItem: false,
+        isAwaitingGameOverResolution: false,
+      );
     } else {
       state = state.copyWith(bombMode: null, selectedBombTiles: const []);
     }
