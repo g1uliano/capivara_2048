@@ -54,7 +54,13 @@ class LivesNotifier extends StateNotifier<LivesState> {
 
   static LivesState applyConsume(LivesState state) {
     if (state.lives <= 0) return state;
-    return state.copyWith(lives: state.lives - 1);
+    // If at or above regenCap, reset lastRegenAt so the 30-min countdown
+    // starts from now instead of from a stale timestamp.
+    final wasAtCap = state.lives >= state.regenCap;
+    return state.copyWith(
+      lives: state.lives - 1,
+      lastRegenAt: wasAtCap ? DateTime.now() : state.lastRegenAt,
+    );
   }
 
   static LivesState applyAddEarned(LivesState state, int amount) {

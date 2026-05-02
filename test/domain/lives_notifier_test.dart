@@ -189,6 +189,26 @@ void main() {
     });
   });
 
+  group('consume resets lastRegenAt when coming from cap', () {
+    test('consumir vida com lastRegenAt velho não deve ganhar vida imediatamente', () {
+      // Simula: jogador estava em cap (5 vidas) com lastRegenAt de 2 horas atrás.
+      // lastRegenAt fica desatualizado enquanto em cap (calcRegen retorna cedo).
+      final twoHoursAgo = DateTime.now().subtract(const Duration(hours: 2));
+      final atCap = _state(lives: 5, regenCap: 5, lastRegenAt: twoHoursAgo);
+
+      // Perde 1 vida
+      final afterConsume = LivesNotifier.applyConsume(atCap);
+      expect(afterConsume.lives, 4);
+
+      // Regen 1 segundo depois NÃO deve ganhar vida — tem que esperar 30 min
+      final oneSecondLater = DateTime.now().add(const Duration(seconds: 1));
+      final afterRegen = LivesNotifier.calcRegen(state: afterConsume, now: oneSecondLater);
+      expect(afterRegen.lives, 4,
+          reason: 'lastRegenAt deve ser resetado ao consumir vida em cap, '
+              'senão a regen acontece instantaneamente');
+    });
+  });
+
   group('regenCap / earnedCap rules', () {
     test('regen stops at regenCap, not earnedCap', () {
       final last = DateTime.now().subtract(const Duration(minutes: 120));

@@ -7,6 +7,11 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.9.9.5] - 2026-05-02
+
+### Fixed
+- Regen de vida não reseta mais imediatamente quando perdida no cap: `applyConsume` agora reseta `lastRegenAt` para `DateTime.now()` quando `lives >= regenCap`, garantindo que o countdown de 30 minutos comece do zero
+
 ## [0.9.9.4] - 2026-05-02
 
 ### Fixed
