@@ -7,6 +7,13 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.9.6] — 2026-05-02
+
+### Fixed
+- Bomba: grade de seleção desalinhada com o tabuleiro — reescrita da arquitetura do overlay.
+  A grade (`BombGridOverlay`) agora vive dentro do Stack que envolve exatamente o BoardWidget,
+  eliminando qualquer cálculo de altura de header. `BombDimOverlay` cuida apenas do dim/label/cancelar.
+
 ## [0.9.5] — 2026-05-02
 
 ### Fixed

@@ -8,6 +8,7 @@ import '../../../domain/lives/lives_notifier.dart';
 import '../../controllers/game_notifier.dart';
 import '../../widgets/board_widget.dart';
 import '../../widgets/bomb_selection_overlay.dart';
+import '../../widgets/bomb_grid_overlay.dart';
 import '../../widgets/game_background.dart';
 import '../../widgets/game_header.dart';
 import '../../widgets/game_over_modal.dart';
@@ -54,30 +55,40 @@ class GameScreen extends ConsumerWidget {
                         ),
                         Expanded(
                           child: Center(
-                            child: GestureDetector(
-                              behavior: HitTestBehavior.opaque,
-                              onPanEnd: (details) {
-                                if (state.isPaused ||
-                                    isGameOver ||
-                                    hasWon ||
-                                    state.bombMode != null) return;
-                                final v = details.velocity.pixelsPerSecond;
-                                const threshold = 100.0;
-                                if (v.dx.abs() > v.dy.abs()) {
-                                  if (v.dx > threshold) {
-                                    notifier.onSwipe(Direction.right);
-                                  } else if (v.dx < -threshold) {
-                                    notifier.onSwipe(Direction.left);
-                                  }
-                                } else {
-                                  if (v.dy > threshold) {
-                                    notifier.onSwipe(Direction.down);
-                                  } else if (v.dy < -threshold) {
-                                    notifier.onSwipe(Direction.up);
-                                  }
-                                }
-                              },
-                              child: RepaintBoundary(child: BoardWidget(size: boardSide)),
+                            child: SizedBox(
+                              width: boardSide,
+                              height: boardSide,
+                              child: Stack(
+                                children: [
+                                  GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    onPanEnd: (details) {
+                                      if (state.isPaused ||
+                                          isGameOver ||
+                                          hasWon ||
+                                          state.bombMode != null) { return; }
+                                      final v = details.velocity.pixelsPerSecond;
+                                      const threshold = 100.0;
+                                      if (v.dx.abs() > v.dy.abs()) {
+                                        if (v.dx > threshold) {
+                                          notifier.onSwipe(Direction.right);
+                                        } else if (v.dx < -threshold) {
+                                          notifier.onSwipe(Direction.left);
+                                        }
+                                      } else {
+                                        if (v.dy > threshold) {
+                                          notifier.onSwipe(Direction.down);
+                                        } else if (v.dy < -threshold) {
+                                          notifier.onSwipe(Direction.up);
+                                        }
+                                      }
+                                    },
+                                    child: RepaintBoundary(child: BoardWidget(size: boardSide)),
+                                  ),
+                                  if (state.bombMode != null)
+                                    const Positioned.fill(child: BombGridOverlay()),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -88,7 +99,7 @@ class GameScreen extends ConsumerWidget {
                   ),
               if (state.isPaused) const Positioned.fill(child: PauseOverlay()),
               if (state.bombMode != null)
-                const Positioned.fill(child: BombSelectionOverlay()),
+                const Positioned.fill(child: BombDimOverlay()),
               if (isGameOver)
                 const Positioned.fill(
                     child: GameOverModal(message: 'Game Over!')),
