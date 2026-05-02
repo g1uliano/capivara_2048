@@ -6,4 +6,7 @@ class GameConstants {
   static const int maxLevel = 11;
   static const double newTileLevel2Probability = 0.1;
   static const double twoCellWidth = tileSize * 2 + tileSpacing;
+
+  static const double inventoryIconSize = 72.0;
+  static const double boardToInventorySpacing = 4.0;
 }

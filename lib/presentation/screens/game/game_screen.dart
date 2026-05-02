@@ -13,6 +13,7 @@ import '../../widgets/game_background.dart';
 import '../../widgets/game_header.dart';
 import '../../widgets/game_over_modal.dart';
 import '../../widgets/inventory_bar.dart';
+import '../../../core/constants/game_constants.dart';
 import '../../widgets/pause_overlay.dart';
 
 class GameScreen extends ConsumerWidget {
@@ -36,7 +37,7 @@ class GameScreen extends ConsumerWidget {
           child: LayoutBuilder(
             builder: (context, constraints) {
               const headerH = 72.0;
-              const inventoryH = 64.0;
+              const inventoryH = 80.0;
               const verticalPad = 8.0;
               final boardSide = min(
                 constraints.maxWidth - 24,
@@ -92,6 +93,7 @@ class GameScreen extends ConsumerWidget {
                             ),
                           ),
                         ),
+                        const SizedBox(height: GameConstants.boardToInventorySpacing),
                         const InventoryBar(),
                         const SizedBox(height: 8),
                       ],

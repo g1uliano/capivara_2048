@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/constants/game_constants.dart';
 
 class InventoryItemButton extends StatelessWidget {
   final String label;
@@ -37,8 +38,8 @@ class InventoryItemButton extends StatelessWidget {
       message: '$count $label',
       triggerMode: TooltipTriggerMode.longPress,
       child: SizedBox(
-        width: 56,
-        height: 56,
+        width: GameConstants.inventoryIconSize,
+        height: GameConstants.inventoryIconSize,
         child: Stack(
           clipBehavior: Clip.none,
           children: [
@@ -56,8 +57,8 @@ class InventoryItemButton extends StatelessWidget {
                       onTap: onPressed,
                       child: Image.asset(
                         pngPath!,
-                        width: 56,
-                        height: 56,
+                        width: GameConstants.inventoryIconSize,
+                        height: GameConstants.inventoryIconSize,
                         fit: BoxFit.contain,
                         errorBuilder: (_, __, ___) => _fallbackButton(),
                       ),
