@@ -7,6 +7,14 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.9.3] — 2026-05-02
+
+### Fixed
+- Tabuleiro 4×4 cortado em telas pequenas (360×640) — `LayoutBuilder` no `GameScreen`
+- Badge de Recompensa Diária desalinhava o grid da Home — `SizedBox.expand` + badge "!"
+- Textos ilegíveis sobre fundo dinâmico (`CollectionScreen`, `SettingsScreen`) — `OutlinedText`
+- Controles de `SettingsScreen` ilegíveis — cards brancos semi-opacos por seção
+
 ## [0.9.2] — 2026-05-01
 
 ### Added

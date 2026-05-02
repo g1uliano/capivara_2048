@@ -2,11 +2,13 @@
 
 > Documento de especificação para desenvolvimento. Pensado para ser alimentado em ferramentas como Claude Code para implementação iterativa.
 >
-> **Status atual:** Fase 2.4 concluída ✅ (v0.9.0+22) — Recompensas Diárias (ciclo 7 dias) implementadas: `DailyRewardsState` (Hive typeId=3), engine puro `daily_rewards_engine.dart` com `computeDailyRewardStatus`/`applyClaim`/`applyStreakReset`/`rewardForDay`, `DailyRewardsNotifier` com entrega via `livesProvider`+`inventoryProvider`, `DailyRewardsScreen` (grid 7 dias, 4 estados: available/alreadyClaimed/streakBroken/cycleCompleted, countdown até meia-noite, overlay dobrar recompensa via `FakeAdService`, diálogo de cap de vidas), `DailyRewardEntryTile` com badge vermelho na `HomeScreen`, toast na primeira abertura do dia. 193 testes passando.
+> **Status atual:** Fase 2.6 concluída ✅ (v0.9.2) — Home redesenhada, Tela de Coleção, Tela de Configurações. Fases 2.4 (Recompensas Diárias) e 2.5 (Identidade "Olha o Bichim!") também concluídas.
+>
+> **Próximo:** **Fase 2.7 — Bugfixes visuais de interface** — 4 correções identificadas em uso real pós-2.6: botão de Recompensa Diária com tamanho inconsistente quando badge está visível, textos ilegíveis nos menus sobre fundo dinâmico, Bottom Overflow em telas com fundo do jogo, textos de Configurações ilegíveis sobre fundo dinâmico.
 >
 > **Renomeação do jogo:** o nome do jogo passa de **"Capivara 2048"** para **"Olha o Bichim!"**. As referências antigas em seções abaixo serão atualizadas progressivamente; durante a transição, considere "Olha o Bichim!" o nome canônico do produto. O *codename* interno do repositório (`capivara_2048`) permanece — apenas o nome de exibição muda.
 >
-> **Próximo:** **Fase 2.5 — Identidade do Jogo (rebranding "Olha o Bichim!" + título na Home + ícone do app + nome no launcher)**. As fases seguintes foram renumeradas: Tela Home + Coleção + Configurações → Fase 2.6; Loja mock → Fase 2.7. (Áudio segue em **Fase 5**, junto da arte adicional e antes do lançamento; o jogo é desenvolvido sem áudio até lá.)
+> **Áudio:** segue em **Fase 5**, junto da arte adicional e antes do lançamento; o jogo é desenvolvido sem áudio até lá.
 
 ---
 
@@ -42,22 +44,22 @@
 **Flutter 3.x** (Dart) — multiplataforma único para iOS, Android, Web e Desktop.
 
 ### 2.2 Bibliotecas recomendadas
-| Categoria        | Biblioteca                                               | Uso                         |
-| ---------------- | -------------------------------------------------------- | --------------------------- |
-| Estado           | `flutter_riverpod`                                       | Gerenciamento de estado     |
-| ID               | `uuid`                                                   | IDs dos tiles para animação |
-| Animações        | `flutter_animate`                                        | Transições suaves           |
-| Áudio            | `audioplayers` ou `just_audio`                           | Sons e música (Fase 5)      |
-| Persistência     | `hive` + `shared_preferences`                            | Local                       |
-| Tipografia       | `google_fonts`                                           | Fredoka, Nunito             |
-| Imagens          | `Image.asset` (Flutter nativo)                           | PNGs dos animais e ícones   |
-| Haptic           | `flutter` nativo (HapticFeedback)                        | Vibração                    |
-| Localização      | `flutter_localizations` + `intl`                         | PT-BR / EN                  |
-| Backend          | `firebase_core` + `cloud_firestore` + `firebase_auth`    | Ranking, contas             |
-| Anúncios         | `google_mobile_ads`                                      | Recompensados de 30s        |
-| Compras          | `in_app_purchase`                                        | Loja                        |
-| Compartilhamento | `share_plus` + `app_links`                               | Códigos de resgate          |
-| Blur (UI)        | `flutter` nativo (`BackdropFilter` + `ImageFilter.blur`) | Efeito vidro fosco          |
+| Categoria | Biblioteca | Uso |
+|---|---|---|
+| Estado | `flutter_riverpod` | Gerenciamento de estado |
+| ID | `uuid` | IDs dos tiles para animação |
+| Animações | `flutter_animate` | Transições suaves |
+| Áudio | `audioplayers` ou `just_audio` | Sons e música (Fase 5) |
+| Persistência | `hive` + `shared_preferences` | Local |
+| Tipografia | `google_fonts` | Fredoka, Nunito |
+| Imagens | `Image.asset` (Flutter nativo) | PNGs dos animais e ícones |
+| Haptic | `flutter` nativo (HapticFeedback) | Vibração |
+| Localização | `flutter_localizations` + `intl` | PT-BR / EN |
+| Backend | `firebase_core` + `cloud_firestore` + `firebase_auth` | Ranking, contas |
+| Anúncios | `google_mobile_ads` | Recompensados de 30s |
+| Compras | `in_app_purchase` | Loja |
+| Compartilhamento | `share_plus` + `app_links` | Códigos de resgate |
+| Blur (UI) | `flutter` nativo (`BackdropFilter` + `ImageFilter.blur`) | Efeito vidro fosco |
 
 ### 2.3 Estrutura de pastas
 ```
@@ -87,10 +89,10 @@ lib/
 │   │   ├── debug/          ✅ (galeria de animais)
 │   │   ├── shop/
 │   │   ├── ranking/
-│   │   ├── collection/
-│   │   ├── daily_rewards/
+│   │   ├── collection/     ✅ (Fase 2.6)
+│   │   ├── daily_rewards/  ✅ (Fase 2.4)
 │   │   ├── invite_friends/
-│   │   ├── settings/
+│   │   ├── settings/       ✅ (Fase 2.6)
 │   │   └── tutorial/
 │   ├── widgets/
 │   │   ├── board_widget.dart            ✅
@@ -101,6 +103,7 @@ lib/
 │   │   ├── host_banner.dart             ✅
 │   │   ├── host_artwork.dart            ✅
 │   │   ├── game_background.dart         ✅
+│   │   ├── game_title_image.dart        ✅ (Fase 2.5)
 │   │   ├── lives_indicator.dart         ✅ (centralizado na 2.3.12)
 │   │   ├── lives_status_banner.dart     ✅
 │   │   ├── pause_button_tile.dart       ✅
@@ -116,6 +119,9 @@ lib/
 assets/
 ├── images/
 │   ├── fundo.png                     ✅
+│   ├── title/title_orange.png        ✅ (Fase 2.5)
+│   ├── title/title_brown.png         ✅ (Fase 2.5)
+│   ├── icon/app_icon.png             ✅ (Fase 2.5)
 │   ├── animals/tile/                 ← 11 PNGs ✅
 │   └── animals/host/                 ← 11 PNGs ✅
 ├── icons/inventory/                  ← 4 PNGs finais ✅
@@ -159,14 +165,14 @@ assets/
 ### 3.4 Regra crítica: quando uma vida é consumida
 **A vida é consumida APENAS no momento do Game Over.**
 
-| Ação                             | Consome vida?     |
-| -------------------------------- | ----------------- |
-| Iniciar nova partida             | ❌ Não             |
-| Sair pro menu durante partida    | ❌ Não             |
-| Continuar partida salva          | ❌ Não             |
-| Reiniciar partida em andamento   | ❌ Não             |
+| Ação | Consome vida? |
+|---|---|
+| Iniciar nova partida | ❌ Não |
+| Sair pro menu durante partida | ❌ Não |
+| Continuar partida salva | ❌ Não |
+| Reiniciar partida em andamento | ❌ Não |
 | **Tabuleiro tranca (Game Over)** | ✅ **Sim, 1 vida** |
-| Atingir 2048 (vitória)           | ❌ Não             |
+| Atingir 2048 (vitória) | ❌ Não |
 
 > **Limite pra iniciar:** ≥1 vida disponível.
 
@@ -174,19 +180,19 @@ assets/
 
 ## 4. Os Animais (Tiles)
 
-| Nível | Valor | Animal                  | Justificativa                                 | Cor (contorno) | PNG tile             | PNG host             |
-| ----- | ----- | ----------------------- | --------------------------------------------- | -------------- | -------------------- | -------------------- |
-| 1     | 2     | **Tanajura**            | A famosa rainha alada que anuncia as chuvas   | `#C0392B`      | `tile/Tanajura.png`  | `host/Tanajura.png`  |
-| 2     | 4     | **Lobo-guará**          | Ícone do cerrado, estrela da nota de R$ 200   | `#E67E22`      | `tile/LoboGuara.png` | `host/LoboGuara.png` |
-| 3     | 8     | **Sapo-cururu**         | Guardião noturno, figura clássica do folclore | `#8D6E63`      | `tile/Cururu.png`    | `host/Cururu.png`    |
-| 4     | 16    | **Tucano**              | Embaixador visual das matas brasileiras       | `#FFB300`      | `tile/Tucano.png`    | `host/Tucano.png`    |
-| 5     | 32    | **Sagui**               | Pequeno primata curioso, ágil e expressivo    | `#A0826D`      | `tile/Sagui.png`     | `host/Sagui.png`     |
-| 6     | 64    | **Preguiça**            | Mestre zen da copa das árvores                | `#BCAAA4`      | `tile/Preguica.png`  | `host/Preguica.png`  |
-| 7     | 128   | **Mico-leão-dourado**   | Ícone absoluto da conservação brasileira      | `#FF8F00`      | `tile/MicoLeao.png`  | `host/MicoLeao.png`  |
-| 8     | 256   | **Boto-cor-de-rosa**    | Misticismo dos rios, paleta única             | `#F48FB1`      | `tile/Boto.png`      | `host/Boto.png`      |
-| 9     | 512   | **Onça-pintada**        | Predador alfa supremo                         | `#FBC02D`      | `tile/Onca.png`      | `host/Onca.png`      |
-| 10    | 1024  | **Sucuri**              | Gigante das águas profundas                   | `#2E7D32`      | `tile/Sucuri.png`    | `host/Sucuri.png`    |
-| 11    | 2048  | **🏆 Capivara Lendária** | "Diplomata da natureza" — fofura suprema      | `#FFD54F`      | `tile/Capivara.png`  | `host/Capivara.png`  |
+| Nível | Valor | Animal | Justificativa | Cor (contorno) | PNG tile | PNG host |
+|---|---|---|---|---|---|---|
+| 1 | 2 | **Tanajura** | A famosa rainha alada que anuncia as chuvas | `#C0392B` | `tile/Tanajura.png` | `host/Tanajura.png` |
+| 2 | 4 | **Lobo-guará** | Ícone do cerrado, estrela da nota de R$ 200 | `#E67E22` | `tile/LoboGuara.png` | `host/LoboGuara.png` |
+| 3 | 8 | **Sapo-cururu** | Guardião noturno, figura clássica do folclore | `#8D6E63` | `tile/Cururu.png` | `host/Cururu.png` |
+| 4 | 16 | **Tucano** | Embaixador visual das matas brasileiras | `#FFB300` | `tile/Tucano.png` | `host/Tucano.png` |
+| 5 | 32 | **Sagui** | Pequeno primata curioso, ágil e expressivo | `#A0826D` | `tile/Sagui.png` | `host/Sagui.png` |
+| 6 | 64 | **Preguiça** | Mestre zen da copa das árvores | `#BCAAA4` | `tile/Preguica.png` | `host/Preguica.png` |
+| 7 | 128 | **Mico-leão-dourado** | Ícone absoluto da conservação brasileira | `#FF8F00` | `tile/MicoLeao.png` | `host/MicoLeao.png` |
+| 8 | 256 | **Boto-cor-de-rosa** | Misticismo dos rios, paleta única | `#F48FB1` | `tile/Boto.png` | `host/Boto.png` |
+| 9 | 512 | **Onça-pintada** | Predador alfa supremo | `#FBC02D` | `tile/Onca.png` | `host/Onca.png` |
+| 10 | 1024 | **Sucuri** | Gigante das águas profundas | `#2E7D32` | `tile/Sucuri.png` | `host/Sucuri.png` |
+| 11 | 2048 | **🏆 Capivara Lendária** | "Diplomata da natureza" — fofura suprema | `#FFD54F` | `tile/Capivara.png` | `host/Capivara.png` |
 
 > Caminhos relativos a `assets/images/animals/`. Nível 5 = Sagui (substituiu Arara-azul na Fase 2.3.7).
 
@@ -218,6 +224,7 @@ assets/
 ### 4.4 Texto sobre cor — legibilidade
 - Textos brancos importantes têm contorno preto sutil (1–1.5px) com anti-aliasing suave (Fase 2.3.6 item A)
 - Aplicado em: nome do anfitrião, cronômetro, pontuação, recorde, todos os textos do `PauseOverlay`
+- **Regra geral (a partir da Fase 2.7):** qualquer texto exibido diretamente sobre o `fundo.png` (sem container branco por trás) deve usar `OutlinedText` — texto branco com contorno preto, 8 sombras radiais blur 0.8–1.0. Textos interativos (controles de configurações) ficam dentro de cards com `Colors.white.withOpacity(0.88)` e `borderRadius: 12`.
 
 ### 4.5 Indicador de vidas (Fase 2.3.9; Fase 2.3.12 — centralizado)
 - **Posição:** topo da tela, **horizontalmente centralizado** (a partir da Fase 2.3.12)
@@ -238,22 +245,22 @@ assets/
 - **Mínimo pra jogar:** 1 vida disponível
 
 ### 5.2 Resumo visual (caps de armazenamento)
-| Origem                                           | Cap de armazenamento |
-| ------------------------------------------------ | -------------------- |
-| Iniciais (instalação)                            | 5                    |
-| Regeneração automática                           | até 5 (não excede)   |
-| Recompensas (diárias, ranking, recorde, convite) | até 15               |
-| **Compras (loja)**                               | **ilimitado**        |
+| Origem | Cap de armazenamento |
+|---|---|
+| Iniciais (instalação) | 5 |
+| Regeneração automática | até 5 (não excede) |
+| Recompensas (diárias, ranking, recorde, convite) | até 15 |
+| **Compras (loja)** | **ilimitado** |
 
 > **Atenção (única limitação de inventário):** apenas vidas têm cap de armazenamento. Bombas e desfazer **não têm cap** — o jogador pode acumular quantos quiser.
 
 ### 5.3 Estados visuais da faixa do `LivesIndicator` (Fase 2.3.9)
-| Faixa                | Condição          | Cor                     |
-| -------------------- | ----------------- | ----------------------- |
-| **"Completo"**       | `current == 5`    | Verde-folha `#66BB6A`   |
-| **"Bônus"**          | `current > 5`     | Dourado `#FFD54F`       |
+| Faixa | Condição | Cor |
+|---|---|---|
+| **"Completo"** | `current == 5` | Verde-folha `#66BB6A` |
+| **"Bônus"** | `current > 5` | Dourado `#FFD54F` |
 | **"Restando MM:SS"** | `0 < current < 5` | Laranja-aviso `#FFA726` |
-| **"Sem vidas"**      | `current == 0`    | Vermelho `#EF5350`      |
+| **"Sem vidas"** | `current == 0` | Vermelho `#EF5350` |
 
 Animações: fade 300ms entre estados + scale 1→1.1→1 (200ms) em transições positivas (vida ganha).
 
@@ -278,7 +285,7 @@ class LivesState {
 ```
 
 ### 5.6 Lógica de adicionar vidas
-- **Regen automática:** soma 1 enquanto `current < regenCap`. **Implementação efetiva a partir da Fase 2.3.12** — antes disso o `nextRegenAt` era populado mas o ticker que dispara o ganho não estava em loop.
+- **Regen automática:** soma 1 enquanto `current < regenCap`. **Implementação efetiva a partir da Fase 2.3.12** — `Timer.periodic` + `AppLifecycleListener`.
 - **Recompensa:** soma N, mas resultado fica clamped em `min(current + N, earnedCap)` — se já tem 14 e ganha 5, vai pra 15 (não 19)
 - **Compra:** soma N **sem cap** — se tem 14 e compra 10, vai pra 24
 
@@ -287,12 +294,12 @@ class LivesState {
 ## 6. Itens e Power-ups
 
 ### 6.1 Tipos
-| Item           | Efeito                                           | Origem            |
-| -------------- | ------------------------------------------------ | ----------------- |
-| **Bomba 2**    | Explode 2 casas adjacentes escolhidas            | Loja, recompensas |
-| **Bomba 3**    | Explode 3 casas escolhidas (categoria separada)  | Apenas loja       |
-| **Desfazer 1** | Desfaz a última jogada                           | Loja, recompensas |
-| **Desfazer 3** | Desfaz as últimas 3 jogadas (categoria separada) | Apenas loja       |
+| Item | Efeito | Origem |
+|---|---|---|
+| **Bomba 2** | Explode 2 casas adjacentes escolhidas | Loja, recompensas |
+| **Bomba 3** | Explode 3 casas escolhidas (categoria separada) | Apenas loja |
+| **Desfazer 1** | Desfaz a última jogada | Loja, recompensas |
+| **Desfazer 3** | Desfaz as últimas 3 jogadas (categoria separada) | Apenas loja |
 
 > **Sem cap de armazenamento:** bombas e desfazer podem ser acumulados sem limite. Apenas vidas têm cap (ver 5.2).
 
@@ -360,14 +367,14 @@ class Inventory {
 ## 7. Loja de Itens
 
 ### 7.1 Pacotes
-| #   | Nome                         | Conteúdo                                      | De       | Por         | Desconto |
-| --- | ---------------------------- | --------------------------------------------- | -------- | ----------- | -------- |
-| 01  | **4× Bomba 3**               | 4 bombas que explodem 3 casas                 | R$ 7,99  | **R$ 3,99** | 50%      |
-| 02  | **4× Desfazer 3**            | 4 desfazer de 3 jogadas                       | R$ 3,99  | **R$ 1,99** | 50%      |
-| 03  | **6 vidas**                  | Direto no inventário (sem cap por ser compra) | R$ 9,99  | **R$ 2,49** | 75%      |
-| 04  | **10 vidas**                 | Direto no inventário (sem cap por ser compra) | R$ 19,99 | **R$ 4,99** | 75%      |
-| 05  | **Combo Mata Atlântica**     | 6 vidas + 2 bombas + 2 desfazer               | R$ 10,99 | **R$ 4,99** | 50%      |
-| 06  | **Combo Floresta Amazônica** | 10 vidas + 4 bombas + 4 desfazer              | R$ 31,99 | **R$ 9,99** | 50%      |
+| # | Nome | Conteúdo | De | Por | Desconto |
+|---|---|---|---|---|---|
+| 01 | **4× Bomba 3** | 4 bombas que explodem 3 casas | R$ 7,99 | **R$ 3,99** | 50% |
+| 02 | **4× Desfazer 3** | 4 desfazer de 3 jogadas | R$ 3,99 | **R$ 1,99** | 50% |
+| 03 | **6 vidas** | Direto no inventário (sem cap por ser compra) | R$ 9,99 | **R$ 2,49** | 75% |
+| 04 | **10 vidas** | Direto no inventário (sem cap por ser compra) | R$ 19,99 | **R$ 4,99** | 75% |
+| 05 | **Combo Mata Atlântica** | 6 vidas + 2 bombas + 2 desfazer | R$ 10,99 | **R$ 4,99** | 50% |
+| 06 | **Combo Floresta Amazônica** | 10 vidas + 4 bombas + 4 desfazer | R$ 31,99 | **R$ 9,99** | 50% |
 
 ### 7.2 Compartilhamento com amigos
 Toda compra gera código único; amigo recebe metade. Código vale 1× pra 1 jogador. Resgate oferece dobrar via anúncio.
@@ -384,15 +391,15 @@ shareCodes/{code}
 ## 8. Recompensas
 
 ### 8.1 Diárias (ciclo 7 dias)
-| Dia | Recompensa                           |
-| --- | ------------------------------------ |
-| 1   | 1× Desfazer 1                        |
-| 2   | 1× Bomba 2                           |
-| 3   | 1 vida                               |
-| 4   | 2× Desfazer 1                        |
-| 5   | 2× Bomba 2                           |
-| 6   | 2 vidas                              |
-| 7   | 2× Desfazer 1 + 2× Bomba 2 + 2 vidas |
+| Dia | Recompensa |
+|---|---|
+| 1 | 1× Desfazer 1 |
+| 2 | 1× Bomba 2 |
+| 3 | 1 vida |
+| 4 | 2× Desfazer 1 |
+| 5 | 2× Bomba 2 |
+| 6 | 2 vidas |
+| 7 | 2× Desfazer 1 + 2× Bomba 2 + 2 vidas |
 
 - Ao receber: oferta de **dobrar** assistindo 30s de anúncio (opcional)
 - **Streak quebrada:** se o jogador perde um dia, volta ao Dia 1
@@ -400,18 +407,18 @@ shareCodes/{code}
 - **Vidas recebidas aqui contam como "ganhas"** — entram no cap de 15
 
 ### 8.2 Ranking global (cada 7 dias)
-| Posição | Recompensa                         |
-| ------- | ---------------------------------- |
-| 1º      | 10 vidas + 10 desfazer + 10 bombas |
-| 2º      | 5 vidas + 5 desfazer + 5 bombas    |
-| 3º      | 3 vidas + 3 desfazer + 3 bombas    |
-| 4º      | 3 vidas + 3 bombas                 |
-| 5º      | 3 vidas + 3 bombas                 |
-| 6º      | 3 vidas + 3 bombas                 |
-| 7º      | 3 vidas + 3 desfazer               |
-| 8º      | 3 vidas + 3 desfazer               |
-| 9º      | 3 vidas + 3 desfazer               |
-| 10º     | 3 vidas                            |
+| Posição | Recompensa |
+|---|---|
+| 1º | 10 vidas + 10 desfazer + 10 bombas |
+| 2º | 5 vidas + 5 desfazer + 5 bombas |
+| 3º | 3 vidas + 3 desfazer + 3 bombas |
+| 4º | 3 vidas + 3 bombas |
+| 5º | 3 vidas + 3 bombas |
+| 6º | 3 vidas + 3 bombas |
+| 7º | 3 vidas + 3 desfazer |
+| 8º | 3 vidas + 3 desfazer |
+| 9º | 3 vidas + 3 desfazer |
+| 10º | 3 vidas |
 
 - Ao receber: oferta de **dobrar** via anúncio (opcional)
 - Vidas recebidas aqui contam como "ganhas" (cap de 15)
@@ -437,12 +444,12 @@ A cada amigo convidado que **criar conta E jogar pelo menos 1 partida**:
 ## 9. Ranking
 
 ### 9.1 Tipos
-| Tipo              | Métrica                                 | Persistência             |
-| ----------------- | --------------------------------------- | ------------------------ |
-| **Pessoal**       | Melhores tempos para chegar ao 2048     | Histórico vitalício      |
-| **Pessoal (alt)** | Maior número alcançado                  | Histórico vitalício      |
-| **Global**        | Melhores tempos para o 2048 entre todos | **Reseta a cada 7 dias** |
-| **Global (alt)**  | Maior número alcançado entre todos      | **Reseta a cada 7 dias** |
+| Tipo | Métrica | Persistência |
+|---|---|---|
+| **Pessoal** | Melhores tempos para chegar ao 2048 | Histórico vitalício |
+| **Pessoal (alt)** | Maior número alcançado | Histórico vitalício |
+| **Global** | Melhores tempos para o 2048 entre todos | **Reseta a cada 7 dias** |
+| **Global (alt)** | Maior número alcançado entre todos | **Reseta a cada 7 dias** |
 
 ### 9.2 Marco zero do ranking global
 - **Reset toda semana, sábado às 18:00 (horário de Brasília)**
@@ -482,25 +489,25 @@ users/{userId}/personalRecords
 - Outline opcional fino e escuro
 
 ### 10.2 Paleta principal
-| Uso                            | Cor                           | Hex       |
-| ------------------------------ | ----------------------------- | --------- |
-| **Fundo do jogo (Fase 2.3.9)** | **`assets/images/fundo.png`** | — (PNG)   |
-| Fundo (fallback se PNG falhar) | Verde-menta claro             | `#D4F1DE` |
-| Fundo (folhagem alternativa)   | Verde-floresta médio          | `#3FA968` |
-| Tabuleiro                      | Madeira clara                 | `#E8D5B7` |
-| Célula vazia                   | Madeira sombreada             | `#C9B79C` |
-| Tile preenchido                | Branco                        | `#FFFFFF` |
-| Acento (UI)                    | Laranja-tucano                | `#FF8C42` |
-| Texto principal                | Marrom escuro                 | `#3E2723` |
-| Texto sobre cor                | Branco-creme                  | `#FFF8E7` |
-| Contorno de texto              | Preto                         | `#000000` |
-| Sucesso / "Completo"           | Verde-folha                   | `#66BB6A` |
-| "Bônus" (faixa de vidas)       | Dourado                       | `#FFD54F` |
-| "Restando" (faixa de vidas)    | Laranja-aviso                 | `#FFA726` |
-| "Sem vidas" (faixa de vidas)   | Vermelho                      | `#EF5350` |
-| Alerta                         | Vermelho-açaí                 | `#C0392B` |
-| Coração de vidas               | Vermelho-coração              | `#E53935` |
-| Premium/dourado                | Dourado                       | `#FFD54F` |
+| Uso | Cor | Hex |
+|---|---|---|
+| **Fundo do jogo (Fase 2.3.9)** | **`assets/images/fundo.png`** | — (PNG) |
+| Fundo (fallback se PNG falhar) | Verde-menta claro | `#D4F1DE` |
+| Fundo (folhagem alternativa) | Verde-floresta médio | `#3FA968` |
+| Tabuleiro | Madeira clara | `#E8D5B7` |
+| Célula vazia | Madeira sombreada | `#C9B79C` |
+| Tile preenchido | Branco | `#FFFFFF` |
+| Acento (UI) | Laranja-tucano | `#FF8C42` |
+| Texto principal | Marrom escuro | `#3E2723` |
+| Texto sobre cor | Branco-creme | `#FFF8E7` |
+| Contorno de texto | Preto | `#000000` |
+| Sucesso / "Completo" | Verde-folha | `#66BB6A` |
+| "Bônus" (faixa de vidas) | Dourado | `#FFD54F` |
+| "Restando" (faixa de vidas) | Laranja-aviso | `#FFA726` |
+| "Sem vidas" (faixa de vidas) | Vermelho | `#EF5350` |
+| Alerta | Vermelho-açaí | `#C0392B` |
+| Coração de vidas | Vermelho-coração | `#E53935` |
+| Premium/dourado | Dourado | `#FFD54F` |
 
 ### 10.3 Tipografia
 - **Títulos**: `Fredoka` (arredondada, divertida)
@@ -516,26 +523,26 @@ users/{userId}/personalRecords
 - Botões grandes (≥48x48dp) com sombra inferior
 
 ### 10.5 Animações
-| Evento                                   | Animação                                                               |
-| ---------------------------------------- | ---------------------------------------------------------------------- |
-| Spawn de tile                            | Scale 0 → 1.1 → 1, bounce, 200ms                                       |
-| Movimento                                | Translate suave, easing cubicOut, 150ms                                |
-| Merge                                    | Pop (scale 1 → 1.2 → 1), 250ms                                         |
-| Merge da Capivara                        | Flash dourado, partículas de folhas, zoom out, 1500ms                  |
-| Troca de anfitrião                       | Fade + scale, 400ms                                                    |
-| Game Over                                | Tabuleiro escurece, modal slide+fade                                   |
-| Botão pressionado                        | Scale 1 → 0.95 → 1, 100ms                                              |
-| Pause overlay (entrada)                  | Fade do blur 0 → max + scale do conteúdo, 250ms                        |
-| Pause overlay (saída)                    | Reverso, 200ms                                                         |
-| Bomba explodindo                         | Onda + partículas, 500ms                                               |
-| Desfazer                                 | Reversão suave, 300ms                                                  |
-| Bomba — modo seleção (entrada)           | Pulse no tabuleiro + dim no resto, 200ms                               |
-| Bomba — célula selecionada               | Pulsa loop infinito, opacidade 0.7 ↔ 1.0, 600ms                        |
-| `LivesIndicator` — vida ganha            | Coração pulsa (scale 1 → 1.15 → 1), 300ms                              |
-| `LivesIndicator` — vida perdida          | Coração tremula (rotate ±5°), 200ms                                    |
+| Evento | Animação |
+|---|---|
+| Spawn de tile | Scale 0 → 1.1 → 1, bounce, 200ms |
+| Movimento | Translate suave, easing cubicOut, 150ms |
+| Merge | Pop (scale 1 → 1.2 → 1), 250ms |
+| Merge da Capivara | Flash dourado, partículas de folhas, zoom out, 1500ms |
+| Troca de anfitrião | Fade + scale, 400ms |
+| Game Over | Tabuleiro escurece, modal slide+fade |
+| Botão pressionado | Scale 1 → 0.95 → 1, 100ms |
+| Pause overlay (entrada) | Fade do blur 0 → max + scale do conteúdo, 250ms |
+| Pause overlay (saída) | Reverso, 200ms |
+| Bomba explodindo | Onda + partículas, 500ms |
+| Desfazer | Reversão suave, 300ms |
+| Bomba — modo seleção (entrada) | Pulse no tabuleiro + dim no resto, 200ms |
+| Bomba — célula selecionada | Pulsa loop infinito, opacidade 0.7 ↔ 1.0, 600ms |
+| `LivesIndicator` — vida ganha | Coração pulsa (scale 1 → 1.15 → 1), 300ms |
+| `LivesIndicator` — vida perdida | Coração tremula (rotate ±5°), 200ms |
 | Faixa de vidas — transição entre estados | Fade entre cores 300ms + scale 1→1.1→1 (200ms) em transições positivas |
-| `ConfirmUseDialog` (entrada)             | Fade + slide-up, 200ms                                                 |
-| Botão pause tile-sized — pressionado     | Scale 1 → 0.95 → 1, 100ms                                              |
+| `ConfirmUseDialog` (entrada) | Fade + slide-up, 200ms |
+| Botão pause tile-sized — pressionado | Scale 1 → 0.95 → 1, 100ms |
 
 ---
 
@@ -543,19 +550,19 @@ users/{userId}/personalRecords
 *(Implementação na Fase 5 — depois de toda a arte e polimento visual, antes do lançamento)*
 
 ### 11.1 Sons dos animais
-| Animal                  | Som sugerido                                  |
-| ----------------------- | --------------------------------------------- |
-| **Tanajura**            | Zumbido leve + "tlec"                         |
-| **Lobo-guará**          | Uivo curto agudo                              |
-| **Sapo-cururu**         | "Croac" grave característico                  |
-| **Tucano**              | "Tac-tac" do bico + assobio                   |
-| **Sagui**               | Trinado curto agudo (chamado típico do sagui) |
-| **Preguiça**            | Bocejo lento e fofo                           |
-| **Mico-leão-dourado**   | Guincho agudo / piado                         |
-| **Boto-cor-de-rosa**    | Sopro d'água + assobio místico                |
-| **Onça-pintada**        | Rosnado curto                                 |
-| **Sucuri**              | Chiado grave                                  |
-| **🏆 Capivara Lendária** | "Wheek" característico + fanfarra dourada     |
+| Animal | Som sugerido |
+|---|---|
+| **Tanajura** | Zumbido leve + "tlec" |
+| **Lobo-guará** | Uivo curto agudo |
+| **Sapo-cururu** | "Croac" grave característico |
+| **Tucano** | "Tac-tac" do bico + assobio |
+| **Sagui** | Trinado curto agudo (chamado típico do sagui) |
+| **Preguiça** | Bocejo lento e fofo |
+| **Mico-leão-dourado** | Guincho agudo / piado |
+| **Boto-cor-de-rosa** | Sopro d'água + assobio místico |
+| **Onça-pintada** | Rosnado curto |
+| **Sucuri** | Chiado grave |
+| **🏆 Capivara Lendária** | "Wheek" característico + fanfarra dourada |
 
 ### 11.2 Sons de UI
 - Botão clicado: pop suave
@@ -621,10 +628,10 @@ users/{userId}/personalRecords
 
 ### 12.2 Tela: Home
 - **Fundo:** mesmo `assets/images/fundo.png` da `GameScreen` (Fase 2.3.11) — `BoxFit.cover`, fallback `#D4F1DE`
-- Logo grande com a Capivara mascote ao centro
+- `GameTitleImage` alternando entre variante laranja e marrom por sessão (Fase 2.5)
 - **Indicador de vidas** centralizado no topo (coração + faixa "Completo/Bônus/Restando/Sem vidas")
 - Botão grande **"Jogar"** (Novo jogo / Continuar partida salva)
-- Cards: Loja, Ranking, Recompensa Diária (com badge), Convidar
+- Cards: Loja, Ranking, Recompensa Diária (com badge vermelho quando disponível), Convidar
 - Ícones menores: Coleção, Configurações, Como Jogar
 
 ### 12.3 Tela: Jogo (Fase 2.3.10; reordenada na 2.3.12)
@@ -670,11 +677,14 @@ users/{userId}/personalRecords
 - Lista paginada
 - Tempo até reset (se Global): contador regressivo até sábado 18h
 
-### 12.6 Tela: Recompensas Diárias
+### 12.6 Tela: Recompensas Diárias (Fase 2.4 — concluída)
 - Grid 7 dias (1–7) com recompensa de cada dia
-- Dia atual destacado, dias anteriores marcados como recebidos
+- 4 estados: available / alreadyClaimed / streakBroken / cycleCompleted
+- Countdown até meia-noite
 - Botão "Coletar" no dia atual
-- Após coletar: oferta de dobrar via anúncio
+- Após coletar: overlay "dobrar via anúncio" (`FakeAdService` em dev)
+- Diálogo de cap de vidas quando aplicável
+- `DailyRewardEntryTile` na `HomeScreen` com badge vermelho + toast na primeira sessão do dia
 
 ### 12.7 Tela: Convidar Amigos
 - Botão "Gerar link de convite" → compartilha via `share_plus`
@@ -705,7 +715,7 @@ class Animal {
   final String soundPath;
   final Color borderColor;
   final String? funFact;
-  final Color backgroundBaseColor;      // usado apenas na Coleção (fase 2.5); ignorado no jogo
+  final Color backgroundBaseColor;      // usado apenas na Coleção (fase 2.6); ignorado no jogo
 }
 ```
 
@@ -737,16 +747,16 @@ class GameState {
 ```
 
 ### 13.4 LivesState (Hive, typeId: 1)
-| Campo          | Tipo      | Descrição                                                       |
-| -------------- | --------- | --------------------------------------------------------------- |
-| current        | int       | vidas atuais (0..∞ — pode passar de 15 com compras)             |
-| regenCap       | int       | 5 (constante, regen para neste valor)                           |
-| earnedCap      | int       | 15 (cap das vidas ganhas via recompensa)                        |
-| nextRegenAt    | DateTime? | timestamp da próxima vida por regen; null se current ≥ regenCap |
-| adWatchesToday | int       | contador diário de anúncios mock (0..40)                        |
-| adCounterDate  | DateTime  | data do contador (reset à meia-noite local)                     |
-| userId         | String?   | null = local; preenchido na fase de backend                     |
-| lastSyncedAt   | DateTime? | null = nunca sincronizado                                       |
+| Campo | Tipo | Descrição |
+|---|---|---|
+| current | int | vidas atuais (0..∞ — pode passar de 15 com compras) |
+| regenCap | int | 5 (constante, regen para neste valor) |
+| earnedCap | int | 15 (cap das vidas ganhas via recompensa) |
+| nextRegenAt | DateTime? | timestamp da próxima vida por regen; null se current ≥ regenCap |
+| adWatchesToday | int | contador diário de anúncios mock (0..40) |
+| adCounterDate | DateTime | data do contador (reset à meia-noite local) |
+| userId | String? | null = local; preenchido na fase de backend |
+| lastSyncedAt | DateTime? | null = nunca sincronizado |
 
 ### 13.5 Inventory (Hive, typeId: 2)
 ```dart
@@ -821,28 +831,28 @@ class ShareCode {
 ## 14. Persistência (Hive + Firestore)
 
 ### 14.1 Hive (local)
-| Chave                     | Conteúdo                          |
-| ------------------------- | --------------------------------- |
-| `current_game`            | GameState serializado (auto-save) |
-| `lives_state`             | LivesState                        |
-| `inventory`               | Inventory                         |
-| `personal_records`        | PersonalRecords                   |
-| `daily_streak`            | int + lastClaimDate               |
-| `unlocked_animals`        | List<int> (níveis vistos)         |
-| `settings.sound_volume`   | double 0–1                        |
-| `settings.music_volume`   | double 0–1                        |
-| `settings.haptic_enabled` | bool                              |
-| `settings.locale`         | String "pt_BR" \| "en_US"         |
-| `ad_counter`              | { date, count }                   |
+| Chave | Conteúdo |
+|---|---|
+| `current_game` | GameState serializado (auto-save) |
+| `lives_state` | LivesState |
+| `inventory` | Inventory |
+| `personal_records` | PersonalRecords |
+| `daily_streak` | int + lastClaimDate |
+| `unlocked_animals` | List<int> (níveis vistos) |
+| `settings.sound_volume` | double 0–1 |
+| `settings.music_volume` | double 0–1 |
+| `settings.haptic_enabled` | bool |
+| `settings.locale` | String "pt_BR" \| "en_US" |
+| `ad_counter` | { date, count } |
 
 ### 14.2 Firestore (remoto, requer login)
-| Coleção                              | Conteúdo                     |
-| ------------------------------------ | ---------------------------- |
-| `users/{userId}`                     | PlayerProfile (sincronizado) |
-| `rankings/{weekId}/entries/{userId}` | Entrada de ranking semanal   |
-| `shareCodes/{code}`                  | Códigos de compartilhamento  |
-| `invites/{inviterId}`                | Lista de convidados e status |
-| `purchases/{userId}/{purchaseId}`    | Histórico de compras         |
+| Coleção | Conteúdo |
+|---|---|
+| `users/{userId}` | PlayerProfile (sincronizado) |
+| `rankings/{weekId}/entries/{userId}` | Entrada de ranking semanal |
+| `shareCodes/{code}` | Códigos de compartilhamento |
+| `invites/{inviterId}` | Lista de convidados e status |
+| `purchases/{userId}/{purchaseId}` | Histórico de compras |
 
 ---
 
@@ -930,13 +940,10 @@ class ShareCode {
 - D — Fundo unificado: `fundo.png` aplicado também na `HomeScreen`
 
 ### ✅ Fase 2.3.12 — Bugfixes de layout, regen e ícones do inventário (v0.8.4)
-**Quatro correções após uso real pós-2.3.11:**
-
 - **A** — `LivesIndicator` centralizado horizontalmente (`Center`) em `GameHeader` e `HomeScreen`
 - **B** — `HostBanner` flush-left no `GameHeader` (sem padding à esquerda) — simetria com `PauseButtonTile` flush-right; `Row(HostBanner, Spacer(), Column(StatusPanel+Pause))`
 - **C** — Timer de regeneração de vidas implementado: `Timer.periodic(30s)` em `LivesNotifier` + `AppLifecycleListener` para recálculo offline ao retornar do background
-- **D** — PNGs finais do inventário integrados: PNG ocupa slot 56×56 inteiro (**o PNG é o botão**, sem fundo verde); fallback `Material`+`Icon` se asset falhar; texto dos botões removido; `ConfirmUseDialog` exibe ícone 40×40 no título
-
+- **D** — PNGs finais do inventário integrados: PNG ocupa slot 56×56 inteiro (**o PNG é o botão**, sem fundo verde); fallback `Material`+`Icon` se asset falhar; `ConfirmUseDialog` exibe ícone 40×40 no título
 
 ---
 
@@ -944,7 +951,7 @@ class ShareCode {
 >
 > **Por que foi movida:** os sons dos animais e UI dependem da identidade visual final, e o sound design ainda não foi feito. Implementar antes da arte final corre risco de retrabalho. O jogo é desenvolvido **sem áudio** até a Fase 5 — todos os controles de volume nas Configurações (Fase 2.6) ficam desabilitados/ocultos até lá.
 
-### ✅ Fase 2.4 — Recompensas diárias (v0.9.0) — **CONCLUÍDA**
+### ✅ Fase 2.4 — Recompensas diárias (v0.9.0)
 - `DailyRewardsState` (Hive typeId=3): `currentDay` (1–7), `lastClaimedDate`, `claimedThisCycle`
 - Engine puro `daily_rewards_engine.dart`: `computeDailyRewardStatus`, `applyClaim`, `applyStreakReset`, `rewardForDay`, `kDailyRewards` (7 dias)
 - `DailyRewardsNotifier`: `claim()` (trata available/streakBroken/cycleCompleted), `claimDouble()`, integrado com `livesProvider`+`inventoryProvider`
@@ -952,79 +959,169 @@ class ShareCode {
 - `DailyRewardEntryTile` na `HomeScreen` com badge vermelho + toast na primeira sessão do dia
 - 193 testes passando (14 engine, 6 notifier, 4 widget, 3 repositório)
 
-### ✅ Fase 2.5 — Identidade do Jogo: rebranding "Olha o Bichim!" + título na Home + ícone do app — **CONCLUÍDA**
+### ✅ Fase 2.5 — Identidade do Jogo: rebranding "Olha o Bichim!" + título na Home + ícone do app
+- Substituição de todas as strings de exibição "Capivara 2048" por "Olha o Bichim!" (codename interno mantido)
+- `GameTitleImage` widget: escolha aleatória por sessão entre `title_orange.png` e `title_brown.png`; `pickAsset({Random?})` para testes determinísticos
+- `flutter_launcher_icons`: ícone do app em Android (adaptive, background `#D4F1DE`), iOS, Web, Windows
+- Nome do launcher: "Olha o Bichim!" em `AndroidManifest.xml`, `Info.plist`, `web/index.html`, `web/manifest.json`
+- Package name técnico (`com.example.capivara_2048`) inalterado
 
-Esta fase consolida a nova identidade do produto antes de avançar com novas telas. Não há lógica de jogo nova — só rebranding, integração de assets de identidade já preparados e ajustes de plataforma.
+### ✅ Fase 2.6 — Tela Home + Coleção + Configurações (v0.9.2)
+- Home redesenhada com grid 2×N de cards e `GameTitleImage`
+- Tela de Coleção: grid 2 colunas, 11 animais (silhueta para não desbloqueados, card detalhado com `backgroundBaseColor` para desbloqueados), bottom sheet detalhado
+- Configurações: haptic toggle, dropdown de idioma, sliders de áudio desabilitados/ocultos até Fase 5
+- Stubs de navegação criados: `ShopScreen`, `InviteFriendsScreen`, `RedeemCodeScreen`
 
-**Assets já preparados (não criar de novo):**
-- `assets/images/title/title_orange.png` (1200×639, transparente) — variante laranja do logotipo "Olha o Bichim!"
-- `assets/images/title/title_brown.png` (1200×638, transparente) — variante marrom do logotipo "Olha o Bichim!"
-- `assets/images/icon/app_icon.png` (1024×1024, transparente, quadrado) — arte oficial do ícone do app
-- `pubspec.yaml` já tem `assets/images/title/` registrado (não precisa adicionar de novo). `assets/images/icon/` precisa ser adicionado quando a fase começar.
+---
 
-**Entregas:**
+### ✅ Fase 2.7 — Bugfixes visuais de interface (v0.9.3)
 
-**A — Rebranding "Olha o Bichim!" no app**
-- Substituir todas as referências de string "Capivara 2048" exibidas ao usuário por "Olha o Bichim!" (telas, diálogos, splash placeholder, textos de Game Over, "Sobre", etc.).
-- O *codename* interno do projeto (`capivara_2048` em `pubspec.yaml`, package Android, paths Dart) **permanece inalterado** — apenas labels de exibição mudam.
-- Buscar com grep no código por: `Capivara 2048`, `capivara 2048` (case-insensitive). Cada ocorrência decide caso a caso: se é nome de exibição → trocar; se é identificador técnico → manter.
+**Objetivo:** quatro correções de legibilidade e layout identificadas em uso real pós-2.6. Nenhuma mudança de lógica de jogo — só UI.
 
-**B — Logotipo na Home (`GameTitleImage`)**
-- Criar `lib/presentation/widgets/game_title_image.dart` com `StatelessWidget` que escolhe **aleatoriamente** entre `title_orange.png` e `title_brown.png` no `build()` usando `Random().nextInt(2)`.
-- API: `GameTitleImage({Key? key, double? height})` — `fit: BoxFit.contain`, `semanticLabel: 'Olha o Bichim!'`.
-- Expor método `@visibleForTesting static String pickAsset({Random? random})` pra teste determinístico (passando `Random(0)` ou similar).
-- Integrar na `HomeScreen` substituindo o atual `SizedBox(height: 220)` (antes dos botões) por `GameTitleImage(height: 220)`.
-- Resultado esperado: a cada abertura da Home, o usuário vê uma das duas variantes do logo. Sem persistência de qual foi mostrado por último — aleatório puro.
-- **Decisão aberta pra brainstorm:** alternar a cada `build` (rebuild da Home muda a cor) ou fixar por sessão (sortear uma vez no `initState` e manter)? A primeira é mais "vivo"; a segunda evita flicker se a Home reconstruir várias vezes. Sugestão: **fixar por sessão** (sorteio em `initState` da Home, passando como prop).
-- Teste: widget test garantindo que o asset renderizado é um dos dois caminhos válidos; teste do `pickAsset` com `Random` injetado.
+**Estimativa:** 1–2 dias.
 
-**C — Ícone do app (`flutter_launcher_icons`)**
-- Adicionar `flutter_launcher_icons` em `dev_dependencies` no `pubspec.yaml`.
-- Configurar bloco `flutter_launcher_icons:` apontando pra `assets/images/icon/app_icon.png` cobrindo Android (com `adaptive_icon_background: '#D4F1DE'` — mesma cor do fundo do jogo, ver 4.3 — e `adaptive_icon_foreground: assets/images/icon/app_icon.png`), iOS, Web e Windows.
-- Rodar `dart run flutter_launcher_icons` e verificar os arquivos gerados em `android/app/src/main/res/mipmap-*/` e `ios/Runner/Assets.xcassets/AppIcon.appiconset/`.
-- **Decisão aberta:** se o ícone tiver bordas transparentes muito largas, pode ficar "pequeno" no launcher Android com adaptive icons. Solução: gerar versão "tight crop" pra adaptive foreground (mantendo `app_icon.png` original como referência fonte). Validar em emulador antes de fechar.
-- Commitar os arquivos gerados (são fonte do build, devem ir pro git).
+#### A — Botão "Recompensa Diária" com tamanho inconsistente quando badge está visível
 
-**D — Nome do app no launcher**
-- **Android:** alterar `android:label` em `android/app/src/main/AndroidManifest.xml` de `"capivara_2048"` para `"Olha o Bichim!"`.
-- **iOS:** alterar `CFBundleDisplayName` (e/ou `CFBundleName`) em `ios/Runner/Info.plist` para `"Olha o Bichim!"`.
-- **Web:** alterar `<title>` em `web/index.html` e `name`/`short_name` em `web/manifest.json`.
-- O nome técnico do package/bundle (ex: `com.example.capivara_2048`) **não é alterado** nesta fase — mudar bundle id quebraria atualização para usuários existentes (não há ainda, mas mantemos a convenção).
+**Bug atual:** o card/botão de Recompensa Diária na `HomeScreen` muda de tamanho (ou desalinha) quando o badge vermelho de "recompensa disponível" aparece no canto superior direito. Os outros cards do grid permanecem com tamanho fixo, mas este cresce ou encolhe.
 
-**E — README, CHANGELOG e atualizações documentais**
-- Atualizar título do `README.md` para "Olha o Bichim!" (mantendo subtítulo "antigo Capivara 2048" pra contexto).
-- Adicionar entrada no `CHANGELOG.md` para a Fase 2.5 quando concluída.
-- Atualizar `CLAUDE.md` (linha de fase atual) ao fechar.
-- Atualizar este design doc removendo "(anteriormente Capivara 2048)" da Seção 1 quando a transição estiver consolidada (passo final da fase).
+**Causa provável:** o `Stack` que contém o botão e o badge não tem tamanho fixo — quando o badge é adicionado, o `Stack` expande pra acomodar o badge que extrapola as bordas, aumentando o bounding box do widget e quebrando o alinhamento do grid.
 
-**Pontos a sincronizar com a Fase 2.6 (Home definitiva):**
-- A `HomeScreen` redesenhada da Fase 2.6 deve preservar o `GameTitleImage` no mesmo "slot" lógico (área central acima dos botões).
-- Decidir nesta fase se o logo terá animação de entrada (`flutter_animate` fade+scale) ou se entra estático — recomendado: estático nesta fase, animar na 2.6 quando a Home for redesenhada por completo.
+**Mudanças:**
+- Auditar o widget do card de Recompensa Diária (provavelmente em `home_screen.dart` ou `daily_reward_entry_tile.dart`)
+- Garantir que o `Stack` que contém o botão + badge usa `clipBehavior: Clip.none` com tamanho fixado via `SizedBox` ou `ConstrainedBox` — o badge pode extrapolar visualmente sem afetar o tamanho do pai
+- Estrutura recomendada:
+  ```dart
+  SizedBox(
+    width: kCardWidth,   // mesmo tamanho dos outros cards
+    height: kCardHeight,
+    child: Stack(
+      clipBehavior: Clip.none,
+      children: [
+        _CardButton(...),
+        if (hasReward)
+          Positioned(top: -6, right: -6, child: _RedBadge()),
+      ],
+    ),
+  )
+  ```
+- Validar que o grid da Home mantém alinhamento uniforme com e sem badge visível
+- Validar em telas 360px, 412px e tablet
 
-**Critérios de aceite:**
-- Build Android instala como "Olha o Bichim!" no launcher (`adb shell pm list packages` mantém `capivara_2048` como package name).
-- Ícone do app aparece corretamente em launchers Android (adaptive) e iOS (1024 + escalas).
-- Home alterna logotipo entre laranja e marrom em sessões consecutivas (testar abrindo/fechando o app várias vezes).
-- Nenhuma string visível ao usuário diz mais "Capivara 2048".
-- Testes existentes continuam passando; pelo menos 1 widget test novo cobrindo `GameTitleImage` (escolha entre os 2 assets).
-- `flutter analyze` zero issues.
+**Casos de teste obrigatórios:**
+- Snapshot test da Home com badge visível: card de Recompensa tem mesma largura/altura dos outros cards
+- Snapshot test da Home sem badge: idem
+- Tap no card de Recompensa navega corretamente pra `/daily_rewards` em ambos os estados
 
-### ✅ Fase 2.6 — Tela Home + Coleção + Configurações (v0.9.2) — **CONCLUÍDA**
-- Home com todos os botões e indicadores (já consumindo `GameTitleImage` da 2.5)
-- Tela de Coleção (silhuetas para não desbloqueados, card detalhado para desbloqueados — usa `backgroundBaseColor` do Animal)
-- Configurações (haptic, idioma) — sliders de volume SFX/música ficam desabilitados/ocultos até a Fase 5
+#### B — Textos ilegíveis nos menus sobre fundo dinâmico
 
-### 🔜 Fase 2.7 — Loja mock (3 dias) — **PRÓXIMA**
-- Tela com os 6 pacotes
-- Cards com "De/Por" e badges de desconto
-- Botão "Comprar" simulado
-- Tela de "Código para presentear" gerada após compra simulada
+**Bug atual:** textos de labels, títulos e descrições em telas como Coleção (`CollectionScreen`) aparecem com cor padrão (preto ou cinza escuro) diretamente sobre o `fundo.png`, ficando ilegíveis porque o fundo tem tonalidades escuras e variadas.
 
-> Esta seção expande o item "Fase 2.7 — Loja mock (3 dias)" do §15, seguindo o mesmo padrão de spec da Fase 2.6.
+**Decisão de design:** todos os textos exibidos diretamente sobre `fundo.png` (sem container branco por trás) devem usar `OutlinedText` — texto branco com contorno preto sutil, 8 sombras radiais blur 0.8–1.0 — o mesmo padrão já aplicado na `GameScreen`.
 
-#### Objetivo
+**Mudanças:**
+- Auditar `CollectionScreen` e identificar todos os textos que estão sobre o fundo sem container (título da tela, nome de cada animal no grid, subtítulos soltos)
+- Substituir `Text(...)` solto por `OutlinedText(...)` (widget já existe em `outlined_text.dart`) com:
+  - `style: TextStyle(color: Colors.white, fontSize: ..., fontFamily: 'Fredoka')`
+  - `outlineColor: Colors.black`
+  - `outlineWidth: 1.2`
+- Textos que já estão dentro de cards com fundo branco **não precisam mudar**
+- Verificar `HomeScreen`: labels de cards soltos fora de containers opacos também precisam de `OutlinedText`
+- **Não alterar** textos dentro de `AlertDialog`, `BottomSheet` ou qualquer container com fundo sólido
 
-Implementar a `ShopScreen` com os 6 pacotes da §7.1, cards com preços De/Por e badge de desconto, botão "Comprar" simulado que entrega os itens localmente, e tela de "Código para presentear" gerada após a compra simulada. Sem integração real de pagamento (IAP real entra na Fase 3).
+**Casos de teste obrigatórios:**
+- Snapshot tests da `CollectionScreen` após a correção (regenerar)
+- Snapshot tests da `HomeScreen` se labels forem ajustados
+- Verificação manual: abrir Coleção sobre `fundo.png` e confirmar legibilidade
+
+#### C — Bottom Overflow em telas com fundo do jogo
+
+**Bug atual:** em algumas telas, ao renderizar com `fundo.png` como fundo, aparece a área amarela listrada com "Bottom Overflow by N pixels". O conteúdo da tela ultrapassa a altura disponível e não está em um widget scrollável.
+
+**Causa provável:** `Column` raiz da tela tem altura fixa (ou não tem `Expanded`/`Flexible`) e o conteúdo total excede a tela.
+
+**Mudanças:**
+- Auditar todas as telas que usam `GameBackground` e identificar quais apresentam overflow (`CollectionScreen`, `SettingsScreen`, `DailyRewardsScreen`, `HomeScreen` são candidatas)
+- Para cada tela com overflow:
+  - Se conteúdo é naturalmente scrollável: envolver em `SingleChildScrollView` ou usar `ListView`/`CustomScrollView`
+  - Se é tela com poucos elementos fixos: usar `Column` com `Expanded` no widget que deve crescer
+- **Padrão recomendado** para telas com `GameBackground`:
+  ```dart
+  Scaffold(
+    body: Stack(
+      children: [
+        GameBackground(),
+        SafeArea(
+          child: Column(
+            children: [
+              // header fixo
+              Expanded(
+                child: SingleChildScrollView(
+                  child: /* conteúdo */,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  )
+  ```
+- Testar em telas pequenas (360×640dp)
+
+**Casos de teste obrigatórios:**
+- Telas afetadas renderizam sem erro de overflow em telas 360×640dp
+- `flutter test` não lança `RenderFlex overflowed` em nenhum widget test
+- Verificação manual em emulador pequeno
+
+#### D — Textos de Configurações ilegíveis sobre fundo dinâmico
+
+**Bug atual:** a `SettingsScreen` renderiza seus controles (toggles, sliders desabilitados, labels de idioma) diretamente sobre o `fundo.png`, sem container de fundo, tornando os labels ilegíveis.
+
+**Decisão de design:** os itens de configurações devem ser renderizados dentro de **cards com fundo branco semi-opaco** (`Colors.white.withOpacity(0.88)`, borderRadius 12, sombra suave). Este padrão é mais adequado para controles interativos do que `OutlinedText` isolado, pois garante contraste também para os widgets `Switch` e `DropdownButton`.
+
+**Estrutura recomendada:**
+```dart
+Container(
+  decoration: BoxDecoration(
+    color: Colors.white.withOpacity(0.88),
+    borderRadius: BorderRadius.circular(12),
+    boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 2))],
+  ),
+  child: Column(
+    children: [
+      // SwitchListTile, ListTile, DropdownButton, etc.
+    ],
+  ),
+)
+```
+
+**Mudanças:**
+- Auditar `settings_screen.dart` e identificar todos os controles/labels sem container
+- Agrupar controles em seções lógicas (ex: "Gameplay", "Idioma", "Áudio") — cada seção num card
+- Dentro dos cards: `SwitchListTile` para toggles, `ListTile` com trailing `DropdownButton` para idioma
+- Títulos de seção fora dos cards: `OutlinedText` branco (padrão do item B)
+- Sliders de áudio: manter visíveis mas `enabled: false`, com label "Disponível na Fase 5" dentro do card
+- Cor de texto dentro dos cards: `#3E2723` (marrom escuro — cor padrão de texto do app)
+
+**Casos de teste obrigatórios:**
+- Snapshot test da `SettingsScreen` após a correção (regenerar)
+- Todos os labels têm contraste AA (texto escuro em fundo branco dentro dos cards)
+- Toggle de haptic funciona (regressão)
+- Dropdown de idioma funciona (regressão)
+- Sliders de áudio desabilitados com label explicativo visível
+- Sem overflow na `SettingsScreen` (regressão do item C)
+
+#### Ordem de execução recomendada
+1. **C primeiro** (overflow) — bloqueia visualização das outras telas; resolver antes de validar B e D
+2. **A** (badge inconsistente) — isolado, rápido, não depende de C
+3. **B** (textos menus) — aplicar `OutlinedText` nas telas afetadas
+4. **D por último** (cards de Configurações) — mais trabalhoso, depende do padrão estabelecido em B
+
+---
+
+### 🔜 Fase 2.8 — Loja mock (3 dias)
+
+**Objetivo:** implementar a `ShopScreen` com os 6 pacotes da §7.1, cards com preços De/Por e badge de desconto, botão "Comprar" simulado que entrega os itens localmente, e tela de "Código para presentear" gerada após a compra simulada. Sem integração real de pagamento (IAP real entra na Fase 3).
 
 #### Sub-entregas
 
@@ -1063,7 +1160,7 @@ _ShopPackageCard({required ShopPackage package})
 1. Mostrar `AlertDialog` de confirmação: "Comprar [nome] por R$ X,XX?"
 2. Ao confirmar: `inventoryProvider.add(package.contents)` + `livesProvider.add(package.contents.lives)`
 3. Mostrar `_GiftCodeSheet` com o código gerado (`ShareCode` local, sem backend)
-4. `ShareCode` gerado localmente com UUID, status `pending`, armazenado em `SharedPreferences` (lista de códigos gerados — Fase 3 migra para Firestore)
+4. `ShareCode` gerado localmente com UUID, status `pending`, armazenado em `SharedPreferences`
 
 **B — `_GiftCodeSheet` (bottom sheet)**
 
@@ -1072,7 +1169,7 @@ _ShopPackageCard({required ShopPackage package})
 // Conteúdo:
 //   Text("Presente gerado!", Fredoka 24)
 //   Text("Compartilhe este código com um amigo:", Nunito 14)
-//   Container com código em Fredoka Mono 28 (ou Fredoka Bold)
+//   Container com código em Fredoka Bold 28
 //   IconButton(Icons.copy) — copia para clipboard
 //   Text("Seu amigo recebe: [conteúdo do giftContents]", Nunito 14)
 //   ElevatedButton("Fechar")
@@ -1095,14 +1192,14 @@ _ShopPackageCard({required ShopPackage package})
 ```dart
 // SharedPreferences key: 'generated_share_codes'
 // Valor: List<String> de JSON serializado dos ShareCode gerados
-// Fase 3 migra para Firestore (sem quebra: mesma estrutura ShareCode)
+// Fase 3 migra para Firestore (mesma estrutura ShareCode)
 ```
 
 **E — Documentação**
 - `CHANGELOG.md`: entrada v0.9.3
-- `README.md`: Fase 2.7 ✅
-- `CLAUDE.md`: fase atual → "Fase 2.7 concluída — próximo: Fase 3"
-- `CAPIVARA_2048_DESIGN.md` §15: marcar Fase 2.7 ✅
+- `README.md`: Fase 2.8 ✅
+- `CLAUDE.md`: fase atual → "Fase 2.8 concluída — próximo: Fase 3"
+- `CAPIVARA_2048_DESIGN.md` §15: marcar Fase 2.8 ✅
 - `CAPIVARA_2048_DESIGN.md` §17: substituir pelo prompt da Fase 3
 
 #### Providers
@@ -1110,7 +1207,7 @@ _ShopPackageCard({required ShopPackage package})
 | Provider | Tipo | Novo? |
 |---|---|---|
 | `shopPackagesProvider` | `Provider<List<ShopPackage>>` | Sim — lista estática de `shop_data.dart` |
-| `generatedShareCodesProvider` | `StateNotifierProvider<...>` | Sim — lista local de `ShareCode` gerados |
+| `generatedShareCodesProvider` | `StateNotifierProvider<...>` | Sim — lista local de `ShareCode` gerados, persistida em `SharedPreferences` |
 | `inventoryProvider` | já existe | Reusar — `add()` com `package.contents` |
 | `livesProvider` | já existe | Reusar — `add(package.contents.lives)` |
 
@@ -1127,7 +1224,6 @@ testWidgets('botão copiar → código no clipboard', ...)
 ```
 
 #### Critérios de aceite
-
 - 6 pacotes visíveis em scroll sem overflow
 - Badge de desconto correto (50% / 75%) em cada card
 - Preço "De" riscado, preço "Por" em destaque verde
@@ -1142,6 +1238,7 @@ testWidgets('botão copiar → código no clipboard', ...)
 | `_onBuy` mock (entrega local) | Substituir por `in_app_purchase` real |
 | `ShareCode` em SharedPreferences | Migrar para Firestore |
 | `_GiftCodeSheet` com código local | Conectar ao backend para validação |
+| `RedeemCodeScreen` (stub criado na 2.6) | Recebe conteúdo na Fase 3 |
 
 ### 🔜 Fase 3 — Backend, ranking e monetização (3–4 semanas)
 - Setup Firebase (Auth, Firestore)
@@ -1197,16 +1294,18 @@ testWidgets('botão copiar → código no clipboard', ...)
 - `HostBanner` anunciado: "Anfitrião: [nome do animal]"
 - Modo "alta visibilidade"
 - Tamanho de fonte ajustável
+- **Cards de Configurações (Fase 2.7):** `SwitchListTile` e `ListTile` anunciam estado automaticamente — nenhuma alteração necessária em `Semantics`
 
 ### 16.2 Performance
 - `const` e Riverpod selectors
 - PNGs em vez de SVGs (Fase 2.3.8 item A) — gargalo removido
-- `precacheImage` pra os 22 PNGs dos animais + 4 do inventário + `fundo.png` no boot
+- `precacheImage` pra os 22 PNGs dos animais + 4 do inventário + `fundo.png` + 2 title PNGs no boot
 - Pool de AudioPlayers (Fase 5)
 - 60fps em Snapdragon 660+ / iPhone 8+
 - `RepaintBoundary` no `GameBackground`
 - `BackdropFilter` no `PauseOverlay` é o único custo significativo de UI — fallback se ficar < 50fps
 - **Timer de regeneração de vidas (Fase 2.3.12 item C):** `Timer.periodic` rodando a cada segundo é leve, mas garantir que o widget é desmontado corretamente (`dispose`) pra não vazar timers entre navegações
+- **Fase 2.7 item C:** overflow resolvido com `SingleChildScrollView` — leve, sem impacto de performance
 
 ### 16.3 LGPD / COPPA / Crianças
 - Conformidade COPPA (US) e LGPD (BR)
@@ -1228,82 +1327,45 @@ testWidgets('botão copiar → código no clipboard', ...)
 
 ---
 
-## 17. Prompt Sugerido para o Claude Code (Fase 2.7 — via skill superpowers)
+## 17. Prompt Sugerido para o Claude Code (Fase 2.8 — via skill superpowers)
 
-> O prompt abaixo entra no fluxo do **superpowers/brainstorming**. O resultado esperado é uma **spec detalhada da Fase 2.7** (refinada via brainstorm), que depois alimenta o **superpowers/writing-plans** pra gerar o plano executável. Nada de código nesta etapa — apenas elicitação, refinamento de design e plano.
+> O prompt abaixo entra no fluxo do **superpowers/brainstorming**. O resultado esperado é uma **spec detalhada da Fase 2.8** (refinada via brainstorm), que depois alimenta o **superpowers/writing-plans** pra gerar o plano executável. Nada de código nesta etapa — apenas elicitação, refinamento de design e plano.
 
 ---
 
 > Use a skill `superpowers/brainstorming` pra refinar o design da próxima fase do projeto **Olha o Bichim!** (Flutter, codename `capivara_2048`).
 >
-> **Contexto:** Fase 2.6 concluída (v0.9.2) — Home redesenhada com grid 2×N de cards e animação do logo, Tela de Coleção (11 animais, grid 2 colunas, bottom sheet detalhado), Tela de Configurações (haptic, idioma, sliders de áudio desabilitados), stubs de navegação criados (`ShopScreen`, `InviteFriendsScreen`, `RedeemCodeScreen`). Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente §7 — Loja de Itens, §12.4 — Tela Loja, §13.7 — `ShopPackage`, §13.8 — `ShareCode`, §15 — roadmap Fase 2.7).
+> **Contexto:** Fase 2.7 concluída (v0.9.3). Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente §7.1, §12.3 e §15 — Fase 2.8).
 >
-> **Fases concluídas:** Fases 1 a 2.6 (v0.9.2). Áudio segue na **Fase 5**. Backend (Firebase, IAP real) entra na **Fase 3**.
+> **Fases concluídas:** 1 a 2.7 (v0.9.3). Áudio na Fase 5. Backend na Fase 3.
 >
-> **Tópico do brainstorm:** **Fase 2.7 — Loja mock**. Esta fase preenche o stub `ShopScreen` com os 6 pacotes da §7.1, simula a compra localmente (sem IAP real), entrega os itens no inventário local, e gera um código de presente. Não há nova lógica de jogo nem integração com backend.
+> **Tópico do brainstorm:** **Fase 2.8 — Loja Mock**. Implementar `ShopScreen` com os 6 pacotes da §7.1, cards com preços De/Por e badge de desconto, botão "Comprar" simulado que entrega os itens localmente, tela de "Código para presentear" gerada após compra simulada. Sem integração real de pagamento (IAP real entra na Fase 3).
 >
-> **Sub-entregas (ver §15 — Fase 2.7 e spec em `docs/superpowers/specs/2026-05-01-fase-2-6-design.md`):**
+> **Quatro sub-entregas:**
 >
-> **A — ShopScreen (conteúdo):**
-> - Substituir o stub criado na Fase 2.6 pelo conteúdo real — não criar nova tela.
-> - `ListView` com os 6 `_ShopPackageCard` na ordem da tabela §7.1.
-> - Cada card: nome do pacote, descrição do conteúdo (`RewardBundle`), preço "De" riscado, preço "Por" em destaque, badge de desconto (50% ou 75%), botão "Comprar".
-> - Botão "Comprar" → `AlertDialog` de confirmação → entrega local via `inventoryProvider` + `livesProvider` → exibe `_GiftCodeSheet`.
-> - `shop_data.dart`: lista estática dos 6 `ShopPackage` conforme §7.1 — sem backend.
+> **A — ShopScreen:** substituir stub da Fase 2.6 com ListView de 6 `_ShopPackageCard`. Cada card: nome + badge desconto (círculo laranja `#FF8C42`), descrição, preço De (riscado) / Por (destaque verde), botão "Comprar".
 >
-> **B — `_GiftCodeSheet` (bottom sheet pós-compra):**
-> - `DraggableScrollableSheet` com código de presente gerado localmente (UUID truncado).
-> - Exibe: título "Presente gerado!", código formatado, conteúdo do `giftContents`, botão copiar para clipboard, botão fechar.
-> - `ShareCode` armazenado em `SharedPreferences` — Fase 3 migra para Firestore sem alterar a estrutura.
+> **B — `_GiftCodeSheet`:** bottom sheet exibido após compra com código UUID local, botão de copiar para clipboard, descrição do conteúdo do presente.
 >
-> **C — `shop_notifier.dart` e `generatedShareCodesProvider`:**
-> - `shopPackagesProvider`: `Provider<List<ShopPackage>>` — lista estática.
-> - `generatedShareCodesProvider`: `StateNotifierProvider` — lista local de `ShareCode` gerados, persistida em `SharedPreferences`.
+> **C — `shop_data.dart`:** lista estática dos 6 pacotes com preços e conteúdos conforme §7.1.
 >
-> **D — README, CHANGELOG, CLAUDE.md, design doc:**
-> - Atualizar documentação ao fechar a fase.
-> - Atualizar §17 do design doc com o prompt de brainstorm da **Fase 3**.
+> **D — Persistência local:** `ShareCode` em `SharedPreferences` (migração para Firestore na Fase 3).
 >
-> **Pontos abertos pra explorar no brainstorm (elicitação esperada):**
+> **Pontos abertos pra explorar no brainstorm:**
 >
-> Sobre **A (ShopScreen — visual do card):**
-> - Badge de desconto: chip no canto superior direito do card vs inline na linha de preço? Recomendação: canto superior direito (mais visível, padrão e-commerce).
-> - Conteúdo do `RewardBundle` no card: texto compacto descritivo ("6 vidas + 2 bombas + 2 desfazer") vs lista com ícones dos itens? Recomendação: texto compacto — ícones exigem assets extras não planejados.
-> - Scroll da loja: `ListView` simples vs `CustomScrollView` com `SliverAppBar` colapsável? Recomendação: `ListView` simples — 6 itens não justificam complexidade.
-> - Header da `ShopScreen`: AppBar simples (padrão da 2.6) vs banner colorido com ilustração? Recomendação: AppBar padrão — arte adicional fica para a Fase 4.
->
-> Sobre **B (`_GiftCodeSheet`):**
-> - Formato do código: UUID truncado 8 chars uppercase com hífen (`A3F9-B2C1`) vs código alfanumérico de 6 chars sem hífen? Recomendação: 8 chars com hífen — legível e fácil de digitar para o amigo.
-> - `_GiftCodeSheet` ou `AlertDialog` simples? Recomendação: bottom sheet — consistente com o padrão da 2.6 (Coleção, Como Jogar).
-> - Confirmação de compra: `AlertDialog` simples ("Comprar [nome] por R$ X,XX?") vs bottom sheet estilizado? Recomendação: `AlertDialog` — fluxo transacional não precisa de visual elaborado.
-> - Exibir o conteúdo do `giftContents` (o que o amigo recebe) separado do `contents` (o que o comprador recebe)?
->
-> Sobre **C (providers e persistência):**
-> - `generatedShareCodesProvider` precisa de notifier próprio ou basta um `StateProvider<List<ShareCode>>`? Recomendação: notifier próprio — encapsula a persistência em `SharedPreferences`.
-> - Serialização do `ShareCode`: `jsonEncode`/`jsonDecode` manual vs `freezed`/`json_serializable`? Recomendação: manual — estrutura simples, sem dependência extra.
-> - Limite de códigos armazenados localmente? Recomendação: últimos 20 — Fase 3 move para Firestore.
->
-> Sobre **testes:**
-> - Widget tests obrigatórios: 6 cards presentes, fluxo completo de compra (tap → dialog → confirmação → inventário atualizado → código gerado), botão copiar, código no clipboard.
-> - `inventoryProvider` e `livesProvider` devem ser mockados nos testes da `ShopScreen`.
-> - Golden tests: não — mesma decisão da Fase 2.6.
->
-> Sobre **sincronização com Fase 3 (Backend/IAP):**
-> - `_onBuy` mock entrega itens localmente — Fase 3 substitui pela chamada `in_app_purchase`.
-> - `ShareCode` em `SharedPreferences` — Fase 3 migra para Firestore; mesma estrutura `ShareCode` já definida em §13.8.
-> - `_GiftCodeSheet` exibe código local — Fase 3 conecta ao backend para validação do resgate.
-> - `RedeemCodeScreen` (stub criado na 2.6) recebe conteúdo na Fase 3.
+> - `ShopPackage` model: quais campos? (`id`, `name`, `description`, `originalPrice`, `salePrice`, `discountPercent`, `contents: PackageContents`, `giftContents: PackageContents`) — confirmar estrutura antes de criar `shop_data.dart`.
+> - `PackageContents`: `lives`, `bombs2`, `bombs3`, `undos1`, `undos3` — esses são os campos corretos baseado nos items existentes?
+> - `shop_notifier.dart`: precisa de estado próprio ou `_onBuy` pode ser função local na screen com acesso direto a `inventoryProvider` e `livesProvider`?
+> - `generatedShareCodesProvider`: `StateNotifierProvider` com persistência em `SharedPreferences` — o padrão já usado em `DailyRewardsNotifier` serve de referência?
+> - Bomba nos combos: são Bomba 2 ou Bomba 3? Confirmar no §7.1 ("2 bombas" — qual tipo?).
+> - Validação manual: rodar em 360×640 para garantir que os 6 cards scrollam sem overflow.
 >
 > **Output esperado do brainstorm:**
-> Uma **spec detalhada da Fase 2.7** (`docs/superpowers/specs/YYYY-MM-DD-fase-2-7-design.md`) com:
-> - Decisões tomadas em cada ponto aberto (visual do card, formato do código, confirmação, scroll).
-> - Para cada sub-entrega (A–D): arquivos a criar/modificar, contratos exatos (assinaturas de widgets, modelos de dados usados, providers Riverpod necessários), casos de teste obrigatórios, critérios de aceite.
-> - Diagrama de navegação textual (fluxo de compra completo: ShopScreen → AlertDialog → GiftCodeSheet).
-> - Lista de pontos a sincronizar com Fase 3 (IAP real, Firestore, validação de código).
-> - Plano de validação manual (emulador Android, simulador iOS — conferir layout da loja, fluxo de compra, código gerado e copiável).
-> - Ao final do documento: **prompt de brainstorm da Fase 3** seguindo este mesmo padrão de cascata.
->
-> Esse documento será depois consumido pela skill `superpowers/writing-plans` pra gerar o plano executável (TDD-friendly, com checkpoints).
+> Uma **spec detalhada da Fase 2.8** (`docs/superpowers/specs/YYYY-MM-DD-fase-2-8-design.md`) com:
+> - Decisões tomadas em cada ponto aberto
+> - Para cada sub-entrega: arquivos a modificar, mudança exata, casos de teste obrigatórios, critérios de aceite
+> - Plano de validação manual
+> - Ao final: **prompt de brainstorm da Fase 3** (Backend — próxima após a Loja Mock) seguindo este mesmo padrão de cascata
 >
 > **Não escreva código nesta etapa.** Foque em refinar o design, fazer perguntas críticas e produzir a spec.
 

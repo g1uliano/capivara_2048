@@ -52,7 +52,7 @@ lib/
 
 ## Fases do roadmap
 
-Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 2.6 concluída (v0.9.2) — próximo: Fase 2.7**. O áudio foi reposicionado para a **Fase 5** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
+Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 2.7 concluída (v0.9.3) — próximo: Fase 2.8**. O áudio foi reposicionado para a **Fase 5** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
 
 | Fase | Foco |
 |------|------|
