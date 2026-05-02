@@ -30,6 +30,9 @@ class InventoryNotifier extends StateNotifier<Inventory> {
     if (!kDebugMode) return;
     state = const Inventory(bomb2: 5, bomb3: 5, undo1: 5, undo3: 5);
   }
+
+  @visibleForTesting
+  void setStateForTest(Inventory inventory) => state = inventory;
 }
 
 final inventoryRepositoryProvider = Provider<InventoryRepository>(
