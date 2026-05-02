@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'core/theme/app_theme.dart';
 import 'data/animals_data.dart';
-import 'presentation/screens/home_screen.dart';
+import 'presentation/screens/splash_screen.dart';
 
 class CapivaraApp extends StatefulWidget {
   const CapivaraApp({super.key});
@@ -52,7 +52,7 @@ class _CapivaraAppState extends State<CapivaraApp> {
       title: 'Olha o Bichim!',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
-      home: const HomeScreen(),
+      home: const SplashScreen(),
     );
   }
 }
