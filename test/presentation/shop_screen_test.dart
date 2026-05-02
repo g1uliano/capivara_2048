@@ -96,7 +96,7 @@ void main() {
     expect(find.text('Presente gerado!'), findsNothing);
   });
 
-  testWidgets('confirmar compra p1 → GiftCodeSheet aparece (compra processada)', (tester) async {
+  testWidgets('confirmar compra p1 → GiftCodeSheet aparece após confirmação', (tester) async {
     await tester.pumpWidget(_buildShop());
     await tester.pumpAndSettle();
 

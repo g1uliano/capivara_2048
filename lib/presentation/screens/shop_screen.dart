@@ -99,21 +99,21 @@ class ShopScreen extends ConsumerWidget {
     // Hive persistence is fire-and-forget — UI does not need to await it).
     final c = package.contents;
     if (c.lives > 0) {
-      unawaited(ref.read(livesProvider.notifier).addPurchased(c.lives));
+      _fireAndLog(ref.read(livesProvider.notifier).addPurchased(c.lives));
     }
     if (c.bomb2 > 0) {
-      unawaited(ref.read(inventoryProvider.notifier).add(ItemType.bomb2, c.bomb2));
+      _fireAndLog(ref.read(inventoryProvider.notifier).add(ItemType.bomb2, c.bomb2));
     }
     if (c.bomb3 > 0) {
-      unawaited(ref.read(inventoryProvider.notifier).add(ItemType.bomb3, c.bomb3));
+      _fireAndLog(ref.read(inventoryProvider.notifier).add(ItemType.bomb3, c.bomb3));
     }
     if (c.undo1 > 0) {
-      unawaited(ref.read(inventoryProvider.notifier).add(ItemType.undo1, c.undo1));
+      _fireAndLog(ref.read(inventoryProvider.notifier).add(ItemType.undo1, c.undo1));
     }
     if (c.undo3 > 0) {
-      unawaited(ref.read(inventoryProvider.notifier).add(ItemType.undo3, c.undo3));
+      _fireAndLog(ref.read(inventoryProvider.notifier).add(ItemType.undo3, c.undo3));
     }
-    unawaited(ref.read(shareCodesProvider.notifier).add(shareCode));
+    _fireAndLog(ref.read(shareCodesProvider.notifier).add(shareCode));
 
     if (context.mounted) {
       showModalBottomSheet(
@@ -212,6 +212,12 @@ class _ShopPackageCard extends StatelessWidget {
       ),
     );
   }
+}
+
+void _fireAndLog(Future<void> future) {
+  unawaited(future.catchError(
+    (Object e) => debugPrint('[ShopScreen] purchase side-effect error: $e'),
+  ));
 }
 
 class _GiftCodeSheet extends StatelessWidget {
