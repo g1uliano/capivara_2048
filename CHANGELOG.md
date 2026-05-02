@@ -7,6 +7,11 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.9.9.4] - 2026-05-02
+
+### Fixed
+- Countdown "Restando MM:SS" agora decrementa a cada segundo — o banner tinha `_timerText()` calculado corretamente mas sem `Timer.periodic(1s)` para forçar rebuild do widget
+
 ## [0.9.9.3] - 2026-05-02
 
 ### Fixed

@@ -122,4 +122,41 @@ void main() {
       expect(find.byType(AnimatedSwitcher), findsOneWidget);
     });
   });
+
+  group('LivesStatusBanner countdown timer lógica', () {
+    test('timerTextFor: 5 min atrás → exibe 25:00', () {
+      final lastRegenAt = DateTime(2026, 1, 1, 12, 0, 0);
+      final now = DateTime(2026, 1, 1, 12, 5, 0); // 5 min depois
+      expect(LivesStatusBanner.timerTextFor(lastRegenAt, now), '25:00');
+    });
+
+    test('timerTextFor: 1 segundo depois → exibe 29:59', () {
+      final lastRegenAt = DateTime(2026, 1, 1, 12, 0, 0);
+      final now = DateTime(2026, 1, 1, 12, 0, 1);
+      expect(LivesStatusBanner.timerTextFor(lastRegenAt, now), '29:59');
+    });
+
+    test('timerTextFor: 30 min exatos → exibe 00:00', () {
+      final lastRegenAt = DateTime(2026, 1, 1, 12, 0, 0);
+      final now = DateTime(2026, 1, 1, 12, 30, 0);
+      expect(LivesStatusBanner.timerTextFor(lastRegenAt, now), '00:00');
+    });
+
+    test('timerTextFor: além de 30 min → exibe 00:00 (não negativo)', () {
+      final lastRegenAt = DateTime(2026, 1, 1, 12, 0, 0);
+      final now = DateTime(2026, 1, 1, 12, 35, 0);
+      expect(LivesStatusBanner.timerTextFor(lastRegenAt, now), '00:00');
+    });
+
+    test('timerTextFor: valores decrementam a cada segundo', () {
+      final lastRegenAt = DateTime(2026, 1, 1, 12, 0, 0);
+      final t1 = DateTime(2026, 1, 1, 12, 5, 0);  // 25:00
+      final t2 = DateTime(2026, 1, 1, 12, 5, 1);  // 24:59
+      final text1 = LivesStatusBanner.timerTextFor(lastRegenAt, t1);
+      final text2 = LivesStatusBanner.timerTextFor(lastRegenAt, t2);
+      expect(text1, '25:00');
+      expect(text2, '24:59');
+      expect(text1, isNot(equals(text2)));
+    });
+  });
 }

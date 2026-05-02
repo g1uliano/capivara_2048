@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/text_styles.dart';
@@ -30,6 +32,16 @@ class LivesStatusBanner extends StatefulWidget {
     required this.lastRegenAt,
   });
 
+  /// Public static for unit testing without widget pump.
+  static String timerTextFor(DateTime lastRegenAt, DateTime now) {
+    final next = lastRegenAt.add(const Duration(minutes: 30));
+    final remaining = next.difference(now);
+    if (remaining.isNegative) return '00:00';
+    final mm = remaining.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final ss = (remaining.inSeconds % 60).toString().padLeft(2, '0');
+    return '$mm:$ss';
+  }
+
   @override
   State<LivesStatusBanner> createState() => _LivesStatusBannerState();
 }
@@ -38,6 +50,7 @@ class _LivesStatusBannerState extends State<LivesStatusBanner>
     with TickerProviderStateMixin {
   late AnimationController _scaleCtrl;
   late Animation<double> _scaleAnim;
+  Timer? _countdownTimer;
 
   @override
   void initState() {
@@ -50,6 +63,7 @@ class _LivesStatusBannerState extends State<LivesStatusBanner>
       TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.1), weight: 50),
       TweenSequenceItem(tween: Tween(begin: 1.1, end: 1.0), weight: 50),
     ]).animate(_scaleCtrl);
+    _updateCountdownTimer();
   }
 
   @override
@@ -58,22 +72,29 @@ class _LivesStatusBannerState extends State<LivesStatusBanner>
     if (widget.current > oldWidget.current) {
       _scaleCtrl.forward(from: 0);
     }
+    if (widget.current != oldWidget.current) {
+      _updateCountdownTimer();
+    }
+  }
+
+  void _updateCountdownTimer() {
+    _countdownTimer?.cancel();
+    if (_stateFor(widget.current) == _BannerState.restando) {
+      _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+        if (mounted) setState(() {});
+      });
+    }
   }
 
   @override
   void dispose() {
+    _countdownTimer?.cancel();
     _scaleCtrl.dispose();
     super.dispose();
   }
 
-  String _timerText() {
-    final next = widget.lastRegenAt.add(const Duration(minutes: 30));
-    final remaining = next.difference(DateTime.now());
-    if (remaining.isNegative) return '00:00';
-    final mm = remaining.inMinutes.remainder(60).toString().padLeft(2, '0');
-    final ss = (remaining.inSeconds % 60).toString().padLeft(2, '0');
-    return '$mm:$ss';
-  }
+  String _timerText() => LivesStatusBanner.timerTextFor(widget.lastRegenAt, DateTime.now());
+
 
   String _label(_BannerState s) => switch (s) {
         _BannerState.completo => 'Completo',
