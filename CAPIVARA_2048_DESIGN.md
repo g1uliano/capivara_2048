@@ -1119,7 +1119,7 @@ Container(
 
 ---
 
-### 🔜 Fase 2.8 — Loja mock (3 dias)
+### ✅ Fase 2.8 — Loja mock (3 dias)
 
 **Objetivo:** implementar a `ShopScreen` com os 6 pacotes da §7.1, cards com preços De/Por e badge de desconto, botão "Comprar" simulado que entrega os itens localmente, e tela de "Código para presentear" gerada após a compra simulada. Sem integração real de pagamento (IAP real entra na Fase 3).
 

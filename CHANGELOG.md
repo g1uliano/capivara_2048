@@ -7,6 +7,14 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.9.4] — 2026-05-02
+
+### Added
+- ShopScreen com 6 pacotes compráveis (Fase 2.8)
+- Compra simulada entrega itens localmente sem IAP real
+- Bottom sheet "Código para presentear" com UUID truncado e botão copiar
+- ShareCode persistido em SharedPreferences (migração Firestore na Fase 3)
+
 ## [0.9.3] — 2026-05-02
 
 ### Fixed
