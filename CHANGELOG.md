@@ -7,6 +7,14 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.9.8] — 2026-05-02
+
+### Fixed
+- Bomba: células do overlay invisíveis sobre o tabuleiro — reescrita do BombGridOverlay
+  usando exatamente o mesmo layout do BoardWidget (Column/Row/Expanded com mesmos paddings),
+  garantindo alinhamento pixel-a-pixel. Fundo branco 60% opaco para contraste real;
+  selecionadas ficam vermelho 65% com borda grossa.
+
 ## [0.9.7] — 2026-05-02
 
 ### Fixed
