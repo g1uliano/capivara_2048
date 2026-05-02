@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:capivara_2048/data/models/lives_state_adapter.dart';
+import 'package:capivara_2048/presentation/widgets/board_widget.dart';
 import 'package:capivara_2048/presentation/widgets/game_header.dart';
 import 'package:capivara_2048/presentation/widgets/pause_button_tile.dart';
 import 'package:flutter/material.dart';
@@ -50,6 +51,35 @@ void main() {
       await tester.pumpWidget(_wrap(const _FakeGameScreen()));
       await tester.pump();
       expect(find.byType(GameHeader), findsOneWidget);
+    });
+
+    testWidgets('BoardWidget com size pequeno não causa overflow', (tester) async {
+      tester.view.physicalSize = const Size(360, 640);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            home: Scaffold(
+              body: SizedBox(
+                width: 360,
+                height: 400,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final boardSide = constraints.maxWidth - 24;
+                    return BoardWidget(size: boardSide);
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
     });
   });
 }

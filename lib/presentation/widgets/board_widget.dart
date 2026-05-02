@@ -5,13 +5,14 @@ import '../controllers/game_notifier.dart';
 import 'tile_widget.dart';
 
 class BoardWidget extends ConsumerWidget {
-  const BoardWidget({super.key});
+  final double? size;
+  const BoardWidget({super.key, this.size});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final board = ref.watch(gameProvider).board;
     final screenWidth = MediaQuery.of(context).size.width;
-    final boardSize = screenWidth - GameConstants.boardPadding * 2;
+    final boardSize = size ?? (screenWidth - GameConstants.boardPadding * 2);
     final tileSize = (boardSize - GameConstants.tileSpacing * (GameConstants.boardSize + 1)) /
         GameConstants.boardSize;
 

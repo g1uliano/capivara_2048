@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/models/game_state.dart';
@@ -41,30 +43,38 @@ class GameScreen extends ConsumerWidget {
                           ? notifier.resume
                           : notifier.pause,
                     ),
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onPanEnd: (details) {
-                        if (state.isPaused ||
-                            isGameOver ||
-                            hasWon ||
-                            state.bombMode != null) return;
-                        final v = details.velocity.pixelsPerSecond;
-                        const threshold = 100.0;
-                        if (v.dx.abs() > v.dy.abs()) {
-                          if (v.dx > threshold) {
-                            notifier.onSwipe(Direction.right);
-                          } else if (v.dx < -threshold) {
-                            notifier.onSwipe(Direction.left);
-                          }
-                        } else {
-                          if (v.dy > threshold) {
-                            notifier.onSwipe(Direction.down);
-                          } else if (v.dy < -threshold) {
-                            notifier.onSwipe(Direction.up);
-                          }
-                        }
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final boardSide = min(
+                          constraints.maxWidth - 24,
+                          constraints.maxHeight - 140, // header + inventory estimado
+                        );
+                        return GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onPanEnd: (details) {
+                            if (state.isPaused ||
+                                isGameOver ||
+                                hasWon ||
+                                state.bombMode != null) return;
+                            final v = details.velocity.pixelsPerSecond;
+                            const threshold = 100.0;
+                            if (v.dx.abs() > v.dy.abs()) {
+                              if (v.dx > threshold) {
+                                notifier.onSwipe(Direction.right);
+                              } else if (v.dx < -threshold) {
+                                notifier.onSwipe(Direction.left);
+                              }
+                            } else {
+                              if (v.dy > threshold) {
+                                notifier.onSwipe(Direction.down);
+                              } else if (v.dy < -threshold) {
+                                notifier.onSwipe(Direction.up);
+                              }
+                            }
+                          },
+                          child: RepaintBoundary(child: BoardWidget(size: boardSide)),
+                        );
                       },
-                      child: const RepaintBoundary(child: BoardWidget()),
                     ),
                     const Spacer(),
                     const InventoryBar(),
