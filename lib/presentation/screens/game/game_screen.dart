@@ -15,6 +15,7 @@ import '../../widgets/game_over_modal.dart';
 import '../../widgets/inventory_bar.dart';
 import '../../../core/constants/game_constants.dart';
 import '../../widgets/pause_overlay.dart';
+import 'game_over_item_overlay.dart';
 
 class GameScreen extends ConsumerWidget {
   const GameScreen({super.key});
@@ -94,7 +95,10 @@ class GameScreen extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(height: GameConstants.boardToInventorySpacing),
-                        const InventoryBar(),
+                        AbsorbPointer(
+                          absorbing: state.isAwaitingGameOverResolution,
+                          child: const InventoryBar(),
+                        ),
                         const SizedBox(height: 8),
                       ],
                     ),
@@ -102,7 +106,9 @@ class GameScreen extends ConsumerWidget {
               if (state.isPaused) const Positioned.fill(child: PauseOverlay()),
               if (state.bombMode != null)
                 const Positioned.fill(child: BombDimOverlay()),
-              if (isGameOver)
+              if (state.isAwaitingGameOverResolution)
+                const Positioned.fill(child: GameOverItemOverlay()),
+              if (isGameOver && !state.isAwaitingGameOverResolution)
                 const Positioned.fill(
                     child: GameOverModal(message: 'Game Over!')),
               if (hasWon && !isGameOver)
