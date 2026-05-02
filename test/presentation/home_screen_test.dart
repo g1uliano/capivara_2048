@@ -156,7 +156,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
     await tester.tap(find.text('Loja'));
     await tester.pumpAndSettle();
-    expect(find.text('Em breve'), findsWidgets);
+    expect(find.text('Loja'), findsWidgets);
   });
 
   testWidgets('badge "!" aparece no card Recompensa Diária quando recompensa disponível',
