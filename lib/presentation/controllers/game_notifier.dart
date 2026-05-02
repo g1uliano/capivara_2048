@@ -154,9 +154,13 @@ class GameNotifier extends StateNotifier<GameState> {
     _bombSelection = [];
     final item = _pendingBombItem;
     _pendingBombItem = null;
-    // Consume the item only after successful confirmation
     if (item != null) _consumeItem?.call(item);
-    state = newState.copyWith(bombMode: null, selectedBombTiles: const []);
+    state = newState.copyWith(
+      bombMode: null,
+      selectedBombTiles: const [],
+      isContinuingWithItem: false,
+      isAwaitingGameOverResolution: false,
+    );
   }
 
   void cancelBomb() {

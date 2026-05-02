@@ -96,7 +96,8 @@ class GameEngine {
     for (final (r, c) in positions) {
       board[r][c] = null;
     }
-    return state.copyWith(board: board);
+    // Removing tiles always creates empty cells — the game is never over after a bomb.
+    return state.copyWith(board: board, isGameOver: false);
   }
 
   _MergeResult _compactAndMerge(List<Tile?> row) {

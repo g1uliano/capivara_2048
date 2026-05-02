@@ -2,6 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:capivara_2048/presentation/controllers/game_notifier.dart';
 import 'package:capivara_2048/data/models/game_state.dart';
+import 'package:capivara_2048/domain/game_engine/bomb_mode.dart';
+import 'package:capivara_2048/domain/game_engine/game_engine.dart';
+import 'package:capivara_2048/data/models/item_type.dart';
 
 void main() {
   test('isAwaitingGameOverResolution defaults to false', () {
@@ -24,12 +27,9 @@ void main() {
     final container = ProviderContainer();
     addTearDown(container.dispose);
     final notifier = container.read(gameProvider.notifier);
-    // Simulate: overlay shown → player tapped "Usar item"
     notifier.startContinueWithItem();
-    // Player opened a bomb but then cancelled
     notifier.cancelBomb();
     final s = container.read(gameProvider);
-    // Must return to the overlay (not go straight to GameOverModal)
     expect(s.isContinuingWithItem, false);
     expect(s.isAwaitingGameOverResolution, true);
     expect(s.bombMode, null);
@@ -44,5 +44,20 @@ void main() {
     final s = container.read(gameProvider);
     expect(s.isContinuingWithItem, true);
     expect(s.isAwaitingGameOverResolution, false);
+  });
+
+  test('confirmBomb after startContinueWithItem clears isContinuingWithItem and isGameOver', () {
+    // Use GameNotifier directly (no Hive) — no consume callback wired.
+    final notifier = GameNotifier(GameEngine());
+    notifier.setAwaitingResolution(true);
+    notifier.startContinueWithItem();
+    notifier.enterBombMode(BombMode.bomb3, ItemType.bomb3);
+    notifier.selectBombTile(0, 0);
+    notifier.selectBombTile(0, 1);
+    notifier.selectBombTile(0, 2); // 3rd tile auto-confirms
+    final s = notifier.state;
+    expect(s.isContinuingWithItem, false);
+    expect(s.bombMode, null);
+    expect(s.isGameOver, false); // tiles removed → board has empty spaces → not game over
   });
 }
