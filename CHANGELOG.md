@@ -7,6 +7,12 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.9.9.1] - 2026-05-02
+
+### Fixed
+- GameOverItemOverlay não aparece mais quando inventário está vazio
+- Cancelar bomba durante fluxo "Usar item" volta para o overlay em vez de ir direto para Game Over
+
 ## [0.9.9] - 2026-05-02
 
 ### Added
