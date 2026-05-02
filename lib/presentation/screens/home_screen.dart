@@ -242,18 +242,34 @@ class _HomeCard extends StatelessWidget {
 
     if (comingSoon) card = Opacity(opacity: 0.5, child: card);
 
+    // Garante tamanho uniforme no grid independente do badge
+    card = SizedBox.expand(child: card);
+
     if (showBadge) {
       card = Stack(
         clipBehavior: Clip.none,
         children: [
-          card,
+          Positioned.fill(child: card),
           Positioned(
-            top: -4,
-            right: -4,
+            top: -6,
+            right: -6,
             child: Container(
-              width: 14,
-              height: 14,
-              decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+              width: 20,
+              height: 20,
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
+              ),
+              child: const Center(
+                child: Text(
+                  '!',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
           ),
         ],

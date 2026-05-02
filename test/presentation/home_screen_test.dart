@@ -4,9 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:capivara_2048/data/models/daily_rewards_state.dart';
 import 'package:capivara_2048/data/models/daily_rewards_state_adapter.dart';
 import 'package:capivara_2048/data/models/inventory_hive_adapter.dart';
 import 'package:capivara_2048/data/models/lives_state_adapter.dart';
+import 'package:capivara_2048/domain/daily_rewards/daily_rewards_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/settings_notifier.dart';
 import 'package:capivara_2048/presentation/screens/home_screen.dart';
 
@@ -15,6 +17,52 @@ Future<Widget> _wrap() async {
   final notifier = SettingsNotifier(prefs);
   return ProviderScope(
     overrides: [settingsProvider.overrideWith((ref) => notifier)],
+    child: const MaterialApp(home: HomeScreen()),
+  );
+}
+
+Future<Widget> _wrapWithoutReward() async {
+  final prefs = await SharedPreferences.getInstance();
+  final settingsNotifier = SettingsNotifier(prefs);
+  // Estado com lastClaimedDate = hoje garante DailyRewardStatus.alreadyClaimed
+  final rewardState = DailyRewardsState(
+    currentDay: 1,
+    lastClaimedDate: DateTime.now(),
+    claimedThisCycle: true,
+  );
+  return ProviderScope(
+    overrides: [
+      settingsProvider.overrideWith((ref) => settingsNotifier),
+      dailyRewardsProvider.overrideWith(
+        (ref) => DailyRewardsNotifier(
+          ref.read(dailyRewardsRepositoryProvider),
+          ref,
+        )..debugSetState(rewardState),
+      ),
+    ],
+    child: const MaterialApp(home: HomeScreen()),
+  );
+}
+
+Future<Widget> _wrapWithReward() async {
+  final prefs = await SharedPreferences.getInstance();
+  final settingsNotifier = SettingsNotifier(prefs);
+  // Estado com lastClaimedDate de 2 dias atrás garante DailyRewardStatus.available
+  final rewardState = DailyRewardsState(
+    currentDay: 1,
+    lastClaimedDate: DateTime.now().subtract(const Duration(days: 2)),
+    claimedThisCycle: false,
+  );
+  return ProviderScope(
+    overrides: [
+      settingsProvider.overrideWith((ref) => settingsNotifier),
+      dailyRewardsProvider.overrideWith(
+        (ref) => DailyRewardsNotifier(
+          ref.read(dailyRewardsRepositoryProvider),
+          ref,
+        )..debugSetState(rewardState),
+      ),
+    ],
     child: const MaterialApp(home: HomeScreen()),
   );
 }
@@ -109,5 +157,26 @@ void main() {
     await tester.tap(find.text('Loja'));
     await tester.pumpAndSettle();
     expect(find.text('Em breve'), findsWidgets);
+  });
+
+  testWidgets('badge "!" aparece no card Recompensa Diária quando recompensa disponível',
+      (tester) async {
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(await _wrapWithReward());
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(find.text('!'), findsOneWidget);
+    expect(find.text('Recompensa Diária'), findsOneWidget);
+  });
+
+  testWidgets('card Recompensa Diária sem badge não exibe "!"', (tester) async {
+    await tester.pumpWidget(await _wrapWithoutReward());
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(find.text('!'), findsNothing);
   });
 }
