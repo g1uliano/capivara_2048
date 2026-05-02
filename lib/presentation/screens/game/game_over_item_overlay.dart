@@ -64,7 +64,7 @@ class _GameOverItemOverlayState extends ConsumerState<GameOverItemOverlay>
     super.dispose();
   }
 
-  void _nextItem(int total) {
+  void _nextItem() {
     setState(() => _index++);
     _hapticController.reset();
     _hapticController.repeat();
@@ -153,7 +153,7 @@ class _GameOverItemOverlayState extends ConsumerState<GameOverItemOverlay>
                         child: const Text('Desistir'),
                       )
                     : TextButton(
-                        onPressed: () => _nextItem(items.length),
+                        onPressed: _nextItem,
                         child: const Text('Próximo item →'),
                       ),
               ),

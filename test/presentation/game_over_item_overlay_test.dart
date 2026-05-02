@@ -80,9 +80,14 @@ void main() {
     await tester.pump(const Duration(milliseconds: 1));
   });
 
-  testWidgets('item PNG image is shown', (tester) async {
+  testWidgets('shows correct PNG for highest-priority item', (tester) async {
     await tester.pumpWidget(_buildOverlay(inventory: inv, prefs: prefs));
     await tester.pump(const Duration(milliseconds: 1));
-    expect(find.byType(Image), findsWidgets);
+    expect(
+      find.byWidgetPredicate(
+        (w) => w is Image && (w.image as AssetImage).assetName == 'assets/icons/inventory/undo_3.png',
+      ),
+      findsOneWidget,
+    );
   });
 }
