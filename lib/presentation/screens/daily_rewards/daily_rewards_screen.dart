@@ -207,56 +207,72 @@ class _DayGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget buildTile(int day) {
-      final reward = rewardForDay(day);
-      final isCurrent = day == effectiveDay &&
-          (status == DailyRewardStatus.available ||
-              status == DailyRewardStatus.streakBroken ||
-              status == DailyRewardStatus.cycleCompleted);
-      final isClaimed = day < effectiveDay ||
-          (status == DailyRewardStatus.alreadyClaimed && day == dailyState.currentDay) ||
-          (status == DailyRewardStatus.cycleCompleted);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // 4 tiles per row, 2 rows of 3/4, with spacing
+        const spacing = 8.0;
+        final tileW = (constraints.maxWidth - spacing * 3) / 4;
+        final tileH = tileW * 1.25;
 
-      DayTileState tileState;
-      if (isClaimed) {
-        tileState = DayTileState.claimed;
-      } else if (isCurrent) {
-        tileState = DayTileState.currentAvailable;
-      } else {
-        tileState = DayTileState.future;
-      }
+        Widget buildTile(int day) {
+          final reward = rewardForDay(day);
+          final isCurrent = day == effectiveDay &&
+              (status == DailyRewardStatus.available ||
+                  status == DailyRewardStatus.streakBroken ||
+                  status == DailyRewardStatus.cycleCompleted);
+          // claimedThisCycle=true only when Day 7 was just claimed (currentDay stays at 7).
+          // For days 1–6, currentDay advances to N+1 after claim, so checking day==currentDay
+          // without claimedThisCycle would mark the *next* unclaimed day as claimed.
+          final isClaimed = day < effectiveDay ||
+              (status == DailyRewardStatus.alreadyClaimed &&
+                  day == dailyState.currentDay &&
+                  dailyState.claimedThisCycle) ||
+              (status == DailyRewardStatus.cycleCompleted);
 
-      Widget tile = DailyRewardDayTile(
-        day: day,
-        reward: reward,
-        tileState: tileState,
-        isDay7: day == 7,
-      );
+          DayTileState tileState;
+          if (isClaimed) {
+            tileState = DayTileState.claimed;
+          } else if (isCurrent) {
+            tileState = DayTileState.currentAvailable;
+          } else {
+            tileState = DayTileState.future;
+          }
 
-      if (animatingDay == day) {
-        tile = tile
-            .animate()
-            .scale(begin: const Offset(1, 1), end: const Offset(1.3, 1.3), duration: 200.ms)
-            .then()
-            .scale(begin: const Offset(1.3, 1.3), end: const Offset(1, 1), duration: 200.ms)
-            .fadeOut(delay: 300.ms, duration: 200.ms);
-      }
+          Widget tile = DailyRewardDayTile(
+            day: day,
+            reward: reward,
+            tileState: tileState,
+            isDay7: day == 7,
+            width: tileW,
+            height: tileH,
+          );
 
-      return tile;
-    }
+          if (animatingDay == day) {
+            tile = tile
+                .animate()
+                .scale(begin: const Offset(1, 1), end: const Offset(1.3, 1.3), duration: 200.ms)
+                .then()
+                .scale(begin: const Offset(1.3, 1.3), end: const Offset(1, 1), duration: 200.ms)
+                .fadeOut(delay: 300.ms, duration: 200.ms);
+          }
 
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [1, 2, 3, 4].map(buildTile).toList(),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [5, 6, 7].map(buildTile).toList(),
-        ),
-      ],
+          return tile;
+        }
+
+        return Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [1, 2, 3, 4].map(buildTile).toList(),
+            ),
+            SizedBox(height: spacing),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [5, 6, 7].map(buildTile).toList(),
+            ),
+          ],
+        );
+      },
     );
   }
 }

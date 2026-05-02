@@ -7,6 +7,15 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.9.5] — 2026-05-02
+
+### Fixed
+- Bomba 3: grade de seleção desalinhada com o tabuleiro — overlay agora espelha a estrutura exata do GameScreen (LayoutBuilder + heights fixas de header/inventory)
+- Recompensa Diária: coletar Dia 1 marcava Dia 2 como coletado — condição `isClaimed` corrigida para exigir `claimedThisCycle=true`
+
+### Changed
+- Recompensa Diária: cards dos dias agora responsivos, ocupam toda a largura disponível da tela
+
 ## [0.9.4] — 2026-05-02
 
 ### Added
