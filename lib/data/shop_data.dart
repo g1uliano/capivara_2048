@@ -1,6 +1,7 @@
 // lib/data/shop_data.dart
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'models/item_type.dart';
 import 'models/shop_package.dart';
 
 final shopPackagesProvider = Provider<List<ShopPackage>>((_) => kShopPackages);
@@ -67,3 +68,10 @@ const List<ShopPackage> kShopPackages = [
     giftContents: RewardBundle(lives: 5, bomb2: 0, bomb3: 2, undo1: 0, undo3: 2),
   ),
 ];
+
+const Map<ItemType, double> kItemUnitPrices = {
+  ItemType.bomb3: 1.99,
+  ItemType.undo3: 0.99,
+  ItemType.bomb2: 1.19,
+  ItemType.undo1: 0.49,
+};
