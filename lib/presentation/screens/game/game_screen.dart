@@ -14,6 +14,7 @@ import '../../widgets/game_header.dart';
 import '../../widgets/game_over_modal.dart';
 import '../../widgets/inventory_bar.dart';
 import '../../../core/constants/game_constants.dart';
+import '../../../domain/inventory/inventory_notifier.dart';
 import '../../widgets/pause_overlay.dart';
 import 'game_over_item_overlay.dart';
 
@@ -26,6 +27,9 @@ class GameScreen extends ConsumerWidget {
     final isGameOver = state.isGameOver;
     final hasWon = state.hasWon;
     final notifier = ref.read(gameProvider.notifier);
+    final inventory = ref.watch(inventoryProvider);
+    final hasAnyItem = inventory.bomb2 > 0 || inventory.bomb3 > 0 ||
+        inventory.undo1 > 0 || inventory.undo3 > 0;
     ref.listen<GameState>(gameProvider, (prev, next) {
       if (prev != null && !prev.isGameOver && next.isGameOver && !next.hasWon) {
         ref.read(livesProvider.notifier).consume();
@@ -106,9 +110,9 @@ class GameScreen extends ConsumerWidget {
               if (state.isPaused) const Positioned.fill(child: PauseOverlay()),
               if (state.bombMode != null)
                 const Positioned.fill(child: BombDimOverlay()),
-              if (state.isAwaitingGameOverResolution)
+              if (state.isAwaitingGameOverResolution && hasAnyItem)
                 const Positioned.fill(child: GameOverItemOverlay()),
-              if (isGameOver && !state.isAwaitingGameOverResolution && !state.isContinuingWithItem)
+              if (isGameOver && (!state.isAwaitingGameOverResolution || !hasAnyItem) && !state.isContinuingWithItem)
                 const Positioned.fill(
                     child: GameOverModal(message: 'Game Over!')),
               if (hasWon && !isGameOver)

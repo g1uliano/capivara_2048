@@ -164,11 +164,12 @@ class GameNotifier extends StateNotifier<GameState> {
     _bombSelection = [];
     _pendingBombItem = null;
     if (wasContinuing) {
+      // Return to the "use item?" overlay so the player can pick a different item.
       state = state.copyWith(
         bombMode: null,
         selectedBombTiles: const [],
         isContinuingWithItem: false,
-        isAwaitingGameOverResolution: false,
+        isAwaitingGameOverResolution: true,
       );
     } else {
       state = state.copyWith(bombMode: null, selectedBombTiles: const []);

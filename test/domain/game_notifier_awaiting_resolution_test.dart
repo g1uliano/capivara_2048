@@ -20,18 +20,18 @@ void main() {
     expect(container.read(gameProvider).isAwaitingGameOverResolution, false);
   });
 
-  test('cancelBomb while isContinuingWithItem clears bomb flags and both continuation flags', () {
+  test('cancelBomb while isContinuingWithItem returns to awaiting overlay', () {
     final container = ProviderContainer();
     addTearDown(container.dispose);
     final notifier = container.read(gameProvider.notifier);
-    // Simulate the state after startContinueWithItem
+    // Simulate: overlay shown → player tapped "Usar item"
     notifier.startContinueWithItem();
-    // Manually set bombMode by reading state — we can't call enterBombMode easily in unit tests,
-    // so just verify the flags are cleared by cancelBomb
+    // Player opened a bomb but then cancelled
     notifier.cancelBomb();
     final s = container.read(gameProvider);
+    // Must return to the overlay (not go straight to GameOverModal)
     expect(s.isContinuingWithItem, false);
-    expect(s.isAwaitingGameOverResolution, false);
+    expect(s.isAwaitingGameOverResolution, true);
     expect(s.bombMode, null);
   });
 
