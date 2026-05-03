@@ -17,6 +17,7 @@ import '../../domain/inventory/inventory_notifier.dart';
 import '../../domain/lives/lives_notifier.dart';
 import '../../domain/shop/share_codes_notifier.dart';
 import '../widgets/game_background.dart';
+import '../widgets/outlined_text.dart';
 
 class ShopScreen extends ConsumerWidget {
   const ShopScreen({super.key});
@@ -52,19 +53,22 @@ class ShopScreen extends ConsumerWidget {
             const SizedBox(height: 24),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 0),
-              child: Text(
-                'Itens avulsos',
+              child: OutlinedText(
+                text: 'Itens avulsos',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF3E2723),
                   fontFamily: 'Fredoka',
                 ),
+                textAlign: TextAlign.left,
               ),
             ),
             const SizedBox(height: 12),
             ...const [ItemType.bomb3, ItemType.undo3, ItemType.bomb2, ItemType.undo1]
-                .map((item) => _UnitItemCard(item: item)),
+                .map((item) => Padding(
+                      padding: EdgeInsets.only(bottom: 12),
+                      child: _UnitItemCard(item: item),
+                    )),
           ],
         ),
       ),
