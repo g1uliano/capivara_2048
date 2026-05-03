@@ -37,19 +37,35 @@ class ShopScreen extends ConsumerWidget {
           foregroundColor: Colors.white,
           elevation: 0,
         ),
-        body: ListView.builder(
+        body: ListView(
           padding: const EdgeInsets.all(16),
-          itemCount: packages.length,
-          itemBuilder: (context, index) {
-            final pkg = packages[index];
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: _ShopPackageCard(
-                package: pkg,
-                onBuy: () => _onBuy(context, ref, pkg),
+          children: [
+            ...packages.map(
+              (pkg) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _ShopPackageCard(
+                  package: pkg,
+                  onBuy: () => _onBuy(context, ref, pkg),
+                ),
               ),
-            );
-          },
+            ),
+            const SizedBox(height: 24),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 0),
+              child: Text(
+                'Itens avulsos',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF3E2723),
+                  fontFamily: 'Fredoka',
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            ...const [ItemType.bomb3, ItemType.undo3, ItemType.bomb2, ItemType.undo1]
+                .map((item) => _UnitItemCard(item: item)),
+          ],
         ),
       ),
     );
@@ -303,6 +319,89 @@ class _GiftCodeSheet extends StatelessWidget {
                     foregroundColor: Colors.white,
                   ),
                   child: const Text('Fechar'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _UnitItemCard extends ConsumerWidget {
+  final ItemType item;
+  const _UnitItemCard({required this.item});
+
+  String get _png => switch (item) {
+        ItemType.bomb2 => 'assets/icons/inventory/bomb_2.png',
+        ItemType.bomb3 => 'assets/icons/inventory/bomb_3.png',
+        ItemType.undo1 => 'assets/icons/inventory/undo_1.png',
+        ItemType.undo3 => 'assets/icons/inventory/undo_3.png',
+      };
+
+  String get _name => switch (item) {
+        ItemType.bomb2 => 'Bomba 2',
+        ItemType.bomb3 => 'Bomba 3',
+        ItemType.undo1 => 'Desfazer 1',
+        ItemType.undo3 => 'Desfazer 3',
+      };
+
+  String get _price {
+    final p = kItemUnitPrices[item] ?? 0.0;
+    return 'R\$ ${p.toStringAsFixed(2).replaceAll('.', ',')}';
+  }
+
+  Future<void> _buy(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Confirmar compra'),
+        content: Text('Você receberá 1× $_name por $_price'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Confirmar'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await ref.read(inventoryProvider.notifier).add(item, 1);
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('$_name adicionado! 🎉')),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              Image.asset(_png, width: 40, height: 40),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(_name, style: const TextStyle(fontSize: 16)),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFF8C42),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                ),
+                onPressed: () => _buy(context, ref),
+                child: Text(
+                  _price,
+                  style: const TextStyle(color: Colors.white, fontSize: 13),
                 ),
               ),
             ],

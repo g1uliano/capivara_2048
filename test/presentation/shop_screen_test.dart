@@ -140,4 +140,46 @@ void main() {
 
     expect(find.text('Copiado!'), findsOneWidget);
   });
+
+  testWidgets('seção Itens avulsos presente abaixo dos pacotes', (tester) async {
+    await tester.pumpWidget(_buildShop());
+    await tester.pumpAndSettle();
+    await tester.dragUntilVisible(
+      find.text('Itens avulsos'),
+      find.byType(ListView),
+      const Offset(0, -300),
+    );
+    expect(find.text('Itens avulsos'), findsOneWidget);
+  });
+
+  testWidgets('4 cards de itens avulsos com preços corretos', (tester) async {
+    await tester.pumpWidget(_buildShop());
+    await tester.pumpAndSettle();
+    await tester.dragUntilVisible(
+      find.text('R\$ 1,99'),
+      find.byType(ListView),
+      const Offset(0, -300),
+    );
+    await tester.dragUntilVisible(
+      find.text('R\$ 0,99'),
+      find.byType(ListView),
+      const Offset(0, -300),
+    );
+    expect(find.text('R\$ 1,99'), findsOneWidget);
+    expect(find.text('R\$ 0,99'), findsOneWidget);
+  });
+
+  testWidgets('tap Comprar item avulso → AlertDialog com preço', (tester) async {
+    await tester.pumpWidget(_buildShop());
+    await tester.pumpAndSettle();
+    await tester.dragUntilVisible(
+      find.text('R\$ 1,99'),
+      find.byType(ListView),
+      const Offset(0, -300),
+    );
+    await tester.tap(find.text('R\$ 1,99').first);
+    await tester.pumpAndSettle();
+    expect(find.text('Confirmar compra'), findsOneWidget);
+    expect(find.textContaining('Bomba 3'), findsWidgets);
+  });
 }
