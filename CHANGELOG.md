@@ -7,6 +7,11 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-05-03
+
+### Changed
+- Splash screen full-screen com arte da floresta amazônica e todos os animais do jogo (1080×1920, `scaleAspectFill`)
+
 ## [1.0.2] - 2026-05-03
 
 ### Fixed
