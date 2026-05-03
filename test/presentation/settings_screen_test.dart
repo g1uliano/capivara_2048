@@ -24,7 +24,7 @@ void main() {
     await tester.pump();
 
     expect(notifier.state.hapticEnabled, isTrue);
-    await tester.tap(find.byType(Switch));
+    await tester.tap(find.byType(Switch).first);
     await tester.pump();
     expect(notifier.state.hapticEnabled, isFalse);
     expect(prefs.getBool('settings.haptic_enabled'), isFalse);
@@ -71,10 +71,20 @@ void main() {
     expect(
       find.descendant(
         of: find.byType(OutlinedText),
-        matching: find.text('Geral'),
+        matching: find.text('Gameplay'),
       ),
       findsOneWidget,
     );
+  });
+
+  testWidgets('toggle Reduzir Efeitos Visuais presente na SettingsScreen', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final notifier = SettingsNotifier(prefs);
+    await tester.pumpWidget(_wrap(notifier));
+    await tester.pump();
+
+    expect(find.text('Reduzir Efeitos Visuais'), findsOneWidget);
   });
 
   testWidgets('controles estão dentro de Cards brancos semi-opacos', (tester) async {

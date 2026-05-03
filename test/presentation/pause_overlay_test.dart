@@ -90,8 +90,19 @@ void main() {
       find.byWidgetPredicate(
         (w) => w is OutlinedText && w.text == 'Reduzir efeitos visuais',
       ),
-      findsOneWidget,
+      findsNothing,
     );
+  });
+
+  testWidgets('PauseOverlay não tem switch Reduzir Efeitos Visuais', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    await tester.pumpWidget(
+      ProviderScope(
+        child: const MaterialApp(home: Scaffold(body: PauseOverlay())),
+      ),
+    );
+
+    expect(find.text('Reduzir efeitos visuais'), findsNothing);
   });
 
   testWidgets('PauseOverlay renders tint overlay Container with black opacity', (tester) async {

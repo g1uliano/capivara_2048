@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/providers/reduce_effects_provider.dart';
 import '../controllers/settings_notifier.dart';
 import '../widgets/game_background.dart';
 import '../widgets/outlined_text.dart';
@@ -42,7 +43,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         body: ListView(
           padding: const EdgeInsets.symmetric(vertical: 8),
           children: [
-            _SettingsSection('Geral'),
+            _SettingsSection('Gameplay'),
             Card(
               margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               color: Colors.white.withValues(alpha: 0.88),
@@ -56,6 +57,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     value: settings.hapticEnabled,
                     onChanged: notifier.setHaptic,
                     activeThumbColor: AppColors.primary,
+                  ),
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final reduceEffects = ref.watch(reduceEffectsProvider);
+                      return SwitchListTile(
+                        tileColor: Colors.transparent,
+                        title: Text('Reduzir Efeitos Visuais', style: GoogleFonts.nunito(fontSize: 16)),
+                        value: reduceEffects,
+                        onChanged: (_) => ref.read(reduceEffectsProvider.notifier).toggle(),
+                        activeThumbColor: AppColors.primary,
+                      );
+                    },
                   ),
                 ],
               ),

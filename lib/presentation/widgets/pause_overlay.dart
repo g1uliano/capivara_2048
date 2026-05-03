@@ -102,21 +102,6 @@ class _PauseOverlayState extends ConsumerState<PauseOverlay> {
                   Navigator.of(context).maybePop();
                 },
               ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  OutlinedText(
-                    text: 'Reduzir efeitos visuais',
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  Switch(
-                    value: reduceEffects,
-                    onChanged: (_) =>
-                        ref.read(reduceEffectsProvider.notifier).toggle(),
-                  ),
-                ],
-              ),
               if (kDebugMode)
                 TextButton(
                   onPressed: () => Navigator.of(context).push(
