@@ -7,6 +7,12 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.1.3] - 2026-05-03
+
+### Fixed
+- RankingScreen: TabBar "Por Tempo / Por Pontuação" agora tem fundo verde com texto branco — legível sobre o GameBackground
+- RankingScreen: texto de estado vazio substituído por OutlinedText (branco + contorno preto)
+
 ## [1.1.2] - 2026-05-03
 
 ### Fixed
