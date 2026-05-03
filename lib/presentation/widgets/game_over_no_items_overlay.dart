@@ -71,7 +71,6 @@ class _GameOverNoItemsOverlayState extends ConsumerState<GameOverNoItemsOverlay>
       // fire-and-forget Hive persistence; state updates are synchronous
       unawaited(ref.read(livesProvider.notifier).rewardFromAd());
       unawaited(ref.read(inventoryProvider.notifier).add(_drawnItem, 1));
-      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('${_nameFor(_drawnItem)} adicionado! Boa sorte! 🎉')),
       );
@@ -136,8 +135,8 @@ class _GameOverNoItemsOverlayState extends ConsumerState<GameOverNoItemsOverlay>
 
     if (_dismissed) return const SizedBox.shrink();
 
-    return WillPopScope(
-      onWillPop: () async => false,
+    return PopScope(
+      canPop: false,
       child: Stack(
         fit: StackFit.expand,
         children: [

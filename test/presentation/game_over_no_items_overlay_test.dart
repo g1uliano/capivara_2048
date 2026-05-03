@@ -65,7 +65,7 @@ void main() {
     expect(found, isTrue);
   });
 
-  testWidgets('back button does not close overlay (WillPopScope)', (tester) async {
+  testWidgets('back button does not close overlay', (tester) async {
     await tester.pumpWidget(_buildOverlay());
     await tester.pumpAndSettle();
     final NavigatorState navigator = tester.state(find.byType(Navigator));
