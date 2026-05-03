@@ -90,6 +90,18 @@ class LivesNotifier extends StateNotifier<LivesState> {
     return applyAddEarned(s.copyWith(adWatchedToday: s.adWatchedToday + 1), 1);
   }
 
+  static LivesState applyAdWatched(LivesState state) {
+    final now = DateTime.now();
+    LivesState s = state;
+    if (now.isAfter(s.adCounterResetAt)) {
+      s = s.copyWith(
+        adWatchedToday: 0,
+        adCounterResetAt: DateTime(now.year, now.month, now.day + 1),
+      );
+    }
+    return s.copyWith(adWatchedToday: s.adWatchedToday + 1);
+  }
+
   void _startRegenTimer() {
     _regenTimer?.cancel();
     _regenTimer = Timer.periodic(const Duration(seconds: 30), (_) => _onRegenTick());
@@ -139,6 +151,12 @@ class LivesNotifier extends StateNotifier<LivesState> {
   Future<void> rewardFromAd() async {
     await _ready.future;
     state = applyAdReward(state);
+    await _repo.save(state);
+  }
+
+  Future<void> recordAdWatched() async {
+    await _ready.future;
+    state = applyAdWatched(state);
     await _repo.save(state);
   }
 

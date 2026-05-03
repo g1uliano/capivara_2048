@@ -70,7 +70,7 @@ class _GameOverNoItemsOverlayState extends ConsumerState<GameOverNoItemsOverlay>
     if (!mounted) return;
     if (rewarded) {
       // fire-and-forget Hive persistence; state updates are synchronous
-      unawaited(ref.read(livesProvider.notifier).rewardFromAd());
+      unawaited(ref.read(livesProvider.notifier).recordAdWatched());
       unawaited(ref.read(inventoryProvider.notifier).add(_drawnItem, 1));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('${_nameFor(_drawnItem)} adicionado! Boa sorte! 🎉')),
