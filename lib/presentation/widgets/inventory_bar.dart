@@ -8,7 +8,14 @@ import 'confirm_use_dialog.dart';
 import 'inventory_item_button.dart';
 
 class InventoryBar extends ConsumerWidget {
-  const InventoryBar({super.key});
+  const InventoryBar({
+    super.key,
+    this.onTapWhenEmpty,
+    this.pulsingItems = const {},
+  });
+
+  final void Function(ItemType)? onTapWhenEmpty;
+  final Set<ItemType> pulsingItems;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -71,6 +78,10 @@ class InventoryBar extends ConsumerWidget {
             pngPath: 'assets/icons/inventory/bomb_2.png',
             count: inventory.bomb2,
             onPressed: inventory.bomb2 > 0 ? useBomb2 : null,
+            onTapWhenEmpty: inventory.bomb2 == 0 && onTapWhenEmpty != null
+                ? () => onTapWhenEmpty!(ItemType.bomb2)
+                : null,
+            shouldPulse: pulsingItems.contains(ItemType.bomb2),
           ),
           InventoryItemButton(
             label: 'Bomba 3',
@@ -78,6 +89,10 @@ class InventoryBar extends ConsumerWidget {
             pngPath: 'assets/icons/inventory/bomb_3.png',
             count: inventory.bomb3,
             onPressed: inventory.bomb3 > 0 ? useBomb3 : null,
+            onTapWhenEmpty: inventory.bomb3 == 0 && onTapWhenEmpty != null
+                ? () => onTapWhenEmpty!(ItemType.bomb3)
+                : null,
+            shouldPulse: pulsingItems.contains(ItemType.bomb3),
           ),
           InventoryItemButton(
             label: 'Desfazer 1',
@@ -85,6 +100,10 @@ class InventoryBar extends ConsumerWidget {
             pngPath: 'assets/icons/inventory/undo_1.png',
             count: inventory.undo1,
             onPressed: inventory.undo1 > 0 ? useUndo1 : null,
+            onTapWhenEmpty: inventory.undo1 == 0 && onTapWhenEmpty != null
+                ? () => onTapWhenEmpty!(ItemType.undo1)
+                : null,
+            shouldPulse: pulsingItems.contains(ItemType.undo1),
           ),
           InventoryItemButton(
             label: 'Desfazer 3',
@@ -92,6 +111,10 @@ class InventoryBar extends ConsumerWidget {
             pngPath: 'assets/icons/inventory/undo_3.png',
             count: inventory.undo3,
             onPressed: inventory.undo3 > 0 ? useUndo3 : null,
+            onTapWhenEmpty: inventory.undo3 == 0 && onTapWhenEmpty != null
+                ? () => onTapWhenEmpty!(ItemType.undo3)
+                : null,
+            shouldPulse: pulsingItems.contains(ItemType.undo3),
           ),
         ],
       ),
