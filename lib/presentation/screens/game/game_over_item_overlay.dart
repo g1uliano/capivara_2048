@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/haptic_utils.dart';
 import '../../../data/models/inventory.dart';
 import '../../../data/models/item_type.dart';
+import '../../../domain/game_engine/bomb_mode.dart';
 import '../../../domain/inventory/inventory_notifier.dart';
 import '../../../presentation/controllers/game_notifier.dart';
 
@@ -72,8 +73,23 @@ class _GameOverItemOverlayState extends ConsumerState<GameOverItemOverlay>
 
   void _useItem(ItemType type) {
     _hapticController.stop();
-    ref.read(inventoryProvider.notifier).consume(type);
-    ref.read(gameProvider.notifier).startContinueWithItem();
+    final notifier = ref.read(gameProvider.notifier);
+    switch (type) {
+      case ItemType.bomb2:
+        notifier.startContinueWithItem();
+        notifier.enterBombMode(BombMode.bomb2, type);
+      case ItemType.bomb3:
+        notifier.startContinueWithItem();
+        notifier.enterBombMode(BombMode.bomb3, type);
+      case ItemType.undo1:
+        final undone = notifier.undo(1);
+        if (undone) ref.read(inventoryProvider.notifier).consume(type);
+        notifier.startContinueWithItem();
+      case ItemType.undo3:
+        final undone = notifier.undo(3);
+        if (undone) ref.read(inventoryProvider.notifier).consume(type);
+        notifier.startContinueWithItem();
+    }
   }
 
   void _giveUp() {

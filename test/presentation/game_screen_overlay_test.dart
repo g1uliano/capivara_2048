@@ -4,6 +4,7 @@ import 'package:capivara_2048/data/models/game_state.dart';
 import 'package:capivara_2048/data/models/inventory.dart';
 import 'package:capivara_2048/domain/game_engine/game_engine.dart';
 import 'package:capivara_2048/data/models/inventory_hive_adapter.dart';
+import 'package:capivara_2048/data/models/item_type.dart';
 import 'package:capivara_2048/data/models/lives_state_adapter.dart';
 import 'package:capivara_2048/data/repositories/inventory_repository.dart';
 import 'package:capivara_2048/data/repositories/lives_repository.dart';
@@ -131,4 +132,60 @@ void main() {
     expect(find.byType(GameOverModal), findsOneWidget);
     expect(find.byType(GameOverNoItemsOverlay), findsNothing);
   });
+
+  testWidgets(
+      'usar Bomba 3 na overlay → inventário não consumido imediatamente, BombMode ativo',
+      (tester) async {
+    final inv = const Inventory(bomb2: 0, bomb3: 1, undo1: 0, undo3: 0);
+    late ProviderContainer container;
+
+    await tester.pumpWidget(
+      ProviderScope(
+        observers: [
+          _ContainerCapture((c) => container = c),
+        ],
+        overrides: [
+          gameProvider.overrideWith((ref) {
+            final notifier = GameNotifier(GameEngine());
+            notifier.setConsumeCallback(
+              (type) => ref.read(inventoryProvider.notifier).consume(type),
+            );
+            notifier.state = _awaitingState(isAwaitingResolution: true);
+            return notifier;
+          }),
+          inventoryRepositoryProvider.overrideWithValue(InventoryRepository()),
+          inventoryProvider.overrideWith((ref) {
+            final notifier = InventoryNotifier(ref.read(inventoryRepositoryProvider));
+            notifier.setStateForTest(inv);
+            return notifier;
+          }),
+          livesRepositoryProvider.overrideWithValue(LivesRepository()),
+          livesProvider.overrideWith((ref) => LivesNotifier(ref.read(livesRepositoryProvider))),
+          settingsProvider.overrideWith((ref) => SettingsNotifier(prefs)),
+        ],
+        child: const MaterialApp(home: GameScreen()),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 1));
+
+    // Navega até Bomba 3 (priority: undo3, undo1, bomb3 — undo3/undo1 count=0, bomb3 é o primeiro)
+    expect(find.text('Bomba 3'), findsOneWidget);
+    await tester.tap(find.text('Usar item'));
+    await tester.pump(const Duration(milliseconds: 1));
+
+    // Inventário NÃO deve ter sido consumido antes do jogador selecionar os tiles
+    expect(container.read(inventoryProvider).bomb3, 1);
+    // BombMode deve estar ativo (overlay de seleção visível)
+    expect(container.read(gameProvider).bombMode, isNotNull);
+  });
+}
+
+class _ContainerCapture extends ProviderObserver {
+  _ContainerCapture(this._capture);
+  final void Function(ProviderContainer) _capture;
+
+  @override
+  void didAddProvider(ProviderBase provider, Object? value, ProviderContainer container) {
+    _capture(container);
+  }
 }
