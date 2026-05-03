@@ -167,6 +167,8 @@ void main() {
     );
     expect(find.text('R\$ 1,99'), findsOneWidget);
     expect(find.text('R\$ 0,99'), findsOneWidget);
+    expect(find.text('R\$ 1,19'), findsOneWidget);
+    expect(find.text('R\$ 0,49'), findsOneWidget);
   });
 
   testWidgets('tap Comprar item avulso → AlertDialog com preço', (tester) async {
