@@ -55,7 +55,8 @@ class _GameOverNoItemsOverlayState extends ConsumerState<GameOverNoItemsOverlay>
 
   void _dismiss() {
     setState(() => _dismissed = true);
-    ref.read(gameProvider.notifier).setAwaitingResolution(false);
+    // startContinueWithItem sinaliza que a partida continua (não vai para Game Over)
+    ref.read(gameProvider.notifier).startContinueWithItem();
   }
 
   String get _price {
@@ -126,7 +127,8 @@ class _GameOverNoItemsOverlayState extends ConsumerState<GameOverNoItemsOverlay>
     );
     if (confirmed != true || !mounted) return;
     unawaited(ref.read(livesProvider.notifier).consume());
-    _dismiss();
+    setState(() => _dismissed = true);
+    ref.read(gameProvider.notifier).setAwaitingResolution(false);
   }
 
   @override
@@ -231,7 +233,11 @@ class _GameOverNoItemsOverlayState extends ConsumerState<GameOverNoItemsOverlay>
                 SizedBox(
                   width: double.infinity,
                   height: 52,
-                  child: OutlinedButton(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: const Color(0xFF3E2723),
+                    ),
                     onPressed: _confirmBuy,
                     child: Text('🛒 Comprar ${_nameFor(_drawnItem)}  •  $_price'),
                   ),
@@ -241,7 +247,7 @@ class _GameOverNoItemsOverlayState extends ConsumerState<GameOverNoItemsOverlay>
                   onPressed: _confirmQuit,
                   child: const Text(
                     'Encerrar partida',
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(color: Colors.white70),
                   ),
                 ),
               ],
