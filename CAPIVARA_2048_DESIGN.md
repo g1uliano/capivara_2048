@@ -2,9 +2,9 @@
 
 > Documento de especificação para desenvolvimento. Pensado para ser alimentado em ferramentas como Claude Code para implementação iterativa.
 >
-> **Status atual:** Fase 2.11 em andamento 🔄 (v1.0.x) — Animação piscante no Game Over + Oferta de item via anúncio/compra sem itens. Fases 2.4 (Recompensas Diárias), 2.5 (Identidade "Olha o Bichim!"), 2.6 (Home redesenhada, Tela de Coleção, Tela de Configurações), 2.7 (Bugfixes visuais de interface), 2.8 (Loja Mock) e 2.9 (Splash Screen, Game Over redesenhado, Inventário maior e Orientação bloqueada), 2.10 (Animação piscante + GameOverNoItemsOverlay) também concluídas.
+> **Status atual:** Fase 2.11 concluída ✅ (v1.1.0) — Loja em overlay acessível pelos ícones desabilitados do inventário. Fase 2.10 concluída ✅ (v1.0.0). Fases 2.4 (Recompensas Diárias), 2.5 (Identidade "Olha o Bichim!"), 2.6 (Home redesenhada, Tela de Coleção, Tela de Configurações), 2.7 (Bugfixes visuais de interface), 2.8 (Loja Mock) e 2.9 (Splash Screen, Game Over redesenhado, Inventário maior e Orientação bloqueada) também concluídas.
 >
-> **Próximo:** **Concluir Fase 2.11 → Fase 3 (Backend)**
+> **Próximo:** **Fase 3 — Backend, ranking, monetização**
 >
 > **Renomeação do jogo:** o nome do jogo passa de **"Capivara 2048"** para **"Olha o Bichim!"**. As referências antigas em seções abaixo serão atualizadas progressivamente; durante a transição, considere "Olha o Bichim!" o nome canônico do produto. O *codename* interno do repositório (`capivara_2048`) permanece — apenas o nome de exibição muda.
 >
@@ -41,7 +41,7 @@
 ## 2. Stack Técnica
 
 ### 2.1 Framework principal
-**Flutter 3.x** (Dart) — multiplataforma único para iOS, Android, Web e Desktop.
+**Flutter 3.x** (Dart) — mobile (Android e iOS). Linux e Web foram removidos do escopo do projeto.
 
 ### 2.2 Bibliotecas recomendadas
 | Categoria | Biblioteca | Uso |
@@ -60,7 +60,7 @@
 | Compras | `in_app_purchase` | Loja |
 | Compartilhamento | `share_plus` + `app_links` | Códigos de resgate |
 | Blur (UI) | `flutter` nativo (`BackdropFilter` + `ImageFilter.blur`) | Efeito vidro fosco |
-| Splash Screen | `flutter_native_splash` | Splash screen nativa (Fase 2.9) ✅ |
+| Splash Screen | `flutter_native_splash` | Splash screen nativa — Android e iOS (Fase 2.9) ✅ |
 | Orientação | `flutter` nativo (`SystemChrome.setPreferredOrientations`) | Bloqueio portrait-only (Fase 2.9) ✅ |
 
 ### 2.3 Estrutura de pastas
@@ -170,6 +170,8 @@ assets/
 
 ### 3.4 Regra crítica: quando uma vida é consumida
 **A vida é consumida APENAS quando o jogador confirma o Game Over sem usar nenhum item de salvamento.**
+
+> **Nota (bug corrigido na v1.0.x):** a implementação anterior consumia a vida imediatamente quando o tabuleiro travava, antes de qualquer decisão do jogador. A spec abaixo sempre foi a correta — o bug era na implementação. A correção garante que a vida só é descontada ao confirmar "Desistir" na `GameOverItemScreen` ou "Encerrar partida" na `GameOverNoItemsOverlay`.
 
 | Ação | Consome vida? |
 |---|---|
@@ -404,9 +406,9 @@ PNGs finais (1024×1024, fundo transparente) em `assets/icons/inventory/`:
    - **Bomba:** entra em modo seleção (`BombSelectionOverlay`) → confirma "Explodir" → animação (500ms), tiles removidos, decrementa contador
 
 #### Regras de bombas
-- **Bomba 2:** 2 casas adjacentes (4-vizinhos)
-- **Bomba 3:** 3 casas, livre escolha
-- Não pode explodir células vazias: feedback "Selecione um tile"
+- **Bomba 2:** jogador seleciona 2 tiles à sua escolha para remover do tabuleiro — exibido no `ConfirmUseDialog` como "Selecione 2 tiles para remover do tabuleiro"
+- **Bomba 3:** jogador seleciona 3 tiles à sua escolha para remover do tabuleiro — exibido no `ConfirmUseDialog` como "Selecione 3 tiles para remover do tabuleiro"
+- Não pode selecionar células vazias: feedback "Selecione um tile com peça"
 - Cancelar no `BombSelectionOverlay` não consome o item
 
 ### 6.3 Game over — resumo dos dois fluxos
@@ -690,7 +692,7 @@ users/{userId}/personalRecords
 ### 11.4 Considerações técnicas
 - Pré-carregar todos os sons no início
 - Pool de AudioPlayers
-- Formatos: OGG (Android/Web), M4A/AAC (iOS), MP3 universal
+- Formatos: M4A/AAC (iOS), OGG (Android), MP3 universal como fallback
 - Tamanho alvo: < 50KB por som de animal
 
 ---
@@ -1228,7 +1230,7 @@ testWidgets('game over sem itens → GameOverNoItemsOverlay, não GameOverItemSc
 
 ---
 
-### 🔄 Fase 2.11 (em andamento) — Loja em overlay sobre o jogo acessível pelos ícones desabilitados do inventário (v1.0.1)
+### ✅ Fase 2.11 — Loja em overlay sobre o jogo acessível pelos ícones desabilitados do inventário (v1.0.1)
 
 **Objetivo:** quando o jogador toca em um ícone de item com contador 0 (acinzentado/desabilitado) na `InventoryBar`, em vez de ignorar o toque, abrir a loja como overlay diretamente sobre o jogo — sem navegar para outra tela — permitindo comprar itens sem perder o contexto da partida. O cronômetro fica pausado enquanto o overlay estiver aberto.
 
@@ -1397,9 +1399,9 @@ testWidgets('tap em ícone habilitado → ConfirmUseDialog (não ShopOverlay)', 
 - Localização PT-BR / EN
 - Acessibilidade (contraste, leitor de tela, fonte ajustável)
 - Modo escuro (opcional)
-- Testes em dispositivos reais
-- Build para iOS, Android, Web
-- Submissão App Store / Play Store / Web hosting
+- Testes em dispositivos reais (Android e iOS)
+- Build para Android e iOS
+- Submissão App Store / Play Store
 - Política de privacidade e termos de uso
 - LGPD/COPPA compliance
 
@@ -1449,6 +1451,7 @@ testWidgets('tap em ícone habilitado → ConfirmUseDialog (não ShopOverlay)', 
 - Keywords: 2048, puzzle, capivara, animais, brasil, fofo, casual, fauna, bichim
 - Screenshots destacando a Capivara
 - Vídeo de gameplay de 30s
+- Distribuição exclusiva via App Store (iOS) e Play Store (Android)
 
 ---
 
