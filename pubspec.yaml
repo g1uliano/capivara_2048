@@ -116,11 +116,11 @@ flutter_launcher_icons:
   adaptive_icon_foreground: assets/images/icon/app_icon_tight.png
 
 flutter_native_splash:
-  color: "#F5F0E8"
+  color: "#1B3610"
   image: assets/images/splash/splash_logo.png
   android: true
   ios: true
   android_gravity: center
   ios_content_mode: center
   android_12:
-    color: "#F5F0E8"
+    color: "#1B3610"
