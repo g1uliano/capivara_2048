@@ -34,15 +34,14 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F0E8),
-      body: Center(
+      backgroundColor: const Color(0xFF1B3610),
+      body: SizedBox.expand(
         child: Image.asset(
-          'assets/images/splash/splash_logo.png',
-          width: 200,
+          'assets/images/splash/splashscreen.png',
+          fit: BoxFit.cover,
         )
             .animate()
-            .fadeIn(duration: 600.ms)
-            .scale(begin: const Offset(0.8, 0.8), end: const Offset(1.0, 1.0), duration: 600.ms),
+            .fadeIn(duration: 400.ms),
       ),
     );
   }
