@@ -75,3 +75,16 @@ const Map<ItemType, double> kItemUnitPrices = {
   ItemType.bomb2: 1.19,
   ItemType.undo1: 0.49,
 };
+
+/// Retorna os IDs dos pacotes que contêm ao menos 1 unidade de [item].
+List<String> packageIdsContaining(ItemType item) {
+  return kShopPackages.where((pkg) {
+    final c = pkg.contents;
+    return switch (item) {
+      ItemType.bomb2 => c.bomb2 > 0,
+      ItemType.bomb3 => c.bomb3 > 0,
+      ItemType.undo1 => c.undo1 > 0,
+      ItemType.undo3 => c.undo3 > 0,
+    };
+  }).map((pkg) => pkg.id).toList();
+}
