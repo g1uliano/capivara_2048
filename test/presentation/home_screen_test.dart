@@ -8,6 +8,7 @@ import 'package:capivara_2048/data/models/daily_rewards_state.dart';
 import 'package:capivara_2048/data/models/daily_rewards_state_adapter.dart';
 import 'package:capivara_2048/data/models/inventory_hive_adapter.dart';
 import 'package:capivara_2048/data/models/lives_state_adapter.dart';
+import 'package:capivara_2048/data/repositories/game_record_repository.dart';
 import 'package:capivara_2048/domain/daily_rewards/daily_rewards_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/settings_notifier.dart';
 import 'package:capivara_2048/presentation/screens/home_screen.dart';
@@ -16,7 +17,10 @@ Future<Widget> _wrap() async {
   final prefs = await SharedPreferences.getInstance();
   final notifier = SettingsNotifier(prefs);
   return ProviderScope(
-    overrides: [settingsProvider.overrideWith((ref) => notifier)],
+    overrides: [
+      settingsProvider.overrideWith((ref) => notifier),
+      gameRecordRepositoryProvider.overrideWithValue(GameRecordRepository()),
+    ],
     child: const MaterialApp(home: HomeScreen()),
   );
 }
@@ -110,10 +114,16 @@ void main() {
     expect(find.text('Novo Jogo'), findsOneWidget);
   });
 
-  testWidgets('card Ranking tem label "Em breve" (desabilitado)', (tester) async {
+  testWidgets('tap em Ranking navega para RankingScreen', (tester) async {
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(await _wrap());
     await tester.pump(const Duration(milliseconds: 500));
-    expect(find.text('Em breve'), findsWidgets);
+    await tester.tap(find.text('Ranking'));
+    await tester.pumpAndSettle();
+    expect(find.text('Pessoal'), findsOneWidget);
   });
 
   testWidgets('GameTitleImage presente no widget tree', (tester) async {

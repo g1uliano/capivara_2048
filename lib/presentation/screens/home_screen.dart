@@ -16,6 +16,7 @@ import 'collection_screen.dart';
 import 'daily_rewards/daily_rewards_screen.dart';
 import 'game/game_screen.dart';
 import 'no_lives_screen.dart';
+import 'ranking_screen.dart';
 import 'settings_screen.dart';
 import 'shop_screen.dart';
 
@@ -104,8 +105,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       _HomeCard(
                         label: 'Ranking',
                         icon: Icons.leaderboard_rounded,
-                        onTap: null,
-                        comingSoon: true,
+                        onTap: () {
+                          maybeHaptic(ref);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const RankingScreen()),
+                          );
+                        },
                       ),
                       _HomeCard(
                         label: 'Recompensa Diária',
