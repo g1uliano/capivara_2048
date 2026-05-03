@@ -7,6 +7,13 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-05-03
+
+### Fixed
+- ShopOverlay agora exibe a seção "Itens avulsos" igual à loja principal
+- Item avulso correspondente ao ícone tocado é destacado com borda laranja no ShopOverlay
+- Assistir anúncio para ganhar item no game over não entrega mais vida extra
+
 ## [1.1.1] - 2026-05-03
 
 ### Fixed
