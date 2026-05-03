@@ -7,6 +7,16 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-05-02
+
+### Added
+- **GameOverNoItemsOverlay** (Fase 2.10-B): quando o tabuleiro trava e o inventário está vazio, oferece 3 opções — ver anúncio (rewarded ad via FakeAdService), comprar item avulso, ou encerrar (consome 1 vida). Botão voltar Android bloqueado. Tabuleiro ao fundo não interativo (AbsorbPointer).
+- **Itens avulsos na ShopScreen** (Fase 2.10-C): seção "Itens avulsos" abaixo dos 6 pacotes; 4 cards compactos (ícone + nome + preço) para compra individual de Bomba 3 (R$ 1,99), Desfazer 3 (R$ 0,99), Bomba 2 (R$ 1,19) e Desfazer 1 (R$ 0,49). Preços ~2× o valor por unidade nos pacotes para incentivar compra do pacote.
+- **`kItemUnitPrices`** em `shop_data.dart`: mapa de preços unitários para os 4 tipos de item.
+
+### Changed
+- **GameOverItemOverlay** (Fase 2.10-A): ícone do item em destaque pisca em loop (opacidade 1.0→0.4→1.0, 800ms easeInOut via `flutter_animate`). Haptic sincronizado com cada ciclo (`AnimationController` separado, respeita `hapticEnabled`). Animação e haptic param ao tocar "Usar item"; reiniciam ao trocar de item. `WillPopScope` substituído por `PopScope`.
+
 ## [0.9.9.5] - 2026-05-02
 
 ### Fixed
