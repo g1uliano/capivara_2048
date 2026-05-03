@@ -1,23 +1,29 @@
 // lib/presentation/controllers/game_notifier.dart
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/models/game_record.dart';
 import '../../data/models/game_state.dart';
 import '../../data/models/item_type.dart';
+import '../../data/repositories/game_record_repository.dart';
 import '../../domain/game_engine/bomb_mode.dart';
 import '../../domain/game_engine/direction.dart';
 import '../../domain/game_engine/game_engine.dart';
 import '../../domain/inventory/inventory_notifier.dart';
+import '../controllers/personal_records_notifier.dart';
 
 class GameNotifier extends StateNotifier<GameState> {
   final GameEngine _engine;
+  final Ref _ref;
   Timer? _timer;
   bool _timerStarted = false;
   List<(int, int)> _bombSelection = [];
   ItemType? _pendingBombItem;
   // Called on confirm to deduct the item; null-safe so tests don't need Hive.
   void Function(ItemType)? _consumeItem;
+  final Set<int> _reachedMilestones = {};
 
-  GameNotifier(this._engine) : super(_engine.newGame());
+  GameNotifier(this._engine, this._ref) : super(_engine.newGame());
 
   void _startTimer() {
     _timer?.cancel();
@@ -49,6 +55,41 @@ class GameNotifier extends StateNotifier<GameState> {
         : after.isGameOver
             ? after
             : after.copyWith(isContinuingWithItem: false);
+
+    if (justLost) {
+      unawaited(_saveGameRecord()); // fire-and-forget
+    }
+
+    // Detectar novos marcos
+    for (final milestone in [11, 12, 13]) {
+      if (!_reachedMilestones.contains(milestone) &&
+          state.maxLevel >= milestone &&
+          !state.hasWon &&
+          state.pendingMilestone == null) {
+        _reachedMilestones.add(milestone);
+        final captured = state.elapsedMs;
+        GameState updated = state;
+        if (milestone == 11) {
+          updated = updated.copyWith(
+            pendingMilestone: milestone,
+            bestTimeMs2048: captured,
+          );
+        } else if (milestone == 12) {
+          updated = updated.copyWith(
+            pendingMilestone: milestone,
+            bestTimeMs4096: captured,
+          );
+        } else {
+          updated = updated.copyWith(pendingMilestone: milestone);
+        }
+        state = updated;
+        unawaited(_ref
+            .read(personalRecordsProvider.notifier)
+            .recordMilestone(milestone, DateTime.now()));
+        break; // Apenas um marco por vez
+      }
+    }
+
     if (boardChanged) {
       if (!_timerStarted) {
         _timerStarted = true;
@@ -70,7 +111,7 @@ class GameNotifier extends StateNotifier<GameState> {
   }
 
   void pause() {
-    if (state.isGameOver || state.hasWon) return;
+    if (state.isGameOver || state.hasWon || state.pendingMilestone != null) return;
     _stopTimer();
     state = state.copyWith(isPaused: true);
   }
@@ -90,6 +131,7 @@ class GameNotifier extends StateNotifier<GameState> {
   }
 
   void restart() {
+    _reachedMilestones.clear();
     _stopTimer();
     _timerStarted = false;
     final fresh = _engine.newGame();
@@ -187,6 +229,33 @@ class GameNotifier extends StateNotifier<GameState> {
     _consumeItem = callback;
   }
 
+  void dismissMilestone() {
+    state = state.copyWith(pendingMilestone: null);
+  }
+
+  Future<void> endGame() async {
+    _stopTimer();
+    state = state.copyWith(hasWon: true, pendingMilestone: null);
+    await _saveGameRecord();
+  }
+
+  Future<void> _saveGameRecord() async {
+    try {
+      final record = GameRecord(
+        playedAt: DateTime.now(),
+        elapsedMs: state.elapsedMs,
+        score: state.score,
+        maxLevel: state.maxLevel,
+      );
+      await _ref.read(gameRecordRepositoryProvider).add(record);
+    } catch (_) {
+      // Não bloquear o jogo se o save falhar
+    }
+  }
+
+  @visibleForTesting
+  void setStateForTest(GameState s) => state = s;
+
   @override
   void dispose() {
     _stopTimer();
@@ -198,7 +267,7 @@ final gameEngineProvider = Provider<GameEngine>((ref) => GameEngine());
 
 final gameProvider = StateNotifierProvider<GameNotifier, GameState>(
   (ref) {
-    final notifier = GameNotifier(ref.read(gameEngineProvider));
+    final notifier = GameNotifier(ref.read(gameEngineProvider), ref);
     notifier.setConsumeCallback(
       (type) => ref.read(inventoryProvider.notifier).consume(type),
     );

@@ -108,4 +108,55 @@ void main() {
       expect(() => notifier.undo(3), returnsNormally);
     });
   });
+
+  group('GameNotifier marcos de vitória', () {
+    GameState _stateWithMaxLevel(int maxLevel) {
+      final board = List.generate(4, (r) => List<Tile?>.filled(4, null));
+      return GameState(
+        board: board,
+        score: 0,
+        highScore: 0,
+        isGameOver: false,
+        hasWon: false,
+        maxLevel: maxLevel,
+      );
+    }
+
+    test('dismissMilestone zera pendingMilestone sem setar hasWon', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final notifier = container.read(gameProvider.notifier);
+      notifier.setStateForTest(
+        _stateWithMaxLevel(11).copyWith(pendingMilestone: 11),
+      );
+      notifier.dismissMilestone();
+      final state = container.read(gameProvider);
+      expect(state.pendingMilestone, null);
+      expect(state.hasWon, false);
+    });
+
+    test('endGame seta hasWon=true e pendingMilestone=null', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final notifier = container.read(gameProvider.notifier);
+      notifier.setStateForTest(
+        _stateWithMaxLevel(11).copyWith(pendingMilestone: 11),
+      );
+      notifier.endGame();
+      final state = container.read(gameProvider);
+      expect(state.hasWon, true);
+      expect(state.pendingMilestone, null);
+    });
+
+    test('pause() é no-op quando pendingMilestone != null', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final notifier = container.read(gameProvider.notifier);
+      notifier.setStateForTest(
+        _stateWithMaxLevel(11).copyWith(pendingMilestone: 11),
+      );
+      notifier.pause();
+      expect(container.read(gameProvider).isPaused, false);
+    });
+  });
 }
