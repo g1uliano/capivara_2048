@@ -30,19 +30,7 @@ void main() {
     expect(prefs.getBool('settings.haptic_enabled'), isFalse);
   });
 
-  testWidgets('toggle idioma para EN persiste', (tester) async {
-    final prefs = await SharedPreferences.getInstance();
-    final notifier = SettingsNotifier(prefs);
-    await tester.pumpWidget(_wrap(notifier));
-    await tester.pump();
-
-    await tester.tap(find.text('EN'));
-    await tester.pump();
-    expect(notifier.state.locale, 'en');
-    expect(prefs.getString('settings.locale'), 'en');
-  });
-
-  testWidgets('sliders de áudio presentes com onChanged null', (tester) async {
+testWidgets('sliders de áudio presentes com onChanged null', (tester) async {
     final prefs = await SharedPreferences.getInstance();
     final notifier = SettingsNotifier(prefs);
     await tester.pumpWidget(_wrap(notifier));
@@ -96,5 +84,15 @@ void main() {
     await tester.pump();
 
     expect(find.byType(Card), findsWidgets);
+  });
+
+  testWidgets('dropdown de idioma está ausente', (tester) async {
+    final prefs = await SharedPreferences.getInstance();
+    final notifier = SettingsNotifier(prefs);
+    await tester.pumpWidget(_wrap(notifier));
+    await tester.pump();
+
+    expect(find.text('PT-BR'), findsNothing);
+    expect(find.text('EN'), findsNothing);
   });
 }

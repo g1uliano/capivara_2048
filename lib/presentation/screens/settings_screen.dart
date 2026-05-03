@@ -57,22 +57,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     onChanged: notifier.setHaptic,
                     activeThumbColor: AppColors.primary,
                   ),
-                  ListTile(
-                    tileColor: Colors.transparent,
-                    title: Text('Idioma', style: GoogleFonts.nunito(fontSize: 16)),
-                    trailing: SegmentedButton<String>(
-                      segments: const [
-                        ButtonSegment(value: 'pt', label: Text('PT-BR')),
-                        ButtonSegment(value: 'en', label: Text('EN')),
-                      ],
-                      selected: {settings.locale},
-                      onSelectionChanged: (s) => notifier.setLocale(s.first),
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.resolveWith((states) =>
-                            states.contains(WidgetState.selected) ? AppColors.primary : null),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
