@@ -30,7 +30,7 @@ void main() {
     expect(prefs.getBool('settings.haptic_enabled'), isFalse);
   });
 
-testWidgets('sliders de áudio presentes com onChanged null', (tester) async {
+  testWidgets('sliders de áudio presentes com onChanged null', (tester) async {
     final prefs = await SharedPreferences.getInstance();
     final notifier = SettingsNotifier(prefs);
     await tester.pumpWidget(_wrap(notifier));
