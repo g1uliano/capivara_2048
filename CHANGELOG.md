@@ -7,6 +7,11 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-05-03
+
+### Fixed
+- `GameOverModal` não aparecia mais sobre o `GameOverNoItemsOverlay` — condição legada `|| !hasAnyItem` removida; modal só exibe após o jogador confirmar "Encerrar partida"
+
 ## [1.0.0] - 2026-05-02
 
 ### Added
