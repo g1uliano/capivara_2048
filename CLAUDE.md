@@ -1,8 +1,8 @@
-# CLAUDE.md — Capivara 2048
+# CLAUDE.md — Capivara 2048 (codinome)
 
 ## Projeto
 
-Flutter puzzle game estilo 2048 com animais amazônicos. Spec completa em `CAPIVARA_2048_DESIGN.md` (design doc).
+"Olha o Bixim!" é um Flutter puzzle game estilo 2048 com animais amazônicos. Spec completa em `CAPIVARA_2048_DESIGN.md` (design doc) - ele pode conter pequenos erros em relação a questões técnicas e de implementação, pois, ele é uma spec geral e um esboço do que tem que ser ou foi implementado, por isso, sempre confira o repositório a procura de arquivos, pastas e pra ter certeza cheque o código e outras specs).
 
 ## Stack
 
@@ -52,7 +52,7 @@ lib/
 
 ## Fases do roadmap
 
-Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 2.10 concluída (v1.0.0) — próximo: Fase 3**. O áudio foi reposicionado para a **Fase 5** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
+Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 2.11 em andamento (v1.0.x) — próximo: concluir 2.11 → Fase 3**. O áudio foi reposicionado para a **Fase 5** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
 
 | Fase | Foco |
 |------|------|
@@ -60,6 +60,7 @@ Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 2
 | 2 | Identidade visual, paleta, tipografia, animações, vidas, inventário, recompensas, coleção, loja mock |
 | 2.5 ✅ | Rebranding "Olha o Bichim!", GameTitleImage, ícone do app, launcher name |
 | 2.6 ✅ | Tela Home + Coleção + Configurações + stubs |
+| 2.11 🔄 | ShopOverlay sobre o jogo acessível pelos ícones desabilitados do inventário |
 | 3 | Backend, ranking, monetização |
 | 4 | Arte adicional e polimento visual (logo, ícone, splash final) |
 | 5 | Áudio (sound design dos 11 animais, SFX, música) |

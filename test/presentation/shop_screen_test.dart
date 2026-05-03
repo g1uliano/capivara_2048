@@ -165,6 +165,16 @@ void main() {
       find.byType(ListView),
       const Offset(0, -300),
     );
+    await tester.dragUntilVisible(
+      find.text('R\$ 1,19'),
+      find.byType(ListView),
+      const Offset(0, -300),
+    );
+    await tester.dragUntilVisible(
+      find.text('R\$ 0,49'),
+      find.byType(ListView),
+      const Offset(0, -300),
+    );
     expect(find.text('R\$ 1,99'), findsOneWidget);
     expect(find.text('R\$ 0,99'), findsOneWidget);
     expect(find.text('R\$ 1,19'), findsOneWidget);

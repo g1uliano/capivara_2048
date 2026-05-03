@@ -47,6 +47,9 @@ void main() {
   tearDown(() async { await Hive.close(); await tempDir.delete(recursive: true); });
 
   testWidgets('estado available: botão Coletar habilitado e título presente', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
     final yesterday = DateTime.now().subtract(const Duration(days: 1));
     final normalizedYesterday = DateTime(yesterday.year, yesterday.month, yesterday.day);
 

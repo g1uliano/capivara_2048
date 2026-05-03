@@ -2,9 +2,9 @@
 
 > Documento de especificação para desenvolvimento. Pensado para ser alimentado em ferramentas como Claude Code para implementação iterativa.
 >
-> **Status atual:** Fase 2.9 concluída ✅ (v0.9.9) — Splash Screen, Game Over redesenhado, Inventário maior e Orientação bloqueada. Fases 2.4 (Recompensas Diárias), 2.5 (Identidade "Olha o Bichim!"), 2.6 (Home redesenhada, Tela de Coleção, Tela de Configurações), 2.7 (Bugfixes visuais de interface) e 2.8 (Loja Mock) também concluídas.
+> **Status atual:** Fase 2.11 em andamento 🔄 (v1.0.x) — Animação piscante no Game Over + Oferta de item via anúncio/compra sem itens. Fases 2.4 (Recompensas Diárias), 2.5 (Identidade "Olha o Bichim!"), 2.6 (Home redesenhada, Tela de Coleção, Tela de Configurações), 2.7 (Bugfixes visuais de interface), 2.8 (Loja Mock) e 2.9 (Splash Screen, Game Over redesenhado, Inventário maior e Orientação bloqueada), 2.10 (Animação piscante + GameOverNoItemsOverlay) também concluídas.
 >
-> **Próximo:** **Fase 2.10 — Animação piscante no Game Over + Oferta de item via anúncio/compra sem itens**
+> **Próximo:** **Concluir Fase 2.11 → Fase 3 (Backend)**
 >
 > **Renomeação do jogo:** o nome do jogo passa de **"Capivara 2048"** para **"Olha o Bichim!"**. As referências antigas em seções abaixo serão atualizadas progressivamente; durante a transição, considere "Olha o Bichim!" o nome canônico do produto. O *codename* interno do repositório (`capivara_2048`) permanece — apenas o nome de exibição muda.
 >
@@ -116,7 +116,8 @@ lib/
 │   │   ├── confirm_use_dialog.dart          ✅
 │   │   ├── bomb_selection_overlay.dart      ✅
 │   │   ├── game_over_item_screen.dart       ✅ (Fase 2.9) + animação piscante (Fase 2.10)
-│   │   ├── game_over_no_items_overlay.dart  ← novo (Fase 2.10)
+│   │   ├── game_over_no_items_overlay.dart  ✅ (Fase 2.10)
+│   │   ├── shop_overlay.dart                ← novo (Fase 2.11)
 │   │   └── animal_card.dart
 │   └── controllers/
 └── assets_manifest.dart
@@ -381,6 +382,7 @@ class LivesState {
 - Mostra cada item com **ícone PNG**, **contador (badge)** e **estado**
 - Itens com contador 0 ficam **acinzentados e desabilitados**, mas continuam visíveis
 - **Tamanho dos ícones (Fase 2.9):** ícones aumentados para 72×72dp (era 56×56dp); espaçamento vertical entre tabuleiro e `InventoryBar` reduzido de 12dp para 4dp
+- **Tap em ícone desabilitado (Fase 2.11):** ao tocar em um ícone com contador 0 (acinzentado), em vez de ignorar o toque, abre a `ShopOverlay` diretamente sobre o jogo — permitindo ao jogador comprar o item sem sair da partida. O cronômetro é pausado enquanto o overlay estiver aberto.
 
 #### Ícones do inventário
 PNGs finais (1024×1024, fundo transparente) em `assets/icons/inventory/`:
@@ -708,13 +710,18 @@ users/{userId}/personalRecords
    │      ├── (linha intermediária: Anfitrião 2x2 à esquerda, PauseButtonTile à direita)
    │      ├── (tabuleiro 4x4)
    │      ├── (inventário no rodapé — ícones 72×72dp)
-   │      ├── [GameOverItemScreen]        ✅ (Fase 2.9) + animação piscante ← (Fase 2.10)
+   │      │       — tap em ícone desabilitado → [ShopOverlay] ← novo (Fase 2.11)
+   │      ├── [ShopOverlay]              ← novo (Fase 2.11)
+   │      │       ├── Mesmos 6 pacotes da loja comum, rolável
+   │      │       ├── Cronômetro do jogo pausado enquanto aberto
+   │      │       └── Botão "X Fechar" retorna ao jogo
+   │      ├── [GameOverItemScreen]        ✅ (Fase 2.9) + animação piscante ✅ (Fase 2.10)
    │      │       ├── Ícone do item piscando em loop (opacidade 1.0→0.4→1.0, 800ms)
    │      │       ├── Mensagem explicativa do efeito
    │      │       ├── "Usar item" → animação para → continua partida
    │      │       ├── "Próximo item" → troca item, nova animação inicia
    │      │       └── "Desistir" → confirmação → Game Over real (1 vida)
-   │      └── [GameOverNoItemsOverlay]    ← novo (Fase 2.10)
+   │      └── [GameOverNoItemsOverlay]    ✅ (Fase 2.10)
    │              ├── Item sorteado em destaque (1 de 4, aleatório)
    │              ├── "Ver anúncio e receber item" → anúncio 30s → item entregue → continua
    │              ├── "Comprar item" → checkout → item entregue → continua
@@ -1215,7 +1222,148 @@ testWidgets('game over sem itens → GameOverNoItemsOverlay, não GameOverItemSc
 
 ---
 
-### 🔜 Fase 3 — Backend, ranking e monetização (3–4 semanas)
+### ✅ Fase 2.10 — Animação piscante no Game Over + Oferta de item via anúncio/compra sem itens (v1.0.0)
+- **A** — Animação piscante (opacidade 1.0→0.4→1.0, 800ms/ciclo) no ícone do item em destaque na `GameOverItemScreen`; para ao usar item, reinicia ao trocar de item; `dispose()` sem vazamento
+- **B** — `GameOverNoItemsOverlay`: overlay sobre o tabuleiro com item sorteado (1 de 4, aleatório), 3 opções (anúncio / compra mock / encerrar), bloqueio do botão voltar Android, integração com `adWatchesToday`
+
+---
+
+### 🔄 Fase 2.11 (em andamento) — Loja em overlay sobre o jogo acessível pelos ícones desabilitados do inventário (v1.0.1)
+
+**Objetivo:** quando o jogador toca em um ícone de item com contador 0 (acinzentado/desabilitado) na `InventoryBar`, em vez de ignorar o toque, abrir a loja como overlay diretamente sobre o jogo — sem navegar para outra tela — permitindo comprar itens sem perder o contexto da partida. O cronômetro fica pausado enquanto o overlay estiver aberto.
+
+**Estimativa:** 1–2 dias.
+
+---
+
+#### A — Comportamento do tap em ícone desabilitado (`InventoryBar` / `InventoryItemButton`)
+
+**Mudança de comportamento:**
+- **Antes (Fases anteriores):** ícone com `count == 0` estava acinzentado e o tap era simplesmente ignorado (`onTap: null` ou `GestureDetector` sem handler)
+- **Agora (Fase 2.11):** ícone com `count == 0` continua acinzentado visualmente, mas o tap abre a `ShopOverlay`
+
+**Arquivos modificados:**
+- `lib/presentation/widgets/inventory_item_button.dart` — receber callback `onTapWhenEmpty: VoidCallback?` e chamá-lo quando `count == 0`
+- `lib/presentation/widgets/inventory_bar.dart` — passar `onTapWhenEmpty: () => _openShopOverlay(context)` para cada `InventoryItemButton`
+- `lib/presentation/screens/game/game_screen.dart` — controlar a exibição da `ShopOverlay` via estado local (`bool _shopOverlayOpen`) e pausar/retomar o cronômetro
+
+**Detalhe importante:** o tap em ícone desabilitado deve abrir a loja genérica (todos os 6 pacotes), não filtrada pelo item tocado. O contexto do item tocado pode ser usado futuramente para destacar o pacote relevante, mas não é requisito desta fase.
+
+---
+
+#### B — `ShopOverlay` — loja como overlay sobre o jogo
+
+**Arquivo novo:** `lib/presentation/widgets/shop_overlay.dart`
+
+A `ShopOverlay` é um overlay que cobre toda a tela por cima do jogo em andamento. Ela reutiliza exatamente os mesmos dados (`shopPackagesProvider`) e o mesmo componente de card (`_ShopPackageCard`) já existentes na `ShopScreen` (Fase 2.8), garantindo consistência visual.
+
+**Layout geral:**
+```
+Stack (sobre GameScreen, ocupa 100% da tela)
+├── Barrier semi-transparente (Colors.black.withOpacity(0.75))
+└── SafeArea
+    └── Column
+        ├── Row (header do overlay)
+        │   ├── OutlinedText("Loja", Fredoka 22, branco)
+        │   └── IconButton(Icons.close, branco) — fecha o overlay
+        ├── Divider sutil (branco com opacidade 0.3)
+        └── Expanded
+            └── ListView.builder (rolável, padding 16dp)
+                // 6 _ShopPackageCard — mesmos cards da ShopScreen
+```
+
+**Características do overlay:**
+- **Rolável:** `ListView` com scroll vertical natural; o jogador pode rolar pelos 6 pacotes livremente
+- **Navegável:** o jogador pode interagir normalmente com os cards, ver preços, tocar em "Comprar"
+- **Botão de fechar:** `IconButton` com `Icons.close` no canto superior direito do header; ao tocar, fecha o overlay e retoma o cronômetro
+- **Sem `AppBar` nativa:** o header é um widget customizado dentro do overlay, sem barra de sistema
+- **Botão voltar Android:** ao pressionar o botão voltar físico do Android, o overlay fecha (diferente da `GameOverNoItemsOverlay` — aqui o voltar é permitido porque o jogador pode querer voltar ao jogo sem comprar nada)
+- **Fundo do jogo:** o tabuleiro e todos os elementos do jogo ficam visíveis mas não interativos (`AbsorbPointer`) enquanto o overlay estiver aberto
+
+**Reutilização dos componentes da `ShopScreen`:**
+- Os 6 pacotes vêm do mesmo `shopPackagesProvider` já existente
+- O card `_ShopPackageCard` é extraído de `shop_screen.dart` para um arquivo compartilhável `lib/presentation/widgets/shop_package_card.dart` se ainda não estiver separado — ou importado diretamente
+- O fluxo de compra (mock) é idêntico ao da `ShopScreen`: `AlertDialog` de confirmação → entrega itens ao `inventoryProvider` e `livesProvider` → exibe `_GiftCodeSheet`
+- Após compra bem-sucedida: o overlay permanece aberto (o jogador pode comprar mais itens ou fechar manualmente)
+
+---
+
+#### C — Pausa e retomada do cronômetro
+
+**Regra:** o cronômetro do jogo deve ficar pausado enquanto a `ShopOverlay` estiver aberta, e retomar exatamente de onde parou ao fechar.
+
+**Implementação:**
+
+O `GameNotifier` já tem lógica de pausa (usada pelo `PauseOverlay`). Reutilizar o mesmo mecanismo:
+
+```dart
+// Ao abrir o overlay:
+ref.read(gameNotifier.notifier).pause();
+setState(() => _shopOverlayOpen = true);
+
+// Ao fechar o overlay (botão X ou botão voltar Android):
+setState(() => _shopOverlayOpen = false);
+ref.read(gameNotifier.notifier).resume();
+```
+
+**Importante:** a pausa via `ShopOverlay` é diferente da pausa via `PauseOverlay`:
+- O `PauseOverlay` exibe blur + botões de controle sobre o tabuleiro
+- A `ShopOverlay` exibe a loja sobre o tabuleiro
+- Os dois não devem coexistir: se o jogo já estiver pausado pelo `PauseOverlay`, o tap em ícone desabilitado não deve abrir a `ShopOverlay` (o toque na `InventoryBar` já fica bloqueado pelo `PauseOverlay` normalmente)
+
+---
+
+#### Casos de teste obrigatórios
+
+```dart
+// inventory_item_button_test.dart
+testWidgets('tap em ícone com count > 0 → abre ConfirmUseDialog (comportamento existente)', ...)
+testWidgets('tap em ícone com count == 0 → chama onTapWhenEmpty callback', ...)
+testWidgets('tap em ícone com count == 0 e onTapWhenEmpty null → nenhum erro', ...)
+
+// shop_overlay_test.dart
+testWidgets('ShopOverlay exibe 6 cards de pacotes', ...)
+testWidgets('ShopOverlay é rolável (scroll funciona)', ...)
+testWidgets('botão X fecha o overlay', ...)
+testWidgets('botão voltar Android fecha o overlay (WillPopScope retorna true)', ...)
+testWidgets('tabuleiro ao fundo não é interativo enquanto overlay aberto (AbsorbPointer)', ...)
+testWidgets('compra no overlay entrega itens ao inventoryProvider', ...)
+testWidgets('overlay permanece aberto após compra bem-sucedida', ...)
+
+// game_screen_test.dart (regressão)
+testWidgets('tap em ícone desabilitado → ShopOverlay exibida sobre o jogo', ...)
+testWidgets('cronômetro pausado quando ShopOverlay aberta', ...)
+testWidgets('cronômetro retomado ao fechar ShopOverlay', ...)
+testWidgets('tap em ícone habilitado → ConfirmUseDialog (não ShopOverlay)', ...)
+```
+
+---
+
+#### Ordem de execução recomendada
+
+1. **C primeiro** (pausa do cronômetro) — verificar se o `GameNotifier.pause()` e `resume()` já funcionam corretamente via testes; ajustar se necessário
+2. **A** (tap em ícone desabilitado) — mudança pequena e isolada no `InventoryItemButton`
+3. **B** (ShopOverlay) — criar o widget, extrair `_ShopPackageCard` se necessário, integrar na `GameScreen`
+
+---
+
+#### Critérios de aceite da Fase 2.11
+
+| Item | Critério |
+|---|---|
+| Tap | Ícone desabilitado (count == 0) responde ao tap abrindo a `ShopOverlay` |
+| Tap | Ícone habilitado (count > 0) continua abrindo `ConfirmUseDialog` (regressão) |
+| Overlay | `ShopOverlay` exibe todos os 6 pacotes da loja |
+| Overlay | Conteúdo é rolável verticalmente |
+| Overlay | Botão X fecha o overlay e retoma o cronômetro |
+| Overlay | Botão voltar Android fecha o overlay e retoma o cronômetro |
+| Overlay | Tabuleiro visível ao fundo mas não interativo |
+| Cronômetro | Cronômetro para ao abrir o overlay |
+| Cronômetro | Cronômetro retoma exatamente do mesmo valor ao fechar |
+| Compra | Compra no overlay entrega itens ao inventário (mesmo fluxo da ShopScreen) |
+| Compra | Overlay permanece aberto após compra (jogador pode comprar mais ou fechar) |
+| Sem regressão | Fluxo da `ShopScreen` comum não foi alterado |
+| Sem regressão | `PauseOverlay` continua funcionando normalmente |
 - Setup Firebase (Auth, Firestore)
 - Login (Google, Apple, anônimo)
 - Sincronização de PlayerProfile
@@ -1304,30 +1452,32 @@ testWidgets('game over sem itens → GameOverNoItemsOverlay, não GameOverItemSc
 
 ---
 
-## 17. Prompt Sugerido para o Claude Code (Fase 2.10 — via skill superpowers)
+## 17. Prompt Sugerido para o Claude Code (Fase 2.11 — via skill superpowers)
 
 > Use a skill `superpowers/brainstorming` pra refinar o design da próxima fase do projeto **Olha o Bichim!** (Flutter, codename `capivara_2048`).
 >
-> **Contexto:** Fase 2.9 concluída (v0.9.9). Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente §3.5, §3.6, §6.3, §12.5, §12.6 e §15 — Fase 2.10).
+> **Contexto:** Fase 2.10 concluída (v1.0.0). Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente §6.2, §12.1, §12.4 e §15 — Fase 2.11).
 >
-> **Fases concluídas:** 1 a 2.9 (v0.9.9). Áudio na Fase 5. Backend na Fase 3.
+> **Fases concluídas:** 1 a 2.10 (v1.0.0). Áudio na Fase 5. Backend na Fase 3.
 >
-> **Tópico do brainstorm:** **Fase 2.10 — Animação piscante no Game Over + `GameOverNoItemsOverlay`**. 2 features de fluxo de Game Over.
+> **Tópico do brainstorm:** **Fase 2.11 — `ShopOverlay` acessível pelos ícones desabilitados do inventário**. 1 feature nova de UX/monetização.
 >
-> **Duas sub-entregas:**
+> **Três sub-entregas:**
 >
-> **A — Animação piscante:** `AnimationController` em loop (opacidade 1.0→0.4→1.0, 800ms/ciclo) no ícone do item em destaque na `GameOverItemScreen`. Para ao usar item, reinicia ao trocar de item. `dispose()` obrigatório.
+> **A — Tap em ícone desabilitado:** adicionar callback `onTapWhenEmpty` ao `InventoryItemButton`; na `InventoryBar`, passar handler que abre a `ShopOverlay`; manter comportamento existente para ícones habilitados.
 >
-> **B — `GameOverNoItemsOverlay`:** overlay sobre o tabuleiro com item sorteado (1 de 4, aleatório), 3 opções (anúncio / compra / encerrar), bloqueio do botão voltar Android, integração com `adWatchesToday`, preço estimado unitário, fluxo de checkout mock.
+> **B — `ShopOverlay`:** overlay rolável sobre o jogo com os 6 pacotes da loja (reutilizando `shopPackagesProvider` e `_ShopPackageCard` da `ShopScreen`), botão X para fechar, botão voltar Android permitido, tabuleiro ao fundo não interativo (`AbsorbPointer`), compra funciona igual à loja comum.
+>
+> **C — Pausa do cronômetro:** ao abrir a `ShopOverlay`, chamar `gameNotifier.pause()`; ao fechar, chamar `gameNotifier.resume()`. Garantir que os dois estados não colidem com o `PauseOverlay` existente.
 >
 > **Pontos abertos pra explorar no brainstorm:**
 >
-> - Feature A: adicionar vibração (haptic) sincronizada com o pulso? (considerar usuários que desligam haptic nas Configurações)
-> - Feature B: se o jogador fechar o anúncio antes dos 30s (skip), o item deve ser entregue mesmo assim?
-> - Feature B: o toast de confirmação de entrega (`"[NomeItem] adicionado! Boa sorte! 🎉"`) deve ser `SnackBar` ou `Overlay` customizado?
-> - Feature B: em produção (Fase 3), a compra entrega o pacote completo (ex: 4× Bomba 3) — informar o jogador antes de confirmar? ("Você receberá 4× Bomba 3 pelo preço de R$ 3,99")
+> - Sub-entrega B: o `_ShopPackageCard` deve ser extraído de `shop_screen.dart` para um arquivo compartilhado (`shop_package_card.dart`) ou importado diretamente? Qual o impacto em testes e manutenção?
+> - Sub-entrega B: após uma compra bem-sucedida no overlay, o ícone do item comprado na `InventoryBar` deve pulsar brevemente (feedback visual de que o inventário foi atualizado) antes de o jogador fechar o overlay?
+> - Sub-entrega B: deve haver algum destaque visual no pacote mais relevante para o item que o jogador tentou usar? (ex: se tocou no ícone de Bomba 2, o card "Combo Mata Atlântica" fica com borda destacada). Isso é uma melhoria opcional — avaliar complexidade.
+> - Sub-entrega C: se o jogador abre a `ShopOverlay`, compra um item, e imediatamente usa o `PauseButtonTile` (que está bloqueado pelo overlay mas poderia ter race condition) — como garantir que os estados de pausa não entram em conflito?
 >
-> **Output esperado:** spec detalhada da Fase 2.10 com decisões em cada ponto, arquivos a modificar, casos de teste, critérios de aceite e plano de validação (360×640, 390×844, tablet). Ao final: prompt de brainstorm da Fase 3 (Backend).
+> **Output esperado:** spec detalhada da Fase 2.11 com decisões em cada ponto aberto, arquivos a modificar por sub-entrega, casos de teste obrigatórios, critérios de aceite e plano de validação (360×640, 390×844). Ao final: **prompt de brainstorm da Fase 3** (Backend — próxima grande fase) seguindo este mesmo padrão.
 >
 > **Não escreva código nesta etapa.**
 

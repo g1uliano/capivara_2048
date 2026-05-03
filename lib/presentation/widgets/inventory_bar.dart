@@ -18,7 +18,7 @@ class InventoryBar extends ConsumerWidget {
       final ok = await showConfirmUseDialog(
         context: context,
         itemName: 'Bomba 2',
-        description: 'Remove os 2 tiles de menor valor do tabuleiro.',
+        description: 'Selecione 2 tiles para remover do tabuleiro.',
         pngPath: 'assets/icons/inventory/bomb_2.png',
       );
       if (!ok) return;
@@ -29,7 +29,7 @@ class InventoryBar extends ConsumerWidget {
       final ok = await showConfirmUseDialog(
         context: context,
         itemName: 'Bomba 3',
-        description: 'Remove os 3 tiles de menor valor do tabuleiro.',
+        description: 'Selecione 3 tiles para remover do tabuleiro.',
         pngPath: 'assets/icons/inventory/bomb_3.png',
       );
       if (!ok) return;

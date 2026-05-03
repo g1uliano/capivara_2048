@@ -210,8 +210,10 @@ class _DayGrid extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         // 4 tiles per row, 2 rows of 3/4, with spacing
+        // Each tile has margin: EdgeInsets.all(4), contributing 8px per tile horizontally
         const spacing = 8.0;
-        final tileW = (constraints.maxWidth - spacing * 3) / 4;
+        const tileMargin = 4.0;
+        final tileW = (constraints.maxWidth - spacing * 3 - tileMargin * 2 * 4) / 4;
         final tileH = tileW * 1.25;
 
         Widget buildTile(int day) {

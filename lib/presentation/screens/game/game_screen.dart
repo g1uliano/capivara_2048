@@ -2,9 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/models/game_state.dart';
 import '../../../domain/game_engine/direction.dart';
-import '../../../domain/lives/lives_notifier.dart';
+
 import '../../controllers/game_notifier.dart';
 import '../../widgets/board_widget.dart';
 import '../../widgets/bomb_selection_overlay.dart';
@@ -31,11 +30,6 @@ class GameScreen extends ConsumerWidget {
     final inventory = ref.watch(inventoryProvider);
     final hasAnyItem = inventory.bomb2 > 0 || inventory.bomb3 > 0 ||
         inventory.undo1 > 0 || inventory.undo3 > 0;
-    ref.listen<GameState>(gameProvider, (prev, next) {
-      if (prev != null && !prev.isGameOver && next.isGameOver && !next.hasWon) {
-        ref.read(livesProvider.notifier).consume();
-      }
-    });
 
     return Scaffold(
       body: GameBackground(

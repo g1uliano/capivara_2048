@@ -30,6 +30,9 @@ void main() {
   tearDown(() async { await Hive.close(); await tempDir.delete(recursive: true); });
 
   testWidgets('estado streakBroken: mostra banner de aviso e botão Coletar habilitado', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
     final threeDaysAgo = DateTime.now().subtract(const Duration(days: 3));
     final normalized = DateTime(threeDaysAgo.year, threeDaysAgo.month, threeDaysAgo.day);
 

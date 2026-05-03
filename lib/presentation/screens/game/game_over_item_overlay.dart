@@ -6,6 +6,7 @@ import '../../../data/models/inventory.dart';
 import '../../../data/models/item_type.dart';
 import '../../../domain/game_engine/bomb_mode.dart';
 import '../../../domain/inventory/inventory_notifier.dart';
+import '../../../domain/lives/lives_notifier.dart';
 import '../../../presentation/controllers/game_notifier.dart';
 
 String _pngFor(ItemType t) => switch (t) {
@@ -94,6 +95,7 @@ class _GameOverItemOverlayState extends ConsumerState<GameOverItemOverlay>
 
   void _giveUp() {
     _hapticController.stop();
+    ref.read(livesProvider.notifier).consume();
     ref.read(gameProvider.notifier).setAwaitingResolution(false);
   }
 

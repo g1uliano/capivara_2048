@@ -30,6 +30,9 @@ void main() {
   tearDown(() async { await Hive.close(); await tempDir.delete(recursive: true); });
 
   testWidgets('estado alreadyClaimed: mostra "Volte amanhã" e sem botão Coletar', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
     final today = DateTime.now();
     final normalizedToday = DateTime(today.year, today.month, today.day);
 
