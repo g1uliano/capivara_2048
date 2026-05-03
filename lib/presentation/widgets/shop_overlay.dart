@@ -8,6 +8,7 @@ import '../../domain/inventory/inventory_notifier.dart';
 import '../../domain/lives/lives_notifier.dart';
 import '../widgets/outlined_text.dart';
 import 'shop_package_card.dart';
+import 'shop_unit_item_card.dart';
 
 class ShopOverlay extends ConsumerStatefulWidget {
   const ShopOverlay({
@@ -121,6 +122,29 @@ class _ShopOverlayState extends ConsumerState<ShopOverlay> {
                               onBuy: () => _onBuy(pkg),
                               highlighted: _relevantIds.contains(pkg.id),
                             ),
+                          ),
+                        const SizedBox(height: 8),
+                        const Align(
+                          alignment: Alignment.centerLeft,
+                          child: OutlinedText(
+                            text: 'Itens avulsos',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Fredoka',
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        for (final item in const [
+                          ItemType.bomb3,
+                          ItemType.undo3,
+                          ItemType.bomb2,
+                          ItemType.undo1,
+                        ])
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 6),
+                            child: ShopUnitItemCard(item: item),
                           ),
                       ],
                     ),
