@@ -15,6 +15,7 @@ import '../../widgets/game_header.dart';
 import '../../widgets/game_over_modal.dart';
 import '../../widgets/inventory_bar.dart';
 import '../../widgets/shop_overlay.dart';
+import '../../widgets/victory_choice_dialog.dart';
 import '../../../core/constants/game_constants.dart';
 import '../../../domain/inventory/inventory_notifier.dart';
 import '../../widgets/pause_overlay.dart';
@@ -33,6 +34,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   Set<ItemType> _pulsingItems = {};
 
   void _openShop(ItemType type) {
+    if (ref.read(gameProvider).pendingMilestone != null) return;
     ref.read(gameProvider.notifier).pause();
     setState(() => _shopItem = type);
   }
@@ -146,6 +148,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               if (hasWon && !isGameOver)
                 const Positioned.fill(
                     child: GameOverModal(message: 'Capivara Lendária! 🎉')),
+              if (state.pendingMilestone != null && !state.hasWon)
+                Positioned.fill(
+                  child: VictoryChoiceDialog(milestone: state.pendingMilestone!),
+                ),
               if (_shopItem != null)
                 Positioned.fill(child: ShopOverlay(
                   itemType: _shopItem!,
