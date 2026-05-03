@@ -17,6 +17,7 @@ import '../../../core/constants/game_constants.dart';
 import '../../../domain/inventory/inventory_notifier.dart';
 import '../../widgets/pause_overlay.dart';
 import 'game_over_item_overlay.dart';
+import '../../widgets/game_over_no_items_overlay.dart';
 
 class GameScreen extends ConsumerWidget {
   const GameScreen({super.key});
@@ -112,6 +113,8 @@ class GameScreen extends ConsumerWidget {
                 const Positioned.fill(child: BombDimOverlay()),
               if (state.isAwaitingGameOverResolution && hasAnyItem)
                 const Positioned.fill(child: GameOverItemOverlay()),
+              if (state.isAwaitingGameOverResolution && !hasAnyItem)
+                const Positioned.fill(child: GameOverNoItemsOverlay()),
               if (isGameOver && (!state.isAwaitingGameOverResolution || !hasAnyItem) && !state.isContinuingWithItem)
                 const Positioned.fill(
                     child: GameOverModal(message: 'Game Over!')),
