@@ -7,6 +7,11 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-05-03
+
+### Fixed
+- Android 12+: splash exibe ícone do app centralizado sobre fundo verde-selva `#1B3610` em vez da imagem full-screen cortada com crop arredondado
+
 ## [1.0.3] - 2026-05-03
 
 ### Changed
