@@ -7,6 +7,24 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-05-03
+
+### Added
+- Dois novos animais: **Peixe-boi** (nível 12, 4096) e **Jacaré** (nível 13, 8192)
+- `VictoryChoiceDialog` — ao atingir 2048/4096/8192 o jogador escolhe Continuar ou Encerrar; cronômetro pausa enquanto decide
+- Recompensas ao continuar além do 4096: 5 vidas + 2×Bomba2 + 1×Bomba3 + 2×Desfazer1 + 1×Desfazer3
+- `PersonalRecords` — contagem de vezes que cada marco foi atingido, com data da primeira vez
+- `GameRecord` — histórico local das últimas 20 partidas (tempo, pontuação, nível máximo)
+- `RankingScreen` — exibe recordes pessoais (Por Tempo / Por Pontuação) e tabela Lendas (mock)
+- Ranking acessível pela Home (card "Ranking" agora navega para a tela)
+- `ShopOverlay` acessível pelos ícones desabilitados do inventário (Fase 2.11 integrada neste release)
+
+### Changed
+- `GameConstants.maxLevel` atualizado de 11 → 13
+- `CollectionScreen` exibe `X/13 animais descobertos` (era `/11`)
+- Configuração "Reduzir Efeitos Visuais" movida para a aba Gameplay da `SettingsScreen` (removida do `PauseOverlay`)
+- Seletor de idioma (PT-BR/EN) removido da `SettingsScreen` (não implementado)
+
 ## [1.0.7] - 2026-05-03
 
 ### Fixed

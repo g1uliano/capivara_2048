@@ -52,7 +52,7 @@ lib/
 
 ## Fases do roadmap
 
-Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 2.11 concluída (v1.1.0) — próximo: Fase 3**. O áudio foi reposicionado para a **Fase 5** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
+Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 2.12 concluída (v1.1.0) — próximo: Fase 3**. O áudio foi reposicionado para a **Fase 5** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
 
 | Fase | Foco |
 |------|------|
@@ -61,9 +61,10 @@ Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 2
 | 2.5 ✅ | Rebranding "Olha o Bichim!", GameTitleImage, ícone do app, launcher name |
 | 2.6 ✅ | Tela Home + Coleção + Configurações + stubs |
 | 2.11 ✅ | ShopOverlay sobre o jogo acessível pelos ícones desabilitados do inventário |
+| 2.12 ✅ | Peixe-boi (4096), Jacaré (8192), multi-vitória, ranking local, PersonalRecords |
 | 3 | Backend, ranking, monetização |
 | 4 | Arte adicional e polimento visual (logo, ícone, splash final) |
-| 5 | Áudio (sound design dos 11 animais, SFX, música) |
+| 5 | Áudio (sound design dos 13 animais, SFX, música) |
 | 6 | Polimento, l10n, acessibilidade, lançamento |
 
 ## Release checklist

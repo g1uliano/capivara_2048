@@ -20,6 +20,8 @@ Puzzle game multiplataforma inspirado no 2048 clássico, onde os números são s
 | 9 | 512 | Onça-pintada |
 | 10 | 1024 | Sucuri |
 | 11 | 2048 | **🏆 Capivara Lendária** |
+| 12 | 4096 | **🌊 Peixe-boi** |
+| 13 | 8192 | **🐊 Jacaré** |
 
 ## Features
 
@@ -113,7 +115,9 @@ assets/
   - 2.6 — Home redesenhada, Coleção, Configurações, stubs de navegação ✅ *(v0.9.2)*
   - 2.7 — Bugfixes visuais: overflow GameScreen, badge Home, OutlinedText, cards SettingsScreen ✅ *(v0.9.3)*
 - **Fase 2.8** — Loja mock ✅ *(v0.9.4)*
-- **Fase 3** — Arte final: ilustrações dos 11 animais
+- **Fase 2.11** — ShopOverlay sobre o jogo, ícones desabilitados do inventário ✅ *(v1.1.0)*
+- **Fase 2.12** — Peixe-boi (4096), Jacaré (8192), multi-vitória, ranking local, PersonalRecords ✅ *(v1.1.0)*
+- **Fase 3** — Backend, ranking global, monetização real
 - **Fase 4** — Áudio: sons e música
 - **Fase 5** — Coleção e Desafio Diário
 - **Fase 6** — Polimento e lançamento (iOS / Android / Web)
