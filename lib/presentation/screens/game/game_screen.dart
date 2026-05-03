@@ -115,7 +115,7 @@ class GameScreen extends ConsumerWidget {
                 const Positioned.fill(child: GameOverItemOverlay()),
               if (state.isAwaitingGameOverResolution && !hasAnyItem)
                 const Positioned.fill(child: GameOverNoItemsOverlay()),
-              if (isGameOver && (!state.isAwaitingGameOverResolution || !hasAnyItem) && !state.isContinuingWithItem)
+              if (isGameOver && !state.isAwaitingGameOverResolution && !state.isContinuingWithItem)
                 const Positioned.fill(
                     child: GameOverModal(message: 'Game Over!')),
               if (hasWon && !isGameOver)
