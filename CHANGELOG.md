@@ -7,6 +7,12 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.0.6] - 2026-05-03
+
+### Fixed
+- "Itens avulsos" agora usa `OutlinedText` (branco com contorno preto) — legível sobre o fundo de floresta
+- Último card de item avulso ("Desfazer 1") não é mais cortado na borda inferior da tela
+
 ## [1.0.5] - 2026-05-03
 
 ### Fixed
