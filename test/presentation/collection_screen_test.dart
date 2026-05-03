@@ -16,7 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 late Directory _tempDir;
 
 class _FakeGameNotifier extends GameNotifier {
-  _FakeGameNotifier(GameState s) : super(GameEngine()) {
+  _FakeGameNotifier(Ref ref, GameState s) : super(GameEngine(), ref) {
     state = s;
   }
 }
@@ -32,7 +32,7 @@ Widget _wrapWithMaxLevel(int maxLevel) {
   );
   return ProviderScope(
     overrides: [
-      gameProvider.overrideWith((_) => _FakeGameNotifier(fakeState)),
+      gameProvider.overrideWith((ref) => _FakeGameNotifier(ref, fakeState)),
     ],
     child: const MaterialApp(home: CollectionScreen()),
   );
@@ -54,33 +54,33 @@ void main() {
 
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
-  testWidgets('maxLevel=0 → 11 cards bloqueados, cabeçalho "0/11"', (tester) async {
+  testWidgets('maxLevel=0 → 13 cards bloqueados, cabeçalho "0/13"', (tester) async {
     await tester.pumpWidget(_wrapWithMaxLevel(0));
     await tester.pump();
-    expect(find.text('0/11 animais descobertos'), findsOneWidget);
-    expect(find.text('???'), findsNWidgets(11));
+    expect(find.text('0/13 animais descobertos'), findsOneWidget);
+    expect(find.text('???'), findsNWidgets(13));
   });
 
-  testWidgets('maxLevel=1 → 1 card colorido, 10 bloqueados', (tester) async {
+  testWidgets('maxLevel=1 → 1 card colorido, 12 bloqueados', (tester) async {
     await tester.pumpWidget(_wrapWithMaxLevel(1));
     await tester.pump();
-    expect(find.text('1/11 animais descobertos'), findsOneWidget);
-    expect(find.text('???'), findsNWidgets(10));
+    expect(find.text('1/13 animais descobertos'), findsOneWidget);
+    expect(find.text('???'), findsNWidgets(12));
     expect(find.text('Tanajura'), findsOneWidget);
   });
 
-  testWidgets('maxLevel=5 → 5 coloridos, 6 bloqueados', (tester) async {
+  testWidgets('maxLevel=5 → 5 coloridos, 8 bloqueados', (tester) async {
     await tester.pumpWidget(_wrapWithMaxLevel(5));
     await tester.pump();
-    expect(find.text('5/11 animais descobertos'), findsOneWidget);
-    expect(find.text('???'), findsNWidgets(6));
+    expect(find.text('5/13 animais descobertos'), findsOneWidget);
+    expect(find.text('???'), findsNWidgets(8));
   });
 
-  testWidgets('maxLevel=11 → 11 coloridos, cabeçalho "11/11"', (tester) async {
+  testWidgets('maxLevel=11 → 11 coloridos, cabeçalho "11/13"', (tester) async {
     await tester.pumpWidget(_wrapWithMaxLevel(11));
     await tester.pump();
-    expect(find.text('11/11 animais descobertos'), findsOneWidget);
-    expect(find.text('???'), findsNothing);
+    expect(find.text('11/13 animais descobertos'), findsOneWidget);
+    expect(find.text('???'), findsNWidgets(2));
   });
 
   testWidgets('tap em card desbloqueado abre bottom sheet com nome e funFact', (tester) async {
@@ -118,6 +118,6 @@ void main() {
     await tester.pump();
     final indicator = tester.widget<LinearProgressIndicator>(
         find.byType(LinearProgressIndicator));
-    expect(indicator.value, closeTo(5 / 11.0, 0.001));
+    expect(indicator.value, closeTo(5 / 13.0, 0.001));
   });
 }

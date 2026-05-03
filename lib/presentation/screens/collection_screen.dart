@@ -34,12 +34,12 @@ class CollectionScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     OutlinedText(
-                      text: '$highest/11 animais descobertos',
+                      text: '$highest/13 animais descobertos',
                       style: GoogleFonts.fredoka(fontSize: 16),
                     ),
                     const SizedBox(height: 4),
                     LinearProgressIndicator(
-                      value: highest / 11.0,
+                      value: highest / 13.0,
                       color: AppColors.primary,
                       backgroundColor: Colors.grey.shade300,
                       minHeight: 8,
