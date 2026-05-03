@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:capivara_2048/data/models/inventory.dart';
 import 'package:capivara_2048/data/models/inventory_hive_adapter.dart';
-import 'package:capivara_2048/data/models/item_type.dart';
 import 'package:capivara_2048/data/repositories/inventory_repository.dart';
 import 'package:capivara_2048/domain/inventory/inventory_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/settings_notifier.dart';
