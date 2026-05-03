@@ -30,7 +30,7 @@ void main() {
 
     final card = tester.widget<Card>(find.byType(Card));
     final shape = card.shape as RoundedRectangleBorder;
-    expect(shape.side.color, isNot(const Color(0xFFFF8C42)));
+    expect(shape.side, BorderSide.none);
   });
 
   testWidgets('highlighted=true: orange border present', (tester) async {
