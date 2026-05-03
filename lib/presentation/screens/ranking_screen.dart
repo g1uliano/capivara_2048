@@ -66,14 +66,17 @@ class _PersonalRankingTab extends ConsumerWidget {
       length: 2,
       child: Column(
         children: [
-          TabBar(
-            labelColor: AppColors.primary,
-            unselectedLabelColor: Colors.grey,
-            indicatorColor: AppColors.primary,
-            tabs: const [
-              Tab(text: 'Por Tempo'),
-              Tab(text: 'Por Pontuação'),
-            ],
+          ColoredBox(
+            color: AppColors.primary,
+            child: TabBar(
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.white70,
+              indicatorColor: Colors.white,
+              tabs: const [
+                Tab(text: 'Por Tempo'),
+                Tab(text: 'Por Pontuação'),
+              ],
+            ),
           ),
           Expanded(
             child: TabBarView(
@@ -104,8 +107,8 @@ class _RecordList extends StatelessWidget {
   Widget build(BuildContext context) {
     if (records.isEmpty) {
       return Center(
-        child: Text(
-          'Jogue sua primeira partida para aparecer aqui!',
+        child: OutlinedText(
+          text: 'Jogue sua primeira partida para aparecer aqui!',
           style: GoogleFonts.nunito(fontSize: 14),
           textAlign: TextAlign.center,
         ),
