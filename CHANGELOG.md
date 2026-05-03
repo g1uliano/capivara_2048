@@ -7,6 +7,12 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.0.7] - 2026-05-03
+
+### Fixed
+- Cards de itens avulsos na loja agora têm espaçamento reduzido — removida `Padding` duplicada e margem interna excessiva
+- Último item ("Desfazer 3") não é mais cortado: `ListView` agora tem `padding` inferior de 32 dp
+
 ## [1.0.6] - 2026-05-03
 
 ### Fixed

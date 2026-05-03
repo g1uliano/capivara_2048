@@ -39,7 +39,7 @@ class ShopScreen extends ConsumerWidget {
           elevation: 0,
         ),
         body: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
           children: [
             ...packages.map(
               (pkg) => Padding(
@@ -66,7 +66,7 @@ class ShopScreen extends ConsumerWidget {
             const SizedBox(height: 12),
             ...const [ItemType.bomb3, ItemType.undo3, ItemType.bomb2, ItemType.undo1]
                 .map((item) => Padding(
-                      padding: EdgeInsets.only(bottom: 12),
+                      padding: EdgeInsets.only(bottom: 6),
                       child: _UnitItemCard(item: item),
                     )),
           ],
@@ -384,32 +384,29 @@ class _UnitItemCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              Image.asset(_png, width: 40, height: 40),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(_name, style: const TextStyle(fontSize: 16)),
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            Image.asset(_png, width: 40, height: 40),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(_name, style: const TextStyle(fontSize: 16)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFF8C42),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF8C42),
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                ),
-                onPressed: () => _buy(context, ref),
-                child: Text(
-                  _price,
-                  style: const TextStyle(color: Colors.white, fontSize: 13),
-                ),
+              onPressed: () => _buy(context, ref),
+              child: Text(
+                _price,
+                style: const TextStyle(color: Colors.white, fontSize: 13),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
