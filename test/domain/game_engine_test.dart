@@ -1,3 +1,5 @@
+import 'package:capivara_2048/core/constants/game_constants.dart';
+import 'package:capivara_2048/data/animals_data.dart';
 import 'package:capivara_2048/domain/game_engine/direction.dart';
 import 'package:capivara_2048/domain/game_engine/game_engine.dart';
 import 'package:capivara_2048/data/models/tile.dart';
@@ -323,6 +325,26 @@ void main() {
       );
       GameEngine.removeTiles(state, [(0, 0)]);
       expect(state.board[0][0], isNotNull); // original unchanged
+    });
+  });
+
+  group('animals nível 12 e 13', () {
+    test('animalForLevel(12) retorna Peixe-boi', () {
+      final animal = animalForLevel(12);
+      expect(animal.name, 'Peixe-boi');
+      expect(animal.value, 4096);
+      expect(animal.level, 12);
+    });
+
+    test('animalForLevel(13) retorna Jacaré', () {
+      final animal = animalForLevel(13);
+      expect(animal.name, 'Jacaré');
+      expect(animal.value, 8192);
+      expect(animal.level, 13);
+    });
+
+    test('GameConstants.maxLevel é 13', () {
+      expect(GameConstants.maxLevel, 13);
     });
   });
 

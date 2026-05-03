@@ -90,6 +90,22 @@ const List<Animal> animals = [
     tilePngPath: 'assets/images/animals/tile/Capivara.png',
     hostPngPath: 'assets/images/animals/host/Capivara.png',
   ),
+  Animal(
+    level: 12, value: 4096, name: 'Peixe-boi',
+    scientificName: 'Trichechus inunguis',
+    funFact: 'O único mamífero aquático exclusivamente de água doce das Américas.',
+    borderColor: Color(0xFF006064), backgroundBaseColor: Color(0xFFE0F7FA),
+    tilePngPath: 'assets/images/animals/tile/PeixeBoi.png',
+    hostPngPath: 'assets/images/animals/host/PeixeBoi.png',
+  ),
+  Animal(
+    level: 13, value: 8192, name: 'Jacaré',
+    scientificName: 'Caiman crocodilus',
+    funFact: 'Pode passar meses sem comer e vive mais de 60 anos na natureza.',
+    borderColor: Color(0xFF1B5E20), backgroundBaseColor: Color(0xFFE8F5E9),
+    tilePngPath: 'assets/images/animals/tile/Jacare.png',
+    hostPngPath: 'assets/images/animals/host/Jacare.png',
+  ),
 ];
 
 Animal animalForLevel(int level) =>
