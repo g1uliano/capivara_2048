@@ -83,7 +83,7 @@ class _GameOverNoItemsOverlayState extends ConsumerState<GameOverNoItemsOverlay>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Adquirir item'),
+        title: const Text('Confirmar compra'),
         content: Text('Você receberá 1× ${_nameFor(_drawnItem)} por $_price'),
         actions: [
           TextButton(
@@ -138,26 +138,34 @@ class _GameOverNoItemsOverlayState extends ConsumerState<GameOverNoItemsOverlay>
 
     return WillPopScope(
       onWillPop: () async => false,
-      child: ColoredBox(
-        color: Colors.black.withValues(alpha: 0.6),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          AbsorbPointer(
+            child: ColoredBox(
+              color: Colors.black.withValues(alpha: 0.6),
+              child: const SizedBox.expand(),
+            ),
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                 OutlinedText(
                   text: 'Você não possui mais itens!',
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
+                    fontFamily: 'Fredoka',
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
                 OutlinedText(
                   text: 'Mas você pode conseguir um agora:',
-                  style: const TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16, fontFamily: 'Nunito'),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
@@ -190,12 +198,13 @@ class _GameOverNoItemsOverlayState extends ConsumerState<GameOverNoItemsOverlay>
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                           color: Color(0xFF3E2723),
+                          fontFamily: 'Fredoka',
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         _descFor(_drawnItem),
-                        style: const TextStyle(fontSize: 14, color: Colors.grey),
+                        style: const TextStyle(fontSize: 14, color: Colors.grey, fontFamily: 'Nunito'),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -240,6 +249,7 @@ class _GameOverNoItemsOverlayState extends ConsumerState<GameOverNoItemsOverlay>
             ),
           ),
         ),
+        ],
       ),
     );
   }
