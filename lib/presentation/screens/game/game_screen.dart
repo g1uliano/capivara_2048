@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../domain/game_engine/direction.dart';
 
+import '../../../data/models/item_type.dart';
 import '../../controllers/game_notifier.dart';
 import '../../widgets/board_widget.dart';
 import '../../widgets/bomb_selection_overlay.dart';
@@ -12,17 +14,43 @@ import '../../widgets/game_background.dart';
 import '../../widgets/game_header.dart';
 import '../../widgets/game_over_modal.dart';
 import '../../widgets/inventory_bar.dart';
+import '../../widgets/shop_overlay.dart';
 import '../../../core/constants/game_constants.dart';
 import '../../../domain/inventory/inventory_notifier.dart';
 import '../../widgets/pause_overlay.dart';
 import 'game_over_item_overlay.dart';
 import '../../widgets/game_over_no_items_overlay.dart';
 
-class GameScreen extends ConsumerWidget {
+class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<GameScreen> createState() => _GameScreenState();
+}
+
+class _GameScreenState extends ConsumerState<GameScreen> {
+  ItemType? _shopItem;
+  Set<ItemType> _pulsingItems = {};
+
+  void _openShop(ItemType type) {
+    ref.read(gameProvider.notifier).pause();
+    setState(() => _shopItem = type);
+  }
+
+  void _closeShop() {
+    setState(() => _shopItem = null);
+    ref.read(gameProvider.notifier).resume();
+  }
+
+  void _onItemPurchased(ItemType type) {
+    setState(() => _pulsingItems.add(type));
+    Timer(const Duration(milliseconds: 300), () {
+      if (mounted) setState(() => _pulsingItems.remove(type));
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(gameProvider);
     final isGameOver = state.isGameOver;
     final hasWon = state.hasWon;
@@ -96,7 +124,10 @@ class GameScreen extends ConsumerWidget {
                         const SizedBox(height: GameConstants.boardToInventorySpacing),
                         AbsorbPointer(
                           absorbing: state.isAwaitingGameOverResolution,
-                          child: const InventoryBar(),
+                          child: InventoryBar(
+                            onTapWhenEmpty: _openShop,
+                            pulsingItems: _pulsingItems,
+                          ),
                         ),
                         const SizedBox(height: 8),
                       ],
@@ -115,6 +146,12 @@ class GameScreen extends ConsumerWidget {
               if (hasWon && !isGameOver)
                 const Positioned.fill(
                     child: GameOverModal(message: 'Capivara Lendária! 🎉')),
+              if (_shopItem != null)
+                Positioned.fill(child: ShopOverlay(
+                  itemType: _shopItem!,
+                  onClose: _closeShop,
+                  onItemPurchased: _onItemPurchased,
+                )),
                 ],
               );
             },

@@ -66,20 +66,24 @@ class ShopPackageCard extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                Text(
-                  'De R\$ ${package.originalPrice.toStringAsFixed(2).replaceAll('.', ',')}',
-                  style: GoogleFonts.nunito(
-                    fontSize: 14,
-                    color: const Color(0xFF9E9E9E),
-                    decoration: TextDecoration.lineThrough,
+                Flexible(
+                  child: Text(
+                    'De R\$ ${package.originalPrice.toStringAsFixed(2).replaceAll('.', ',')}',
+                    style: GoogleFonts.nunito(
+                      fontSize: 14,
+                      color: const Color(0xFF9E9E9E),
+                      decoration: TextDecoration.lineThrough,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
-                Text(
-                  'Por R\$ ${package.currentPrice.toStringAsFixed(2).replaceAll('.', ',')}',
-                  style: GoogleFonts.fredoka(
-                    fontSize: 20,
-                    color: AppColors.primary,
+                Flexible(
+                  child: Text(
+                    'Por R\$ ${package.currentPrice.toStringAsFixed(2).replaceAll('.', ',')}',
+                    style: GoogleFonts.fredoka(
+                      fontSize: 20,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
               ],

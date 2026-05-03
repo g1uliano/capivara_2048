@@ -24,7 +24,17 @@ class _LivesIndicatorState extends ConsumerState<LivesIndicator>
     _prevLives = ref.read(livesProvider).lives;
     _ticker = createTicker((elapsed) {
       setState(() => _elapsed = elapsed);
-    })..start();
+    });
+    _syncTicker();
+  }
+
+  void _syncTicker() {
+    final s = ref.read(livesProvider);
+    if (s.lives < s.regenCap) {
+      if (!_ticker.isActive) _ticker.start();
+    } else {
+      if (_ticker.isActive) _ticker.stop();
+    }
   }
 
   @override
@@ -81,6 +91,7 @@ class _LivesIndicatorState extends ConsumerState<LivesIndicator>
     // ignore: unused_local_variable
     final _ = _elapsed;
     final state = ref.watch(livesProvider);
+    _syncTicker();
 
     // Capturar _prevLives antes do rebuild para passar ao banner
     final prevLives = _prevLives;
