@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/constants/game_constants.dart';
 
 class InventoryItemButton extends StatelessWidget {
   final String label;
   final int count;
   final VoidCallback? onPressed;
+  final VoidCallback? onTapWhenEmpty;
+  final bool shouldPulse;
   final IconData icon;
   final String? pngPath;
 
@@ -14,16 +17,18 @@ class InventoryItemButton extends StatelessWidget {
     required this.count,
     required this.icon,
     this.onPressed,
+    this.onTapWhenEmpty,
+    this.shouldPulse = false,
     this.pngPath,
   });
 
-  Widget _fallbackButton() {
+  Widget _fallbackButton(VoidCallback? onTap) {
     return Material(
       color: const Color(0xFF4CAF50),
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: onPressed,
+        onTap: onTap,
         child: Center(child: Icon(icon, color: Colors.white, size: 28)),
       ),
     );
@@ -33,6 +38,46 @@ class InventoryItemButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final enabled = count > 0;
     final badgeText = count > 99 ? '99+' : '$count';
+    final effectiveTap = enabled ? onPressed : onTapWhenEmpty;
+
+    Widget inner = ColorFiltered(
+      colorFilter: enabled
+          ? const ColorFilter.mode(Colors.transparent, BlendMode.dst)
+          : const ColorFilter.matrix([
+              0.2126, 0.7152, 0.0722, 0, 0,
+              0.2126, 0.7152, 0.0722, 0, 0,
+              0.2126, 0.7152, 0.0722, 0, 0,
+              0,      0,      0,      1, 0,
+            ]),
+      child: pngPath != null
+          ? GestureDetector(
+              onTap: effectiveTap,
+              child: Image.asset(
+                pngPath!,
+                width: GameConstants.inventoryIconSize,
+                height: GameConstants.inventoryIconSize,
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => _fallbackButton(effectiveTap),
+              ),
+            )
+          : _fallbackButton(effectiveTap),
+    );
+
+    if (shouldPulse) {
+      inner = inner
+          .animate()
+          .scale(
+            begin: const Offset(1, 1),
+            end: const Offset(1.2, 1.2),
+            duration: 150.ms,
+          )
+          .then()
+          .scale(
+            begin: const Offset(1.2, 1.2),
+            end: const Offset(1, 1),
+            duration: 150.ms,
+          );
+    }
 
     return Tooltip(
       message: '$count $label',
@@ -43,28 +88,7 @@ class InventoryItemButton extends StatelessWidget {
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            ColorFiltered(
-              colorFilter: enabled
-                  ? const ColorFilter.mode(Colors.transparent, BlendMode.dst)
-                  : const ColorFilter.matrix([
-                      0.2126, 0.7152, 0.0722, 0, 0,
-                      0.2126, 0.7152, 0.0722, 0, 0,
-                      0.2126, 0.7152, 0.0722, 0, 0,
-                      0,      0,      0,      1, 0,
-                    ]),
-              child: pngPath != null
-                  ? GestureDetector(
-                      onTap: onPressed,
-                      child: Image.asset(
-                        pngPath!,
-                        width: GameConstants.inventoryIconSize,
-                        height: GameConstants.inventoryIconSize,
-                        fit: BoxFit.contain,
-                        errorBuilder: (_, __, ___) => _fallbackButton(),
-                      ),
-                    )
-                  : _fallbackButton(),
-            ),
+            inner,
             if (count > 0)
               Positioned(
                 top: -4,
