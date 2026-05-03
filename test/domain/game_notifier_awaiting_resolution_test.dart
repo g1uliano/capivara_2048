@@ -48,7 +48,17 @@ void main() {
 
   test('confirmBomb after startContinueWithItem clears isContinuingWithItem and isGameOver', () {
     // Use GameNotifier directly (no Hive) — no consume callback wired.
-    final notifier = GameNotifier(GameEngine());
+    final container2 = ProviderContainer(
+      overrides: [
+        gameProvider.overrideWith((ref) {
+          final n = GameNotifier(ref.read(gameEngineProvider), ref);
+          n.setConsumeCallback((_) {});
+          return n;
+        }),
+      ],
+    );
+    addTearDown(container2.dispose);
+    final notifier = container2.read(gameProvider.notifier);
     notifier.setAwaitingResolution(true);
     notifier.startContinueWithItem();
     notifier.enterBombMode(BombMode.bomb3, ItemType.bomb3);

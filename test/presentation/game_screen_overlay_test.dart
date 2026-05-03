@@ -57,7 +57,7 @@ Widget _buildScreen({
   return ProviderScope(
     overrides: [
       gameProvider.overrideWith((ref) {
-        final notifier = GameNotifier(GameEngine());
+        final notifier = GameNotifier(GameEngine(), ref);
         notifier.state = gameState;
         return notifier;
       }),
@@ -146,7 +146,7 @@ void main() {
         ],
         overrides: [
           gameProvider.overrideWith((ref) {
-            final notifier = GameNotifier(GameEngine());
+            final notifier = GameNotifier(GameEngine(), ref);
             notifier.setConsumeCallback(
               (type) => ref.read(inventoryProvider.notifier).consume(type),
             );

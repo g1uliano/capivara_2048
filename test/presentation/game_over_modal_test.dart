@@ -111,7 +111,7 @@ void main() {
           },
         ),
         gameProvider.overrideWith((ref) {
-          final n = GameNotifier(ref.read(gameEngineProvider));
+          final n = GameNotifier(ref.read(gameEngineProvider), ref);
           n.setConsumeCallback((_) {});
           return n;
         }),
@@ -157,7 +157,7 @@ void main() {
           },
         ),
         gameProvider.overrideWith((ref) {
-          final n = GameNotifier(ref.read(gameEngineProvider));
+          final n = GameNotifier(ref.read(gameEngineProvider), ref);
           n.setConsumeCallback((_) {});
           return n;
         }),
