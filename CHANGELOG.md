@@ -7,6 +7,11 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-05-03
+
+### Fixed
+- Assistir anúncio para ganhar item no game over não entrega mais uma vida extra — o fluxo de item agora apenas contabiliza o anúncio no limite diário
+
 ## [1.1.0] - 2026-05-03
 
 ### Added
