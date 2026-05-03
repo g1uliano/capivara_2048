@@ -7,6 +7,12 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.0.5] - 2026-05-03
+
+### Fixed
+- Flash branco entre splash nativa e primeiro frame Flutter eliminado — `NormalTheme` agora usa `#1B3610` como `windowBackground` em vez da cor padrão do sistema
+- `SplashScreen` Flutter exibe a arte full-screen corretamente (referência morta a `splash_logo.png` removida)
+
 ## [1.0.4] - 2026-05-03
 
 ### Fixed
