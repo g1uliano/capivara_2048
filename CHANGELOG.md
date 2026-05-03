@@ -7,6 +7,12 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-05-03
+
+### Fixed
+- Usar Bomba 2/3 na `GameOverItemOverlay` agora abre a grade de seleção de tiles corretamente — o item não era mais consumido antes do jogador selecionar os tiles, eliminando o travamento do jogo
+- Botões "Comprar" e "Encerrar partida" no `GameOverNoItemsOverlay` agora legíveis sobre o fundo escuro
+
 ## [1.0.1] - 2026-05-03
 
 ### Fixed
