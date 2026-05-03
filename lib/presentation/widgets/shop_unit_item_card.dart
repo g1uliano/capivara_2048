@@ -7,7 +7,8 @@ import '../../domain/inventory/inventory_notifier.dart';
 
 class ShopUnitItemCard extends ConsumerWidget {
   final ItemType item;
-  const ShopUnitItemCard({super.key, required this.item});
+  final bool highlighted;
+  const ShopUnitItemCard({super.key, required this.item, this.highlighted = false});
 
   String get _png => switch (item) {
         ItemType.bomb2 => 'assets/icons/inventory/bomb_2.png',
@@ -57,7 +58,12 @@ class ShopUnitItemCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: highlighted
+            ? const BorderSide(color: Color(0xFFFF8C42), width: 2)
+            : BorderSide.none,
+      ),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(

@@ -144,7 +144,10 @@ class _ShopOverlayState extends ConsumerState<ShopOverlay> {
                         ])
                           Padding(
                             padding: const EdgeInsets.only(bottom: 6),
-                            child: ShopUnitItemCard(item: item),
+                            child: ShopUnitItemCard(
+                              item: item,
+                              highlighted: item == widget.itemType,
+                            ),
                           ),
                       ],
                     ),
