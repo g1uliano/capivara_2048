@@ -20,6 +20,9 @@ class GameState {
   // True when player tapped "Usar item" and is now selecting from InventoryBar.
   // Suppresses GameOverModal while keeping the board interactive.
   final bool isContinuingWithItem;
+  final int? pendingMilestone;   // 11, 12 ou 13 — dispara VictoryChoiceDialog
+  final int? bestTimeMs2048;     // elapsedMs capturado ao atingir nível 11
+  final int? bestTimeMs4096;     // elapsedMs capturado ao atingir nível 12
 
   static const _bombSentinel = Object();
 
@@ -37,6 +40,9 @@ class GameState {
     this.selectedBombTiles = const [],
     this.isAwaitingGameOverResolution = false,
     this.isContinuingWithItem = false,
+    this.pendingMilestone,
+    this.bestTimeMs2048,
+    this.bestTimeMs4096,
   }) : undoStack = List.unmodifiable(undoStack ?? const []);
 
   GameState copyWith({
@@ -53,6 +59,9 @@ class GameState {
     List<(int, int)>? selectedBombTiles,
     bool? isAwaitingGameOverResolution,
     bool? isContinuingWithItem,
+    Object? pendingMilestone = _bombSentinel,
+    Object? bestTimeMs2048 = _bombSentinel,
+    Object? bestTimeMs4096 = _bombSentinel,
   }) {
     return GameState(
       board: board ?? this.board,
@@ -68,6 +77,15 @@ class GameState {
       selectedBombTiles: selectedBombTiles ?? this.selectedBombTiles,
       isAwaitingGameOverResolution: isAwaitingGameOverResolution ?? this.isAwaitingGameOverResolution,
       isContinuingWithItem: isContinuingWithItem ?? this.isContinuingWithItem,
+      pendingMilestone: pendingMilestone == _bombSentinel
+          ? this.pendingMilestone
+          : pendingMilestone as int?,
+      bestTimeMs2048: bestTimeMs2048 == _bombSentinel
+          ? this.bestTimeMs2048
+          : bestTimeMs2048 as int?,
+      bestTimeMs4096: bestTimeMs4096 == _bombSentinel
+          ? this.bestTimeMs4096
+          : bestTimeMs4096 as int?,
     );
   }
 }

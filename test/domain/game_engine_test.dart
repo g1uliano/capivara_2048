@@ -328,6 +328,47 @@ void main() {
     });
   });
 
+  group('vitória múltipla — _checkWin desativado', () {
+    test('merge que gera nível 11 não seta hasWon', () {
+      final engine = GameEngine();
+      final board = List.generate(4, (r) => List<Tile?>.filled(4, null));
+      board[0][2] = const Tile(id: 'a', level: 10, row: 0, col: 2);
+      board[0][3] = const Tile(id: 'b', level: 10, row: 0, col: 3);
+      final state = GameState(
+        board: board, score: 0, highScore: 0, isGameOver: false, hasWon: false,
+      );
+      final next = engine.move(state, Direction.left);
+      expect(next.hasWon, false);
+      expect(next.maxLevel, 11);
+    });
+
+    test('merge que gera nível 12 não seta hasWon', () {
+      final engine = GameEngine();
+      final board = List.generate(4, (r) => List<Tile?>.filled(4, null));
+      board[0][2] = const Tile(id: 'a', level: 11, row: 0, col: 2);
+      board[0][3] = const Tile(id: 'b', level: 11, row: 0, col: 3);
+      final state = GameState(
+        board: board, score: 0, highScore: 0, isGameOver: false, hasWon: false,
+      );
+      final next = engine.move(state, Direction.left);
+      expect(next.hasWon, false);
+      expect(next.maxLevel, 12);
+    });
+
+    test('merge que gera nível 13 não seta hasWon', () {
+      final engine = GameEngine();
+      final board = List.generate(4, (r) => List<Tile?>.filled(4, null));
+      board[0][2] = const Tile(id: 'a', level: 12, row: 0, col: 2);
+      board[0][3] = const Tile(id: 'b', level: 12, row: 0, col: 3);
+      final state = GameState(
+        board: board, score: 0, highScore: 0, isGameOver: false, hasWon: false,
+      );
+      final next = engine.move(state, Direction.left);
+      expect(next.hasWon, false);
+      expect(next.maxLevel, 13);
+    });
+  });
+
   group('animals nível 12 e 13', () {
     test('animalForLevel(12) retorna Peixe-boi', () {
       final animal = animalForLevel(12);

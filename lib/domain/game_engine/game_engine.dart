@@ -219,8 +219,7 @@ class GameEngine {
   }
 
   bool _checkWin(List<List<Tile?>> board) {
-    return board.any((row) =>
-        row.any((t) => t != null && t.level >= GameConstants.maxLevel));
+    return false; // Vitória detectada pelo GameNotifier via pendingMilestone
   }
 
   int _valueForLevel(int level) => (1 << level);
