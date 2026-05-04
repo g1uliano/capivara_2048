@@ -117,10 +117,10 @@ class _RewardSummary extends StatelessWidget {
     final multiplier = doubled ? 2 : 1;
     final items = <Widget>[];
     if (reward.undo1 > 0) {
-      items.add(_row('assets/icons/inventory/undo_1.png', '${reward.undo1 * multiplier}× Desfazer 1'));
+      items.add(_row('assets/images/inventory/undo_1.png', '${reward.undo1 * multiplier}× Desfazer 1'));
     }
     if (reward.bomb2 > 0) {
-      items.add(_row('assets/icons/inventory/bomb_2.png', '${reward.bomb2 * multiplier}× Bomba 2'));
+      items.add(_row('assets/images/inventory/bomb_2.png', '${reward.bomb2 * multiplier}× Bomba 2'));
     }
     if (reward.lives > 0) {
       items.add(_rowIcon(Icons.favorite, Colors.redAccent, '${reward.lives * multiplier}× Vida'));

@@ -11,10 +11,10 @@ class ShopUnitItemCard extends ConsumerWidget {
   const ShopUnitItemCard({super.key, required this.item, this.highlighted = false});
 
   String get _png => switch (item) {
-        ItemType.bomb2 => 'assets/icons/inventory/bomb_2.png',
-        ItemType.bomb3 => 'assets/icons/inventory/bomb_3.png',
-        ItemType.undo1 => 'assets/icons/inventory/undo_1.png',
-        ItemType.undo3 => 'assets/icons/inventory/undo_3.png',
+        ItemType.bomb2 => 'assets/images/inventory/bomb_2.png',
+        ItemType.bomb3 => 'assets/images/inventory/bomb_3.png',
+        ItemType.undo1 => 'assets/images/inventory/undo_1.png',
+        ItemType.undo3 => 'assets/images/inventory/undo_3.png',
       };
 
   String get _name => switch (item) {

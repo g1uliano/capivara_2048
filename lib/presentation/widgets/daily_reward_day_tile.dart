@@ -99,10 +99,10 @@ class _RewardIcons extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = <Widget>[];
     if (reward.undo1 > 0) {
-      items.add(_icon('assets/icons/inventory/undo_1.png', reward.undo1, iconSize));
+      items.add(_icon('assets/images/inventory/undo_1.png', reward.undo1, iconSize));
     }
     if (reward.bomb2 > 0) {
-      items.add(_icon('assets/icons/inventory/bomb_2.png', reward.bomb2, iconSize));
+      items.add(_icon('assets/images/inventory/bomb_2.png', reward.bomb2, iconSize));
     }
     if (reward.lives > 0) {
       items.add(_liveIcon(reward.lives, iconSize));

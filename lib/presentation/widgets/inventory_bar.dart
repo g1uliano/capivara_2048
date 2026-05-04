@@ -28,7 +28,7 @@ class InventoryBar extends ConsumerWidget {
         context: context,
         itemName: 'Bomba 2',
         description: 'Selecione 2 tiles para remover do tabuleiro.',
-        pngPath: 'assets/icons/inventory/bomb_2.png',
+        pngPath: 'assets/images/inventory/bomb_2.png',
       );
       if (!ok) return;
       ref.read(gameProvider.notifier).enterBombMode(BombMode.bomb2, ItemType.bomb2);
@@ -39,7 +39,7 @@ class InventoryBar extends ConsumerWidget {
         context: context,
         itemName: 'Bomba 3',
         description: 'Selecione 3 tiles para remover do tabuleiro.',
-        pngPath: 'assets/icons/inventory/bomb_3.png',
+        pngPath: 'assets/images/inventory/bomb_3.png',
       );
       if (!ok) return;
       ref.read(gameProvider.notifier).enterBombMode(BombMode.bomb3, ItemType.bomb3);
@@ -50,7 +50,7 @@ class InventoryBar extends ConsumerWidget {
         context: context,
         itemName: 'Desfazer 1',
         description: 'Desfaz o último movimento.',
-        pngPath: 'assets/icons/inventory/undo_1.png',
+        pngPath: 'assets/images/inventory/undo_1.png',
       );
       if (!ok) return;
       final undone = ref.read(gameProvider.notifier).undo(1);
@@ -62,7 +62,7 @@ class InventoryBar extends ConsumerWidget {
         context: context,
         itemName: 'Desfazer 3',
         description: 'Desfaz os últimos 3 movimentos.',
-        pngPath: 'assets/icons/inventory/undo_3.png',
+        pngPath: 'assets/images/inventory/undo_3.png',
       );
       if (!ok) return;
       final undone = ref.read(gameProvider.notifier).undo(3);
@@ -77,7 +77,7 @@ class InventoryBar extends ConsumerWidget {
           InventoryItemButton(
             label: 'Bomba 2',
             icon: Icons.bolt,
-            pngPath: 'assets/icons/inventory/bomb_2.png',
+            pngPath: 'assets/images/inventory/bomb_2.png',
             count: inventory.bomb2,
             onPressed: inventory.bomb2 > 0 ? useBomb2 : null,
             onTapWhenEmpty: inventory.bomb2 == 0 && onTapWhenEmpty != null
@@ -88,7 +88,7 @@ class InventoryBar extends ConsumerWidget {
           InventoryItemButton(
             label: 'Bomba 3',
             icon: Icons.auto_fix_high,
-            pngPath: 'assets/icons/inventory/bomb_3.png',
+            pngPath: 'assets/images/inventory/bomb_3.png',
             count: inventory.bomb3,
             onPressed: inventory.bomb3 > 0 ? useBomb3 : null,
             onTapWhenEmpty: inventory.bomb3 == 0 && onTapWhenEmpty != null
@@ -99,14 +99,14 @@ class InventoryBar extends ConsumerWidget {
           InventoryItemButton(
             label: 'Desfazer 1',
             icon: Icons.undo,
-            pngPath: 'assets/icons/inventory/undo_1.png',
+            pngPath: 'assets/images/inventory/undo_1.png',
             count: inventory.undo1,
             onPressed: inventory.undo1 > 0 && undoStackLen >= 1 ? useUndo1 : null,
             forceDisabled: inventory.undo1 > 0 && undoStackLen < 1,
             onTapWhenDisabled: () => showCannotUseItemDialog(
               context: context,
               message: 'Não há jogadas para desfazer.',
-              pngPath: 'assets/icons/inventory/undo_1.png',
+              pngPath: 'assets/images/inventory/undo_1.png',
             ),
             onTapWhenEmpty: inventory.undo1 == 0 && onTapWhenEmpty != null
                 ? () => onTapWhenEmpty!(ItemType.undo1)
@@ -116,14 +116,14 @@ class InventoryBar extends ConsumerWidget {
           InventoryItemButton(
             label: 'Desfazer 3',
             icon: Icons.fast_rewind,
-            pngPath: 'assets/icons/inventory/undo_3.png',
+            pngPath: 'assets/images/inventory/undo_3.png',
             count: inventory.undo3,
             onPressed: inventory.undo3 > 0 && undoStackLen >= 3 ? useUndo3 : null,
             forceDisabled: inventory.undo3 > 0 && undoStackLen < 3,
             onTapWhenDisabled: () => showCannotUseItemDialog(
               context: context,
               message: 'São necessárias pelo menos 3 jogadas para usar o Desfazer 3.',
-              pngPath: 'assets/icons/inventory/undo_3.png',
+              pngPath: 'assets/images/inventory/undo_3.png',
             ),
             onTapWhenEmpty: inventory.undo3 == 0 && onTapWhenEmpty != null
                 ? () => onTapWhenEmpty!(ItemType.undo3)

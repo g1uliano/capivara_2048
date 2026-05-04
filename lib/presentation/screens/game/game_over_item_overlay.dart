@@ -10,10 +10,10 @@ import '../../../domain/lives/lives_notifier.dart';
 import '../../../presentation/controllers/game_notifier.dart';
 
 String _pngFor(ItemType t) => switch (t) {
-      ItemType.bomb2 => 'assets/icons/inventory/bomb_2.png',
-      ItemType.bomb3 => 'assets/icons/inventory/bomb_3.png',
-      ItemType.undo1 => 'assets/icons/inventory/undo_1.png',
-      ItemType.undo3 => 'assets/icons/inventory/undo_3.png',
+      ItemType.bomb2 => 'assets/images/inventory/bomb_2.png',
+      ItemType.bomb3 => 'assets/images/inventory/bomb_3.png',
+      ItemType.undo1 => 'assets/images/inventory/undo_1.png',
+      ItemType.undo3 => 'assets/images/inventory/undo_3.png',
     };
 
 String _nameFor(ItemType t) => switch (t) {
