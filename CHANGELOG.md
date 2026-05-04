@@ -7,6 +7,11 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.2.3] - 2026-05-04
+
+### Fixed
+- **Tabuleiro retangular em telas compactas** (ex: 640dp): substituído `SizedBox(boardSide×boardSide)` — cujo cálculo usava `headerH=72` muito abaixo da altura real do `GameHeader` (~238dp) — por `AspectRatio(1.0)` + `LayoutBuilder` interno. O tabuleiro agora é sempre quadrado em qualquer tamanho de tela, usando todo o espaço disponível entre o header e o inventário.
+
 ## [1.2.2] - 2026-05-04
 
 ### Changed

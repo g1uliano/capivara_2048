@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../domain/game_engine/direction.dart';
@@ -64,16 +62,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     return Scaffold(
       body: GameBackground(
         child: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              const headerH = 72.0;
-              const inventoryH = 80.0; // inventoryIconSize (72) + SizedBox bottom (8)
-              const verticalPad = 8.0;
-              final boardSide = min(
-                constraints.maxWidth - 24,
-                constraints.maxHeight - headerH - inventoryH - verticalPad - GameConstants.boardToInventorySpacing,
-              );
-              return Stack(
+          child: Stack(
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -86,39 +75,43 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                         ),
                         Expanded(
                           child: Center(
-                            child: SizedBox(
-                              width: boardSide,
-                              height: boardSide,
-                              child: Stack(
-                                children: [
-                                  GestureDetector(
-                                    behavior: HitTestBehavior.opaque,
-                                    onPanEnd: (details) {
-                                      if (state.isPaused ||
-                                          isGameOver ||
-                                          hasWon ||
-                                          state.bombMode != null) { return; }
-                                      final v = details.velocity.pixelsPerSecond;
-                                      const threshold = 100.0;
-                                      if (v.dx.abs() > v.dy.abs()) {
-                                        if (v.dx > threshold) {
-                                          notifier.onSwipe(Direction.right);
-                                        } else if (v.dx < -threshold) {
-                                          notifier.onSwipe(Direction.left);
-                                        }
-                                      } else {
-                                        if (v.dy > threshold) {
-                                          notifier.onSwipe(Direction.down);
-                                        } else if (v.dy < -threshold) {
-                                          notifier.onSwipe(Direction.up);
-                                        }
-                                      }
-                                    },
-                                    child: RepaintBoundary(child: BoardWidget(size: boardSide)),
-                                  ),
-                                  if (state.bombMode != null)
-                                    const Positioned.fill(child: BombGridOverlay()),
-                                ],
+                            child: AspectRatio(
+                              aspectRatio: 1.0,
+                              child: LayoutBuilder(
+                                builder: (context, bc) {
+                                  final side = bc.maxWidth;
+                                  return Stack(
+                                    children: [
+                                      GestureDetector(
+                                        behavior: HitTestBehavior.opaque,
+                                        onPanEnd: (details) {
+                                          if (state.isPaused ||
+                                              isGameOver ||
+                                              hasWon ||
+                                              state.bombMode != null) { return; }
+                                          final v = details.velocity.pixelsPerSecond;
+                                          const threshold = 100.0;
+                                          if (v.dx.abs() > v.dy.abs()) {
+                                            if (v.dx > threshold) {
+                                              notifier.onSwipe(Direction.right);
+                                            } else if (v.dx < -threshold) {
+                                              notifier.onSwipe(Direction.left);
+                                            }
+                                          } else {
+                                            if (v.dy > threshold) {
+                                              notifier.onSwipe(Direction.down);
+                                            } else if (v.dy < -threshold) {
+                                              notifier.onSwipe(Direction.up);
+                                            }
+                                          }
+                                        },
+                                        child: RepaintBoundary(child: BoardWidget(size: side)),
+                                      ),
+                                      if (state.bombMode != null)
+                                        const Positioned.fill(child: BombGridOverlay()),
+                                    ],
+                                  );
+                                },
                               ),
                             ),
                           ),
@@ -159,8 +152,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                   onItemPurchased: _onItemPurchased,
                 )),
                 ],
-              );
-            },
           ),
         ),
       ),
