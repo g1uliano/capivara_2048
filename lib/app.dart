@@ -4,7 +4,13 @@ import 'core/asset_precache.dart';
 import 'presentation/screens/splash_screen.dart';
 
 class CapivaraApp extends StatefulWidget {
-  const CapivaraApp({super.key});
+  const CapivaraApp({super.key, this.precacheFutureOverride});
+
+  /// Override the precache future (tests only).
+  /// When non-null, [SplashScreen] receives this instead of calling
+  /// [precacheCriticalAssets]. Production code always passes null.
+  @visibleForTesting
+  final Future<void>? precacheFutureOverride;
 
   @override
   State<CapivaraApp> createState() => _CapivaraAppState();
@@ -19,7 +25,7 @@ class _CapivaraAppState extends State<CapivaraApp> {
     // Inicia o precache uma única vez. Splashscreen é decodificada primeiro
     // (aguardada antes dos demais) para aparecer imediatamente; o resto
     // carrega em paralelo. A SplashScreen aguarda essa future antes de navegar.
-    _precacheFuture ??= precacheCriticalAssets(context);
+    _precacheFuture ??= widget.precacheFutureOverride ?? precacheCriticalAssets(context);
   }
 
   @override
