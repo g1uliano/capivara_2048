@@ -65,11 +65,41 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         child: SafeArea(
           child: LayoutBuilder(
             builder: (context, lc) {
-              final scale = min(lc.maxWidth / 390.0, lc.maxHeight / 844.0).clamp(0.1, 1.0);
-              final hostSize    = (152.0 * scale).clamp(80.0, 152.0);
-              final livesIconSz = (44.0  * scale).clamp(28.0, 44.0);
-              final pauseSz     = (72.0  * scale).clamp(48.0, 72.0);
-              final invIconSz   = (72.0  * scale).clamp(44.0, 72.0);
+              // Layout adaptativo em duas fases:
+              // 1) O tabuleiro é quadrado e ocupa toda a largura útil.
+              // 2) O espaço vertical restante (acima e abaixo do tabuleiro) é
+              //    distribuído entre header e inventário. Se sobra espaço,
+              //    os elementos crescem (acima de 1.0); se falta, encolhem.
+              const hPad = 24.0; // 2 * 12 (Padding horizontal da Column)
+              const otherVerticalAtScale1 = 330.0; // header(238) + inv(80) + spacers(12)
+              const baseDesignTotal = 696.0; // otherVerticalAtScale1 + 366 (board design)
+
+              final boardSide = lc.maxWidth - hPad;
+              final maxScaleByWidth = (lc.maxHeight - boardSide) / otherVerticalAtScale1;
+
+              // Cap horizontal: header (host + status + pause) e inventário (4 ícones)
+              // não podem estourar a largura do tabuleiro.
+              final maxScaleByHeaderWidth = (boardSide - 130.0) / 230.0; // host(152)+pause(72)+~status(130)
+              final maxScaleByInvWidth = (boardSide - 32.0) / 288.0;     // 4 ícones de 72 + paddings
+              final maxScaleHorizontal = min(maxScaleByHeaderWidth, maxScaleByInvWidth);
+
+              double scale;
+              if (maxScaleByWidth >= 1.0) {
+                // Há folga vertical: header e inventário crescem até 1.5×,
+                // limitado pela largura disponível.
+                scale = min(maxScaleByWidth, maxScaleHorizontal).clamp(1.0, 1.5);
+              } else {
+                // Tela compacta: encolhe header/inv pra caber, board fica menor.
+                scale = min(
+                  (lc.maxWidth - hPad) / 366.0,
+                  lc.maxHeight / baseDesignTotal,
+                ).clamp(0.5, 1.0);
+              }
+
+              final hostSize    = (152.0 * scale).clamp(80.0, 228.0);
+              final livesIconSz = (44.0  * scale).clamp(28.0, 66.0);
+              final pauseSz     = (72.0  * scale).clamp(48.0, 108.0);
+              final invIconSz   = (72.0  * scale).clamp(44.0, 108.0);
               return Stack(
                 children: [
                   Padding(

@@ -7,6 +7,11 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.2.6] - 2026-05-04
+
+### Changed
+- **Game screen: elementos crescem além de 1.0× quando há folga vertical** — em dispositivos onde o tabuleiro (limitado pela largura) não consome toda a altura disponível, o anfitrião, indicador de vidas, botão pausar, ícones do inventário e demais elementos do header crescem proporcionalmente para preencher o espaço (até 1.5× do tamanho de design). Antes o scale era clampado em 1.0, deixando grandes faixas vazias acima e abaixo do tabuleiro em telas com mais de ~844dp de altura útil. A escala respeita também a largura disponível para o header (host + status + pause) e a fileira do inventário, evitando overflow.
+
 ## [1.2.5] - 2026-05-04
 
 ### Changed
