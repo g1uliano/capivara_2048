@@ -77,29 +77,36 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               final boardSide = lc.maxWidth - hPad;
               final maxScaleByWidth = (lc.maxHeight - boardSide) / otherVerticalAtScale1;
 
-              // Cap horizontal: header (host + status + pause) e inventário (4 ícones)
-              // não podem estourar a largura do tabuleiro.
-              final maxScaleByHeaderWidth = (boardSide - 130.0) / 230.0; // host(152)+pause(72)+~status(130)
-              final maxScaleByInvWidth = (boardSide - 32.0) / 288.0;     // 4 ícones de 72 + paddings
-              final maxScaleHorizontal = min(maxScaleByHeaderWidth, maxScaleByInvWidth);
+              // Cap horizontal independente para header e inventário.
+              // Header: o Row tem hostBanner + Spacer + (status/pause column).
+              // O Spacer absorve folga, então a constraint real é:
+              //   host(152*s) + max(statusW, pause(72*s)) <= boardSide
+              // Pra s <= ~2, max = statusW (~146dp medido). Usamos 160 de margem.
+              final maxScaleByHeaderWidth = (boardSide - 160.0) / 152.0;
+              // Inventário: 4 ícones lado a lado em (boardSide - 32) com paddings.
+              final maxScaleByInvWidth = (boardSide - 32.0) / 288.0;
 
-              double scale;
+              double headerScale;
+              double invScale;
               if (maxScaleByWidth >= 1.0) {
                 // Há folga vertical: header e inventário crescem até 1.5×,
-                // limitado pela largura disponível.
-                scale = min(maxScaleByWidth, maxScaleHorizontal).clamp(1.0, 1.5);
+                // cada um limitado pela sua própria constraint horizontal.
+                headerScale = min(maxScaleByWidth, maxScaleByHeaderWidth).clamp(1.0, 1.5);
+                invScale = min(maxScaleByWidth, maxScaleByInvWidth).clamp(1.0, 1.5);
               } else {
                 // Tela compacta: encolhe header/inv pra caber, board fica menor.
-                scale = min(
+                final compact = min(
                   (lc.maxWidth - hPad) / 366.0,
                   lc.maxHeight / baseDesignTotal,
                 ).clamp(0.5, 1.0);
+                headerScale = compact;
+                invScale = compact;
               }
 
-              final hostSize    = (152.0 * scale).clamp(80.0, 228.0);
-              final livesIconSz = (44.0  * scale).clamp(28.0, 66.0);
-              final pauseSz     = (72.0  * scale).clamp(48.0, 108.0);
-              final invIconSz   = (72.0  * scale).clamp(44.0, 108.0);
+              final hostSize    = (152.0 * headerScale).clamp(80.0, 228.0);
+              final livesIconSz = (44.0  * headerScale).clamp(28.0, 66.0);
+              final pauseSz     = (72.0  * headerScale).clamp(48.0, 108.0);
+              final invIconSz   = (72.0  * invScale).clamp(44.0, 108.0);
               return Stack(
                 children: [
                   Padding(

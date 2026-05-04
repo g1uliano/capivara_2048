@@ -7,6 +7,11 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.2.7] - 2026-05-04
+
+### Changed
+- **Header cresce mais agressivamente quando há folga vertical** — a função de cap horizontal do header foi recalibrada com base na medida real do `StatusPanel` (~146dp) e na constraint correta do `Row` (`host + max(status, pause) ≤ boardSide`, já que o `Spacer` absorve folga). Antes a fórmula reservava 130dp para status+pause juntos e usava divisor 230, o que limitava o header a ~1.13× mesmo com espaço sobrando. Agora o divisor é 152 (só o host) e a reserva é 160dp (status com margem), permitindo o header crescer até ~1.31× em telas com folga vertical (ex: 414×894dp). Header e inventário agora usam escalas independentes (`headerScale`/`invScale`).
+
 ## [1.2.6] - 2026-05-04
 
 ### Changed
