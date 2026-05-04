@@ -279,20 +279,21 @@ void main() {
       expect(after.undoStack.length, 0);
     });
 
-    test('undoStack caps at 3', () {
+    test('undoStack grows with each valid move', () {
       GameState state = _stateWithBoard([
         [1, null, null, null],
         [null, null, null, null],
         [null, null, null, null],
         [null, null, null, null],
       ]);
+      int moves = 0;
       for (int i = 0; i < 6; i++) {
         final next = engine.move(state, Direction.right);
-        if (next.board != state.board) state = next;
+        if (next.board != state.board) { state = next; moves++; }
         final next2 = engine.move(state, Direction.left);
-        if (next2.board != state.board) state = next2;
+        if (next2.board != state.board) { state = next2; moves++; }
       }
-      expect(state.undoStack.length, lessThanOrEqualTo(3));
+      expect(state.undoStack.length, moves);
     });
   });
 

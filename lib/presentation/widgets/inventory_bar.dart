@@ -4,6 +4,7 @@ import '../../data/models/item_type.dart';
 import '../../domain/game_engine/bomb_mode.dart';
 import '../../domain/inventory/inventory_notifier.dart';
 import '../controllers/game_notifier.dart';
+import 'cannot_use_item_dialog.dart';
 import 'confirm_use_dialog.dart';
 import 'inventory_item_button.dart';
 
@@ -20,6 +21,7 @@ class InventoryBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final inventory = ref.watch(inventoryProvider);
+    final undoStackLen = ref.watch(gameProvider.select((s) => s.undoStack.length));
 
     Future<void> useBomb2() async {
       final ok = await showConfirmUseDialog(
@@ -99,7 +101,13 @@ class InventoryBar extends ConsumerWidget {
             icon: Icons.undo,
             pngPath: 'assets/icons/inventory/undo_1.png',
             count: inventory.undo1,
-            onPressed: inventory.undo1 > 0 ? useUndo1 : null,
+            onPressed: inventory.undo1 > 0 && undoStackLen >= 1 ? useUndo1 : null,
+            forceDisabled: inventory.undo1 > 0 && undoStackLen < 1,
+            onTapWhenDisabled: () => showCannotUseItemDialog(
+              context: context,
+              message: 'Não há jogadas para desfazer.',
+              pngPath: 'assets/icons/inventory/undo_1.png',
+            ),
             onTapWhenEmpty: inventory.undo1 == 0 && onTapWhenEmpty != null
                 ? () => onTapWhenEmpty!(ItemType.undo1)
                 : null,
@@ -110,7 +118,13 @@ class InventoryBar extends ConsumerWidget {
             icon: Icons.fast_rewind,
             pngPath: 'assets/icons/inventory/undo_3.png',
             count: inventory.undo3,
-            onPressed: inventory.undo3 > 0 ? useUndo3 : null,
+            onPressed: inventory.undo3 > 0 && undoStackLen >= 3 ? useUndo3 : null,
+            forceDisabled: inventory.undo3 > 0 && undoStackLen < 3,
+            onTapWhenDisabled: () => showCannotUseItemDialog(
+              context: context,
+              message: 'São necessárias pelo menos 3 jogadas para usar o Desfazer 3.',
+              pngPath: 'assets/icons/inventory/undo_3.png',
+            ),
             onTapWhenEmpty: inventory.undo3 == 0 && onTapWhenEmpty != null
                 ? () => onTapWhenEmpty!(ItemType.undo3)
                 : null,

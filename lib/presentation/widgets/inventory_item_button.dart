@@ -7,9 +7,11 @@ class InventoryItemButton extends StatelessWidget {
   final int count;
   final VoidCallback? onPressed;
   final VoidCallback? onTapWhenEmpty;
+  final VoidCallback? onTapWhenDisabled;
   final bool shouldPulse;
   final IconData icon;
   final String? pngPath;
+  final bool forceDisabled;
 
   const InventoryItemButton({
     super.key,
@@ -18,8 +20,10 @@ class InventoryItemButton extends StatelessWidget {
     required this.icon,
     this.onPressed,
     this.onTapWhenEmpty,
+    this.onTapWhenDisabled,
     this.shouldPulse = false,
     this.pngPath,
+    this.forceDisabled = false,
   });
 
   Widget _fallbackButton(VoidCallback? onTap) {
@@ -36,9 +40,11 @@ class InventoryItemButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final enabled = count > 0;
+    final enabled = count > 0 && !forceDisabled;
     final badgeText = count > 99 ? '99+' : '$count';
-    final effectiveTap = enabled ? onPressed : onTapWhenEmpty;
+    final effectiveTap = enabled
+        ? onPressed
+        : (forceDisabled ? onTapWhenDisabled : onTapWhenEmpty);
 
     Widget inner = ColorFiltered(
       colorFilter: enabled

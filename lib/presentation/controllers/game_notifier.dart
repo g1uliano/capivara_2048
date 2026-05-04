@@ -127,9 +127,10 @@ class GameNotifier extends StateNotifier<GameState> {
 
   bool undo(int steps) {
     final stack = state.undoStack;
-    if (stack.isEmpty) return false;
-    final idx = (steps - 1).clamp(0, stack.length - 1);
-    state = stack[idx];
+    if (stack.length < steps) return false;
+    final idx = steps - 1;
+    final remainingStack = stack.skip(idx + 1).toList();
+    state = stack[idx].copyWith(undoStack: remainingStack);
     return true;
   }
 

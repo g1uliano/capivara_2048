@@ -75,7 +75,7 @@ class GameEngine {
       }
     }
 
-    final newUndoStack = [state.copyWith(undoStack: []), ...state.undoStack.map((s) => s.copyWith(undoStack: []))].take(3).toList();
+    final newUndoStack = [state.copyWith(undoStack: []), ...state.undoStack];
 
     var next = state.copyWith(
       board: unrotated,

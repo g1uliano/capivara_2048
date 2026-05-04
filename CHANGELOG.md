@@ -7,6 +7,15 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.1.4] - 2026-05-04
+
+### Fixed
+- Itens de Desfazer podem ser usados consecutivamente sem precisar fazer uma jogada entre os usos
+- Desfazer 3 pode ser usado várias vezes seguidas, voltando 3 jogadas a cada uso (desde que haja histórico suficiente)
+- Histórico de undo agora é ilimitado (antes era limitado a 3 entradas)
+- Desfazer 1 e Desfazer 3 ficam desabilitados (cinza) quando não há jogadas suficientes para o item
+- Ao tentar usar um item de Desfazer desabilitado, exibe dialog explicativo em vez de abrir a loja
+
 ## [1.1.3] - 2026-05-03
 
 ### Fixed
