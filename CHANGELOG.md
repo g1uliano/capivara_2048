@@ -7,6 +7,12 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-05-04
+
+### Changed
+- **Polimento da HomeScreen**: logo e botões de ação movidos levemente para cima (`Align(0, -0.2)` em vez de `Center`), deixando o logo acima do pássaro conforme referência visual
+- Botões inferiores com mais respiro: `edgePad` 8→12px, `rowBaseBottom` 8→24px, `rowTopBottom` 120→148px (telas normais) — elimina o encostamento nas bordas e entre as fileiras
+
 ## [1.2.0] - 2026-05-04
 
 ### Added

@@ -90,8 +90,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
 
-              // Centro — título + botões de ação
-              Center(
+              // Centro — título + botões de ação (alinhado levemente acima do centro)
+              Align(
+                alignment: const Alignment(0, -0.2),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
