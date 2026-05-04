@@ -131,6 +131,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                                   return Stack(
                                     children: [
                                       GestureDetector(
+                                        key: const Key('game_board'),
                                         behavior: HitTestBehavior.opaque,
                                         onPanEnd: (details) {
                                           if (state.isPaused ||
