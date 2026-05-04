@@ -57,12 +57,13 @@ Future<ProviderScope> _wrap({
   );
 }
 
-GameState _savedGameState() => GameState(
+GameState _savedGameState({bool isPaused = false}) => GameState(
       board: List.generate(4, (_) => List.filled(4, null)),
       score: 100,
       highScore: 0,
       isGameOver: false,
       hasWon: false,
+      isPaused: isPaused,
     );
 
 late Directory _tempDir;
@@ -203,6 +204,32 @@ void main() {
     await tester.tap(find.byKey(const Key('home_btn_recompensas')));
     await tester.pumpAndSettle();
     expect(find.textContaining('Recompensa'), findsWidgets);
+  });
+
+  testWidgets(
+      'tap em "Continuar Jogo" desfaz pausa do jogo (regressão: back do Android deixava isPaused=true e ao voltar via Continuar caia no PauseOverlay)',
+      (tester) async {
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      await _wrap(gameState: _savedGameState(isPaused: true)),
+    );
+    await tester.pump(const Duration(milliseconds: 500));
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(HomeScreen)),
+    );
+    expect(container.read(gameProvider).isPaused, isTrue,
+        reason: 'pre-condição: jogo começa pausado');
+
+    await tester.tap(find.text('Continuar Jogo'));
+    // Não pumpa: resume() é síncrono e o estado já foi atualizado.
+    // Pumpar aqui dispararia render da GameScreen, fora do escopo deste teste.
+
+    expect(container.read(gameProvider).isPaused, isFalse,
+        reason: '"Continuar" deve despausar o jogo antes de navegar');
   });
 
   testWidgets('tap em ComoJogar abre BottomSheet', (tester) async {

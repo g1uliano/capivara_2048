@@ -46,6 +46,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   void _continueGame() {
     maybeHaptic(ref);
+    // Garante que ao voltar pra Home (inclusive via back do Android, que não
+    // dispara resume()) e clicar Continuar, o jogo de fato continue — senão
+    // o jogador caia novamente no PauseOverlay e teria que clicar Continuar 2x.
+    ref.read(gameProvider.notifier).resume();
     Navigator.push(context, MaterialPageRoute(builder: (_) => const GameScreen()));
   }
 

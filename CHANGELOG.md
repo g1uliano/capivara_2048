@@ -7,6 +7,11 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.2.9] - 2026-05-04
+
+### Fixed
+- **"Continuar Jogo" na Home não despausava o jogo quando o jogador voltava via botão back do Android** — ao pausar o jogo e usar o back do sistema para voltar à Home (em vez do botão "Menu" no overlay, que já chamava `resume()`), o `gameProvider` global ficava com `isPaused = true`. Como `GameScreen` não tinha `PopScope`, o pop default não despausava. Resultado: ao clicar "Continuar Jogo", o jogador caia novamente no `PauseOverlay` e precisava clicar "Continuar" pela segunda vez. Fix: `_continueGame()` agora chama `gameProvider.notifier.resume()` antes de navegar — semântica clara: clicar "Continuar" continua o jogo.
+
 ## [1.2.8] - 2026-05-04
 
 ### Fixed
