@@ -105,5 +105,26 @@ void main() {
       await container.read(personalRecordsProvider.notifier).markRewardCollected(13);
       expect(container.read(personalRecordsProvider).rewardCollected8192, true);
     });
+
+    test(
+        'highestLevelEver persiste através de uma reinicialização (regressão: coleção resetava ao fechar app)',
+        () async {
+      // Boot 1: usuário joga e atinge nível 8.
+      final c1 = ProviderContainer();
+      await c1.read(personalRecordsProvider.notifier).load();
+      await c1.read(personalRecordsProvider.notifier).updateHighestLevel(8);
+      expect(c1.read(personalRecordsProvider).highestLevelEver, 8);
+      c1.dispose();
+
+      // Boot 2: app fecha e abre de novo. Novo notifier deve carregar 8 do Hive.
+      final c2 = ProviderContainer();
+      addTearDown(c2.dispose);
+      // Sem chamar load(), o estado fica em 0 — era o bug em main.dart.
+      expect(c2.read(personalRecordsProvider).highestLevelEver, 0,
+          reason: 'pre-condição: sem load() o estado está vazio');
+      await c2.read(personalRecordsProvider.notifier).load();
+      expect(c2.read(personalRecordsProvider).highestLevelEver, 8,
+          reason: 'após load() o estado deve refletir o Hive');
+    });
   });
 }

@@ -7,6 +7,14 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.2.10] - 2026-05-04
+
+### Fixed
+- **Coleção resetava ao fechar e reabrir o app** — mesmo tendo desbloqueado animais em níveis altos, ao reabrir o app a tela de Coleção mostrava todos os animais bloqueados (`0/13 animais descobertos`). Causa-raiz: `main.dart` chamava `.load()` em `reduceEffectsProvider`, `inventoryProvider` e `dailyRewardsProvider` no boot, mas **não chamava em `personalRecordsProvider`**. Como `PersonalRecordsNotifier()` inicializa com `const PersonalRecords()` (`highestLevelEver = 0`), o estado em memória ficava zerado a cada cold start mesmo com o Hive populado — `updateHighestLevel()` salvava certinho, mas ninguém lia de volta. Como a tela de Coleção deriva o desbloqueio direto de `highestLevelEver`, todos os animais voltavam a aparecer como `???`. Fix: adicionar `await container.read(personalRecordsProvider.notifier).load()` em `main.dart`, seguindo o mesmo padrão dos outros notifiers persistidos.
+
+### Tests
+- Novo teste de regressão em `personal_records_notifier_test.dart` que verifica round-trip de `highestLevelEver` através de duas instâncias do `ProviderContainer` (simulando reinicialização do app). 340/340 passing.
+
 ## [1.2.9] - 2026-05-04
 
 ### Fixed

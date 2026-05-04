@@ -13,6 +13,7 @@ import 'core/providers/reduce_effects_provider.dart';
 import 'domain/inventory/inventory_notifier.dart';
 import 'domain/daily_rewards/daily_rewards_notifier.dart';
 import 'presentation/controllers/settings_notifier.dart';
+import 'presentation/controllers/personal_records_notifier.dart';
 import 'app.dart';
 
 void main() async {
@@ -39,6 +40,7 @@ void main() async {
   await container.read(reduceEffectsProvider.notifier).load();
   await container.read(inventoryProvider.notifier).load();
   await container.read(dailyRewardsProvider.notifier).load();
+  await container.read(personalRecordsProvider.notifier).load();
   runApp(UncontrolledProviderScope(container: container, child: const CapivaraApp()));
 }
 
