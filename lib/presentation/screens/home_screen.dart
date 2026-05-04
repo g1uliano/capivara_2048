@@ -10,6 +10,7 @@ import '../../domain/daily_rewards/daily_rewards_notifier.dart';
 import '../../data/models/game_state.dart';
 import '../controllers/game_notifier.dart';
 import '../widgets/game_background.dart';
+import '../widgets/outlined_text.dart';
 import '../widgets/game_title_image.dart';
 import 'collection_screen.dart';
 import 'daily_rewards/daily_rewards_screen.dart';
@@ -92,11 +93,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
               // Centro — título + botões de ação (alinhado levemente acima do centro)
               Align(
-                alignment: const Alignment(0, -0.2),
+                alignment: Alignment(0, HomeConstants.centerAlignY(h)),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    GameTitleImage(asset: _titleAsset, height: 200)
+                    GameTitleImage(asset: _titleAsset, height: HomeConstants.titleHeight(h))
                         .animate()
                         .fadeIn(duration: 400.ms)
                         .scale(begin: const Offset(0.85, 0.85)),
@@ -325,19 +326,18 @@ class _ActionButtonState extends State<_ActionButton> {
           width: HomeConstants.actionButtonWidth,
           height: HomeConstants.actionButtonHeight,
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.80),
-            borderRadius: BorderRadius.circular(30),
+            color: const Color(0xFFFF8C42),
+            borderRadius: BorderRadius.circular(12),
             boxShadow: const [
               BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 3)),
             ],
           ),
           alignment: Alignment.center,
-          child: Text(
-            widget.label,
-            style: GoogleFonts.fredoka(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF3E2723),
+          child: OutlinedText(
+            text: widget.label,
+            style: GoogleFonts.nunito(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),

@@ -7,6 +7,13 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.2.2] - 2026-05-04
+
+### Changed
+- **Estilo dos botões de ação** ("Novo jogo" / "Continuar Jogo"): fundo laranja `#FF8C42`, bordas `radius 12`, texto branco com contorno preto via `OutlinedText` + Nunito bold — igualado aos botões da tela de pausa
+- **Layout compacto corrigido** (telas ≤640dp, ex: Genymotion 768×1280): título reduzido de 200dp para 130dp, alinhamento vertical ajustado de `-0.2` para `-0.5` e gap de 20dp para 16dp — elimina a sobreposição dos botões Recompensas/Ranking sobre os botões de jogo
+- Telas normais (>700dp): alinhamento vertical ajustado de `-0.2` para `-0.3` para garantir folga acima dos botões inferiores
+
 ## [1.2.1] - 2026-05-04
 
 ### Changed
