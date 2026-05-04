@@ -117,6 +117,7 @@ assets/
 - **Fase 2.8** — Loja mock ✅ *(v0.9.4)*
 - **Fase 2.11** — ShopOverlay sobre o jogo, ícones desabilitados do inventário ✅ *(v1.1.0)*
 - **Fase 2.12** — Peixe-boi (4096), Jacaré (8192), multi-vitória, ranking local, PersonalRecords ✅ *(v1.1.0)*
+- **Fase 2.13** — Redesign da HomeScreen, botões PNG ilustrados, reorganização de assets ✅ *(v1.2.0)*
 - **Fase 3** — Backend, ranking global, monetização real
 - **Fase 4** — Áudio: sons e música
 - **Fase 5** — Coleção e Desafio Diário

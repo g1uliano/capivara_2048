@@ -7,6 +7,26 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-05-04
+
+### Added
+- **Redesign da HomeScreen** (Fase 2.13): 6 botões ilustrados PNG posicionados nos cantos e base da tela via `Stack + Positioned`, conforme referência visual `menu.jpeg`
+- `HomeConstants`: constantes de layout responsivas com breakpoint 700dp (suporte a 360×640 e 390×844)
+- Contorno branco nos botões PNG via `ColorFiltered + Transform.scale(1.06)` — sem editar assets
+- Badge vermelho condicional no botão Recompensas Diárias quando há recompensa disponível
+- Botões de ação centrais `Continuar Jogo` / `Novo jogo` estilo cápsula semi-transparente (Fredoka 20dp)
+- `debugSetState` com `@visibleForTesting` no `GameNotifier` para testes de widget
+
+### Changed
+- `HomeScreen` removeu `LivesIndicator` — indicador de vidas permanece apenas na `GameScreen`
+- `_HomeCard` (grid de ícones Material) substituído pelos botões ilustrados PNG
+- `_PlayButton` substituído pelos `_ActionButton` separados por estado de partida salva
+
+### Chore
+- Assets de inventário movidos de `assets/icons/inventory/` para `assets/images/inventory/`
+- Pasta `assets/icons/` removida; todos os assets consolidados sob `assets/images/`
+- 6 PNGs de `assets/images/home/` registrados no `pubspec.yaml` e adicionados ao `precacheImage`
+
 ## [1.1.4] - 2026-05-04
 
 ### Fixed
