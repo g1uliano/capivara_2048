@@ -223,11 +223,11 @@ class _HomeButtonState extends State<_HomeButton> {
               scale: 1.06,
               child: ColorFiltered(
                 colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                child: Image.asset(widget.path, width: widget.size, fit: BoxFit.contain),
+                child: Image.asset(widget.path, width: widget.size, height: widget.size, fit: BoxFit.contain),
               ),
             ),
             // Imagem real
-            Image.asset(widget.path, width: widget.size, fit: BoxFit.contain),
+            Image.asset(widget.path, width: widget.size, height: widget.size, fit: BoxFit.contain),
           ],
         ),
       ),
