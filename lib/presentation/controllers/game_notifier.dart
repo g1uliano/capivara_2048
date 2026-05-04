@@ -56,10 +56,6 @@ class GameNotifier extends StateNotifier<GameState> {
             ? after
             : after.copyWith(isContinuingWithItem: false);
 
-    if (justLost) {
-      unawaited(_saveGameRecord()); // fire-and-forget
-    }
-
     // Detectar novos marcos
     for (final milestone in [11, 12, 13]) {
       if (!_reachedMilestones.contains(milestone) &&
@@ -143,6 +139,12 @@ class GameNotifier extends StateNotifier<GameState> {
 
   void setAwaitingResolution(bool value) {
     state = state.copyWith(isAwaitingGameOverResolution: value);
+  }
+
+  /// Confirma game over definitivo (quando jogador desiste/encerra) e salva o record.
+  void confirmGameOver() {
+    unawaited(_saveGameRecord());
+    setAwaitingResolution(false);
   }
 
   void startContinueWithItem() {

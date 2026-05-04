@@ -96,7 +96,7 @@ class _GameOverItemOverlayState extends ConsumerState<GameOverItemOverlay>
   void _giveUp() {
     _hapticController.stop();
     ref.read(livesProvider.notifier).consume();
-    ref.read(gameProvider.notifier).setAwaitingResolution(false);
+    ref.read(gameProvider.notifier).confirmGameOver();
   }
 
   @override

@@ -128,7 +128,7 @@ class _GameOverNoItemsOverlayState extends ConsumerState<GameOverNoItemsOverlay>
     if (confirmed != true || !mounted) return;
     unawaited(ref.read(livesProvider.notifier).consume());
     setState(() => _dismissed = true);
-    ref.read(gameProvider.notifier).setAwaitingResolution(false);
+    ref.read(gameProvider.notifier).confirmGameOver();
   }
 
   @override
