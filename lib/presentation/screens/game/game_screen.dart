@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../domain/game_engine/direction.dart';
@@ -64,7 +65,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         child: SafeArea(
           child: LayoutBuilder(
             builder: (context, lc) {
-              final scale = (lc.maxHeight / 844.0).clamp(0.1, 1.0);
+              final scale = min(lc.maxWidth / 390.0, lc.maxHeight / 844.0).clamp(0.1, 1.0);
               final hostSize    = (152.0 * scale).clamp(80.0, 152.0);
               final livesIconSz = (44.0  * scale).clamp(28.0, 44.0);
               final pauseSz     = (72.0  * scale).clamp(48.0, 72.0);

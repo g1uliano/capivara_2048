@@ -1,33 +1,38 @@
 /// Constantes de layout da HomeScreen.
-/// Breakpoint em 700dp de altura separa telas compactas (ex: 360×640)
-/// das normais (ex: 390×844).
+/// Recebe um `scale` pré-calculado pelo widget:
+///   scale = min(screenW / 390, screenH / 844).clamp(0.1, 1.0)
+/// Equivalente ao `vmin` do CSS — escala pelo lado mais restrito.
 class HomeConstants {
   HomeConstants._();
 
   /// Tamanho (width e height) dos botões ilustrados PNG.
-  static double buttonSize(double screenH) => screenH < 700 ? 90.0 : 110.0;
+  static double buttonSize(double scale) => (110.0 * scale).clamp(70.0, 110.0);
 
   /// Padding das bordas esquerda/direita/topo para os Positioned.
-  static double edgePad(double screenH) => screenH < 700 ? 8.0 : 12.0;
+  static double edgePad(double scale) => (12.0 * scale).clamp(6.0, 12.0);
 
   /// bottom dos botões da fileira superior (Recompensas / Ranking).
-  static double rowTopBottom(double screenH) => screenH < 700 ? 118.0 : 148.0;
+  static double rowTopBottom(double scale) => (148.0 * scale).clamp(80.0, 148.0);
 
   /// bottom dos botões da fileira base (Loja / ComoJogar).
-  static double rowBaseBottom(double screenH) => screenH < 700 ? 16.0 : 24.0;
+  static double rowBaseBottom(double scale) => (24.0 * scale).clamp(12.0, 24.0);
 
   /// Altura do GameTitleImage na HomeScreen.
-  static double titleHeight(double screenH) => screenH < 700 ? 130.0 : 200.0;
+  static double titleHeight(double scale) => (200.0 * scale).clamp(110.0, 200.0);
 
   /// Espaço vertical entre o GameTitleImage e os _ActionButtons.
-  static double titleActionGap(double screenH) => screenH < 700 ? 16.0 : 32.0;
+  static double titleActionGap(double scale) => (32.0 * scale).clamp(10.0, 32.0);
 
   /// Alinhamento vertical do grupo logo+botões (Align.y). Negativo = sobe.
-  static double centerAlignY(double screenH) => screenH < 700 ? -0.5 : -0.3;
+  /// Fração relativa — escala naturalmente com a tela, valor fixo.
+  static const double centerAlignY = -0.30;
 
-  /// Largura fixa dos botões de ação centrais ("Novo jogo" / "Continuar Jogo").
-  static const double actionButtonWidth = 260.0;
+  /// Largura dos botões de ação centrais ("Novo jogo" / "Continuar Jogo").
+  static double actionButtonWidth(double scale) => (260.0 * scale).clamp(200.0, 260.0);
 
-  /// Altura fixa dos botões de ação centrais.
-  static const double actionButtonHeight = 52.0;
+  /// Altura dos botões de ação centrais.
+  static double actionButtonHeight(double scale) => (52.0 * scale).clamp(44.0, 52.0);
+
+  /// Tamanho da fonte dos botões de ação centrais.
+  static double actionButtonFontSize(double scale) => (18.0 * scale).clamp(14.0, 18.0);
 }

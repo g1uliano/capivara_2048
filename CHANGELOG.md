@@ -7,6 +7,11 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.2.5] - 2026-05-04
+
+### Changed
+- **Layout adaptativo: `vmin` em vez de `vheight`** — tanto `HomeScreen` quanto `GameScreen` agora calculam `scale = min(width/390, height/844)` (equivalente ao `vmin` do CSS). Isso garante que elementos não transbordem horizontalmente em tablets ou telas largas. Antes o scale usava apenas a altura, o que podia gerar elementos grandes demais em paisagem.
+
 ## [1.2.4] - 2026-05-04
 
 ### Changed

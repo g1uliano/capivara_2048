@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -59,7 +60,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final dailyState = ref.watch(dailyRewardsProvider);
     final rewardAvailable =
         computeDailyRewardStatus(DateTime.now(), dailyState) == DailyRewardStatus.available;
-    final h = MediaQuery.of(context).size.height;
+    final size = MediaQuery.of(context).size;
+    final scale = min(size.width / 390.0, size.height / 844.0).clamp(0.1, 1.0);
 
     return GameBackground(
       child: Scaffold(
@@ -69,48 +71,50 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               // Canto superior esquerdo — Coleção
               Positioned(
-                top: HomeConstants.edgePad(h),
-                left: HomeConstants.edgePad(h),
+                top: HomeConstants.edgePad(scale),
+                left: HomeConstants.edgePad(scale),
                 child: _HomeButton(
                   key: const Key('home_btn_colecao'),
                   path: 'assets/images/home/Colecao.png',
-                  size: HomeConstants.buttonSize(h),
+                  size: HomeConstants.buttonSize(scale),
                   onTap: () => _nav(const CollectionScreen()),
                 ),
               ),
 
               // Canto superior direito — Configurações
               Positioned(
-                top: HomeConstants.edgePad(h),
-                right: HomeConstants.edgePad(h),
+                top: HomeConstants.edgePad(scale),
+                right: HomeConstants.edgePad(scale),
                 child: _HomeButton(
                   key: const Key('home_btn_configuracao'),
                   path: 'assets/images/home/Configuracao.png',
-                  size: HomeConstants.buttonSize(h),
+                  size: HomeConstants.buttonSize(scale),
                   onTap: () => _nav(const SettingsScreen()),
                 ),
               ),
 
               // Centro — título + botões de ação (alinhado levemente acima do centro)
               Align(
-                alignment: Alignment(0, HomeConstants.centerAlignY(h)),
+                alignment: Alignment(0, HomeConstants.centerAlignY),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    GameTitleImage(asset: _titleAsset, height: HomeConstants.titleHeight(h))
+                    GameTitleImage(asset: _titleAsset, height: HomeConstants.titleHeight(scale))
                         .animate()
                         .fadeIn(duration: 400.ms)
                         .scale(begin: const Offset(0.85, 0.85)),
-                    SizedBox(height: HomeConstants.titleActionGap(h)),
+                    SizedBox(height: HomeConstants.titleActionGap(scale)),
                     if (_hasSavedGame(gameState))
                       _ActionButton(
                         label: 'Continuar Jogo',
                         onTap: _continueGame,
+                        scale: scale,
                       ),
                     if (_hasSavedGame(gameState)) const SizedBox(height: 12),
                     _ActionButton(
                       label: 'Novo jogo',
                       onTap: _startNewGame,
+                      scale: scale,
                     ),
                   ],
                 ),
@@ -118,12 +122,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
               // Fileira inferior superior esquerda — Recompensas
               Positioned(
-                bottom: HomeConstants.rowTopBottom(h),
-                left: HomeConstants.edgePad(h),
+                bottom: HomeConstants.rowTopBottom(scale),
+                left: HomeConstants.edgePad(scale),
                 child: _HomeButtonWithBadge(
                   key: const Key('home_btn_recompensas'),
                   path: 'assets/images/home/Recompensas.png',
-                  size: HomeConstants.buttonSize(h),
+                  size: HomeConstants.buttonSize(scale),
                   showBadge: rewardAvailable,
                   onTap: () => _nav(const DailyRewardsScreen()),
                 ),
@@ -131,36 +135,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
               // Fileira inferior superior direita — Ranking
               Positioned(
-                bottom: HomeConstants.rowTopBottom(h),
-                right: HomeConstants.edgePad(h),
+                bottom: HomeConstants.rowTopBottom(scale),
+                right: HomeConstants.edgePad(scale),
                 child: _HomeButton(
                   key: const Key('home_btn_ranking'),
                   path: 'assets/images/home/Ranking.png',
-                  size: HomeConstants.buttonSize(h),
+                  size: HomeConstants.buttonSize(scale),
                   onTap: () => _nav(const RankingScreen()),
                 ),
               ),
 
               // Fileira base esquerda — Loja
               Positioned(
-                bottom: HomeConstants.rowBaseBottom(h),
-                left: HomeConstants.edgePad(h),
+                bottom: HomeConstants.rowBaseBottom(scale),
+                left: HomeConstants.edgePad(scale),
                 child: _HomeButton(
                   key: const Key('home_btn_loja'),
                   path: 'assets/images/home/IconeLoja.png',
-                  size: HomeConstants.buttonSize(h),
+                  size: HomeConstants.buttonSize(scale),
                   onTap: () => _nav(const ShopScreen()),
                 ),
               ),
 
               // Fileira base direita — Como Jogar
               Positioned(
-                bottom: HomeConstants.rowBaseBottom(h),
-                right: HomeConstants.edgePad(h),
+                bottom: HomeConstants.rowBaseBottom(scale),
+                right: HomeConstants.edgePad(scale),
                 child: _HomeButton(
                   key: const Key('home_btn_comojogar'),
                   path: 'assets/images/home/ComoJogar.png',
-                  size: HomeConstants.buttonSize(h),
+                  size: HomeConstants.buttonSize(scale),
                   onTap: () => showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
@@ -294,10 +298,11 @@ class _HomeButtonWithBadge extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 class _ActionButton extends StatefulWidget {
-  const _ActionButton({required this.label, required this.onTap});
+  const _ActionButton({required this.label, required this.onTap, required this.scale});
 
   final String label;
   final VoidCallback onTap;
+  final double scale;
 
   @override
   State<_ActionButton> createState() => _ActionButtonState();
@@ -323,8 +328,8 @@ class _ActionButtonState extends State<_ActionButton> {
         scale: _scale,
         duration: const Duration(milliseconds: 100),
         child: Container(
-          width: HomeConstants.actionButtonWidth,
-          height: HomeConstants.actionButtonHeight,
+          width: HomeConstants.actionButtonWidth(widget.scale),
+          height: HomeConstants.actionButtonHeight(widget.scale),
           decoration: BoxDecoration(
             color: const Color(0xFFFF8C42),
             borderRadius: BorderRadius.circular(12),
@@ -336,7 +341,7 @@ class _ActionButtonState extends State<_ActionButton> {
           child: OutlinedText(
             text: widget.label,
             style: GoogleFonts.nunito(
-              fontSize: 18,
+              fontSize: HomeConstants.actionButtonFontSize(widget.scale),
               fontWeight: FontWeight.bold,
             ),
           ),
