@@ -73,7 +73,10 @@ Sempre que lançar uma nova versão (merge + push):
 1. Atualizar `CHANGELOG.md` com a versão e as mudanças
 2. Atualizar `README.md` se necessário (roadmap, features, versão)
 3. Atualizar `CLAUDE.md` se houver informações relevantes (convenções novas, decisões de arquitetura, bugs conhecidos, etc.)
-4. Fazer merge em main e push
+4. Atualizar `AGENTS.md` se houver informações relevantes (fase atual, convenções, regras novas)
+5. Fazer merge em main e push
+
+> **Nota:** sempre que `CLAUDE.md` for atualizado, verificar se `AGENTS.md` também precisa ser atualizado — e vice-versa. Os dois devem estar em sincronia quanto à fase atual, convenções de desenvolvimento e decisões de arquitetura.
 
 ## Animais (referência rápida)
 
