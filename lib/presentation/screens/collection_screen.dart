@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
 import '../../data/animals_data.dart';
 import '../../data/models/animal.dart';
-import '../controllers/game_notifier.dart';
+import '../controllers/personal_records_notifier.dart';
 import '../widgets/game_background.dart';
 import '../widgets/outlined_text.dart';
 
@@ -13,7 +13,7 @@ class CollectionScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final highest = ref.watch(gameProvider.select((s) => s.maxLevel));
+    final highest = ref.watch(personalRecordsProvider.select((s) => s.highestLevelEver));
 
     return GameBackground(
       child: Scaffold(

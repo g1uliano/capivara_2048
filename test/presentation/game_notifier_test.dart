@@ -1,3 +1,5 @@
+import 'package:capivara_2048/data/models/personal_records.dart';
+import 'package:capivara_2048/presentation/controllers/personal_records_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:capivara_2048/presentation/controllers/game_notifier.dart';
@@ -5,31 +7,51 @@ import 'package:capivara_2048/domain/game_engine/direction.dart';
 import 'package:capivara_2048/data/models/tile.dart';
 import 'package:capivara_2048/data/models/game_state.dart';
 
+class _FakePersonalRecordsNotifier extends PersonalRecordsNotifier {
+  @override
+  Future<void> updateHighestLevel(int level) async {
+    // No-op para testes (evita tentativas de salvar no Hive)
+  }
+
+  @override
+  Future<void> recordMilestone(int level, DateTime reachedAt) async {
+    // No-op para testes
+  }
+}
+
+ProviderContainer _createContainer() {
+  return ProviderContainer(
+    overrides: [
+      personalRecordsProvider.overrideWith((ref) => _FakePersonalRecordsNotifier()),
+    ],
+  );
+}
+
 void main() {
   group('GameNotifier timer', () {
     test('elapsedMs starts at 0', () {
-      final container = ProviderContainer();
+      final container = _createContainer();
       addTearDown(container.dispose);
       final state = container.read(gameProvider);
       expect(state.elapsedMs, 0);
     });
 
     test('isPaused starts false', () {
-      final container = ProviderContainer();
+      final container = _createContainer();
       addTearDown(container.dispose);
       final state = container.read(gameProvider);
       expect(state.isPaused, false);
     });
 
     test('pause sets isPaused to true', () {
-      final container = ProviderContainer();
+      final container = _createContainer();
       addTearDown(container.dispose);
       container.read(gameProvider.notifier).pause();
       expect(container.read(gameProvider).isPaused, true);
     });
 
     test('resume sets isPaused to false', () {
-      final container = ProviderContainer();
+      final container = _createContainer();
       addTearDown(container.dispose);
       container.read(gameProvider.notifier).pause();
       container.read(gameProvider.notifier).resume();
@@ -37,7 +59,7 @@ void main() {
     });
 
     test('restart resets elapsedMs and isPaused', () {
-      final container = ProviderContainer();
+      final container = _createContainer();
       addTearDown(container.dispose);
       container.read(gameProvider.notifier).pause();
       container.read(gameProvider.notifier).restart();
@@ -47,7 +69,7 @@ void main() {
     });
 
     test('restart resets maxLevel to 1', () {
-      final container = ProviderContainer();
+      final container = _createContainer();
       addTearDown(container.dispose);
       // Simular maxLevel alto (após alguns moves hipotéticos)
       // restart() deve sempre voltar para 1
@@ -59,7 +81,7 @@ void main() {
 
   group('GameNotifier.undo', () {
     test('undo does nothing when undoStack is empty', () {
-      final container = ProviderContainer();
+      final container = _createContainer();
       addTearDown(container.dispose);
       final notifier = container.read(gameProvider.notifier);
       final before = container.read(gameProvider);
@@ -69,7 +91,7 @@ void main() {
     });
 
     test('undo(1) restores previous state after a move', () {
-      final container = ProviderContainer();
+      final container = _createContainer();
       addTearDown(container.dispose);
       final notifier = container.read(gameProvider.notifier);
 
@@ -99,7 +121,7 @@ void main() {
     });
 
     test('undo(3) does not throw on a small stack', () {
-      final container = ProviderContainer();
+      final container = _createContainer();
       addTearDown(container.dispose);
       final notifier = container.read(gameProvider.notifier);
       for (final dir in [Direction.left, Direction.right, Direction.left]) {
@@ -123,7 +145,7 @@ void main() {
     }
 
     test('dismissMilestone zera pendingMilestone sem setar hasWon', () {
-      final container = ProviderContainer();
+      final container = _createContainer();
       addTearDown(container.dispose);
       final notifier = container.read(gameProvider.notifier);
       notifier.setStateForTest(
@@ -136,7 +158,7 @@ void main() {
     });
 
     test('endGame seta hasWon=true e pendingMilestone=null', () {
-      final container = ProviderContainer();
+      final container = _createContainer();
       addTearDown(container.dispose);
       final notifier = container.read(gameProvider.notifier);
       notifier.setStateForTest(
@@ -149,7 +171,7 @@ void main() {
     });
 
     test('pause() é no-op quando pendingMilestone != null', () {
-      final container = ProviderContainer();
+      final container = _createContainer();
       addTearDown(container.dispose);
       final notifier = container.read(gameProvider.notifier);
       notifier.setStateForTest(

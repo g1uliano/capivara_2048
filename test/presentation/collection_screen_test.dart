@@ -2,9 +2,8 @@ import 'dart:io';
 import 'package:capivara_2048/data/models/daily_rewards_state_adapter.dart';
 import 'package:capivara_2048/data/models/inventory_hive_adapter.dart';
 import 'package:capivara_2048/data/models/lives_state_adapter.dart';
-import 'package:capivara_2048/data/models/game_state.dart';
-import 'package:capivara_2048/domain/game_engine/game_engine.dart';
-import 'package:capivara_2048/presentation/controllers/game_notifier.dart';
+import 'package:capivara_2048/data/models/personal_records.dart';
+import 'package:capivara_2048/presentation/controllers/personal_records_notifier.dart';
 import 'package:capivara_2048/presentation/screens/collection_screen.dart';
 import 'package:capivara_2048/presentation/widgets/outlined_text.dart';
 import 'package:flutter/material.dart';
@@ -15,24 +14,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 late Directory _tempDir;
 
-class _FakeGameNotifier extends GameNotifier {
-  _FakeGameNotifier(Ref ref, GameState s) : super(GameEngine(), ref) {
-    state = s;
+class _FakePersonalRecordsNotifier extends PersonalRecordsNotifier {
+  _FakePersonalRecordsNotifier(PersonalRecords initial) : super() {
+    state = initial;
   }
 }
 
 Widget _wrapWithMaxLevel(int maxLevel) {
-  final fakeState = GameState(
-    board: List.generate(4, (_) => List.filled(4, null)),
-    score: 0,
-    highScore: 0,
-    isGameOver: false,
-    hasWon: false,
-    maxLevel: maxLevel,
-  );
+  final fakeRecords = PersonalRecords(highestLevelEver: maxLevel);
   return ProviderScope(
     overrides: [
-      gameProvider.overrideWith((ref) => _FakeGameNotifier(ref, fakeState)),
+      personalRecordsProvider.overrideWith((ref) => _FakePersonalRecordsNotifier(fakeRecords)),
     ],
     child: const MaterialApp(home: CollectionScreen()),
   );

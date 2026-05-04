@@ -7,6 +7,7 @@ class PersonalRecordsHiveAdapter extends TypeAdapter<PersonalRecords> {
 
   @override
   PersonalRecords read(BinaryReader reader) {
+    final numFields = reader.availableBytes;
     return PersonalRecords(
       timesReached2048: reader.readInt(),
       timesReached4096: reader.readInt(),
@@ -16,6 +17,7 @@ class PersonalRecordsHiveAdapter extends TypeAdapter<PersonalRecords> {
       firstReached8192At: reader.readBool() ? DateTime.fromMillisecondsSinceEpoch(reader.readInt()) : null,
       rewardCollected4096: reader.readBool(),
       rewardCollected8192: reader.readBool(),
+      highestLevelEver: numFields > 0 ? reader.readInt() : 0,
     );
   }
 
@@ -32,5 +34,6 @@ class PersonalRecordsHiveAdapter extends TypeAdapter<PersonalRecords> {
     if (obj.firstReached8192At != null) writer.writeInt(obj.firstReached8192At!.millisecondsSinceEpoch);
     writer.writeBool(obj.rewardCollected4096);
     writer.writeBool(obj.rewardCollected8192);
+    writer.writeInt(obj.highestLevelEver);
   }
 }

@@ -56,6 +56,13 @@ class GameNotifier extends StateNotifier<GameState> {
             ? after
             : after.copyWith(isContinuingWithItem: false);
 
+    // Atualizar nível mais alto já alcançado (persistido para coleção)
+    if (state.maxLevel > before.maxLevel) {
+      unawaited(
+        _ref.read(personalRecordsProvider.notifier).updateHighestLevel(state.maxLevel),
+      );
+    }
+
     // Detectar novos marcos
     for (final milestone in [11, 12, 13]) {
       if (!_reachedMilestones.contains(milestone) &&

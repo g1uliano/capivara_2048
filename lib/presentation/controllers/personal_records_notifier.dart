@@ -66,6 +66,13 @@ class PersonalRecordsNotifier extends StateNotifier<PersonalRecords> {
     }
     await _save();
   }
+
+  Future<void> updateHighestLevel(int level) async {
+    if (level > state.highestLevelEver) {
+      state = state.copyWith(highestLevelEver: level);
+      await _save();
+    }
+  }
 }
 
 final personalRecordsProvider =
