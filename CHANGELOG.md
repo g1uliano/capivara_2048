@@ -7,6 +7,11 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.2.4] - 2026-05-04
+
+### Changed
+- **Layout adaptativo da tela de jogo**: todos os elementos (animal, coração/vidas, botão pausar, ícones do inventário) agora escalam proporcionalmente à altura disponível usando `scale = availableHeight / 844` (844dp = altura de design base), com clamp no tamanho máximo original. O tabuleiro recebe o espaço restante via `AspectRatio(1.0)` e sempre é quadrado. Em telas compactas (~640dp) o tabuleiro passa de ~234dp para ~360dp; em telas normais (~844dp) o layout permanece idêntico ao anterior.
+
 ## [1.2.3] - 2026-05-04
 
 ### Fixed

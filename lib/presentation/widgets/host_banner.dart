@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/constants/game_constants.dart';
 import '../../core/theme/text_styles.dart';
 import '../../data/animals_data.dart';
 import '../controllers/game_notifier.dart';
 import 'host_artwork.dart';
 
 class HostBanner extends ConsumerWidget {
-  const HostBanner({super.key});
+  final double hostSize;
+  const HostBanner({super.key, required this.hostSize});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final maxLevel = ref.watch(gameProvider.select((s) => s.maxLevel));
-    const slotWidth = GameConstants.twoCellWidth;
 
     return SizedBox(
-      width: slotWidth,
+      width: hostSize,
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 400),
         transitionBuilder: (child, anim) =>
@@ -24,7 +23,7 @@ class HostBanner extends ConsumerWidget {
         child: _AnimalHost(
           key: ValueKey(maxLevel),
           level: maxLevel,
-          slotWidth: slotWidth,
+          slotWidth: hostSize,
         ),
       ),
     );

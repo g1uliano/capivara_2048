@@ -11,20 +11,20 @@ Widget _wrap(Widget child) => ProviderScope(
 void main() {
   group('HostBanner', () {
     testWidgets('renderiza sem erro', (tester) async {
-      await tester.pumpWidget(_wrap(const HostBanner()));
+      await tester.pumpWidget(_wrap(HostBanner(hostSize: 152)));
       await tester.pump();
       expect(find.byType(HostBanner), findsOneWidget);
     });
 
     testWidgets('largura igual a twoCellWidth (152dp)', (tester) async {
-      await tester.pumpWidget(_wrap(const HostBanner()));
+      await tester.pumpWidget(_wrap(HostBanner(hostSize: 152)));
       await tester.pump();
       final size = tester.getSize(find.byType(HostBanner));
       expect(size.width, GameConstants.twoCellWidth);
     });
 
     testWidgets('exibe Tanajura no estado inicial (maxLevel == 1)', (tester) async {
-      await tester.pumpWidget(_wrap(const HostBanner()));
+      await tester.pumpWidget(_wrap(HostBanner(hostSize: 152)));
       await tester.pump();
       expect(find.text('Tanajura'), findsOneWidget);
       expect(find.text('Comece!'), findsNothing);
@@ -35,7 +35,7 @@ void main() {
         _wrap(
           SizedBox(
             width: GameConstants.twoCellWidth,
-            child: const HostBanner(),
+            child: HostBanner(hostSize: 152),
           ),
         ),
       );

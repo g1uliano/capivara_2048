@@ -62,13 +62,23 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     return Scaffold(
       body: GameBackground(
         child: SafeArea(
-          child: Stack(
+          child: LayoutBuilder(
+            builder: (context, lc) {
+              final scale = (lc.maxHeight / 844.0).clamp(0.1, 1.0);
+              final hostSize    = (152.0 * scale).clamp(80.0, 152.0);
+              final livesIconSz = (44.0  * scale).clamp(28.0, 44.0);
+              final pauseSz     = (72.0  * scale).clamp(48.0, 72.0);
+              final invIconSz   = (72.0  * scale).clamp(44.0, 72.0);
+              return Stack(
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Column(
                       children: [
                         GameHeader(
+                          hostSize: hostSize,
+                          livesIconSize: livesIconSz,
+                          pauseSize: pauseSz,
                           onPauseTap: state.isPaused
                               ? notifier.resume
                               : notifier.pause,
@@ -120,6 +130,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                         AbsorbPointer(
                           absorbing: state.isAwaitingGameOverResolution,
                           child: InventoryBar(
+                            iconSize: invIconSz,
                             onTapWhenEmpty: _openShop,
                             pulsingItems: _pulsingItems,
                           ),
@@ -152,6 +163,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                   onItemPurchased: _onItemPurchased,
                 )),
                 ],
+              );
+            },
           ),
         ),
       ),

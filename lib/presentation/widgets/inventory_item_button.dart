@@ -12,6 +12,7 @@ class InventoryItemButton extends StatelessWidget {
   final IconData icon;
   final String? pngPath;
   final bool forceDisabled;
+  final double size;
 
   const InventoryItemButton({
     super.key,
@@ -24,6 +25,7 @@ class InventoryItemButton extends StatelessWidget {
     this.shouldPulse = false,
     this.pngPath,
     this.forceDisabled = false,
+    this.size = GameConstants.inventoryIconSize,
   });
 
   Widget _fallbackButton(VoidCallback? onTap) {
@@ -60,8 +62,8 @@ class InventoryItemButton extends StatelessWidget {
               onTap: effectiveTap,
               child: Image.asset(
                 pngPath!,
-                width: GameConstants.inventoryIconSize,
-                height: GameConstants.inventoryIconSize,
+                width: size,
+                height: size,
                 fit: BoxFit.contain,
                 errorBuilder: (_, __, ___) => _fallbackButton(effectiveTap),
               ),
@@ -89,8 +91,8 @@ class InventoryItemButton extends StatelessWidget {
       message: '$count $label',
       triggerMode: TooltipTriggerMode.longPress,
       child: SizedBox(
-        width: GameConstants.inventoryIconSize,
-        height: GameConstants.inventoryIconSize,
+        width: size,
+        height: size,
         child: Stack(
           clipBehavior: Clip.none,
           children: [

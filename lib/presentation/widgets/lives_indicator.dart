@@ -6,7 +6,8 @@ import '../../domain/lives/lives_notifier.dart';
 import 'lives_status_banner.dart';
 
 class LivesIndicator extends ConsumerStatefulWidget {
-  const LivesIndicator({super.key});
+  final double iconSize;
+  const LivesIndicator({super.key, this.iconSize = 44.0});
 
   @override
   ConsumerState<LivesIndicator> createState() => _LivesIndicatorState();
@@ -108,16 +109,16 @@ class _LivesIndicatorState extends ConsumerState<LivesIndicator>
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
-              width: 44,
-              height: 44,
+              width: widget.iconSize,
+              height: widget.iconSize,
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  const Icon(Icons.favorite, color: Colors.redAccent, size: 40),
+                  Icon(Icons.favorite, color: Colors.redAccent, size: widget.iconSize * 0.9),
                   Text(
                     '${state.lives}',
                     style: GoogleFonts.fredoka(
-                      fontSize: 16,
+                      fontSize: widget.iconSize * 0.36,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                       shadows: const [

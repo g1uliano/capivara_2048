@@ -95,7 +95,7 @@ class _FakeGameScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Column(
           children: [
-            GameHeader(onPauseTap: () {}),
+            GameHeader(onPauseTap: () {}, hostSize: 152, livesIconSize: 44, pauseSize: 72),
             const Expanded(child: Placeholder()),
           ],
         ),

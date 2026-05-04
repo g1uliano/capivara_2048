@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/constants/game_constants.dart';
 import '../../data/models/item_type.dart';
 import '../../domain/game_engine/bomb_mode.dart';
 import '../../domain/inventory/inventory_notifier.dart';
@@ -13,10 +14,12 @@ class InventoryBar extends ConsumerWidget {
     super.key,
     this.onTapWhenEmpty,
     this.pulsingItems = const {},
+    this.iconSize = GameConstants.inventoryIconSize,
   });
 
   final void Function(ItemType)? onTapWhenEmpty;
   final Set<ItemType> pulsingItems;
+  final double iconSize;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -79,6 +82,7 @@ class InventoryBar extends ConsumerWidget {
             icon: Icons.bolt,
             pngPath: 'assets/images/inventory/bomb_2.png',
             count: inventory.bomb2,
+            size: iconSize,
             onPressed: inventory.bomb2 > 0 ? useBomb2 : null,
             onTapWhenEmpty: inventory.bomb2 == 0 && onTapWhenEmpty != null
                 ? () => onTapWhenEmpty!(ItemType.bomb2)
@@ -90,6 +94,7 @@ class InventoryBar extends ConsumerWidget {
             icon: Icons.auto_fix_high,
             pngPath: 'assets/images/inventory/bomb_3.png',
             count: inventory.bomb3,
+            size: iconSize,
             onPressed: inventory.bomb3 > 0 ? useBomb3 : null,
             onTapWhenEmpty: inventory.bomb3 == 0 && onTapWhenEmpty != null
                 ? () => onTapWhenEmpty!(ItemType.bomb3)
@@ -101,6 +106,7 @@ class InventoryBar extends ConsumerWidget {
             icon: Icons.undo,
             pngPath: 'assets/images/inventory/undo_1.png',
             count: inventory.undo1,
+            size: iconSize,
             onPressed: inventory.undo1 > 0 && undoStackLen >= 1 ? useUndo1 : null,
             forceDisabled: inventory.undo1 > 0 && undoStackLen < 1,
             onTapWhenDisabled: () => showCannotUseItemDialog(
@@ -118,6 +124,7 @@ class InventoryBar extends ConsumerWidget {
             icon: Icons.fast_rewind,
             pngPath: 'assets/images/inventory/undo_3.png',
             count: inventory.undo3,
+            size: iconSize,
             onPressed: inventory.undo3 > 0 && undoStackLen >= 3 ? useUndo3 : null,
             forceDisabled: inventory.undo3 > 0 && undoStackLen < 3,
             onTapWhenDisabled: () => showCannotUseItemDialog(

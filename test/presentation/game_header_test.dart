@@ -37,7 +37,7 @@ void main() {
 
   group('GameHeader', () {
     testWidgets('renderiza LivesIndicator, HostBanner, StatusPanel e PauseButtonTile', (tester) async {
-      await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () {})));
+      await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () {}, hostSize: 152, livesIconSize: 44, pauseSize: 72)));
       await tester.pump(); // pumpAndSettle times out — LivesIndicator has continuous animation
       expect(find.byType(LivesIndicator), findsOneWidget);
       expect(find.byType(HostBanner), findsOneWidget);
@@ -47,7 +47,7 @@ void main() {
 
     testWidgets('chama onPauseTap ao tocar no PauseButtonTile', (tester) async {
       var tapped = false;
-      await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () => tapped = true)));
+      await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () => tapped = true, hostSize: 152, livesIconSize: 44, pauseSize: 72)));
       await tester.pump(); // pumpAndSettle times out — LivesIndicator has continuous animation
       await tester.tap(find.byType(PauseButtonTile));
       await tester.pump();
@@ -55,7 +55,7 @@ void main() {
     });
 
     testWidgets('HostBanner está à esquerda do StatusPanel', (tester) async {
-      await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () {})));
+      await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () {}, hostSize: 152, livesIconSize: 44, pauseSize: 72)));
       await tester.pump(); // pumpAndSettle times out — LivesIndicator has continuous animation
       final hostPos = tester.getTopLeft(find.byType(HostBanner));
       final statusPos = tester.getTopLeft(find.byType(StatusPanel));
@@ -63,7 +63,7 @@ void main() {
     });
 
     testWidgets('LivesIndicator está horizontalmente centralizado', (tester) async {
-      await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () {})));
+      await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () {}, hostSize: 152, livesIconSize: 44, pauseSize: 72)));
       await tester.pump();
       final headerBox = tester.getRect(find.byType(GameHeader));
       final indicatorBox = tester.getRect(find.byType(LivesIndicator));
@@ -77,7 +77,7 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
-      await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () {})));
+      await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () {}, hostSize: 152, livesIconSize: 44, pauseSize: 72)));
       await tester.pump();
       final headerBox = tester.getRect(find.byType(GameHeader));
       final hostBox = tester.getRect(find.byType(HostBanner));
@@ -85,7 +85,7 @@ void main() {
     });
 
     testWidgets('PauseButtonTile está à direita do HostBanner', (tester) async {
-      await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () {})));
+      await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () {}, hostSize: 152, livesIconSize: 44, pauseSize: 72)));
       await tester.pump();
       final hostBox = tester.getRect(find.byType(HostBanner));
       final pauseBox = tester.getRect(find.byType(PauseButtonTile));
@@ -96,7 +96,7 @@ void main() {
       tester.view.physicalSize = const Size(360, 800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
-      await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () {})));
+      await tester.pumpWidget(_wrap(GameHeader(onPauseTap: () {}, hostSize: 152, livesIconSize: 44, pauseSize: 72)));
       await tester.pump(); // pumpAndSettle times out — LivesIndicator has continuous animation
       expect(tester.takeException(), isNull);
     });
