@@ -66,7 +66,8 @@ flutter:
     - assets/images/animals/host/
     - assets/images/textures/
     - assets/images/fundo.png
-    - assets/icons/inventory/
+    - assets/images/inventory/
+    - assets/images/home/
     - assets/images/title/
     - assets/images/icon/
     - assets/images/splash/
