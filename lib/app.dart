@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'core/theme/app_theme.dart';
-import 'data/animals_data.dart';
+import 'core/asset_precache.dart';
 import 'presentation/screens/splash_screen.dart';
 
 class CapivaraApp extends StatefulWidget {
@@ -11,45 +11,15 @@ class CapivaraApp extends StatefulWidget {
 }
 
 class _CapivaraAppState extends State<CapivaraApp> {
-  bool _precached = false;
+  Future<void>? _precacheFuture;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (_precached) return;
-    _precached = true;
-    for (final animal in animals) {
-      precacheImage(
-        ResizeImage(
-          AssetImage(animal.tilePngPath),
-          width: 144,
-          height: 144,
-        ),
-        context,
-      );
-      precacheImage(
-        ResizeImage(
-          AssetImage(animal.hostPngPath),
-          width: 304,
-          height: 304,
-        ),
-        context,
-      );
-    }
-    precacheImage(
-      const AssetImage('assets/images/fundo.png'),
-      context,
-    );
-    precacheImage(const AssetImage('assets/images/inventory/bomb_2.png'), context);
-    precacheImage(const AssetImage('assets/images/inventory/bomb_3.png'), context);
-    precacheImage(const AssetImage('assets/images/inventory/undo_1.png'), context);
-    precacheImage(const AssetImage('assets/images/inventory/undo_3.png'), context);
-    precacheImage(const AssetImage('assets/images/home/Colecao.png'), context);
-    precacheImage(const AssetImage('assets/images/home/ComoJogar.png'), context);
-    precacheImage(const AssetImage('assets/images/home/Configuracao.png'), context);
-    precacheImage(const AssetImage('assets/images/home/IconeLoja.png'), context);
-    precacheImage(const AssetImage('assets/images/home/Ranking.png'), context);
-    precacheImage(const AssetImage('assets/images/home/Recompensas.png'), context);
+    // Inicia o precache uma única vez. Splashscreen é decodificada primeiro
+    // (aguardada antes dos demais) para aparecer imediatamente; o resto
+    // carrega em paralelo. A SplashScreen aguarda essa future antes de navegar.
+    _precacheFuture ??= precacheCriticalAssets(context);
   }
 
   @override
@@ -58,7 +28,7 @@ class _CapivaraAppState extends State<CapivaraApp> {
       title: 'Olha o Bichim!',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
-      home: const SplashScreen(),
+      home: SplashScreen(precacheFuture: _precacheFuture),
     );
   }
 }

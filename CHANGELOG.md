@@ -7,6 +7,17 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.2.8] - 2026-05-04
+
+### Fixed
+- **Splashscreen e Home carregando progressivamente em emuladores (Genymotion)** — após a splash nativa do Android 12+ (ícone do app), a `splashscreen.png` sumia rápido demais e a Home aparecia com os 6 ícones e a logo do título carregando um por um, com vários segundos de delay entre eles. Causa-raiz: as chamadas `precacheImage` em `app.dart` eram fire-and-forget (sem `await`/`Future.wait`), o timer fixo de 1500ms da `SplashScreen` navegava sem aguardar o precache, a própria `splashscreen.png` (3.5 MB) não estava na lista de precache (decodificava on-the-spot, podia exceder os 1500ms), e os títulos do jogo (`title_brown.png`/`title_orange.png`) não eram precacheados. Em devices físicos rápidos o problema passava despercebido, mas no Genymotion ficava muito visível.
+
+### Changed
+- Lista de assets críticos extraída para `lib/core/asset_precache.dart` com função `criticalAssetPaths()` (testável) e `precacheCriticalAssets(context)` que decodifica a `splashscreen.png` primeiro (await) e o resto em paralelo (Future.wait).
+- `SplashScreen` agora aceita uma `precacheFuture` opcional e aguarda ela completar (com timeout-cap de 4s e duração mínima de 1500ms) antes de navegar para a Home, garantindo que tudo esteja decodificado quando a Home aparecer.
+- Adicionados ao precache: `splashscreen.png`, `title_brown.png`, `title_orange.png` (que estavam ausentes).
+- Timer de navegação refatorado para `Timer` cancelável no `dispose` (evita pending timers em testes).
+
 ## [1.2.7] - 2026-05-04
 
 ### Changed
