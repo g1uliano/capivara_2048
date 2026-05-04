@@ -49,3 +49,6 @@ cache/removed_bg/
 
 # Worktrees
 .worktrees/
+
+# Pi coding agent state
+.pi/
