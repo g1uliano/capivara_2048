@@ -1,5 +1,7 @@
-// test/e2e/_harness/registry.dart
 import 'scenario.dart';
+import '../flows/smoke_boot.dart';
+import '../flows/nav_smokes.dart';
+import '../persistence/collection_survives_restart.dart';
 
 /// Single source of truth for all E2E scenarios.
 ///
@@ -9,5 +11,9 @@ import 'scenario.dart';
 ///
 /// Add new scenarios here as they are implemented.
 final List<E2EScenario> allScenarios = <E2EScenario>[
-  // Scenarios added in Tasks 6–8 and beyond.
+  smokeBootScenario,
+  navHomeToCollectionScenario,
+  navHomeToSettingsScenario,
+  navNewGameScenario,
+  collectionSurvivesRestartScenario,
 ];

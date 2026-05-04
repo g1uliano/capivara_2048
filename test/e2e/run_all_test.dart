@@ -17,7 +17,7 @@ void main() {
   )) {
     testWidgets('[${scenario.id}] ${scenario.title}', (tester) async {
       final h = GameTestHarness();
-      addTearDown(h.teardown);
+      addTearDown(() => tester.runAsync(h.teardown));
       await scenario.run(tester, h);
     });
   }
