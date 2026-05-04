@@ -33,8 +33,8 @@ void main() {
   });
 
   group('animals list', () {
-    test('has exactly 11 animals', () {
-      expect(animals.length, 11);
+    test('has exactly 13 animals', () {
+      expect(animals.length, 13);
     });
 
     test('level 5 is Sagui, not Arara-azul', () {
@@ -82,7 +82,7 @@ void main() {
       expect(names, isNot(contains('Arara-azul')));
     });
 
-    test('all 11 animals have scientificName populated', () {
+    test('all 13 animals have scientificName populated', () {
       for (final animal in animals) {
         expect(
           animal.scientificName,
@@ -97,7 +97,7 @@ void main() {
       }
     });
 
-    test('all 11 animals have funFact populated', () {
+    test('all 13 animals have funFact populated', () {
       for (final animal in animals) {
         expect(
           animal.funFact,

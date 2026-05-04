@@ -2,9 +2,9 @@
 
 > Documento de especificação para desenvolvimento. Pensado para ser alimentado em ferramentas como Claude Code para implementação iterativa.
 >
-> **Status atual:** Fase 2.11 concluída ✅ (v1.1.0) — Loja em overlay acessível pelos ícones desabilitados do inventário. Fase 2.10 concluída ✅ (v1.0.0). Fases 2.4 (Recompensas Diárias), 2.5 (Identidade "Olha o Bichim!"), 2.6 (Home redesenhada, Tela de Coleção, Tela de Configurações), 2.7 (Bugfixes visuais de interface), 2.8 (Loja Mock) e 2.9 (Splash Screen, Game Over redesenhado, Inventário maior e Orientação bloqueada) também concluídas.
+> **Status atual:** Fase 2.11 concluída ✅ (v1.0.1) — Loja em overlay acessível pelos ícones desabilitados do inventário. Fase 2.10 concluída ✅ (v1.0.0). Fases 2.4 a 2.9 também concluídas.
 >
-> **Próximo:** **Fase 3 — Backend, ranking, monetização**
+> **Próximo:** **Fase 2.12 — Expansão além do 2048: Peixe-boi (4096) e Jacaré (8192) + Ranking Lendas**
 >
 > **Renomeação do jogo:** o nome do jogo passa de **"Capivara 2048"** para **"Olha o Bichim!"**. As referências antigas em seções abaixo serão atualizadas progressivamente; durante a transição, considere "Olha o Bichim!" o nome canônico do produto. O *codename* interno do repositório (`capivara_2048`) permanece — apenas o nome de exibição muda.
 >
@@ -54,7 +54,7 @@
 | Tipografia | `google_fonts` | Fredoka, Nunito |
 | Imagens | `Image.asset` (Flutter nativo) | PNGs dos animais e ícones |
 | Haptic | `flutter` nativo (HapticFeedback) | Vibração |
-| Localização | `flutter_localizations` + `intl` | PT-BR / EN |
+| Localização | `flutter_localizations` + `intl` | PT-BR no lançamento; EN e outros em expansão futura |
 | Backend | `firebase_core` + `cloud_firestore` + `firebase_auth` | Ranking, contas |
 | Anúncios | `google_mobile_ads` | Recompensados de 30s |
 | Compras | `in_app_purchase` | Loja |
@@ -72,6 +72,8 @@ lib/
 │   ├── constants/
 │   ├── theme/
 │   └── utils/
+│       ├── fake_ad_service.dart        ✅
+│       └── fake_ranking_service.dart   ← novo (Fase 2.12)
 ├── data/
 │   ├── models/
 │   ├── repositories/
@@ -267,15 +269,17 @@ Quando o tabuleiro trava e o jogador **não possui nenhum item no inventário**,
 | 9 | 512 | **Onça-pintada** | Predador alfa supremo | `#FBC02D` | `tile/Onca.png` | `host/Onca.png` |
 | 10 | 1024 | **Sucuri** | Gigante das águas profundas | `#2E7D32` | `tile/Sucuri.png` | `host/Sucuri.png` |
 | 11 | 2048 | **🏆 Capivara Lendária** | "Diplomata da natureza" — fofura suprema | `#FFD54F` | `tile/Capivara.png` | `host/Capivara.png` |
+| 12 | 4096 | **🌊 Peixe-boi Lendário** | Gentil gigante das águas amazônicas, espécie ameaçada | `#006064` | `tile/PeixeBoi.png` | `host/PeixeBoi.png` |
+| 13 | 8192 | **🐊 Jacaré Supremo** | Predador ancestral, símbolo de resistência e raridade | `#1B5E20` | `tile/Jacare.png` | `host/Jacare.png` |
 
-> Caminhos relativos a `assets/images/animals/`. Nível 5 = Sagui (substituiu Arara-azul na Fase 2.3.7).
+> Caminhos relativos a `assets/images/animals/`. Nível 5 = Sagui (substituiu Arara-azul na Fase 2.3.7). Níveis 12 e 13 adicionados na Fase 2.12 — assets já presentes nas pastas.
 
 ### 4.1 Visual do tile
 - **Fundo:** branco (`#FFFFFF`)
-- **Contorno:** cor da tabela (3px, arredondado)
+- **Contorno:** cor da tabela (3px, arredondado) — níveis 12 e 13 usam **4px** para reforçar raridade
 - **Marca d'água:** PNG do animal centralizado, opacidade ~28%, ocupa ~80% do tile
 - **Número:** sobreposto, Fredoka Bold, cor `#3E2723`
-- **Sombra:** suave abaixo
+- **Sombra:** suave abaixo — níveis 12 e 13 têm sombra levemente mais intensa
 - **Animação idle:** respiração lenta + piscar aleatório (futuro)
 
 ### 4.2 Anfitrião do jogo (Fase 2.3.10 — 2x2; Fase 2.3.11 — Tanajura inicial; Fase 2.3.12 — flush-left sem padding)
@@ -530,6 +534,10 @@ A cada amigo convidado que **criar conta E jogar pelo menos 1 partida**:
 | **Pessoal (alt)** | Maior número alcançado | Histórico vitalício |
 | **Global** | Melhores tempos para o 2048 entre todos | **Reseta a cada 7 dias** |
 | **Global (alt)** | Maior número alcançado entre todos | **Reseta a cada 7 dias** |
+| **Lendas 4096** | Vezes que o jogador atingiu 4096 | **Vitalício — nunca reseta** |
+| **Lendas 8192** | Vezes que o jogador atingiu 8192 | **Vitalício — nunca reseta** |
+
+> **Regra de desempate no Ranking Lendas:** em caso de empate no contador de vezes, quem atingiu o marco pela primeira vez mais cedo (`firstReachedAt`) fica à frente. Empate exato em ambos os critérios = mesma colocação.
 
 ### 9.2 Marco zero do ranking global
 - **Reset toda semana, sábado às 18:00 (horário de Brasília)**
@@ -543,13 +551,31 @@ rankings/{week_id}/entries/{userId}
   - bestTimeMs: int
   - bestNumber: int
   - completedAt: timestamp
-  - country: string?
+  - country: string?   // reservado para expansão futura — não exibido no lançamento
 
 users/{userId}/personalRecords
   - bestTimeMs: int
-  - bestNumber: int
+  - bestNumber: int           // maior número já atingido (2048, 4096 ou 8192)
   - totalGames: int
-  - totalWins: int
+  - totalWins: int            // vezes que atingiu 2048 ou mais
+  - timesReached4096: int     // Fase 2.12
+  - timesReached8192: int     // Fase 2.12
+  - firstReached4096At: timestamp?   // Fase 2.12 — para desempate
+  - firstReached8192At: timestamp?   // Fase 2.12 — para desempate
+
+legendsRankings/4096/entries/{userId}   // Fase 2.12
+  - userId: string
+  - displayName: string
+  - timesReached: int
+  - firstReachedAt: timestamp
+  - country: string?   // reservado para expansão futura
+
+legendsRankings/8192/entries/{userId}   // Fase 2.12
+  - userId: string
+  - displayName: string
+  - timesReached: int
+  - firstReachedAt: timestamp
+  - country: string?   // reservado para expansão futura
 ```
 
 ### 9.4 Anti-cheat (consideração futura)
@@ -590,6 +616,10 @@ users/{userId}/personalRecords
 | Premium/dourado | Dourado | `#FFD54F` |
 | Botão "Desistir" / "Encerrar" (Game Over) | Vermelho | `#EF5350` |
 | Botão "Ver anúncio" (`GameOverNoItemsOverlay`) | Laranja-tucano | `#FF8C42` |
+| Contorno tile Peixe-boi (4096) | Azul-petróleo | `#006064` |
+| Contorno tile Jacaré (8192) | Verde militar | `#1B5E20` |
+| Background card Peixe-boi (Coleção) | Azul bem claro | `#E0F7FA` |
+| Background card Jacaré (Coleção) | Verde bem claro | `#E8F5E9` |
 
 ### 10.3 Tipografia
 - **Títulos**: `Fredoka` (arredondada, divertida)
@@ -614,6 +644,8 @@ users/{userId}/personalRecords
 | Movimento | Translate suave, easing cubicOut, 150ms |
 | Merge | Pop (scale 1 → 1.2 → 1), 250ms |
 | Merge da Capivara | Flash dourado, partículas de folhas, zoom out, 1500ms |
+| Merge do Peixe-boi (4096) | Onda azul-petróleo + partículas de água + zoom out, 1500ms ← novo (Fase 2.12) |
+| Merge do Jacaré (8192) | Explosão verde-escura + partículas de folha + tremor de tela + haptic longa, 2000ms ← novo (Fase 2.12) |
 | Troca de anfitrião | Fade + scale, 400ms |
 | Game Over | Tabuleiro escurece levemente, overlay slide-up, 300ms |
 | Botão pressionado | Scale 1 → 0.95 → 1, 100ms |
@@ -861,8 +893,19 @@ Stack (sobre GameScreen, WillPopScope retorna false)
 - Botão "Resgatar"
 - Após resgate: oferta de dobrar via anúncio
 
-### 12.12 Tela: Debug — Galeria de Animais
-Tela acessível apenas em build de debug (via `kDebugMode`). Mostra os 11 animais em 3 modos: tile, host 1x1 e host 2x2.
+### 12.12 Tela: Configurações (atualizada na Fase 2.12)
+Card de **Gameplay** (branco semi-opaco, borderRadius 12):
+- `SwitchListTile` — **Vibração (Haptic)**: ativa/desativa feedback tátil
+- `SwitchListTile` — **Reduzir Efeitos Visuais**: desativa animações complexas para melhor desempenho — *movido do `PauseOverlay` na Fase 2.12*
+
+Card de **Idioma** (Fase 2.12 — removido):
+- O dropdown de idioma foi removido. O app é exclusivamente PT-BR no lançamento. O card de idioma não é exibido. Quando a expansão de idiomas for implementada (Fase 6), o card é readicionado.
+
+Card de **Áudio** (desabilitado até Fase 5):
+- Sliders de volume SFX e música — visíveis mas `enabled: false` com label "Disponível em breve"
+
+### 12.13 Tela: Debug — Galeria de Animais
+Tela acessível apenas em build de debug (via `kDebugMode`). Mostra os 13 animais em 3 modos: tile, host 1x1 e host 2x2 — incluindo Peixe-boi e Jacaré após a Fase 2.12.
 
 ---
 
@@ -902,9 +945,10 @@ class GameState {
   final List<List<Tile?>> board;
   final int score;
   final int highScore;
-  final int highestLevelReached;     // inicializa em 1 (Tanajura)
+  final int highestLevelReached;     // inicializa em 1 (Tanajura); máximo 13 (Jacaré)
   final bool isGameOver;
-  final bool hasWon;
+  final bool hasWon;                 // true ao atingir qualquer marco (2048, 4096 ou 8192)
+  final int? wonAtLevel;             // 11, 12 ou 13 — nível atingido que gerou a vitória
   final DateTime? startedAt;
   final Duration elapsed;
   final List<GameState> undoStack;   // últimos N estados (N=3 atende Desfazer 3)
@@ -951,9 +995,13 @@ class PlayerProfile {
 
 class PersonalRecords {
   final int? bestTimeMs;
-  final int bestNumber;
+  final int bestNumber;           // maior número já atingido (2048, 4096 ou 8192)
   final int totalGames;
-  final int totalWins;
+  final int totalWins;            // vezes que atingiu 2048 ou mais
+  final int timesReached4096;     // Fase 2.12
+  final int timesReached8192;     // Fase 2.12
+  final DateTime? firstReached4096At;   // Fase 2.12 — para desempate no Ranking Lendas
+  final DateTime? firstReached8192At;   // Fase 2.12 — para desempate no Ranking Lendas
 }
 ```
 
@@ -1004,12 +1052,14 @@ class ShareCode {
 | `lives_state` | LivesState |
 | `inventory` | Inventory |
 | `personal_records` | PersonalRecords |
+| `personal_ranking` | PersonalRankingState — top 20 entradas por tempo e por número (Fase 2.12) |
 | `daily_streak` | int + lastClaimDate |
 | `unlocked_animals` | List<int> (níveis vistos) |
 | `settings.sound_volume` | double 0–1 |
 | `settings.music_volume` | double 0–1 |
 | `settings.haptic_enabled` | bool |
-| `settings.locale` | String "pt_BR" \| "en_US" |
+| `settings.reduce_motion` | bool — "Reduzir Efeitos Visuais" (movido do PauseOverlay para Settings na Fase 2.12) |
+| `settings.locale` | String "pt_BR" — fixo no lançamento; UI de seleção removida na Fase 2.12; EN em expansão futura |
 | `ad_counter` | { date, count } |
 
 ### 14.2 Firestore (remoto, requer login)
@@ -1088,288 +1138,459 @@ class ShareCode {
 
 ---
 
-### 🔜 Fase 2.10 — Animação piscante no Game Over + Oferta de item via anúncio/compra sem itens (v1.0.0)
-
-**Objetivo:** 2 novas features de fluxo de Game Over que melhoram retenção e monetização — animação de atenção nos itens disponíveis e fluxo dedicado para quando o inventário está zerado.
-
-**Estimativa:** 1–2 dias.
-
----
-
-#### A — Feature: animação piscante nos ícones de item durante `GameOverItemScreen`
-
-**Objetivo:** quando o tabuleiro trava e o fluxo de salvamento é exibido, o ícone do item em destaque deve piscar em loop para chamar atenção do jogador e reforçar que há uma ação disponível.
-
-**Arquivos modificados:**
-- `lib/presentation/screens/game/game_over_item_screen.dart`
-
-**Implementação:**
-```dart
-// Usar flutter_animate (já no projeto):
-Image.asset(itemPngPath, width: 120, height: 120)
-  .animate(onPlay: (controller) => controller.repeat(reverse: true))
-  .fadeIn(duration: 400.ms, curve: Curves.easeInOut)
-  .then()
-  .fadeOut(duration: 400.ms, curve: Curves.easeInOut);
-```
-
-**Regras da animação:**
-- **Ciclo:** opacidade 1.0 → 0.4 → 1.0, 800ms por ciclo completo, easing `easeInOut`
-- **Início:** imediatamente ao exibir o item (inclusive ao trocar via "Próximo item")
-- **Parada:** imediatamente ao tocar "Usar item"
-- **Troca de item:** controller anterior disposto; novo inicia imediatamente para o próximo item
-- **Dispose:** `_pulseController.dispose()` no `dispose()` do widget — obrigatório para não vazar animações
-
-**Casos de teste obrigatórios:**
-- Widget test: controller em loop enquanto item exibido
-- Widget test: ao tocar "Usar item", animação para antes da navegação
-- Widget test: ao trocar item, animação anterior para e nova inicia
-- Widget test: `dispose()` não lança exceção
-
----
-
-#### B — Feature: `GameOverNoItemsOverlay` — oferta de item via anúncio ou compra quando inventário zerado
-
-**Objetivo:** quando o tabuleiro trava e o jogador não tem nenhum item, em vez de encerrar diretamente a partida, oferecer ao jogador a possibilidade de adquirir um item (via anúncio ou compra) para tentar salvar a partida. O overlay se abre por cima do tabuleiro, com três opções claras e bem explicadas.
-
-**Arquivos novos:**
-- `lib/presentation/widgets/game_over_no_items_overlay.dart`
-
-**Arquivos modificados:**
-- `lib/presentation/screens/game/game_screen.dart` — detectar `inventory.isEmpty` no game over e exibir o overlay
-- `lib/domain/game_engine/game_notifier.dart` — reusar `isAwaitingGameOverResolution` da Fase 2.9
-- `lib/data/shop_data.dart` — expor `estimatedUnitPrice(ItemType)` para uso no overlay
-
-**Lógica de sorteio do item:**
-```dart
-ItemType _drawRandomItem() {
-  const items = [ItemType.bomb2, ItemType.bomb3, ItemType.undo1, ItemType.undo3];
-  return items[Random().nextInt(items.length)];
-}
-// Sorteio feito uma única vez ao abrir o overlay; resultado armazenado em estado local do widget
-```
-
-**Fluxo completo — Opção 1 (ver anúncio):**
-1. Jogador toca "📺 Ver anúncio e receber [NomeItem]"
-2. Se `adWatchesToday >= 40`: botão desabilitado, label `"Limite diário atingido"` — fim
-3. Chama `FakeAdService.showRewardedAd()` (dev) / `google_mobile_ads` (produção) — 30s
-4. Callback `onAdRewarded`: `inventoryNotifier.add(itemSorteado, 1)` + `livesNotifier.incrementAdCount()`
-5. Overlay fecha; partida continua; toast: `"[NomeItem] adicionado! Boa sorte! 🎉"` — **nenhuma vida consumida**
-
-**Fluxo completo — Opção 2 (comprar):**
-1. Jogador toca "🛒 Comprar [NomeItem]  •  ~R$ X,XX"
-2. `AlertDialog`: `"Comprar 1× [NomeItem] por R$ X,XX?"` com "Cancelar" / "Confirmar compra"
-3. Cancelar: fecha AlertDialog, retorna ao overlay
-4. Confirmar (mock dev): item entregue; overlay fecha; partida continua — **nenhuma vida consumida**
-5. Confirmar (produção — Fase 3): `in_app_purchase` com o pacote mais barato que contém o item; em sucesso, entrega os itens do pacote completo
-
-**Fluxo completo — Opção 3 (encerrar):**
-1. Jogador toca "Encerrar partida"
-2. `AlertDialog`: `"Tem certeza? Você perderá 1 vida e a partida será encerrada."` com "Cancelar" / "Confirmar"
-3. Cancelar: retorna ao overlay
-4. Confirmar: `livesNotifier.consume(1)`; overlay fecha; modal padrão de Game Over
-
-**Bloqueio do botão voltar (Android):**
-```dart
-WillPopScope(
-  onWillPop: () async => false,
-  child: GameOverNoItemsOverlay(...),
-)
-```
-
-**Casos de teste obrigatórios:**
-```dart
-testWidgets('exibe quando inventory.isEmpty == true no game over', ...)
-testWidgets('item sorteado é um dos 4 tipos válidos', ...)
-testWidgets('item sorteado não muda enquanto overlay está aberto', ...)
-testWidgets('botão anúncio desabilitado quando adWatchesToday >= 40', ...)
-testWidgets('tap anúncio → FakeAdService chamado → item entregue → overlay fecha', ...)
-testWidgets('tap comprar → AlertDialog com preço → cancelar retorna ao overlay', ...)
-testWidgets('tap comprar → confirmar → item entregue → overlay fecha', ...)
-testWidgets('tap encerrar → AlertDialog → cancelar retorna ao overlay', ...)
-testWidgets('tap encerrar → confirmar → 1 vida consumida → overlay fecha', ...)
-testWidgets('botão voltar Android ignorado (WillPopScope retorna false)', ...)
-testWidgets('tabuleiro ao fundo não é interativo (AbsorbPointer)', ...)
-
-// Regressão em game_screen_test.dart:
-testWidgets('game over com itens → GameOverItemScreen, não GameOverNoItemsOverlay', ...)
-testWidgets('game over sem itens → GameOverNoItemsOverlay, não GameOverItemScreen', ...)
-```
-
----
-
-#### Ordem de execução recomendada
-
-1. **A primeiro** (animação piscante) — modifica apenas `game_over_item_screen.dart`, isolado e rápido
-2. **B** (`GameOverNoItemsOverlay`) — mais complexo, envolve novo widget, anúncios e compras mock
-
----
-
-#### Critérios de aceite da Fase 2.10
-
-| Item | Critério |
-|---|---|
-| Animação | Ícone do item pisca em loop durante toda a exibição na `GameOverItemScreen` |
-| Animação | Animação para ao tocar "Usar item" |
-| Animação | Troca de item reinicia a animação piscante no novo item |
-| Animação | Nenhum vazamento de `AnimationController` |
-| Overlay | Aparece somente quando `inventory.isEmpty == true` no game over |
-| Overlay | Item sorteado é um dos 4 tipos; não muda enquanto overlay está aberto |
-| Overlay | Opção de anúncio desabilitada quando limite diário atingido |
-| Overlay | Anúncio entrega o item sorteado e fecha o overlay sem consumir vida |
-| Overlay | Compra (mock) entrega o item sorteado e fecha o overlay sem consumir vida |
-| Overlay | Encerrar + confirmar consome 1 vida e exibe modal de Game Over |
-| Overlay | Botão voltar Android não fecha o overlay |
-| Overlay | Tabuleiro ao fundo visível mas não interativo |
-
----
-
 ### ✅ Fase 2.10 — Animação piscante no Game Over + Oferta de item via anúncio/compra sem itens (v1.0.0)
 - **A** — Animação piscante (opacidade 1.0→0.4→1.0, 800ms/ciclo) no ícone do item em destaque na `GameOverItemScreen`; para ao usar item, reinicia ao trocar de item; `dispose()` sem vazamento
 - **B** — `GameOverNoItemsOverlay`: overlay sobre o tabuleiro com item sorteado (1 de 4, aleatório), 3 opções (anúncio / compra mock / encerrar), bloqueio do botão voltar Android, integração com `adWatchesToday`
 
 ---
 
-### ✅ Fase 2.11 — Loja em overlay sobre o jogo acessível pelos ícones desabilitados do inventário (v1.0.1)
-
-**Objetivo:** quando o jogador toca em um ícone de item com contador 0 (acinzentado/desabilitado) na `InventoryBar`, em vez de ignorar o toque, abrir a loja como overlay diretamente sobre o jogo — sem navegar para outra tela — permitindo comprar itens sem perder o contexto da partida. O cronômetro fica pausado enquanto o overlay estiver aberto.
-
-**Estimativa:** 1–2 dias.
+### ✅ Fase 2.11 — Loja em overlay acessível pelos ícones desabilitados do inventário (v1.0.1)
+- **A** — Tap em ícone desabilitado (count == 0) abre `ShopOverlay` em vez de ser ignorado
+- **B** — `ShopOverlay`: overlay rolável com os 6 pacotes da loja, botão X para fechar, botão voltar Android permitido, tabuleiro ao fundo não interativo
+- **C** — Cronômetro pausado enquanto `ShopOverlay` aberta; retoma ao fechar sem conflito com `PauseOverlay`
 
 ---
 
-#### A — Comportamento do tap em ícone desabilitado (`InventoryBar` / `InventoryItemButton`)
+### 🔜 Fase 2.12 — Expansão além do 2048: Peixe-boi (4096) e Jacaré (8192) + Ranking Lendas
 
-**Mudança de comportamento:**
-- **Antes (Fases anteriores):** ícone com `count == 0` estava acinzentado e o tap era simplesmente ignorado (`onTap: null` ou `GestureDetector` sem handler)
-- **Agora (Fase 2.11):** ícone com `count == 0` continua acinzentado visualmente, mas o tap abre a `ShopOverlay`
+**Objetivo:** expandir o jogo para além do tile 2048, adicionando dois novos animais lendários (Peixe-boi 4096 e Jacaré 8192), o diálogo de escolha ao atingir cada marco, e um novo sistema de ranking vitalício baseado em vezes que o jogador atingiu esses marcos raros.
+
+**Estimativa:** 2–3 dias.
+
+---
+
+#### A — Novos tiles e animais
+
+**Dois novos níveis adicionados à tabela de animais:**
+
+| Nível | Valor | Animal | Justificativa | Cor (contorno) | PNG tile | PNG host |
+|---|---|---|---|---|---|---|
+| 12 | 4096 | **🌊 Peixe-boi Lendário** | Gentil gigante das águas amazônicas, espécie ameaçada | `#006064` (azul-petróleo) | `tile/PeixeBoi.png` | `host/PeixeBoi.png` |
+| 13 | 8192 | **🐊 Jacaré Supremo** | Predador ancestral, símbolo de resistência e raridade | `#1B5E20` (verde militar) | `tile/Jacare.png` | `host/Jacare.png` |
+
+> Os arquivos `PeixeBoi.png` e `Jacare.png` já existem nas pastas `assets/images/animals/tile/` e `assets/images/animals/host/` respectivamente.
+
+**Visual dos tiles lendários:**
+- Seguem o mesmo padrão visual dos demais tiles (fundo branco, marca d'água, número em Fredoka Bold `#3E2723`)
+- Contorno mais espesso: **4px** (em vez de 3px dos outros) para distinguir visualmente a raridade
+- Sombra levemente mais intensa para dar peso visual
+
+**Atualização em `animals_data.dart`:** adicionar os dois novos `Animal` à lista, com `level: 12`, `level: 13`, cores e caminhos de PNG corretos.
+
+---
+
+#### B — Fluxo ao atingir 2048, 4096 e 8192
+
+**Regra geral:** ao formar um tile de valor 2048, 4096 ou 8192, o jogo não encerra automaticamente. Em vez disso, exibe um diálogo de escolha. A partida só encerra se o jogador escolher "Encerrar".
+
+**Ao atingir 2048 (Capivara Lendária — nível 11):**
+
+1. Animação especial do merge da Capivara (flash dourado, partículas de folhas, zoom out, 1500ms) — igual ao comportamento atual
+2. Cronômetro para
+3. Exibe `VictoryChoiceDialog`:
+   ```
+   🎉 Você chegou à Capivara Lendária!
+   "A fofura chegou ao seu limite... ou chegou?"
+
+   [Continuar até o Peixe-boi (4096)]   [Encerrar e salvar resultado]
+   ```
+4. **Encerrar:** registra o resultado (tempo, pontuação), exibe modal de resultado final, consome lógica normal de fim de partida
+5. **Continuar:** o cronômetro **não retoma** — passa a contar a partir de zero para o trecho 2048→4096; ou mantém o cronômetro parado e registra apenas a pontuação como critério. *(Decisão de implementação: o cronômetro do ranking é medido apenas até o 2048 — após isso, a partida continua mas o tempo do ranking já foi registrado)*
+
+**Ao atingir 4096 (Peixe-boi Lendário — nível 12):**
+
+1. Animação especial do merge do Peixe-boi: **onda azul** + partículas de água + zoom out, 1500ms
+2. Exibe `VictoryChoiceDialog`:
+   ```
+   🌊 Você chegou ao Peixe-boi Lendário!
+   "As águas da Amazônia nunca foram tão fundas..."
+
+   [Continuar até o Jacaré (8192)]   [Encerrar e salvar resultado]
+   ```
+3. Registra no **Ranking Lendas — 4096**: incrementa `timesReached4096` do jogador em +1
+4. **Encerrar:** modal de resultado final
+5. **Continuar:** partida segue
+
+**Ao atingir 8192 (Jacaré Supremo — nível 13):**
+
+1. Animação especial do merge do Jacaré: **explosão verde escura** + partículas de folha + tremor de tela (vibração haptic longa), 2000ms
+2. Registra no **Ranking Lendas — 8192**: incrementa `timesReached8192` do jogador em +1
+3. Exibe `VictoryChoiceDialog` **sem opção de continuar** — 8192 é o teto definitivo:
+   ```
+   🐊 Você chegou ao Jacaré Supremo!
+   "O predador ancestral foi despertado. Não há mais além."
+
+   [Encerrar — você é uma lenda]
+   ```
+4. Modal de resultado final exibido automaticamente após o jogador tocar o botão
+
+**`VictoryChoiceDialog` — especificação visual:**
+- Overlay sobre o jogo (não nova rota)
+- Fundo: card branco semi-opaco (`Colors.white.withOpacity(0.95)`), borderRadius 24, padding 28
+- Ícone do animal atingido: PNG 100×100dp com animação de bounce de entrada
+- Título: Fredoka Bold 24, `#3E2723`
+- Subtítulo: Nunito italic 15, `Colors.grey[600]`
+- Botão primário "Continuar": `ElevatedButton`, cor do contorno do animal (azul-petróleo para Peixe-boi, verde-militar para Jacaré), largura total
+- Botão secundário "Encerrar": `OutlinedButton`, cinza, largura total
+- Botão voltar Android: **bloqueado** enquanto o diálogo estiver aberto (`WillPopScope` retorna false)
+
+---
+
+#### C — Anfitrião ao continuar além do 2048
+
+- Ao continuar após o 2048: o anfitrião passa a ser a **Capivara** (nível 11) e permanece assim até o jogador formar o tile de Peixe-boi
+- Ao formar o Peixe-boi: o anfitrião muda para o **Peixe-boi** (nível 12)
+- Ao continuar após o 4096: o anfitrião permanece o Peixe-boi até o Jacaré ser formado
+- Ao formar o Jacaré: o anfitrião muda para o **Jacaré** (nível 13)
+- O `highestLevelReached` em `GameState` agora vai até 13
+
+---
+
+#### D — Ranking Lendas (novo — vitalício)
+
+**Dois novos sub-rankings permanentes, separados do ranking global semanal:**
+
+**Ranking Lendas 4096:**
+- Métrica: número de vezes que o jogador atingiu 4096 em qualquer partida
+- Persistência: **vitalício** — nunca reseta
+- Desempate: quem atingiu primeiro (menor `firstReachedAt`) fica à frente em caso de empate no contador
+- Exibição: lista paginada, sem pódio destacado (diferente do ranking global)
+
+**Ranking Lendas 8192:**
+- Métrica: número de vezes que o jogador atingiu 8192 em qualquer partida
+- Persistência: **vitalício** — nunca reseta
+- Desempate: mesma regra — quem atingiu primeiro fica à frente no empate
+- Exibição: lista paginada
+
+**Recompensas ao atingir marcos (única vez por jogador — não por vezes atingidas):**
+
+| Marco | Recompensa (entregue na primeira vez) |
+|---|---|
+| Primeira vez que atinge 4096 | 5 vidas + 5 bombas + 5 desfazer |
+| Primeira vez que atinge 8192 | 10 vidas + 10 bombas + 10 desfazer |
+
+> Nas vezes subsequentes, não há recompensa adicional — o incentivo é a posição no ranking.
+
+**Atualização em `PersonalRecords`:**
+```dart
+class PersonalRecords {
+  final int? bestTimeMs;
+  final int bestNumber;           // maior número já atingido (2048, 4096 ou 8192)
+  final int totalGames;
+  final int totalWins;            // vezes que atingiu 2048 ou mais
+  final int timesReached4096;     // novo
+  final int timesReached8192;     // novo
+  final DateTime? firstReached4096At;   // novo — para desempate
+  final DateTime? firstReached8192At;   // novo — para desempate
+}
+```
+
+**Atualização no modelo Firestore:**
+```
+legendsRankings/4096/entries/{userId}
+  - userId: string
+  - displayName: string
+  - timesReached: int
+  - firstReachedAt: timestamp
+  - country: string?
+
+legendsRankings/8192/entries/{userId}
+  - userId: string
+  - displayName: string
+  - timesReached: int
+  - firstReachedAt: timestamp
+  - country: string?
+```
+
+---
+
+#### E — Atualização da tela de Ranking
+
+A tela de Ranking recebe uma nova aba:
+
+```
+Tabs: [Global Semanal] | [Pessoal] | [Lendas]
+```
+
+**Aba Lendas:**
+- Dois sub-rankings exibidos em sequência (com separador visual): **4096 — Peixe-boi** e **8192 — Jacaré**
+- Cada sub-ranking: lista paginada com posição, nome do jogador, número de vezes atingidas e data da primeira vez
+- Sem reset — exibe dados históricos
+- Se o jogador ainda não atingiu o marco, exibe mensagem motivacional: `"Você ainda não chegou aqui. Continue jogando!"`
+
+---
+
+#### F — Atualização da tela de Coleção
+
+Os dois novos animais entram na `CollectionScreen`:
+- Aparecem como silhueta até o jogador atingir o respectivo tile pela primeira vez
+- Ao desbloquear: card com `backgroundBaseColor` derivado da cor de contorno do animal
+- Peixe-boi: `backgroundBaseColor = Color(0xFFE0F7FA)` (azul bem claro)
+- Jacaré: `backgroundBaseColor = Color(0xFFE8F5E9)` (verde bem claro)
+
+---
+
+#### G — Ranking local (Hive) + mock do ranking global para validação de layout
+
+**Objetivo:** implementar o ranking pessoal completo com persistência local via Hive e criar dados mock suficientes para o ranking global, permitindo validar todo o layout da `RankingScreen` — incluindo pódio, lista paginada, aba Lendas e cronômetro de reset — sem depender do backend real (Fase 3).
+
+---
+
+**G1 — Ranking pessoal local (Hive)**
+
+O ranking pessoal já tem o modelo em `PersonalRecords`. O que falta é a **lista de melhores tempos** e **lista de maiores números** registrados localmente, exibíveis na aba "Pessoal" da `RankingScreen`.
+
+Novo Hive box: `personal_ranking` (typeId: 4)
+
+```dart
+class PersonalRankingEntry {
+  final int scoreMs;          // tempo em ms até o 2048 (null se não completou)
+  final int bestNumber;       // maior número atingido nessa partida
+  final DateTime playedAt;
+}
+
+class PersonalRankingState {
+  final List<PersonalRankingEntry> entries;  // máximo 20 entradas — as melhores
+}
+```
+
+**Lógica de inserção:**
+- Ao encerrar uma partida (por vitória ou desistência), criar um `PersonalRankingEntry` e inserir
+- Manter apenas as 20 melhores entradas ordenadas por `scoreMs` (menor é melhor para tempo; null vai ao final)
+- Para maior número: ordenar por `bestNumber` decrescente, também top 20
+
+**Exibição na aba "Pessoal" da `RankingScreen`:**
+```
+Sub-tab: [Melhor tempo] | [Maior número]
+
+Melhor tempo:
+  Posição | Tempo     | Maior nº  | Data
+  1º      | 04:32     | 2048      | 02/05/2026
+  2º      | 05:11     | 2048      | 30/04/2026
+  ...
+
+Maior número:
+  Posição | Maior nº  | Tempo     | Data
+  1º      | 8192      | —         | 01/05/2026
+  2º      | 4096      | —         | 28/04/2026
+  ...
+```
+
+- Se o jogador ainda não tem nenhuma entrada: exibe `"Jogue sua primeira partida para aparecer aqui!"`
+- A entrada do jogador atual é sempre destacada (fundo levemente colorido) mesmo que esteja fora do top 20
+
+---
+
+**G2 — Mock do ranking global para validação de layout**
+
+Criar um `FakeRankingService` que fornece dados estáticos simulando um ranking global real, usado exclusivamente em dev (`kDebugMode`). Em produção (Fase 3), esse serviço é substituído pela integração Firestore.
+
+Arquivo novo: `lib/core/utils/fake_ranking_service.dart`
+
+```dart
+class FakeRankingService {
+  // Retorna lista de entradas mock para o ranking global semanal (melhor tempo)
+  static List<GlobalRankingEntry> globalBestTime() => [
+    GlobalRankingEntry(userId: 'u1', displayName: 'CapyMaster', bestTimeMs: 182000, bestNumber: 2048),
+    GlobalRankingEntry(userId: 'u2', displayName: 'JacaréPro', bestTimeMs: 195000, bestNumber: 4096),
+    GlobalRankingEntry(userId: 'u3', displayName: 'PeixeBoi42', bestTimeMs: 201000, bestNumber: 2048),
+    // ... 10 entradas no total para pódio + lista
+  ];
+
+  // Retorna lista mock para o ranking global (maior número)
+  static List<GlobalRankingEntry> globalBestNumber() => [...];
+
+  // Retorna lista mock para Ranking Lendas 4096
+  static List<LegendsRankingEntry> legends4096() => [
+    LegendsRankingEntry(userId: 'u2', displayName: 'JacaréPro', timesReached: 3, firstReachedAt: DateTime(2026, 4, 1)),
+    LegendsRankingEntry(userId: 'u5', displayName: 'Tucano77', timesReached: 3, firstReachedAt: DateTime(2026, 4, 5)),
+    // empate proposital para testar o comportamento de mesma posição
+  ];
+
+  // Retorna lista mock para Ranking Lendas 8192
+  static List<LegendsRankingEntry> legends8192() => [...];
+
+  // Simula o timer de reset: retorna DateTime de quando o próximo reset ocorre
+  static DateTime nextResetAt() => DateTime.now().add(const Duration(hours: 72));
+}
+```
+
+**Dados mock devem cobrir os seguintes casos de layout:**
+- Pódio com 1º, 2º e 3º lugares distintos
+- Pelo menos 1 empate no Ranking Lendas (mesma posição)
+- O jogador local (`userId == localUserId`) aparece em pelo menos uma das listas, em posição que não seja top 3, para testar o destaque de "sua posição"
+- Uma entrada com `bestNumber: 4096` e outra com `bestNumber: 8192` no ranking global
+
+**Integração na `RankingScreen`:**
+- Em `kDebugMode`: usar `FakeRankingService` para popular as abas Global e Lendas
+- Em produção: `RankingScreen` receberá dados do Firestore (Fase 3) — o ponto de injeção deve ser via provider para facilitar a troca
+- Criar `rankingProvider` (ou `rankingNotifier`) que em dev retorna dados do `FakeRankingService` e em produção será conectado ao Firestore
+
+```dart
+// Estrutura sugerida para facilitar a substituição na Fase 3:
+final rankingRepositoryProvider = Provider<RankingRepository>((ref) {
+  if (kDebugMode) return FakeRankingRepository();
+  return FirestoreRankingRepository(); // implementado na Fase 3
+});
+```
+
+**Cronômetro de reset na aba Global:**
+- Exibe contador regressivo até o próximo sábado às 18:00 (Brasília)
+- Em dev: usar `FakeRankingService.nextResetAt()` como data alvo
+- Formato: `"Reinicia em 2d 14h 32m"` — atualizado a cada minuto
+
+---
+
+**Casos de teste adicionais (G):**
+
+```dart
+// personal_ranking_test.dart
+testWidgets('entrada adicionada ao encerrar partida', ...)
+testWidgets('máximo de 20 entradas mantido — pior resultado é descartado', ...)
+testWidgets('aba Pessoal exibe sub-tabs Melhor tempo e Maior número', ...)
+testWidgets('entry do jogador atual destacada na lista', ...)
+testWidgets('sem partidas → exibe mensagem motivacional', ...)
+
+// fake_ranking_service_test.dart
+testWidgets('FakeRankingService.globalBestTime retorna 10 entradas ordenadas', ...)
+testWidgets('FakeRankingService.legends4096 contém pelo menos 1 empate', ...)
+testWidgets('nextResetAt retorna data futura', ...)
+
+// ranking_screen_test.dart (adicionais)
+testWidgets('aba Global exibe pódio com 1º, 2º, 3º', ...)
+testWidgets('aba Global exibe cronômetro de reset', ...)
+testWidgets('aba Global exibe posição do jogador local destacada', ...)
+testWidgets('aba Lendas exibe empate com mesma posição para dois jogadores', ...)
+testWidgets('em kDebugMode, dados vêm do FakeRankingService', ...)
+```
+
+---
+
+---
+
+#### H — Configurações: remover idioma EN + mover "Reduzir Efeitos Visuais" do PauseOverlay
+
+**Objetivo:** duas limpezas de UI nas Configurações e no menu de pausa, alinhadas ao escopo Brasil-only e à organização lógica das opções do jogo.
+
+---
+
+**H1 — Remover opção de idioma inglês da `SettingsScreen`**
+
+O dropdown de idioma atualmente oferece "Português (BR)" e "English". Como o jogo será lançado exclusivamente no Brasil, a opção EN deve ser removida.
+
+**Mudanças:**
+- Em `settings_screen.dart`: remover o `DropdownButton` de idioma inteiramente — ou, se preferível para facilitar expansão futura, manter o widget mas com apenas uma opção visível ("Português (BR)") e desabilitado, com label "Apenas PT-BR disponível no momento"
+- **Decisão de implementação recomendada:** remover o dropdown completamente por enquanto. Quando a expansão de idiomas for implementada (Fase 6), o widget é readicionado
+- Em `lib/core/constants/` ou onde estiver a lista de locales suportados: remover `en_US` da lista de opções
+- A chave `settings.locale` no Hive permanece — apenas não há mais UI para alterá-la
+- Garantir que o app sempre inicializa com `pt_BR` independentemente de qualquer valor salvo em `settings.locale` que possa ser `en_US` de builds anteriores
 
 **Arquivos modificados:**
-- `lib/presentation/widgets/inventory_item_button.dart` — receber callback `onTapWhenEmpty: VoidCallback?` e chamá-lo quando `count == 0`
-- `lib/presentation/widgets/inventory_bar.dart` — passar `onTapWhenEmpty: () => _openShopOverlay(context)` para cada `InventoryItemButton`
-- `lib/presentation/screens/game/game_screen.dart` — controlar a exibição da `ShopOverlay` via estado local (`bool _shopOverlayOpen`) e pausar/retomar o cronômetro
-
-**Detalhe importante:** o tap em ícone desabilitado deve abrir a loja genérica (todos os 6 pacotes), não filtrada pelo item tocado. O contexto do item tocado pode ser usado futuramente para destacar o pacote relevante, mas não é requisito desta fase.
+- `lib/presentation/screens/settings/settings_screen.dart`
+- `lib/core/constants/supported_locales.dart` (ou equivalente)
 
 ---
 
-#### B — `ShopOverlay` — loja como overlay sobre o jogo
+**H2 — Mover "Reduzir Efeitos Visuais" do `PauseOverlay` para a `SettingsScreen`**
 
-**Arquivo novo:** `lib/presentation/widgets/shop_overlay.dart`
+Atualmente o `PauseOverlay` (menu exibido ao pausar o jogo) tem uma opção "Reduzir Efeitos Visuais" (toggle). Ela deve ser removida do overlay de pausa e adicionada à tela de Configurações, junto com os demais toggles de sistema.
 
-A `ShopOverlay` é um overlay que cobre toda a tela por cima do jogo em andamento. Ela reutiliza exatamente os mesmos dados (`shopPackagesProvider`) e o mesmo componente de card (`_ShopPackageCard`) já existentes na `ShopScreen` (Fase 2.8), garantindo consistência visual.
+**Justificativa:** o menu de pausa deve conter apenas ações rápidas de partida (Continuar, Reiniciar, Menu). Opções de preferências visuais pertencem às Configurações, onde o jogador as acessa fora da partida.
 
-**Layout geral:**
-```
-Stack (sobre GameScreen, ocupa 100% da tela)
-├── Barrier semi-transparente (Colors.black.withOpacity(0.75))
-└── SafeArea
-    └── Column
-        ├── Row (header do overlay)
-        │   ├── OutlinedText("Loja", Fredoka 22, branco)
-        │   └── IconButton(Icons.close, branco) — fecha o overlay
-        ├── Divider sutil (branco com opacidade 0.3)
-        └── Expanded
-            └── ListView.builder (rolável, padding 16dp)
-                // 6 _ShopPackageCard — mesmos cards da ShopScreen
-```
+**Mudanças no `PauseOverlay`:**
+- Remover o `SwitchListTile` ou `CheckboxListTile` de "Reduzir Efeitos Visuais"
+- O overlay fica mais limpo: apenas os três botões de ação (Continuar, Reiniciar, Menu)
+- Nenhuma outra alteração no layout do overlay
 
-**Características do overlay:**
-- **Rolável:** `ListView` com scroll vertical natural; o jogador pode rolar pelos 6 pacotes livremente
-- **Navegável:** o jogador pode interagir normalmente com os cards, ver preços, tocar em "Comprar"
-- **Botão de fechar:** `IconButton` com `Icons.close` no canto superior direito do header; ao tocar, fecha o overlay e retoma o cronômetro
-- **Sem `AppBar` nativa:** o header é um widget customizado dentro do overlay, sem barra de sistema
-- **Botão voltar Android:** ao pressionar o botão voltar físico do Android, o overlay fecha (diferente da `GameOverNoItemsOverlay` — aqui o voltar é permitido porque o jogador pode querer voltar ao jogo sem comprar nada)
-- **Fundo do jogo:** o tabuleiro e todos os elementos do jogo ficam visíveis mas não interativos (`AbsorbPointer`) enquanto o overlay estiver aberto
+**Mudanças na `SettingsScreen`:**
+- Adicionar toggle "Reduzir Efeitos Visuais" dentro do card de configurações de gameplay (junto com o toggle de haptic)
+- Label: `"Reduzir Efeitos Visuais"`
+- Sub-label: `"Desativa animações complexas para melhor desempenho"`
+- Implementado como `SwitchListTile` dentro do card branco semi-opaco existente (`Colors.white.withOpacity(0.88)`, borderRadius 12)
+- O valor é lido/gravado via o mesmo provider/Hive key que já existia (`settings.reduce_motion` ou equivalente)
 
-**Reutilização dos componentes da `ShopScreen`:**
-- Os 6 pacotes vêm do mesmo `shopPackagesProvider` já existente
-- O card `_ShopPackageCard` é extraído de `shop_screen.dart` para um arquivo compartilhável `lib/presentation/widgets/shop_package_card.dart` se ainda não estiver separado — ou importado diretamente
-- O fluxo de compra (mock) é idêntico ao da `ShopScreen`: `AlertDialog` de confirmação → entrega itens ao `inventoryProvider` e `livesProvider` → exibe `_GiftCodeSheet`
-- Após compra bem-sucedida: o overlay permanece aberto (o jogador pode comprar mais itens ou fechar manualmente)
+**Atualização em `14.1` (Hive):** a chave `settings.reduce_motion` (ou o nome atual) já deve existir — apenas muda de onde é controlada na UI.
+
+**Arquivos modificados:**
+- `lib/presentation/widgets/pause_overlay.dart` — remover o toggle
+- `lib/presentation/screens/settings/settings_screen.dart` — adicionar o toggle no card de gameplay
 
 ---
 
-#### C — Pausa e retomada do cronômetro
-
-**Regra:** o cronômetro do jogo deve ficar pausado enquanto a `ShopOverlay` estiver aberta, e retomar exatamente de onde parou ao fechar.
-
-**Implementação:**
-
-O `GameNotifier` já tem lógica de pausa (usada pelo `PauseOverlay`). Reutilizar o mesmo mecanismo:
+**Casos de teste (H):**
 
 ```dart
-// Ao abrir o overlay:
-ref.read(gameNotifier.notifier).pause();
-setState(() => _shopOverlayOpen = true);
+// settings_screen_test.dart
+testWidgets('dropdown de idioma não está presente na SettingsScreen', ...)
+testWidgets('toggle "Reduzir Efeitos Visuais" presente na SettingsScreen', ...)
+testWidgets('toggle "Reduzir Efeitos Visuais" lê e grava valor correto no provider', ...)
 
-// Ao fechar o overlay (botão X ou botão voltar Android):
-setState(() => _shopOverlayOpen = false);
-ref.read(gameNotifier.notifier).resume();
-```
-
-**Importante:** a pausa via `ShopOverlay` é diferente da pausa via `PauseOverlay`:
-- O `PauseOverlay` exibe blur + botões de controle sobre o tabuleiro
-- A `ShopOverlay` exibe a loja sobre o tabuleiro
-- Os dois não devem coexistir: se o jogo já estiver pausado pelo `PauseOverlay`, o tap em ícone desabilitado não deve abrir a `ShopOverlay` (o toque na `InventoryBar` já fica bloqueado pelo `PauseOverlay` normalmente)
-
----
-
-#### Casos de teste obrigatórios
-
-```dart
-// inventory_item_button_test.dart
-testWidgets('tap em ícone com count > 0 → abre ConfirmUseDialog (comportamento existente)', ...)
-testWidgets('tap em ícone com count == 0 → chama onTapWhenEmpty callback', ...)
-testWidgets('tap em ícone com count == 0 e onTapWhenEmpty null → nenhum erro', ...)
-
-// shop_overlay_test.dart
-testWidgets('ShopOverlay exibe 6 cards de pacotes', ...)
-testWidgets('ShopOverlay é rolável (scroll funciona)', ...)
-testWidgets('botão X fecha o overlay', ...)
-testWidgets('botão voltar Android fecha o overlay (WillPopScope retorna true)', ...)
-testWidgets('tabuleiro ao fundo não é interativo enquanto overlay aberto (AbsorbPointer)', ...)
-testWidgets('compra no overlay entrega itens ao inventoryProvider', ...)
-testWidgets('overlay permanece aberto após compra bem-sucedida', ...)
-
-// game_screen_test.dart (regressão)
-testWidgets('tap em ícone desabilitado → ShopOverlay exibida sobre o jogo', ...)
-testWidgets('cronômetro pausado quando ShopOverlay aberta', ...)
-testWidgets('cronômetro retomado ao fechar ShopOverlay', ...)
-testWidgets('tap em ícone habilitado → ConfirmUseDialog (não ShopOverlay)', ...)
+// pause_overlay_test.dart
+testWidgets('PauseOverlay não contém toggle "Reduzir Efeitos Visuais"', ...)
+testWidgets('PauseOverlay contém apenas Continuar, Reiniciar e Menu', ...)
 ```
 
 ---
 
-#### Ordem de execução recomendada
+**Atualização da ordem de execução recomendada:**
 
-1. **C primeiro** (pausa do cronômetro) — verificar se o `GameNotifier.pause()` e `resume()` já funcionam corretamente via testes; ajustar se necessário
-2. **A** (tap em ícone desabilitado) — mudança pequena e isolada no `InventoryItemButton`
-3. **B** (ShopOverlay) — criar o widget, extrair `_ShopPackageCard` se necessário, integrar na `GameScreen`
+1. **H** (limpeza de Configurações e PauseOverlay) — rápido, sem dependências, bom para começar
+2. **A** (novos tiles) — adicionar os dois `Animal` em `animals_data.dart`; verificar galeria de debug
+3. **C** (anfitrião) — `highestLevelReached` max 13, lógica do `HostBanner`
+4. **B** (fluxo de vitória) — criar `VictoryChoiceDialog`, integrar na `GameScreen`
+5. **D** (Ranking Lendas) — modelo de dados + lógica de incremento + recompensas
+6. **G1** (ranking pessoal local) — Hive box, lógica de inserção, aba Pessoal completa
+7. **G2** (mock global) — `FakeRankingService`, `rankingRepositoryProvider`, layout completo da `RankingScreen`
+8. **E** (aba Lendas na RankingScreen) — integrada ao layout já construído em G2
+9. **F** (tela de Coleção) — dois novos cards
 
 ---
 
-#### Critérios de aceite da Fase 2.11
+**Atualização dos critérios de aceite:**
 
 | Item | Critério |
 |---|---|
-| Tap | Ícone desabilitado (count == 0) responde ao tap abrindo a `ShopOverlay` |
-| Tap | Ícone habilitado (count > 0) continua abrindo `ConfirmUseDialog` (regressão) |
-| Overlay | `ShopOverlay` exibe todos os 6 pacotes da loja |
-| Overlay | Conteúdo é rolável verticalmente |
-| Overlay | Botão X fecha o overlay e retoma o cronômetro |
-| Overlay | Botão voltar Android fecha o overlay e retoma o cronômetro |
-| Overlay | Tabuleiro visível ao fundo mas não interativo |
-| Cronômetro | Cronômetro para ao abrir o overlay |
-| Cronômetro | Cronômetro retoma exatamente do mesmo valor ao fechar |
-| Compra | Compra no overlay entrega itens ao inventário (mesmo fluxo da ShopScreen) |
-| Compra | Overlay permanece aberto após compra (jogador pode comprar mais ou fechar) |
-| Sem regressão | Fluxo da `ShopScreen` comum não foi alterado |
-| Sem regressão | `PauseOverlay` continua funcionando normalmente |
+| Tiles | Peixe-boi (4096) e Jacaré (8192) renderizam com PNG, cor de contorno e contorno 4px |
+| Tiles | Animais aparecem corretamente na galeria de debug |
+| Fluxo 2048 | Ao atingir 2048: animação + diálogo com opções Continuar / Encerrar |
+| Fluxo 4096 | Ao atingir 4096: animação de onda azul + diálogo com opções Continuar / Encerrar |
+| Fluxo 8192 | Ao atingir 8192: animação verde + tremor haptic + diálogo com apenas Encerrar |
+| Fluxo 8192 | 8192 é o teto — não há opção de continuar |
+| Anfitrião | Capivara vira anfitrião ao continuar após 2048 |
+| Anfitrião | Peixe-boi vira anfitrião ao atingir 4096 |
+| Anfitrião | Jacaré vira anfitrião ao atingir 8192 |
+| Ranking Lendas | `timesReached4096` e `timesReached8192` incrementam corretamente |
+| Ranking Lendas | `firstReachedAt` registrado apenas na primeira vez |
+| Ranking Lendas | Recompensa de primeira vez entregue apenas 1× por marco |
+| Ranking Lendas | Aba Lendas visível na `RankingScreen` com dados mock |
+| Ranking Lendas | Empate exibido com mesma posição; desempate por `firstReachedAt` |
+| Ranking Pessoal | Entradas salvas localmente no Hive ao encerrar partida |
+| Ranking Pessoal | Sub-tabs Melhor tempo e Maior número funcionando |
+| Ranking Pessoal | Jogador local destacado na lista |
+| Ranking Pessoal | Máximo de 20 entradas mantido |
+| Ranking Global (mock) | Pódio com 3 colocações distintas renderizado |
+| Ranking Global (mock) | Cronômetro de reset exibindo contagem regressiva |
+| Ranking Global (mock) | Posição do jogador local destacada fora do pódio |
+| Ranking Global (mock) | Dados injetados via `rankingRepositoryProvider` — substituível na Fase 3 |
+| Coleção | Peixe-boi e Jacaré aparecem como silhueta antes de desbloquear |
+| Coleção | Desbloqueiam ao atingir o respectivo tile pela primeira vez |
+| Configurações | Dropdown de idioma removido da `SettingsScreen` |
+| Configurações | Toggle "Reduzir Efeitos Visuais" presente na `SettingsScreen` |
+| Configurações | Toggle lê e grava valor corretamente (sem regressão de comportamento) |
+| PauseOverlay | Toggle "Reduzir Efeitos Visuais" removido do `PauseOverlay` |
+| PauseOverlay | Overlay contém apenas Continuar, Reiniciar e Menu |
+| Regressão | Fluxo de Game Over não alterado |
+| Regressão | Ranking global semanal não alterado |
+| Regressão | Tiles 1–11 sem alteração visual |
+
+---
+
+### 🔜 Fase 3 — Backend, ranking e monetização (3–4 semanas)
 - Setup Firebase (Auth, Firestore)
 - Login (Google, Apple, anônimo)
 - Sincronização de PlayerProfile
 - Ranking global semanal
+- Ranking Lendas (4096 e 8192) — persistência Firestore
 - Sistema de convites com deep links
 - Sistema de códigos de compartilhamento
 - Recompensas de ranking
@@ -1396,14 +1617,14 @@ testWidgets('tap em ícone habilitado → ConfirmUseDialog (não ShopOverlay)', 
 - Pré-carregar tudo no início do app
 
 ### 🔜 Fase 6 — Polimento + Lançamento
-- Localização PT-BR / EN
+- Idioma: **PT-BR exclusivamente** no lançamento — EN e outros idiomas em expansão futura
 - Acessibilidade (contraste, leitor de tela, fonte ajustável)
 - Modo escuro (opcional)
 - Testes em dispositivos reais (Android e iOS)
 - Build para Android e iOS
-- Submissão App Store / Play Store
+- Submissão App Store / Play Store — região Brasil
 - Política de privacidade e termos de uso
-- LGPD/COPPA compliance
+- LGPD compliance
 
 ---
 
@@ -1434,8 +1655,8 @@ testWidgets('tap em ícone habilitado → ConfirmUseDialog (não ShopOverlay)', 
 - **Animação piscante (Fase 2.10):** `AnimationController.repeat` nativo — sem rebuild desnecessário; `dispose()` obrigatório
 - **`GameOverNoItemsOverlay` (Fase 2.10):** sem `BackdropFilter` — apenas `ColoredBox` semi-transparente para não adicionar custo de GPU
 
-### 16.3 LGPD / COPPA / Crianças
-- Conformidade COPPA (US) e LGPD (BR)
+### 16.3 LGPD / Crianças
+- Conformidade **LGPD (BR)** — lançamento exclusivo no Brasil; COPPA (US) será avaliada em expansão futura
 - Login não obrigatório
 - Consentimento parental se < 13 anos
 - Anúncios com flag `tagForChildDirectedTreatment`
@@ -1447,40 +1668,51 @@ testWidgets('tap em ícone habilitado → ConfirmUseDialog (não ShopOverlay)', 
 - Atenção à apropriação cultural
 
 ### 16.5 SEO e App Store
-- Nome: "Olha o Bichim!" (BR) / "Olha o Bichim! — Brazil Animals 2048" (EN)
+- **Lançamento inicial:** Brasil exclusivamente — outros países cobertos em expansão futura
+- Nome: "Olha o Bichim!"
 - Keywords: 2048, puzzle, capivara, animais, brasil, fofo, casual, fauna, bichim
 - Screenshots destacando a Capivara
 - Vídeo de gameplay de 30s
-- Distribuição exclusiva via App Store (iOS) e Play Store (Android)
+- Distribuição via App Store (iOS) e Play Store (Android) — somente região Brasil no lançamento
 
 ---
 
-## 17. Prompt Sugerido para o Claude Code (Fase 2.11 — via skill superpowers)
+## 17. Prompt Sugerido para o Claude Code (Fase 2.12 — via skill superpowers)
 
 > Use a skill `superpowers/brainstorming` pra refinar o design da próxima fase do projeto **Olha o Bichim!** (Flutter, codename `capivara_2048`).
 >
-> **Contexto:** Fase 2.10 concluída (v1.0.0). Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente §6.2, §12.1, §12.4 e §15 — Fase 2.11).
+> **Contexto:** Fase 2.11 concluída (v1.0.1). Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente §4, §9, §10.2, §10.5, §12, §13.3, §13.6 e §15 — Fase 2.12).
 >
-> **Fases concluídas:** 1 a 2.10 (v1.0.0). Áudio na Fase 5. Backend na Fase 3.
+> **Fases concluídas:** 1 a 2.11. Áudio na Fase 5. Backend na Fase 3.
 >
-> **Tópico do brainstorm:** **Fase 2.11 — `ShopOverlay` acessível pelos ícones desabilitados do inventário**. 1 feature nova de UX/monetização.
+> **Tópico do brainstorm:** **Fase 2.12 — Expansão além do 2048: Peixe-boi (4096) e Jacaré (8192) + Ranking Lendas**. Novos tiles, diálogo de escolha ao atingir marcos, anfitrião atualizado e sistema de ranking vitalício.
 >
-> **Três sub-entregas:**
+> **Seis sub-entregas (A a F):**
 >
-> **A — Tap em ícone desabilitado:** adicionar callback `onTapWhenEmpty` ao `InventoryItemButton`; na `InventoryBar`, passar handler que abre a `ShopOverlay`; manter comportamento existente para ícones habilitados.
+> **A — Novos tiles:** adicionar `Animal` nível 12 (Peixe-boi, `#006064`, 4px) e nível 13 (Jacaré, `#1B5E20`, 4px) em `animals_data.dart`. Assets já existem nas pastas.
 >
-> **B — `ShopOverlay`:** overlay rolável sobre o jogo com os 6 pacotes da loja (reutilizando `shopPackagesProvider` e `_ShopPackageCard` da `ShopScreen`), botão X para fechar, botão voltar Android permitido, tabuleiro ao fundo não interativo (`AbsorbPointer`), compra funciona igual à loja comum.
+> **B — Fluxo de vitória:** `VictoryChoiceDialog` exibido ao atingir 2048, 4096 e 8192. 2048 e 4096 oferecem Continuar / Encerrar. 8192 só oferece Encerrar. WillPopScope bloqueia voltar.
 >
-> **C — Pausa do cronômetro:** ao abrir a `ShopOverlay`, chamar `gameNotifier.pause()`; ao fechar, chamar `gameNotifier.resume()`. Garantir que os dois estados não colidem com o `PauseOverlay` existente.
+> **C — Anfitrião:** `highestLevelReached` vai até 13. Capivara como anfitrião ao continuar após 2048, Peixe-boi ao atingir 4096, Jacaré ao atingir 8192.
+>
+> **D — Ranking Lendas:** `timesReached4096` e `timesReached8192` em `PersonalRecords`, `firstReachedAt` para desempate, recompensa única na primeira vez por marco, coleções Firestore `legendsRankings/4096` e `legendsRankings/8192`.
+>
+> **E — Tela de Ranking:** nova aba "Lendas" com dois sub-rankings; mensagem motivacional para quem ainda não atingiu o marco.
+>
+> **F — Tela de Coleção:** Peixe-boi e Jacaré como silhueta até desbloquear; `backgroundBaseColor` `#E0F7FA` e `#E8F5E9` respectivamente.
+>
+> **G — Ranking local + mock global:** ranking pessoal persistido em Hive (top 20 por tempo e por número, sub-tabs na aba Pessoal); `FakeRankingService` com dados mock cobrindo pódio, empates, jogador local fora do top 3 e cronômetro de reset; `rankingRepositoryProvider` com injeção via `kDebugMode` para substituição fácil na Fase 3.
+>
+> **H — Limpeza de Configurações e PauseOverlay:** remover dropdown de idioma EN da `SettingsScreen` (Brasil-only); remover toggle "Reduzir Efeitos Visuais" do `PauseOverlay` e movê-lo para a `SettingsScreen` no card de gameplay, junto ao toggle de haptic.
 >
 > **Pontos abertos pra explorar no brainstorm:**
 >
-> - Sub-entrega B: o `_ShopPackageCard` deve ser extraído de `shop_screen.dart` para um arquivo compartilhado (`shop_package_card.dart`) ou importado diretamente? Qual o impacto em testes e manutenção?
-> - Sub-entrega B: após uma compra bem-sucedida no overlay, o ícone do item comprado na `InventoryBar` deve pulsar brevemente (feedback visual de que o inventário foi atualizado) antes de o jogador fechar o overlay?
-> - Sub-entrega B: deve haver algum destaque visual no pacote mais relevante para o item que o jogador tentou usar? (ex: se tocou no ícone de Bomba 2, o card "Combo Mata Atlântica" fica com borda destacada). Isso é uma melhoria opcional — avaliar complexidade.
-> - Sub-entrega C: se o jogador abre a `ShopOverlay`, compra um item, e imediatamente usa o `PauseButtonTile` (que está bloqueado pelo overlay mas poderia ter race condition) — como garantir que os estados de pausa não entram em conflito?
+> - Sub-entrega B: o cronômetro do ranking é medido apenas até o 2048 — ao continuar, o tempo parou de contar para fins de ranking. Como isso deve ser exibido na UI? O cronômetro na tela congela visualmente ou mostra o tempo registrado?
+> - Sub-entrega B: ao escolher "Continuar" após o 4096 e eventualmente o tabuleiro travar, o fluxo de Game Over funciona normalmente (com itens, sem itens)? Confirmar que não há conflito com o estado `hasWon`.
+> - Sub-entrega D: a recompensa de primeira vez (5 vidas + bombas + desfazer para 4096; 10 de cada para 8192) deve ser entregue imediatamente ao atingir o marco, ou ao encerrar a partida?
+> - Sub-entrega E: o Ranking Lendas deve ter recompensas semanais como o Global, ou é puramente prestígio (sem recompensa periódica)?
 >
-> **Output esperado:** spec detalhada da Fase 2.11 com decisões em cada ponto aberto, arquivos a modificar por sub-entrega, casos de teste obrigatórios, critérios de aceite e plano de validação (360×640, 390×844). Ao final: **prompt de brainstorm da Fase 3** (Backend — próxima grande fase) seguindo este mesmo padrão.
+> **Output esperado:** spec detalhada da Fase 2.12 com decisões em cada ponto aberto, arquivos a modificar por sub-entrega, casos de teste obrigatórios, critérios de aceite e plano de validação. Ao final: **prompt de brainstorm da Fase 3** (Backend).
 >
 > **Não escreva código nesta etapa.**
 
