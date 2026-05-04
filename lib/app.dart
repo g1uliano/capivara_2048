@@ -44,6 +44,12 @@ class _CapivaraAppState extends State<CapivaraApp> {
     precacheImage(const AssetImage('assets/images/inventory/bomb_3.png'), context);
     precacheImage(const AssetImage('assets/images/inventory/undo_1.png'), context);
     precacheImage(const AssetImage('assets/images/inventory/undo_3.png'), context);
+    precacheImage(const AssetImage('assets/images/home/Colecao.png'), context);
+    precacheImage(const AssetImage('assets/images/home/ComoJogar.png'), context);
+    precacheImage(const AssetImage('assets/images/home/Configuracao.png'), context);
+    precacheImage(const AssetImage('assets/images/home/IconeLoja.png'), context);
+    precacheImage(const AssetImage('assets/images/home/Ranking.png'), context);
+    precacheImage(const AssetImage('assets/images/home/Recompensas.png'), context);
   }
 
   @override

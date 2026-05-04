@@ -88,7 +88,7 @@ void main() {
                 context: ctx,
                 itemName: 'Bomba 2',
                 description: 'Remove tiles.',
-                pngPath: 'assets/icons/inventory/bomb_2.png',
+                pngPath: 'assets/images/inventory/bomb_2.png',
               ),
               child: const Text('Open'),
             ),

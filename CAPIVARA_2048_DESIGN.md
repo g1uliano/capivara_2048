@@ -2,9 +2,9 @@
 
 > Documento de especificação para desenvolvimento. Pensado para ser alimentado em ferramentas como Claude Code para implementação iterativa.
 >
-> **Status atual:** Fase 2.11 concluída ✅ (v1.0.1) — Loja em overlay acessível pelos ícones desabilitados do inventário. Fase 2.10 concluída ✅ (v1.0.0). Fases 2.4 a 2.9 também concluídas.
+> **Status atual:** Fase 2.12 concluída ✅ (v1.1.0) + bugfixes até v1.1.4. Todas as fases 2.x concluídas.
 >
-> **Próximo:** **Fase 2.12 — Expansão além do 2048: Peixe-boi (4096) e Jacaré (8192) + Ranking Lendas**
+> **Próximo:** **Fase 2.13 — Redesign da Home + reorganização de assets**
 >
 > **Renomeação do jogo:** o nome do jogo passa de **"Capivara 2048"** para **"Olha o Bichim!"**. As referências antigas em seções abaixo serão atualizadas progressivamente; durante a transição, considere "Olha o Bichim!" o nome canônico do produto. O *codename* interno do repositório (`capivara_2048`) permanece — apenas o nome de exibição muda.
 >
@@ -130,18 +130,35 @@ assets/
 │   ├── title/title_orange.png        ✅ (Fase 2.5)
 │   ├── title/title_brown.png         ✅ (Fase 2.5)
 │   ├── icon/app_icon.png             ✅ (Fase 2.5)
-│   ├── animals/tile/                 ← 11 PNGs ✅
-│   └── animals/host/                 ← 11 PNGs ✅
-├── icons/inventory/                  ← 4 PNGs finais ✅
-│   ├── bomb_2.png   ← Bomba 2 — tema **Sucuri** (verde)
-│   ├── bomb_3.png   ← Bomba 3 — tema **Mico-leão-dourado**
-│   ├── undo_1.png   ← Desfazer 1 — tema **Capivara**
-│   └── undo_3.png   ← Desfazer 3 — tema **Onça-pintada**
+│   ├── animals/tile/                 ← 13 PNGs ✅ (11 originais + PeixeBoi + Jacare)
+│   └── animals/host/                 ← 13 PNGs ✅
+├── images/
+│   ├── fundo.png                     ✅
+│   ├── splash/splash_logo.png        ✅ (Fase 2.9)
+│   ├── title/title_orange.png        ✅ (Fase 2.5)
+│   ├── title/title_brown.png         ✅ (Fase 2.5)
+│   ├── icon/app_icon.png             ✅ (Fase 2.5)
+│   ├── animals/tile/                 ← 13 PNGs ✅
+│   ├── animals/host/                 ← 13 PNGs ✅
+│   ├── home/                         ← 6 PNGs botões da Home (Fase 2.13)
+│   │   ├── Colecao.png
+│   │   ├── ComoJogar.png
+│   │   ├── Configuracao.png
+│   │   ├── IconeLoja.png
+│   │   ├── Ranking.png
+│   │   └── Recompensas.png
+│   └── inventory/                    ← movido de assets/icons/inventory/ (Fase 2.13)
+│       ├── bomb_2.png   ← Bomba 2 — tema **Sucuri** (verde)
+│       ├── bomb_3.png   ← Bomba 3 — tema **Mico-leão-dourado**
+│       ├── undo_1.png   ← Desfazer 1 — tema **Capivara**
+│       └── undo_3.png   ← Desfazer 3 — tema **Onça-pintada**
 ├── sounds/animals/                   ← Fase 5
 ├── sounds/ui/                        ← Fase 5
 ├── music/                            ← Fase 5
 └── fonts/
 ```
+
+> **Nota (Fase 2.13):** a pasta `assets/icons/` foi removida inteiramente. Os ícones de inventário foram movidos para `assets/images/inventory/`. Todos os paths no código que referenciam `assets/icons/inventory/` devem ser atualizados para `assets/images/inventory/`.
 
 ---
 
@@ -376,8 +393,8 @@ class LivesState {
 |---|---|---|
 | **Bomba 2** | Explode 2 casas adjacentes escolhidas | Loja, recompensas |
 | **Bomba 3** | Explode 3 casas escolhidas (categoria separada) | Apenas loja |
-| **Desfazer 1** | Desfaz a última jogada | Loja, recompensas |
-| **Desfazer 3** | Desfaz as últimas 3 jogadas (categoria separada) | Apenas loja |
+| **Desfazer 1** | Desfaz a última jogada — exige ≥1 entrada na pilha de histórico | Loja, recompensas |
+| **Desfazer 3** | Desfaz as últimas 3 jogadas — exige ≥3 entradas na pilha de histórico | Apenas loja |
 
 > **Sem cap de armazenamento:** bombas e desfazer podem ser acumulados sem limite. Apenas vidas têm cap (ver 5.2).
 
@@ -388,16 +405,16 @@ class LivesState {
 - Mostra cada item com **ícone PNG**, **contador (badge)** e **estado**
 - Itens com contador 0 ficam **acinzentados e desabilitados**, mas continuam visíveis
 - **Tamanho dos ícones (Fase 2.9):** ícones aumentados para 72×72dp (era 56×56dp); espaçamento vertical entre tabuleiro e `InventoryBar` reduzido de 12dp para 4dp
-- **Tap em ícone desabilitado (Fase 2.11):** ao tocar em um ícone com contador 0 (acinzentado), em vez de ignorar o toque, abre a `ShopOverlay` diretamente sobre o jogo — permitindo ao jogador comprar o item sem sair da partida. O cronômetro é pausado enquanto o overlay estiver aberto.
+- **Tap em ícone desabilitado (Fase 2.11):** ao tocar em um ícone com contador 0 (acinzentado), em vez de ignorar o toque, abre a `ShopOverlay` diretamente sobre o jogo — permitindo ao jogador comprar o item sem sair da partida. O cronômetro é pausado enquanto o overlay estiver aberto. A partir da v1.1.2, o pacote correspondente ao item tocado é destacado com borda laranja dentro da `ShopOverlay`.
 
 #### Ícones do inventário
-PNGs finais (1024×1024, fundo transparente) em `assets/icons/inventory/`:
+PNGs finais (1024×1024, fundo transparente) em `assets/images/inventory/` (movido de `assets/icons/inventory/` na Fase 2.13):
 - `bomb_2.png` — Bomba 2 casas, tema **Sucuri** (verde, com pavio aceso)
 - `bomb_3.png` — Bomba 3 casas, tema **Mico-leão-dourado**
 - `undo_1.png` — Desfazer 1, tema **Capivara** (segurando relógio com seta de retorno)
 - `undo_3.png` — Desfazer 3, tema **Onça-pintada**
 
-**Visual do botão (Fase 2.9):** o PNG ocupa o slot 72×72dp inteiro — o PNG **é** o botão. Sem fundo verde nem `Material`. Fallback automático para `Material(#4CAF50)` + `Icon` branco se o asset falhar ao carregar.
+**Visual do botão (Fase 2.9 / paths atualizados na Fase 2.13):** o PNG ocupa o slot 72×72dp inteiro — o PNG **é** o botão. Sem fundo verde nem `Material`. Fallback automático para `Material(#4CAF50)` + `Icon` branco se o asset falhar ao carregar.
 
 #### Confirmação universal antes do uso (Fase 2.3.8)
 **TODOS os itens do inventário exigem confirmação antes de serem usados** — exceto quando acionados pela `GameOverItemScreen` ou `GameOverNoItemsOverlay`, onde a confirmação já está embutida no fluxo.
@@ -406,8 +423,15 @@ PNGs finais (1024×1024, fundo transparente) em `assets/icons/inventory/`:
 1. Tap no ícone do item → abre `ConfirmUseDialog`
 2. Cancelar → fecha dialog, nada muda
 3. Usar:
-   - **Desfazer:** executa `gameNotifier.undo(steps)`, animação reversa (300ms), decrementa contador
-   - **Bomba:** entra em modo seleção (`BombSelectionOverlay`) → confirma "Explodir" → animação (500ms), tiles removidos, decrementa contador
+   - **Desfazer:** executa `gameNotifier.undo(steps)`, animação reversa (300ms), decrementa contador. Pode ser usado consecutivamente sem exigir uma jogada nova entre os usos — Desfazer 3 volta 3 jogadas por uso e pode ser repetido enquanto houver histórico suficiente
+   - **Bomba:** entra em modo seleção (`BombSelectionOverlay`) → confirma "Explodir" → animação (500ms), tiles removidos, decrementa contador. Bombas **não geram** entradas no histórico de undo
+
+#### Regras de disponibilidade do Desfazer (v1.1.4)
+- **Histórico de undo:** ilimitado — não há cap artificial de entradas
+- **Desfazer 1:** disponível quando a pilha tem ≥1 entrada
+- **Desfazer 3:** disponível quando a pilha tem ≥3 entradas
+- **Ícone desabilitado por pilha insuficiente:** acinzentado com badge de quantidade visível; ao tocar, exibe dialog `"Ops! 🙈"` explicando que não há jogadas suficientes para desfazer — **não abre a loja**
+- **Bombas:** não afetam nem são afetadas pelo histórico de undo
 
 #### Regras de bombas
 - **Bomba 2:** jogador seleciona 2 tiles à sua escolha para remover do tabuleiro — exibido no `ConfirmUseDialog` como "Selecione 2 tiles para remover do tabuleiro"
@@ -418,6 +442,8 @@ PNGs finais (1024×1024, fundo transparente) em `assets/icons/inventory/`:
 ### 6.3 Game over — resumo dos dois fluxos
 - **Com itens no inventário:** `GameOverItemScreen` com animação piscante (§3.5, Fases 2.9 + 2.10)
 - **Sem itens no inventário:** `GameOverNoItemsOverlay` com oferta de anúncio, compra ou encerramento (§3.6, Fase 2.10)
+
+> **Nota (v1.1.1 / v1.1.2):** ao escolher "Ver anúncio" no `GameOverNoItemsOverlay`, o anúncio apenas contabiliza no limite diário (`adWatchesToday`) e entrega o item sorteado — **sem entregar vida extra**. Comportamento anterior (v1.1.0) entregava vida incorretamente.
 
 ### 6.4 Modelo de dados
 ```dart
@@ -779,13 +805,56 @@ legendsRankings/8192/entries/{userId}   // Fase 2.12
 - **`SplashScreen` Flutter:** executa Hive, `precacheImage`, verificação de login; navega para `HomeScreen` com `Navigator.pushReplacement`
 - **Sem interação:** nenhum tap aceito durante a splash
 
-### 12.3 Tela: Home
-- **Fundo:** `assets/images/fundo.png` — `BoxFit.cover`, fallback `#D4F1DE`
-- `GameTitleImage` alternando entre variante laranja e marrom por sessão (Fase 2.5)
-- **Indicador de vidas** centralizado no topo
-- Botão grande **"Jogar"** (Novo jogo / Continuar partida salva)
-- Cards: Loja, Ranking, Recompensa Diária (com badge vermelho quando disponível), Convidar
-- Ícones menores: Coleção, Configurações, Como Jogar
+### 12.3 Tela: Home (redesenhada na Fase 2.13)
+
+**Referência visual:** `menu.jpeg` na raiz do projeto — seguir fielmente o layout, posicionamento e estilo dos botões ilustrados.
+
+**Fundo:** `assets/images/fundo.png` — `BoxFit.cover`, fallback `#D4F1DE`. Ocupa 100% da tela.
+
+**`LivesIndicator`:** **removido da Home** a partir da Fase 2.13. O indicador de vidas permanece apenas na `GameScreen`.
+
+**Layout geral:**
+```
+Stack (tela cheia, fundo.png)
+└── SafeArea
+    ├── [Superior esquerdo]   Botão ilustrado: Coleção       (Colecao.png)
+    ├── [Superior direito]    Botão ilustrado: Configurações (Configuracao.png)
+    ├── [Centro]              GameTitleImage ("Olha o Bichim!")
+    ├── [Centro-abaixo]       Botão "Continuar Jogo"  (visível apenas se há partida salva)
+    ├── [Centro-abaixo]       Botão "Novo jogo"
+    ├── [Inferior esquerdo]   Botão ilustrado: Recompensas Diárias (Recompensas.png)
+    ├── [Inferior direito]    Botão ilustrado: Ranking              (Ranking.png)
+    ├── [Inferior esq. base]  Botão ilustrado: Loja                 (IconeLoja.png)
+    └── [Inferior dir. base]  Botão ilustrado: Tutorial / Como Jogar (ComoJogar.png)
+```
+
+**Botões ilustrados (6 no total):**
+- Cada botão usa o PNG correspondente de `assets/images/home/` como widget completo (o PNG **é** o botão — `GestureDetector` envolvendo `Image.asset`)
+- Tamanho: ~110×110dp cada (ajustar conforme proporcionalidade visual do `menu.jpeg`)
+- Posicionamento: 4 cantos da tela + 2 na base central-lateral, conforme `menu.jpeg`
+- **Badge vermelho** no botão Recompensas quando há recompensa diária disponível — mesmo comportamento do `DailyRewardEntryTile` anterior, mas agora sobre o PNG do botão (badge posicionado no canto superior direito via `Stack` com `Clip.none`)
+- Animação de tap: scale 1 → 0.92 → 1, 100ms (feedback tátil)
+- **Sem label de texto** abaixo dos botões — o texto já está impresso no próprio PNG
+
+**Botões de ação centrais ("Continuar Jogo" / "Novo jogo"):**
+- Estilo conforme `menu.jpeg`: cápsulas com fundo semi-transparente claro, texto em Fredoka Bold, cor `#3E2723`
+- "Continuar Jogo" exibido apenas quando há `current_game` salvo no Hive; caso contrário apenas "Novo jogo" é exibido
+- Largura: ~260dp, altura: ~52dp, borderRadius: 30dp
+- Sombra suave
+
+**`GameTitleImage`:**
+- Mantém a lógica de alternância entre `title_orange.png` e `title_brown.png` por sessão (Fase 2.5)
+- Posicionada centralmente, acima dos botões de ação
+
+**Navegação de cada botão:**
+| Botão PNG | Destino |
+|---|---|
+| `Colecao.png` | `CollectionScreen` |
+| `Configuracao.png` | `SettingsScreen` |
+| `Recompensas.png` | `DailyRewardsScreen` |
+| `Ranking.png` | `RankingScreen` |
+| `IconeLoja.png` | `ShopScreen` |
+| `ComoJogar.png` | `TutorialScreen` |
 
 ### 12.4 Tela: Jogo (layout Fase 2.3.12; InventoryBar Fase 2.9)
 **Layout (de cima pra baixo):**
@@ -951,9 +1020,11 @@ class GameState {
   final int? wonAtLevel;             // 11, 12 ou 13 — nível atingido que gerou a vitória
   final DateTime? startedAt;
   final Duration elapsed;
-  final List<GameState> undoStack;   // últimos N estados (N=3 atende Desfazer 3)
+  final List<GameState> undoStack;   // histórico ilimitado (v1.1.4 — removido cap artificial de 3)
 }
 ```
+
+> **Nota (v1.1.4):** o `undoStack` antes era artificialmente limitado a 3 entradas para atender o Desfazer 3. O limite foi removido — o histórico agora é ilimitado. A disponibilidade de cada item é verificada no momento do uso: Desfazer 1 exige `undoStack.length >= 1`; Desfazer 3 exige `undoStack.length >= 3`.
 
 ### 13.4 LivesState (Hive, typeId: 1)
 | Campo | Tipo | Descrição |
@@ -1054,7 +1125,7 @@ class ShareCode {
 | `personal_records` | PersonalRecords |
 | `personal_ranking` | PersonalRankingState — top 20 entradas por tempo e por número (Fase 2.12) |
 | `daily_streak` | int + lastClaimDate |
-| `unlocked_animals` | List<int> (níveis vistos) |
+| `unlocked_animals` | `highestLevelEver` (int) — maior nível já atingido em qualquer partida, persistido permanentemente; determina quais animais aparecem desbloqueados na Coleção (v1.1.0) |
 | `settings.sound_volume` | double 0–1 |
 | `settings.music_volume` | double 0–1 |
 | `settings.haptic_enabled` | bool |
@@ -1151,437 +1222,251 @@ class ShareCode {
 
 ---
 
-### 🔜 Fase 2.12 — Expansão além do 2048: Peixe-boi (4096) e Jacaré (8192) + Ranking Lendas
-
-**Objetivo:** expandir o jogo para além do tile 2048, adicionando dois novos animais lendários (Peixe-boi 4096 e Jacaré 8192), o diálogo de escolha ao atingir cada marco, e um novo sistema de ranking vitalício baseado em vezes que o jogador atingiu esses marcos raros.
-
-**Estimativa:** 2–3 dias.
-
----
-
-#### A — Novos tiles e animais
-
-**Dois novos níveis adicionados à tabela de animais:**
-
-| Nível | Valor | Animal | Justificativa | Cor (contorno) | PNG tile | PNG host |
-|---|---|---|---|---|---|---|
-| 12 | 4096 | **🌊 Peixe-boi Lendário** | Gentil gigante das águas amazônicas, espécie ameaçada | `#006064` (azul-petróleo) | `tile/PeixeBoi.png` | `host/PeixeBoi.png` |
-| 13 | 8192 | **🐊 Jacaré Supremo** | Predador ancestral, símbolo de resistência e raridade | `#1B5E20` (verde militar) | `tile/Jacare.png` | `host/Jacare.png` |
-
-> Os arquivos `PeixeBoi.png` e `Jacare.png` já existem nas pastas `assets/images/animals/tile/` e `assets/images/animals/host/` respectivamente.
-
-**Visual dos tiles lendários:**
-- Seguem o mesmo padrão visual dos demais tiles (fundo branco, marca d'água, número em Fredoka Bold `#3E2723`)
-- Contorno mais espesso: **4px** (em vez de 3px dos outros) para distinguir visualmente a raridade
-- Sombra levemente mais intensa para dar peso visual
-
-**Atualização em `animals_data.dart`:** adicionar os dois novos `Animal` à lista, com `level: 12`, `level: 13`, cores e caminhos de PNG corretos.
+### ✅ Fase 2.12 — Expansão além do 2048: Peixe-boi (4096) e Jacaré (8192) + Ranking Lendas (v1.1.0)
+- **A** — Peixe-boi (nível 12, 4096, `#006064`, 4px) e Jacaré (nível 13, 8192, `#1B5E20`, 4px) adicionados
+- **B** — `VictoryChoiceDialog` ao atingir 2048, 4096 e 8192; 8192 é teto definitivo
+- **C** — Anfitrião atualizado: `highestLevelReached` vai até 13
+- **D** — Ranking Lendas: `timesReached4096`, `timesReached8192`, `firstReachedAt`, recompensa única por marco
+- **E** — Aba Lendas na `RankingScreen`
+- **F** — Peixe-boi e Jacaré na `CollectionScreen`; desbloqueio permanente via `highestLevelEver` (Hive)
+- **G** — Ranking pessoal local (Hive, top 20); `FakeRankingService` mock; `rankingRepositoryProvider`
+- **H** — Dropdown de idioma EN removido das Configurações; toggle "Reduzir Efeitos Visuais" movido do `PauseOverlay` para Configurações
 
 ---
 
-#### B — Fluxo ao atingir 2048, 4096 e 8192
+### ✅ v1.1.1 — Correção do fluxo de anúncio no Game Over
+- Ao assistir anúncio para ganhar item no `GameOverNoItemsOverlay`, o fluxo agora apenas contabiliza o anúncio no limite diário (`adWatchesToday`) e entrega o item sorteado — sem entregar vida extra (comportamento incorreto anterior)
 
-**Regra geral:** ao formar um tile de valor 2048, 4096 ou 8192, o jogo não encerra automaticamente. Em vez disso, exibe um diálogo de escolha. A partida só encerra se o jogador escolher "Encerrar".
+### ✅ v1.1.2 — ShopOverlay: destaque de item e seção de itens avulsos
+- `ShopOverlay` passa a exibir a seção "Itens avulsos" igual à loja principal
+- Ao abrir a `ShopOverlay` via tap em ícone desabilitado, o pacote correspondente ao item tocado é destacado com borda laranja
 
-**Ao atingir 2048 (Capivara Lendária — nível 11):**
+### ✅ v1.1.3 — Legibilidade da RankingScreen
+- `TabBar` "Por Tempo / Por Pontuação": fundo verde + texto branco para legibilidade sobre o `GameBackground`
+- Texto de estado vazio usa `OutlinedText` (branco com contorno preto)
 
-1. Animação especial do merge da Capivara (flash dourado, partículas de folhas, zoom out, 1500ms) — igual ao comportamento atual
-2. Cronômetro para
-3. Exibe `VictoryChoiceDialog`:
-   ```
-   🎉 Você chegou à Capivara Lendária!
-   "A fofura chegou ao seu limite... ou chegou?"
-
-   [Continuar até o Peixe-boi (4096)]   [Encerrar e salvar resultado]
-   ```
-4. **Encerrar:** registra o resultado (tempo, pontuação), exibe modal de resultado final, consome lógica normal de fim de partida
-5. **Continuar:** o cronômetro **não retoma** — passa a contar a partir de zero para o trecho 2048→4096; ou mantém o cronômetro parado e registra apenas a pontuação como critério. *(Decisão de implementação: o cronômetro do ranking é medido apenas até o 2048 — após isso, a partida continua mas o tempo do ranking já foi registrado)*
-
-**Ao atingir 4096 (Peixe-boi Lendário — nível 12):**
-
-1. Animação especial do merge do Peixe-boi: **onda azul** + partículas de água + zoom out, 1500ms
-2. Exibe `VictoryChoiceDialog`:
-   ```
-   🌊 Você chegou ao Peixe-boi Lendário!
-   "As águas da Amazônia nunca foram tão fundas..."
-
-   [Continuar até o Jacaré (8192)]   [Encerrar e salvar resultado]
-   ```
-3. Registra no **Ranking Lendas — 4096**: incrementa `timesReached4096` do jogador em +1
-4. **Encerrar:** modal de resultado final
-5. **Continuar:** partida segue
-
-**Ao atingir 8192 (Jacaré Supremo — nível 13):**
-
-1. Animação especial do merge do Jacaré: **explosão verde escura** + partículas de folha + tremor de tela (vibração haptic longa), 2000ms
-2. Registra no **Ranking Lendas — 8192**: incrementa `timesReached8192` do jogador em +1
-3. Exibe `VictoryChoiceDialog` **sem opção de continuar** — 8192 é o teto definitivo:
-   ```
-   🐊 Você chegou ao Jacaré Supremo!
-   "O predador ancestral foi despertado. Não há mais além."
-
-   [Encerrar — você é uma lenda]
-   ```
-4. Modal de resultado final exibido automaticamente após o jogador tocar o botão
-
-**`VictoryChoiceDialog` — especificação visual:**
-- Overlay sobre o jogo (não nova rota)
-- Fundo: card branco semi-opaco (`Colors.white.withOpacity(0.95)`), borderRadius 24, padding 28
-- Ícone do animal atingido: PNG 100×100dp com animação de bounce de entrada
-- Título: Fredoka Bold 24, `#3E2723`
-- Subtítulo: Nunito italic 15, `Colors.grey[600]`
-- Botão primário "Continuar": `ElevatedButton`, cor do contorno do animal (azul-petróleo para Peixe-boi, verde-militar para Jacaré), largura total
-- Botão secundário "Encerrar": `OutlinedButton`, cinza, largura total
-- Botão voltar Android: **bloqueado** enquanto o diálogo estiver aberto (`WillPopScope` retorna false)
+### ✅ v1.1.4 — Mecânica de Desfazer corrigida
+- Itens Desfazer 1 e Desfazer 3 podem ser usados consecutivamente sem exigir jogada nova entre os usos
+- Desfazer 3 pode ser usado N vezes seguidas (voltando 3 jogadas por uso) enquanto houver histórico suficiente
+- Histórico de undo passou a ser ilimitado — cap artificial de 3 entradas removido
+- Desfazer 1 exige ≥1 entrada na pilha; Desfazer 3 exige ≥3 entradas na pilha
+- Ícone Desfazer com pilha insuficiente: acinzentado com badge visível; tap exibe dialog `"Ops! 🙈"` — não abre a loja
+- Bombas não geram entradas no histórico de undo (comportamento mantido)
 
 ---
 
-#### C — Anfitrião ao continuar além do 2048
+---
 
-- Ao continuar após o 2048: o anfitrião passa a ser a **Capivara** (nível 11) e permanece assim até o jogador formar o tile de Peixe-boi
-- Ao formar o Peixe-boi: o anfitrião muda para o **Peixe-boi** (nível 12)
-- Ao continuar após o 4096: o anfitrião permanece o Peixe-boi até o Jacaré ser formado
-- Ao formar o Jacaré: o anfitrião muda para o **Jacaré** (nível 13)
-- O `highestLevelReached` em `GameState` agora vai até 13
+### 🔜 Fase 2.13 — Redesign da Home + reorganização de assets (v1.2.0)
+
+**Objetivo:** implementar o novo visual da Home com os botões ilustrados PNG, remover o `LivesIndicator` da Home, e reorganizar a estrutura de assets eliminando a pasta `assets/icons/` e movendo os ícones de inventário para `assets/images/inventory/`.
+
+**Estimativa:** 1–2 dias.
 
 ---
 
-#### D — Ranking Lendas (novo — vitalício)
+#### A — Reorganização de assets
 
-**Dois novos sub-rankings permanentes, separados do ranking global semanal:**
+**Objetivo:** consolidar todos os assets visuais sob `assets/images/`, eliminando a pasta `assets/icons/` que ficou isolada.
 
-**Ranking Lendas 4096:**
-- Métrica: número de vezes que o jogador atingiu 4096 em qualquer partida
-- Persistência: **vitalício** — nunca reseta
-- Desempate: quem atingiu primeiro (menor `firstReachedAt`) fica à frente em caso de empate no contador
-- Exibição: lista paginada, sem pódio destacado (diferente do ranking global)
+**Mudanças no `pubspec.yaml`:**
+```yaml
+# Remover:
+- assets/icons/inventory/
 
-**Ranking Lendas 8192:**
-- Métrica: número de vezes que o jogador atingiu 8192 em qualquer partida
-- Persistência: **vitalício** — nunca reseta
-- Desempate: mesma regra — quem atingiu primeiro fica à frente no empate
-- Exibição: lista paginada
-
-**Recompensas ao atingir marcos (única vez por jogador — não por vezes atingidas):**
-
-| Marco | Recompensa (entregue na primeira vez) |
-|---|---|
-| Primeira vez que atinge 4096 | 5 vidas + 5 bombas + 5 desfazer |
-| Primeira vez que atinge 8192 | 10 vidas + 10 bombas + 10 desfazer |
-
-> Nas vezes subsequentes, não há recompensa adicional — o incentivo é a posição no ranking.
-
-**Atualização em `PersonalRecords`:**
-```dart
-class PersonalRecords {
-  final int? bestTimeMs;
-  final int bestNumber;           // maior número já atingido (2048, 4096 ou 8192)
-  final int totalGames;
-  final int totalWins;            // vezes que atingiu 2048 ou mais
-  final int timesReached4096;     // novo
-  final int timesReached8192;     // novo
-  final DateTime? firstReached4096At;   // novo — para desempate
-  final DateTime? firstReached8192At;   // novo — para desempate
-}
+# Adicionar:
+- assets/images/inventory/
+- assets/images/home/
 ```
 
-**Atualização no modelo Firestore:**
+**Arquivos a mover (renomear path, não o arquivo):**
 ```
-legendsRankings/4096/entries/{userId}
-  - userId: string
-  - displayName: string
-  - timesReached: int
-  - firstReachedAt: timestamp
-  - country: string?
+assets/icons/inventory/bomb_2.png  →  assets/images/inventory/bomb_2.png
+assets/icons/inventory/bomb_3.png  →  assets/images/inventory/bomb_3.png
+assets/icons/inventory/undo_1.png  →  assets/images/inventory/undo_1.png
+assets/icons/inventory/undo_3.png  →  assets/images/inventory/undo_3.png
+```
 
-legendsRankings/8192/entries/{userId}
-  - userId: string
-  - displayName: string
-  - timesReached: int
-  - firstReachedAt: timestamp
-  - country: string?
+**Novos assets já existentes para registrar:**
 ```
+assets/images/home/Colecao.png
+assets/images/home/ComoJogar.png
+assets/images/home/Configuracao.png
+assets/images/home/IconeLoja.png
+assets/images/home/Ranking.png
+assets/images/home/Recompensas.png
+```
+
+**Busca e substituição de paths no código:**
+- Buscar: `assets/icons/inventory/`
+- Substituir por: `assets/images/inventory/`
+- Arquivos afetados: `inventory_item_button.dart`, `confirm_use_dialog.dart`, `game_over_item_screen.dart`, `game_over_no_items_overlay.dart`, `fake_ranking_service.dart` e qualquer outro que referencie os ícones de inventário
+
+**Deletar após mover:**
+- Pasta `assets/icons/inventory/` (agora vazia)
+- Pasta `assets/icons/` (agora vazia)
+
+**Atualizar `precacheImage` na `SplashScreen`:** adicionar os 6 PNGs de `home/` e os 4 de `inventory/` (com novo path) à lista de pre-cache.
 
 ---
 
-#### E — Atualização da tela de Ranking
+#### B — Redesign da `HomeScreen`
 
-A tela de Ranking recebe uma nova aba:
+**Referência visual obrigatória:** `menu.jpeg` na raiz do projeto. Seguir fielmente o posicionamento, proporções e estilo de todos os elementos.
 
-```
-Tabs: [Global Semanal] | [Pessoal] | [Lendas]
-```
+**Arquivo a modificar:** `lib/presentation/screens/home/home_screen.dart`
 
-**Aba Lendas:**
-- Dois sub-rankings exibidos em sequência (com separador visual): **4096 — Peixe-boi** e **8192 — Jacaré**
-- Cada sub-ranking: lista paginada com posição, nome do jogador, número de vezes atingidas e data da primeira vez
-- Sem reset — exibe dados históricos
-- Se o jogador ainda não atingiu o marco, exibe mensagem motivacional: `"Você ainda não chegou aqui. Continue jogando!"`
+**Remover da `HomeScreen`:**
+- `LivesIndicator` (widget e import) — não aparece mais na Home
+- Cards antigos de grid (Loja, Ranking, Recompensa, Convidar)
+- Qualquer `DailyRewardEntryTile` com badge (o badge migra para o botão PNG de Recompensas)
 
----
-
-#### F — Atualização da tela de Coleção
-
-Os dois novos animais entram na `CollectionScreen`:
-- Aparecem como silhueta até o jogador atingir o respectivo tile pela primeira vez
-- Ao desbloquear: card com `backgroundBaseColor` derivado da cor de contorno do animal
-- Peixe-boi: `backgroundBaseColor = Color(0xFFE0F7FA)` (azul bem claro)
-- Jacaré: `backgroundBaseColor = Color(0xFFE8F5E9)` (verde bem claro)
-
----
-
-#### G — Ranking local (Hive) + mock do ranking global para validação de layout
-
-**Objetivo:** implementar o ranking pessoal completo com persistência local via Hive e criar dados mock suficientes para o ranking global, permitindo validar todo o layout da `RankingScreen` — incluindo pódio, lista paginada, aba Lendas e cronômetro de reset — sem depender do backend real (Fase 3).
-
----
-
-**G1 — Ranking pessoal local (Hive)**
-
-O ranking pessoal já tem o modelo em `PersonalRecords`. O que falta é a **lista de melhores tempos** e **lista de maiores números** registrados localmente, exibíveis na aba "Pessoal" da `RankingScreen`.
-
-Novo Hive box: `personal_ranking` (typeId: 4)
+**Novo layout da `HomeScreen`:**
 
 ```dart
-class PersonalRankingEntry {
-  final int scoreMs;          // tempo em ms até o 2048 (null se não completou)
-  final int bestNumber;       // maior número atingido nessa partida
-  final DateTime playedAt;
-}
+Scaffold(
+  body: Stack(
+    children: [
+      // 1. Fundo
+      GameBackground(), // fundo.png, BoxFit.cover
 
-class PersonalRankingState {
-  final List<PersonalRankingEntry> entries;  // máximo 20 entradas — as melhores
-}
+      // 2. Conteúdo
+      SafeArea(
+        child: Stack(
+          children: [
+            // Canto superior esquerdo
+            Positioned(top: 8, left: 8,
+              child: _HomeButton('assets/images/home/Colecao.png',
+                                 onTap: () => nav(CollectionScreen))),
+
+            // Canto superior direito
+            Positioned(top: 8, right: 8,
+              child: _HomeButton('assets/images/home/Configuracao.png',
+                                 onTap: () => nav(SettingsScreen))),
+
+            // Centro — título + botões de ação
+            Center(
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                GameTitleImage(),
+                SizedBox(height: 32),
+                if (hasCurrentGame) _ActionButton('Continuar Jogo',
+                                                   onTap: () => continueGame()),
+                SizedBox(height: 12),
+                _ActionButton('Novo jogo', onTap: () => newGame()),
+              ]),
+            ),
+
+            // Inferior esquerdo — Recompensas (com badge)
+            Positioned(bottom: 80, left: 8,
+              child: _HomeButtonWithBadge(
+                'assets/images/home/Recompensas.png',
+                showBadge: dailyRewardAvailable,
+                onTap: () => nav(DailyRewardsScreen))),
+
+            // Inferior direito — Ranking
+            Positioned(bottom: 80, right: 8,
+              child: _HomeButton('assets/images/home/Ranking.png',
+                                 onTap: () => nav(RankingScreen))),
+
+            // Base esquerda — Loja
+            Positioned(bottom: 8, left: 8,
+              child: _HomeButton('assets/images/home/IconeLoja.png',
+                                 onTap: () => nav(ShopScreen))),
+
+            // Base direita — Tutorial
+            Positioned(bottom: 8, right: 8,
+              child: _HomeButton('assets/images/home/ComoJogar.png',
+                                 onTap: () => nav(TutorialScreen))),
+          ],
+        ),
+      ),
+    ],
+  ),
+)
 ```
 
-**Lógica de inserção:**
-- Ao encerrar uma partida (por vitória ou desistência), criar um `PersonalRankingEntry` e inserir
-- Manter apenas as 20 melhores entradas ordenadas por `scoreMs` (menor é melhor para tempo; null vai ao final)
-- Para maior número: ordenar por `bestNumber` decrescente, também top 20
+> **Nota de posicionamento:** os valores exatos de `top`, `bottom`, `left`, `right` devem ser calibrados contra `menu.jpeg` em dispositivos 390×844dp e 360×640dp. O pseudocódigo acima é estrutural — ajustar na implementação.
 
-**Exibição na aba "Pessoal" da `RankingScreen`:**
-```
-Sub-tab: [Melhor tempo] | [Maior número]
-
-Melhor tempo:
-  Posição | Tempo     | Maior nº  | Data
-  1º      | 04:32     | 2048      | 02/05/2026
-  2º      | 05:11     | 2048      | 30/04/2026
-  ...
-
-Maior número:
-  Posição | Maior nº  | Tempo     | Data
-  1º      | 8192      | —         | 01/05/2026
-  2º      | 4096      | —         | 28/04/2026
-  ...
+**`_HomeButton` widget:**
+```dart
+// GestureDetector com animação de scale
+// Image.asset(path, width: 110, height: 110, fit: BoxFit.contain)
+// onTap: scale 1→0.92→1, 100ms + HapticFeedback.lightImpact()
 ```
 
-- Se o jogador ainda não tem nenhuma entrada: exibe `"Jogue sua primeira partida para aparecer aqui!"`
-- A entrada do jogador atual é sempre destacada (fundo levemente colorido) mesmo que esteja fora do top 20
+**`_HomeButtonWithBadge` widget:**
+```dart
+// Stack com _HomeButton + badge condicional
+// Badge: círculo vermelho #EF5350, 14dp, posicionado Positioned(top: -4, right: -4)
+// Clip.none para o badge extrapolar sem afetar o tamanho do pai
+```
+
+**`_ActionButton` widget:**
+```dart
+// Container com borderRadius 30, fundo Colors.white.withOpacity(0.80)
+// Texto: Fredoka Bold 20, cor #3E2723
+// Largura: 260dp, altura: 52dp
+// Sombra: BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0,3))
+// onTap: scale 1→0.95→1, 100ms
+```
 
 ---
 
-**G2 — Mock do ranking global para validação de layout**
-
-Criar um `FakeRankingService` que fornece dados estáticos simulando um ranking global real, usado exclusivamente em dev (`kDebugMode`). Em produção (Fase 3), esse serviço é substituído pela integração Firestore.
-
-Arquivo novo: `lib/core/utils/fake_ranking_service.dart`
+#### Casos de teste obrigatórios
 
 ```dart
-class FakeRankingService {
-  // Retorna lista de entradas mock para o ranking global semanal (melhor tempo)
-  static List<GlobalRankingEntry> globalBestTime() => [
-    GlobalRankingEntry(userId: 'u1', displayName: 'CapyMaster', bestTimeMs: 182000, bestNumber: 2048),
-    GlobalRankingEntry(userId: 'u2', displayName: 'JacaréPro', bestTimeMs: 195000, bestNumber: 4096),
-    GlobalRankingEntry(userId: 'u3', displayName: 'PeixeBoi42', bestTimeMs: 201000, bestNumber: 2048),
-    // ... 10 entradas no total para pódio + lista
-  ];
+// home_screen_test.dart
+testWidgets('HomeScreen não contém LivesIndicator', ...)
+testWidgets('6 botões ilustrados presentes no widget tree', ...)
+testWidgets('GameTitleImage presente', ...)
+testWidgets('botão "Continuar Jogo" visível apenas quando há partida salva', ...)
+testWidgets('botão "Novo jogo" sempre visível', ...)
+testWidgets('badge de recompensa visível quando dailyRewardAvailable == true', ...)
+testWidgets('badge de recompensa ausente quando dailyRewardAvailable == false', ...)
+testWidgets('tap em Coleção navega para CollectionScreen', ...)
+testWidgets('tap em Configurações navega para SettingsScreen', ...)
+testWidgets('tap em Recompensas navega para DailyRewardsScreen', ...)
+testWidgets('tap em Ranking navega para RankingScreen', ...)
+testWidgets('tap em Loja navega para ShopScreen', ...)
+testWidgets('tap em Tutorial navega para TutorialScreen', ...)
 
-  // Retorna lista mock para o ranking global (maior número)
-  static List<GlobalRankingEntry> globalBestNumber() => [...];
+// inventory_item_button_test.dart (regressão de path)
+testWidgets('ícones de inventário carregam de assets/images/inventory/', ...)
 
-  // Retorna lista mock para Ranking Lendas 4096
-  static List<LegendsRankingEntry> legends4096() => [
-    LegendsRankingEntry(userId: 'u2', displayName: 'JacaréPro', timesReached: 3, firstReachedAt: DateTime(2026, 4, 1)),
-    LegendsRankingEntry(userId: 'u5', displayName: 'Tucano77', timesReached: 3, firstReachedAt: DateTime(2026, 4, 5)),
-    // empate proposital para testar o comportamento de mesma posição
-  ];
-
-  // Retorna lista mock para Ranking Lendas 8192
-  static List<LegendsRankingEntry> legends8192() => [...];
-
-  // Simula o timer de reset: retorna DateTime de quando o próximo reset ocorre
-  static DateTime nextResetAt() => DateTime.now().add(const Duration(hours: 72));
-}
-```
-
-**Dados mock devem cobrir os seguintes casos de layout:**
-- Pódio com 1º, 2º e 3º lugares distintos
-- Pelo menos 1 empate no Ranking Lendas (mesma posição)
-- O jogador local (`userId == localUserId`) aparece em pelo menos uma das listas, em posição que não seja top 3, para testar o destaque de "sua posição"
-- Uma entrada com `bestNumber: 4096` e outra com `bestNumber: 8192` no ranking global
-
-**Integração na `RankingScreen`:**
-- Em `kDebugMode`: usar `FakeRankingService` para popular as abas Global e Lendas
-- Em produção: `RankingScreen` receberá dados do Firestore (Fase 3) — o ponto de injeção deve ser via provider para facilitar a troca
-- Criar `rankingProvider` (ou `rankingNotifier`) que em dev retorna dados do `FakeRankingService` e em produção será conectado ao Firestore
-
-```dart
-// Estrutura sugerida para facilitar a substituição na Fase 3:
-final rankingRepositoryProvider = Provider<RankingRepository>((ref) {
-  if (kDebugMode) return FakeRankingRepository();
-  return FirestoreRankingRepository(); // implementado na Fase 3
-});
-```
-
-**Cronômetro de reset na aba Global:**
-- Exibe contador regressivo até o próximo sábado às 18:00 (Brasília)
-- Em dev: usar `FakeRankingService.nextResetAt()` como data alvo
-- Formato: `"Reinicia em 2d 14h 32m"` — atualizado a cada minuto
-
----
-
-**Casos de teste adicionais (G):**
-
-```dart
-// personal_ranking_test.dart
-testWidgets('entrada adicionada ao encerrar partida', ...)
-testWidgets('máximo de 20 entradas mantido — pior resultado é descartado', ...)
-testWidgets('aba Pessoal exibe sub-tabs Melhor tempo e Maior número', ...)
-testWidgets('entry do jogador atual destacada na lista', ...)
-testWidgets('sem partidas → exibe mensagem motivacional', ...)
-
-// fake_ranking_service_test.dart
-testWidgets('FakeRankingService.globalBestTime retorna 10 entradas ordenadas', ...)
-testWidgets('FakeRankingService.legends4096 contém pelo menos 1 empate', ...)
-testWidgets('nextResetAt retorna data futura', ...)
-
-// ranking_screen_test.dart (adicionais)
-testWidgets('aba Global exibe pódio com 1º, 2º, 3º', ...)
-testWidgets('aba Global exibe cronômetro de reset', ...)
-testWidgets('aba Global exibe posição do jogador local destacada', ...)
-testWidgets('aba Lendas exibe empate com mesma posição para dois jogadores', ...)
-testWidgets('em kDebugMode, dados vêm do FakeRankingService', ...)
+// splash_screen_test.dart (regressão de precache)
+testWidgets('precacheImage inclui assets/images/home/ e assets/images/inventory/', ...)
 ```
 
 ---
 
----
+#### Ordem de execução recomendada
 
-#### H — Configurações: remover idioma EN + mover "Reduzir Efeitos Visuais" do PauseOverlay
-
-**Objetivo:** duas limpezas de UI nas Configurações e no menu de pausa, alinhadas ao escopo Brasil-only e à organização lógica das opções do jogo.
-
----
-
-**H1 — Remover opção de idioma inglês da `SettingsScreen`**
-
-O dropdown de idioma atualmente oferece "Português (BR)" e "English". Como o jogo será lançado exclusivamente no Brasil, a opção EN deve ser removida.
-
-**Mudanças:**
-- Em `settings_screen.dart`: remover o `DropdownButton` de idioma inteiramente — ou, se preferível para facilitar expansão futura, manter o widget mas com apenas uma opção visível ("Português (BR)") e desabilitado, com label "Apenas PT-BR disponível no momento"
-- **Decisão de implementação recomendada:** remover o dropdown completamente por enquanto. Quando a expansão de idiomas for implementada (Fase 6), o widget é readicionado
-- Em `lib/core/constants/` ou onde estiver a lista de locales suportados: remover `en_US` da lista de opções
-- A chave `settings.locale` no Hive permanece — apenas não há mais UI para alterá-la
-- Garantir que o app sempre inicializa com `pt_BR` independentemente de qualquer valor salvo em `settings.locale` que possa ser `en_US` de builds anteriores
-
-**Arquivos modificados:**
-- `lib/presentation/screens/settings/settings_screen.dart`
-- `lib/core/constants/supported_locales.dart` (ou equivalente)
+1. **A primeiro** (reorganização de assets) — mover arquivos, atualizar `pubspec.yaml`, busca e substituição de paths; rodar `flutter pub get` e confirmar que não há erros de asset missing
+2. **B** (redesign da `HomeScreen`) — implementar novo layout com base em `menu.jpeg`
+3. Rodar todos os testes — garantir 0 falhas incluindo regressões de path
 
 ---
 
-**H2 — Mover "Reduzir Efeitos Visuais" do `PauseOverlay` para a `SettingsScreen`**
-
-Atualmente o `PauseOverlay` (menu exibido ao pausar o jogo) tem uma opção "Reduzir Efeitos Visuais" (toggle). Ela deve ser removida do overlay de pausa e adicionada à tela de Configurações, junto com os demais toggles de sistema.
-
-**Justificativa:** o menu de pausa deve conter apenas ações rápidas de partida (Continuar, Reiniciar, Menu). Opções de preferências visuais pertencem às Configurações, onde o jogador as acessa fora da partida.
-
-**Mudanças no `PauseOverlay`:**
-- Remover o `SwitchListTile` ou `CheckboxListTile` de "Reduzir Efeitos Visuais"
-- O overlay fica mais limpo: apenas os três botões de ação (Continuar, Reiniciar, Menu)
-- Nenhuma outra alteração no layout do overlay
-
-**Mudanças na `SettingsScreen`:**
-- Adicionar toggle "Reduzir Efeitos Visuais" dentro do card de configurações de gameplay (junto com o toggle de haptic)
-- Label: `"Reduzir Efeitos Visuais"`
-- Sub-label: `"Desativa animações complexas para melhor desempenho"`
-- Implementado como `SwitchListTile` dentro do card branco semi-opaco existente (`Colors.white.withOpacity(0.88)`, borderRadius 12)
-- O valor é lido/gravado via o mesmo provider/Hive key que já existia (`settings.reduce_motion` ou equivalente)
-
-**Atualização em `14.1` (Hive):** a chave `settings.reduce_motion` (ou o nome atual) já deve existir — apenas muda de onde é controlada na UI.
-
-**Arquivos modificados:**
-- `lib/presentation/widgets/pause_overlay.dart` — remover o toggle
-- `lib/presentation/screens/settings/settings_screen.dart` — adicionar o toggle no card de gameplay
-
----
-
-**Casos de teste (H):**
-
-```dart
-// settings_screen_test.dart
-testWidgets('dropdown de idioma não está presente na SettingsScreen', ...)
-testWidgets('toggle "Reduzir Efeitos Visuais" presente na SettingsScreen', ...)
-testWidgets('toggle "Reduzir Efeitos Visuais" lê e grava valor correto no provider', ...)
-
-// pause_overlay_test.dart
-testWidgets('PauseOverlay não contém toggle "Reduzir Efeitos Visuais"', ...)
-testWidgets('PauseOverlay contém apenas Continuar, Reiniciar e Menu', ...)
-```
-
----
-
-**Atualização da ordem de execução recomendada:**
-
-1. **H** (limpeza de Configurações e PauseOverlay) — rápido, sem dependências, bom para começar
-2. **A** (novos tiles) — adicionar os dois `Animal` em `animals_data.dart`; verificar galeria de debug
-3. **C** (anfitrião) — `highestLevelReached` max 13, lógica do `HostBanner`
-4. **B** (fluxo de vitória) — criar `VictoryChoiceDialog`, integrar na `GameScreen`
-5. **D** (Ranking Lendas) — modelo de dados + lógica de incremento + recompensas
-6. **G1** (ranking pessoal local) — Hive box, lógica de inserção, aba Pessoal completa
-7. **G2** (mock global) — `FakeRankingService`, `rankingRepositoryProvider`, layout completo da `RankingScreen`
-8. **E** (aba Lendas na RankingScreen) — integrada ao layout já construído em G2
-9. **F** (tela de Coleção) — dois novos cards
-
----
-
-**Atualização dos critérios de aceite:**
+#### Critérios de aceite da Fase 2.13
 
 | Item | Critério |
 |---|---|
-| Tiles | Peixe-boi (4096) e Jacaré (8192) renderizam com PNG, cor de contorno e contorno 4px |
-| Tiles | Animais aparecem corretamente na galeria de debug |
-| Fluxo 2048 | Ao atingir 2048: animação + diálogo com opções Continuar / Encerrar |
-| Fluxo 4096 | Ao atingir 4096: animação de onda azul + diálogo com opções Continuar / Encerrar |
-| Fluxo 8192 | Ao atingir 8192: animação verde + tremor haptic + diálogo com apenas Encerrar |
-| Fluxo 8192 | 8192 é o teto — não há opção de continuar |
-| Anfitrião | Capivara vira anfitrião ao continuar após 2048 |
-| Anfitrião | Peixe-boi vira anfitrião ao atingir 4096 |
-| Anfitrião | Jacaré vira anfitrião ao atingir 8192 |
-| Ranking Lendas | `timesReached4096` e `timesReached8192` incrementam corretamente |
-| Ranking Lendas | `firstReachedAt` registrado apenas na primeira vez |
-| Ranking Lendas | Recompensa de primeira vez entregue apenas 1× por marco |
-| Ranking Lendas | Aba Lendas visível na `RankingScreen` com dados mock |
-| Ranking Lendas | Empate exibido com mesma posição; desempate por `firstReachedAt` |
-| Ranking Pessoal | Entradas salvas localmente no Hive ao encerrar partida |
-| Ranking Pessoal | Sub-tabs Melhor tempo e Maior número funcionando |
-| Ranking Pessoal | Jogador local destacado na lista |
-| Ranking Pessoal | Máximo de 20 entradas mantido |
-| Ranking Global (mock) | Pódio com 3 colocações distintas renderizado |
-| Ranking Global (mock) | Cronômetro de reset exibindo contagem regressiva |
-| Ranking Global (mock) | Posição do jogador local destacada fora do pódio |
-| Ranking Global (mock) | Dados injetados via `rankingRepositoryProvider` — substituível na Fase 3 |
-| Coleção | Peixe-boi e Jacaré aparecem como silhueta antes de desbloquear |
-| Coleção | Desbloqueiam ao atingir o respectivo tile pela primeira vez |
-| Configurações | Dropdown de idioma removido da `SettingsScreen` |
-| Configurações | Toggle "Reduzir Efeitos Visuais" presente na `SettingsScreen` |
-| Configurações | Toggle lê e grava valor corretamente (sem regressão de comportamento) |
-| PauseOverlay | Toggle "Reduzir Efeitos Visuais" removido do `PauseOverlay` |
-| PauseOverlay | Overlay contém apenas Continuar, Reiniciar e Menu |
-| Regressão | Fluxo de Game Over não alterado |
-| Regressão | Ranking global semanal não alterado |
-| Regressão | Tiles 1–11 sem alteração visual |
+| Assets | `assets/icons/` removida — não existe mais no projeto |
+| Assets | `assets/images/inventory/` contém os 4 PNGs de inventário |
+| Assets | `assets/images/home/` contém os 6 PNGs de botões |
+| Assets | Nenhuma referência a `assets/icons/` permanece no código |
+| Assets | `pubspec.yaml` atualizado sem erros de asset missing |
+| Home | `LivesIndicator` não está na `HomeScreen` |
+| Home | 6 botões ilustrados presentes e tocáveis |
+| Home | Posicionamento visual fiel ao `menu.jpeg` |
+| Home | "Continuar Jogo" aparece apenas com partida salva |
+| Home | Badge de recompensa no botão Recompensas quando disponível |
+| Home | Todos os 6 botões navegam para a tela correta |
+| Home | `GameTitleImage` centralizada com alternância laranja/marrom |
+| Regressão | `InventoryBar` na GameScreen carrega ícones do novo path |
+| Regressão | `ConfirmUseDialog` exibe ícone correto do novo path |
+| Regressão | `GameOverItemScreen` e `GameOverNoItemsOverlay` sem erro de asset |
+| Regressão | `SplashScreen` pre-cache inclui novos paths |
 
 ---
 
@@ -1677,42 +1562,34 @@ testWidgets('PauseOverlay contém apenas Continuar, Reiniciar e Menu', ...)
 
 ---
 
-## 17. Prompt Sugerido para o Claude Code (Fase 2.12 — via skill superpowers)
+## 17. Prompt Sugerido para o Claude Code (Fase 2.13 — via skill superpowers)
 
 > Use a skill `superpowers/brainstorming` pra refinar o design da próxima fase do projeto **Olha o Bichim!** (Flutter, codename `capivara_2048`).
 >
-> **Contexto:** Fase 2.11 concluída (v1.0.1). Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente §4, §9, §10.2, §10.5, §12, §13.3, §13.6 e §15 — Fase 2.12).
+> **Contexto:** Fase 2.12 concluída (v1.1.0) + bugfixes até v1.1.4. Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente §2.3, §6.2, §12.3 e §15 — Fase 2.13). A referência visual obrigatória para o redesign da Home é o arquivo `menu.jpeg` na raiz do projeto.
 >
-> **Fases concluídas:** 1 a 2.11. Áudio na Fase 5. Backend na Fase 3.
+> **Fases concluídas:** 1 a 2.12 + v1.1.x. Áudio na Fase 5. Backend na Fase 3.
 >
-> **Tópico do brainstorm:** **Fase 2.12 — Expansão além do 2048: Peixe-boi (4096) e Jacaré (8192) + Ranking Lendas**. Novos tiles, diálogo de escolha ao atingir marcos, anfitrião atualizado e sistema de ranking vitalício.
+> **Tópico do brainstorm:** **Fase 2.13 — Redesign da Home + reorganização de assets**. Duas sub-entregas independentes: reorganização da estrutura de pastas e implementação do novo layout da `HomeScreen`.
 >
-> **Seis sub-entregas (A a F):**
+> **Duas sub-entregas:**
 >
-> **A — Novos tiles:** adicionar `Animal` nível 12 (Peixe-boi, `#006064`, 4px) e nível 13 (Jacaré, `#1B5E20`, 4px) em `animals_data.dart`. Assets já existem nas pastas.
+> **A — Reorganização de assets:** mover `assets/icons/inventory/` para `assets/images/inventory/`; registrar `assets/images/home/` com os 6 PNGs de botões; atualizar `pubspec.yaml`; busca e substituição de todos os paths `assets/icons/inventory/` no código; deletar pasta `assets/icons/` que ficará vazia; atualizar `precacheImage` na `SplashScreen`.
 >
-> **B — Fluxo de vitória:** `VictoryChoiceDialog` exibido ao atingir 2048, 4096 e 8192. 2048 e 4096 oferecem Continuar / Encerrar. 8192 só oferece Encerrar. WillPopScope bloqueia voltar.
+> Arquivos afetados pela substituição de path: `inventory_item_button.dart`, `confirm_use_dialog.dart`, `game_over_item_screen.dart`, `game_over_no_items_overlay.dart` e qualquer outro que referencie os ícones de inventário.
 >
-> **C — Anfitrião:** `highestLevelReached` vai até 13. Capivara como anfitrião ao continuar após 2048, Peixe-boi ao atingir 4096, Jacaré ao atingir 8192.
+> **B — Redesign da `HomeScreen`:** implementar layout com base em `menu.jpeg`. Remover `LivesIndicator` da Home. Criar 3 widgets auxiliares: `_HomeButton` (PNG como botão com animação de scale), `_HomeButtonWithBadge` (badge vermelho condicional para Recompensas), `_ActionButton` (cápsula semi-transparente para "Continuar Jogo" / "Novo jogo"). Posicionar os 6 botões nos cantos e base da tela via `Positioned` dentro de `Stack`.
 >
-> **D — Ranking Lendas:** `timesReached4096` e `timesReached8192` em `PersonalRecords`, `firstReachedAt` para desempate, recompensa única na primeira vez por marco, coleções Firestore `legendsRankings/4096` e `legendsRankings/8192`.
->
-> **E — Tela de Ranking:** nova aba "Lendas" com dois sub-rankings; mensagem motivacional para quem ainda não atingiu o marco.
->
-> **F — Tela de Coleção:** Peixe-boi e Jacaré como silhueta até desbloquear; `backgroundBaseColor` `#E0F7FA` e `#E8F5E9` respectivamente.
->
-> **G — Ranking local + mock global:** ranking pessoal persistido em Hive (top 20 por tempo e por número, sub-tabs na aba Pessoal); `FakeRankingService` com dados mock cobrindo pódio, empates, jogador local fora do top 3 e cronômetro de reset; `rankingRepositoryProvider` com injeção via `kDebugMode` para substituição fácil na Fase 3.
->
-> **H — Limpeza de Configurações e PauseOverlay:** remover dropdown de idioma EN da `SettingsScreen` (Brasil-only); remover toggle "Reduzir Efeitos Visuais" do `PauseOverlay` e movê-lo para a `SettingsScreen` no card de gameplay, junto ao toggle de haptic.
+> PNGs disponíveis em `assets/images/home/`: `Colecao.png`, `ComoJogar.png`, `Configuracao.png`, `IconeLoja.png`, `Ranking.png`, `Recompensas.png`.
 >
 > **Pontos abertos pra explorar no brainstorm:**
 >
-> - Sub-entrega B: o cronômetro do ranking é medido apenas até o 2048 — ao continuar, o tempo parou de contar para fins de ranking. Como isso deve ser exibido na UI? O cronômetro na tela congela visualmente ou mostra o tempo registrado?
-> - Sub-entrega B: ao escolher "Continuar" após o 4096 e eventualmente o tabuleiro travar, o fluxo de Game Over funciona normalmente (com itens, sem itens)? Confirmar que não há conflito com o estado `hasWon`.
-> - Sub-entrega D: a recompensa de primeira vez (5 vidas + bombas + desfazer para 4096; 10 de cada para 8192) deve ser entregue imediatamente ao atingir o marco, ou ao encerrar a partida?
-> - Sub-entrega E: o Ranking Lendas deve ter recompensas semanais como o Global, ou é puramente prestígio (sem recompensa periódica)?
+> - Sub-entrega A: o `precacheImage` atual na `SplashScreen` lista os assets explicitamente ou usa um glob? Se explícito, quantos paths precisam ser atualizados?
+> - Sub-entrega B: os valores exatos de `top/bottom/left/right` dos `Positioned` devem ser definidos em constantes (`HomeConstants`) para facilitar ajustes por dispositivo — como estruturar essas constantes considerando telas 360×640 e 390×844?
+> - Sub-entrega B: o botão "Continuar Jogo" verifica `current_game` no Hive — essa leitura deve ser feita no `initState` da Home, em um provider reativo, ou via `FutureBuilder`? Qual tem menos jank na transição da splash?
+> - Sub-entrega B: a `GameTitleImage` já alterna laranja/marrom por sessão (escolha em `initState`). Esse comportamento deve ser mantido exatamente igual ou há alguma mudança visual nessa fase?
 >
-> **Output esperado:** spec detalhada da Fase 2.12 com decisões em cada ponto aberto, arquivos a modificar por sub-entrega, casos de teste obrigatórios, critérios de aceite e plano de validação. Ao final: **prompt de brainstorm da Fase 3** (Backend).
+> **Output esperado:** spec detalhada da Fase 2.13 com decisões em cada ponto aberto, lista completa de arquivos a modificar por sub-entrega, casos de teste obrigatórios, critérios de aceite e plano de validação (360×640, 390×844). Ao final: **prompt de brainstorm da Fase 3** (Backend — próxima grande fase).
 >
 > **Não escreva código nesta etapa.**
 

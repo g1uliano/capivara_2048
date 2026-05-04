@@ -27,7 +27,7 @@ void main() {
               icon: Icons.dangerous,
               label: 'Bomba',
               count: 2,
-              pngPath: 'assets/icons/inventory/bomb_2.png',
+              pngPath: 'assets/images/inventory/bomb_2.png',
             ),
           ),
         ),

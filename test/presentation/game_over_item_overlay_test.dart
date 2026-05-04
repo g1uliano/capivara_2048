@@ -84,7 +84,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 1));
     expect(
       find.byWidgetPredicate(
-        (w) => w is Image && (w.image as AssetImage).assetName == 'assets/icons/inventory/undo_3.png',
+        (w) => w is Image && (w.image as AssetImage).assetName == 'assets/images/inventory/undo_3.png',
       ),
       findsOneWidget,
     );
