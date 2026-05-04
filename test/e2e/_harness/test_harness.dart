@@ -35,6 +35,7 @@ class GameTestHarness {
   bool _booted = false;
 
   Future<Widget> boot({GameState? initialGameState}) async {
+    assert(!_booted, 'GameTestHarness.boot() called twice — call teardown() first');
     SharedPreferences.setMockInitialValues(<String, Object>{});
     tempDir = await Directory.systemTemp.createTemp('e2e_hive_');
     Hive.init(tempDir.path);

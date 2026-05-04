@@ -36,6 +36,6 @@ void main() {
     final h = GameTestHarness();
     await h.boot();
     await h.teardown();
-    // No expect — passing means no exception was thrown.
+    expect(h.tempDir.existsSync(), isFalse);
   });
 }
