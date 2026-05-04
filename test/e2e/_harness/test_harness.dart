@@ -68,6 +68,39 @@ class GameTestHarness {
     );
   }
 
+  /// Simulates a cold app restart: disposes the current [container] and
+  /// provider state, but keeps Hive on disk (same [tempDir]).
+  /// Call after [boot()].
+  Future<Widget> restart() async {
+    assert(_booted, 'GameTestHarness.restart() called before boot()');
+    container.dispose();
+    await Hive.close(); // flush all boxes to disk and close them
+
+    // Re-use same SharedPreferences mock and same Hive directory (tempDir).
+    // Hive.close() does not reset init path; repo.load() re-opens from tempDir.
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    final prefs = await SharedPreferences.getInstance();
+    final repo = GameRecordRepository();
+    await repo.load();
+
+    container = ProviderContainer(
+      overrides: [
+        settingsProvider.overrideWith((ref) => SettingsNotifier(prefs)),
+        gameRecordRepositoryProvider.overrideWithValue(repo),
+      ],
+    );
+
+    await container.read(reduceEffectsProvider.notifier).load();
+    await container.read(inventoryProvider.notifier).load();
+    await container.read(dailyRewardsProvider.notifier).load();
+    await container.read(personalRecordsProvider.notifier).load();
+
+    return UncontrolledProviderScope(
+      container: container,
+      child: CapivaraApp(precacheFutureOverride: Future.value()),
+    );
+  }
+
   Future<void> teardown() async {
     if (!_booted) return;
     container.dispose();
