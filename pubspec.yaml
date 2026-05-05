@@ -2,7 +2,7 @@ name: capivara_2048
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -39,6 +39,7 @@ dependencies:
   flutter_animate: ^4.5.0
   package_info_plus: ^8.1.2
   share_plus: ^10.0.0
+  path_provider: ^2.1.0
 
 dev_dependencies:
   flutter_test:
@@ -53,15 +54,14 @@ dev_dependencies:
   flutter_launcher_icons: ^0.14.0
   # hive_generator: incompatible with current SDK analyzer (needs <7.0.0, SDK uses ~10.x)
 
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
+  # For information on the generic Dart part of this file, see the
+  # following page: https://dart.dev/tools/pub/pubspec
 
-# The following section is specific to Flutter packages.
+  # The following section is specific to Flutter packages.
   path_provider_platform_interface: any
   plugin_platform_interface: any
   alchemist: ^0.14.0
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -119,7 +119,7 @@ flutter_launcher_icons:
     generate: true
     image_path: assets/images/icon/app_icon_tight.png
   image_path: assets/images/icon/app_icon_tight.png
-  adaptive_icon_background: '#D4F1DE'
+  adaptive_icon_background: "#D4F1DE"
   adaptive_icon_foreground: assets/images/icon/app_icon_tight.png
 
 flutter_native_splash:
