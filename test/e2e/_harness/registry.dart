@@ -1,4 +1,5 @@
 import 'scenario.dart';
+import '../engine/engine_flows.dart';
 import '../flows/smoke_boot.dart';
 import '../flows/nav_smokes.dart';
 import '../flows/pause_flows.dart';
@@ -48,4 +49,15 @@ final List<E2EScenario> allScenarios = <E2EScenario>[
   livesConsumedOnGameOverScenario,
   noLivesScreenScenario,
   livesRegenOverTimeScenario,
+  // Fase 3.2 Task 1 — engine
+  engineSwipeLeftScenario,
+  engineSwipeRightScenario,
+  engineSwipeUpScenario,
+  engineSwipeDownScenario,
+  engineNoOpSwipeScenario,
+  engineScoreAccumulatesScenario,
+  engineHighScoreScenario,
+  engineMergeChainScenario,
+  engineSpawnOnlyAfterValidMoveScenario,
+  engineGameOverScenario,
 ];
