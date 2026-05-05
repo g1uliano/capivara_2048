@@ -7,6 +7,24 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-05-04
+
+### Added (Fase 3.1 — E2E Flow Scenarios)
+- **23 cenários E2E** cobrindo todos os flows principais do jogo (Tier 1 headless)
+  - Pause / Resume / Back (regressão v1.2.9 protegida)
+  - Game Over overlays — com e sem itens no inventário
+  - Itens de inventário — undo1, bomb2, bomb3
+  - Loja (ShopOverlay) — abertura e compra
+  - Vitórias — milestones 2048, 4096, 8192 + continue after win
+  - Recompensas diárias — claim e bloqueio same-day
+  - Vidas — consumo, tela sem vidas, regeneração
+
+### Changed
+- `GameNotifier.debugSetState` agora chama `_stopTimer()` para evitar timers órfãos nos testes
+- `GameTestHarness.boot()` desabilita Google Fonts runtime fetching (evita timeout 23s em testes headless)
+- `GameTestHarness.teardown()` usa timeout em `Hive.close()` para tolerar writes async não-aguardados
+- Adicionados `Key('inventory_bomb2')`, `Key('inventory_bomb3')`, `Key('inventory_undo1')`, `Key('inventory_undo3')` em `inventory_bar.dart`
+
 ## [1.2.10] - 2026-05-04
 
 ### Fixed
