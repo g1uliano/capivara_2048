@@ -1,4 +1,5 @@
 import 'scenario.dart';
+import '../nav/nav_flows.dart';
 import '../engine/engine_flows.dart';
 import '../items/items_flows.dart';
 import '../flows/smoke_boot.dart';
@@ -70,4 +71,12 @@ final List<E2EScenario> allScenarios = <E2EScenario>[
   itemsBombDimOverlayScenario,
   itemsCountPersistsScenario,
   itemsEmptyItemOpensShopScenario,
+  // Fase 3.2 Task 3 — nav
+  navHomeToRankingScenario,
+  navHomeToShopScenario,
+  navHomeToDailyRewardsScenario,
+  navHomeToTutorialScenario,
+  navCollectionBackScenario,
+  navSettingsBackScenario,
+  navNewGameBackScenario,
 ];
