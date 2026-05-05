@@ -1,4 +1,7 @@
 # 🦫 Olha o Bichim!
+
+[![CI](https://github.com/g1uliano/capivara_2048/actions/workflows/ci.yml/badge.svg)](https://github.com/g1uliano/capivara_2048/actions/workflows/ci.yml)
+
 > Anteriormente conhecido como Capivara 2048
 
 > Combine animais da Amazônia em um tabuleiro 4x4 e descubra a Capivara Lendária.
