@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:capivara_2048/app.dart';
@@ -36,6 +37,7 @@ class GameTestHarness {
 
   Future<Widget> boot({GameState? initialGameState}) async {
     assert(!_booted, 'GameTestHarness.boot() called twice — call teardown() first');
+    GoogleFonts.config.allowRuntimeFetching = false;
     SharedPreferences.setMockInitialValues(<String, Object>{});
     tempDir = await Directory.systemTemp.createTemp('e2e_hive_');
     Hive.init(tempDir.path);
@@ -104,7 +106,13 @@ class GameTestHarness {
   Future<void> teardown() async {
     if (!_booted) return;
     container.dispose();
-    await Hive.close();
+    // Use a timeout in case there are unawaited Hive writes pending (e.g. from
+    // `unawaited(notifier.add(...))` inside widget code). We're deleting the
+    // temp directory anyway, so skipping the flush is safe for test isolation.
+    await Hive.close().timeout(
+      const Duration(seconds: 2),
+      onTimeout: () {},
+    );
     if (tempDir.existsSync()) {
       await tempDir.delete(recursive: true);
     }
