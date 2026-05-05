@@ -1,5 +1,6 @@
 import 'scenario.dart';
 import '../engine/engine_flows.dart';
+import '../items/items_flows.dart';
 import '../flows/smoke_boot.dart';
 import '../flows/nav_smokes.dart';
 import '../flows/pause_flows.dart';
@@ -60,4 +61,13 @@ final List<E2EScenario> allScenarios = <E2EScenario>[
   engineMergeChainScenario,
   engineSpawnOnlyAfterValidMoveScenario,
   engineGameOverScenario,
+  // Fase 3.2 Task 2 — items
+  itemsBomb2RequiresTargetScenario,
+  itemsBomb2CancellableScenario,
+  itemsBomb3RequiresTargetScenario,
+  itemsUndo1DisabledScenario,
+  itemsUndo3DisabledScenario,
+  itemsBombDimOverlayScenario,
+  itemsCountPersistsScenario,
+  itemsEmptyItemOpensShopScenario,
 ];
