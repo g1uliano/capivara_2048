@@ -5,6 +5,7 @@ import '../flows/pause_flows.dart';
 import '../flows/game_over_flows.dart';
 import '../flows/items_flows.dart';
 import '../flows/shop_flows.dart';
+import '../flows/win_flows.dart';
 import '../persistence/collection_survives_restart.dart';
 
 /// Single source of truth for all E2E scenarios.
@@ -33,4 +34,9 @@ final List<E2EScenario> allScenarios = <E2EScenario>[
   // Task 5
   shopOverlayFromEmptyInventoryScenario,
   shopPurchaseItemScenario,
+  // Task 6
+  win2048FirstTimeScenario,
+  win4096FirstTimeScenario,
+  win8192FirstTimeScenario,
+  continueAfterWinScenario,
 ];
