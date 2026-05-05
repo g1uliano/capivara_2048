@@ -1,4 +1,6 @@
 import 'scenario.dart';
+import '../pause/pause_flows.dart';
+import '../daily/daily_flows.dart';
 import '../nav/nav_flows.dart';
 import '../engine/engine_flows.dart';
 import '../items/items_flows.dart';
@@ -61,6 +63,14 @@ final List<E2EScenario> allScenarios = <E2EScenario>[
   persistenceSettingsScenario,
   persistenceGameRecordsScenario,
   persistenceInProgressGameScenario,
+  // Fase 3.3 Task 2 — pause
+  pauseTapButtonScenario,
+  pauseReiniciarScenario,
+  pauseSystemBackScenario,
+  pauseTimeNotConsumedScenario,
+  // Fase 3.3 Task 2 — daily
+  dailyStreakIncrementsScenario,
+  dailyCycleResetsScenario,
   // Fase 3.2 Task 1 — engine
   engineSwipeLeftScenario,
   engineSwipeRightScenario,
