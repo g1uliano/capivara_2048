@@ -33,6 +33,9 @@ class InventoryNotifier extends StateNotifier<Inventory> {
 
   @visibleForTesting
   void setStateForTest(Inventory inventory) => state = inventory;
+
+  @visibleForTesting
+  void debugSetState(Inventory s) => state = s;
 }
 
 final inventoryRepositoryProvider = Provider<InventoryRepository>(

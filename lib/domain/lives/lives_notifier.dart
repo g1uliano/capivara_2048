@@ -169,6 +169,9 @@ class LivesNotifier extends StateNotifier<LivesState> {
 
   bool get canWatchAd => canWatchAdFor(state);
   bool get canPlay => state.lives > 0;
+
+  @visibleForTesting
+  void debugSetState(LivesState s) => state = s;
 }
 
 final livesRepositoryProvider = Provider((_) => LivesRepository());

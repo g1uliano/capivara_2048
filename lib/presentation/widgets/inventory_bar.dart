@@ -78,6 +78,7 @@ class InventoryBar extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           InventoryItemButton(
+            key: const Key('inventory_bomb2'),
             label: 'Bomba 2',
             icon: Icons.bolt,
             pngPath: 'assets/images/inventory/bomb_2.png',
@@ -90,6 +91,7 @@ class InventoryBar extends ConsumerWidget {
             shouldPulse: pulsingItems.contains(ItemType.bomb2),
           ),
           InventoryItemButton(
+            key: const Key('inventory_bomb3'),
             label: 'Bomba 3',
             icon: Icons.auto_fix_high,
             pngPath: 'assets/images/inventory/bomb_3.png',
@@ -102,6 +104,7 @@ class InventoryBar extends ConsumerWidget {
             shouldPulse: pulsingItems.contains(ItemType.bomb3),
           ),
           InventoryItemButton(
+            key: const Key('inventory_undo1'),
             label: 'Desfazer 1',
             icon: Icons.undo,
             pngPath: 'assets/images/inventory/undo_1.png',
@@ -120,6 +123,7 @@ class InventoryBar extends ConsumerWidget {
             shouldPulse: pulsingItems.contains(ItemType.undo1),
           ),
           InventoryItemButton(
+            key: const Key('inventory_undo3'),
             label: 'Desfazer 3',
             icon: Icons.fast_rewind,
             pngPath: 'assets/images/inventory/undo_3.png',
