@@ -37,6 +37,20 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+
+    flavorDimensions += "environment"
+
+    productFlavors {
+        create("prod") {
+            dimension = "environment"
+        }
+        create("tst") {
+            dimension = "environment"
+            applicationIdSuffix = ".test"
+            versionNameSuffix = "-TEST"
+            resValue("string", "app_name", "Bichim TEST")
+        }
+    }
 }
 
 flutter {
