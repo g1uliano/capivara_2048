@@ -6,6 +6,7 @@ import '../flows/game_over_flows.dart';
 import '../flows/items_flows.dart';
 import '../flows/shop_flows.dart';
 import '../flows/win_flows.dart';
+import '../flows/daily_flows.dart';
 import '../persistence/collection_survives_restart.dart';
 
 /// Single source of truth for all E2E scenarios.
@@ -39,4 +40,7 @@ final List<E2EScenario> allScenarios = <E2EScenario>[
   win4096FirstTimeScenario,
   win8192FirstTimeScenario,
   continueAfterWinScenario,
+  // Task 7
+  dailyRewardClaimScenario,
+  dailyRewardLockedSameDayScenario,
 ];
