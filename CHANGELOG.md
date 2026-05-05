@@ -7,6 +7,14 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-05-04
+
+### Added (Fase 3.2 — Engine, Items e Nav)
+- **25 novos cenários E2E** (total: 48 no Tier 1)
+  - `engine.*` (10): swipe ↑↓←→, no-op, score, highscore, merge chain, spawn, gameover
+  - `items.*` (8): bomb2/3 seleção, cancelamento, undo desabilitado, dim overlay, persistência, shop routing
+  - `nav.*` (7 restantes): ranking, loja, recompensas, tutorial bottom sheet, back de coleção/configurações/jogo
+
 ## [1.3.0] - 2026-05-04
 
 ### Added (Fase 3.1 — E2E Flow Scenarios)
