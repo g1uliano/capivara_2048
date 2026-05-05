@@ -111,7 +111,7 @@ class GameTestHarness {
     // temp directory anyway, so skipping the flush is safe for test isolation.
     await Hive.close().timeout(
       const Duration(seconds: 2),
-      onTimeout: () {},
+      onTimeout: () => [],
     );
     if (tempDir.existsSync()) {
       await tempDir.delete(recursive: true);
