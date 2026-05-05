@@ -7,6 +7,16 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.3.2] - 2026-05-04
+
+### Added (Fase 3.3 — Persistence, Pause, Daily, Settings)
+- **18 novos cenários E2E** (total: 66 no Tier 1)
+  - `persistence.*` (8): inventário, vidas, recompensas, personal records, settings, game records, jogo em andamento
+  - `pause.*` (4): botão pausar, reiniciar, system back, timer pausado
+  - `daily.*` (2): streak incrementa, ciclo reseta após streak break
+  - `settings.*` (4): reduce effects toggle+persist, blur desabilitado, haptics persist, locale PT-BR
+- Infraestrutura: `LivesNotifier.awaitReady()` `@visibleForTesting` + guards em `AppLifecycleListener` para contexto de testes
+
 ## [1.3.1] - 2026-05-04
 
 ### Added (Fase 3.2 — Engine, Items e Nav)
