@@ -7,9 +7,21 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.3.7] — 2026-05-05
+
+### Added (Fase 3.8 — Documentação do framework de testes)
+
+- `docs/TESTING.md`: guia completo de testes — Tier 1, APK Tier 2, como adicionar novo cenário (<5 min), troubleshooting de golden tests flaky
+- Fase 3 marcada como concluída (subfases 3.0–3.8)
+
+### Changed
+
+- `README.md`: roadmap corrigido (Fase 3 era E2E Test Framework, não backend); seção de testes simplificada com link para `docs/TESTING.md`
+
 ## [1.3.6] — 2026-05-05
 
 ### Added
+
 - CI GitHub Actions workflow (Fase 3.7): roda suite Tier 1 em todo PR/push para main
 - Upload automático de golden diffs como artefato em caso de falha
 - Badge de status CI no README

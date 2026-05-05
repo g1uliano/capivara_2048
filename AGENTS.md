@@ -52,7 +52,7 @@ lib/
 
 ## Fases do roadmap
 
-Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 3.7 concluída (v1.3.6) — próximo: Fase 3.8**. O áudio foi reposicionado para a **Fase 5** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
+Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 3 concluída (v1.3.7) — próximo: Fase 4**. O áudio foi reposicionado para a **Fase 5** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
 
 | Fase    | Foco                                                                                                 |
 | ------- | ---------------------------------------------------------------------------------------------------- |
@@ -62,10 +62,11 @@ Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 3
 | 2.6 ✅  | Tela Home + Coleção + Configurações + stubs                                                          |
 | 2.11 ✅ | ShopOverlay sobre o jogo acessível pelos ícones desabilitados do inventário                          |
 | 2.12 ✅ | Peixe-boi (4096), Jacaré (8192), multi-vitória, ranking local, PersonalRecords                       |
-| 3       | Backend, ranking, monetização                                                                        |
+| 3 ✅    | E2E Test Framework: 95+ cenários, golden tests, APK Tier 2, CI GitHub Actions, documentação         |
 | 3.5 ✅  | `golden.*` com `alchemist` — 15 testes (5 telas × 3 viewports)                                       |
 | 3.6 ✅  | Tier 2: APK flavor `tst` + TestRunnerScreen + Share + Demo (integration_test)                        |
 | 3.7 ✅  | CI GitHub Actions: suite Tier 1 em PR/push, golden diffs como artefato, badge no README              |
+| 3.8 ✅  | Documentação do framework de testes (`docs/TESTING.md`)                                               |
 | 4       | Arte adicional e polimento visual (logo, ícone, splash final)                                        |
 | 5       | Áudio (sound design dos 13 animais, SFX, música)                                                     |
 | 6       | Polimento, l10n, acessibilidade, lançamento                                                          |
