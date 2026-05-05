@@ -1,6 +1,8 @@
 import 'scenario.dart';
 import '../flows/smoke_boot.dart';
 import '../flows/nav_smokes.dart';
+import '../flows/pause_flows.dart';
+import '../flows/game_over_flows.dart';
 import '../persistence/collection_survives_restart.dart';
 
 /// Single source of truth for all E2E scenarios.
@@ -16,4 +18,10 @@ final List<E2EScenario> allScenarios = <E2EScenario>[
   navHomeToSettingsScenario,
   navNewGameScenario,
   collectionSurvivesRestartScenario,
+  // Task 2
+  continueAfterPauseScenario,
+  continueAfterBackButtonScenario,
+  // Task 3
+  gameOverNoItemsScenario,
+  gameOverWithItemsScenario,
 ];

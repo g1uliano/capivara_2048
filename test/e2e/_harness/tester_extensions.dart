@@ -70,6 +70,7 @@ extension E2EHelpers on WidgetTester {
         highScore: 0,
         isGameOver: true,
         hasWon: false,
+        maxLevel: 1, // level 1 (Tanajura) is valid for animalForLevel()
         isAwaitingGameOverResolution: true,
       ),
     );
@@ -84,6 +85,7 @@ extension E2EHelpers on WidgetTester {
         highScore: 0,
         isGameOver: true,
         hasWon: false,
+        maxLevel: 1, // level 1 (Tanajura) is valid for animalForLevel()
         isAwaitingGameOverResolution: false,
       ),
     );

@@ -147,7 +147,10 @@ class GameNotifier extends StateNotifier<GameState> {
 
   // ignore: invalid_use_of_protected_member
   @visibleForTesting
-  void debugSetState(GameState s) => state = s;
+  void debugSetState(GameState s) {
+    _stopTimer();
+    state = s;
+  }
 
   void setAwaitingResolution(bool value) {
     state = state.copyWith(isAwaitingGameOverResolution: value);
