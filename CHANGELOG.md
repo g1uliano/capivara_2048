@@ -7,6 +7,18 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.3.5] — 2026-05-05
+
+### Added
+- Fase 3.6: APK Tier 2 com `TestRunnerScreen` visual
+  - `integration_test/tier2_runner.dart` — entry point do APK de testes (flavor `tst`)
+  - `lib/testing/` — TestRunnerApp, TestRunnerScreen, TestResultsStore, share_results
+  - Android flavor `tst` com `applicationIdSuffix .test` (instala em paralelo ao app prod)
+  - Share button (📤) exporta JSON + PNG via share_plus
+  - Demo mode (🎬) via `--dart-define=DEMO_MODE=true` suprime assertions
+  - 6 cenários taggeados com `ScenarioTag.demo`
+  - `lib/main_test.dart` stub documentando entry point alternativo
+
 ## [v1.3.4] — Fase 3.5 — Golden Tests
 
 ### Added
