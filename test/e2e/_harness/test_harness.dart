@@ -76,9 +76,9 @@ class GameTestHarness {
     container.dispose();
     await Hive.close(); // flush all boxes to disk and close them
 
-    // Re-use same SharedPreferences mock and same Hive directory (tempDir).
-    // Hive.close() does not reset init path; repo.load() re-opens from tempDir.
-    SharedPreferences.setMockInitialValues(<String, Object>{});
+    // Re-use same SharedPreferences mock (no reset — simulates production cold
+    // restart where SharedPreferences persists on disk). Same Hive tempDir also
+    // kept on purpose.
     final prefs = await SharedPreferences.getInstance();
     final repo = GameRecordRepository();
     await repo.load();

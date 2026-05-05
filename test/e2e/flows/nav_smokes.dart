@@ -3,10 +3,11 @@ import 'package:capivara_2048/presentation/screens/collection_screen.dart';
 import 'package:capivara_2048/presentation/screens/settings_screen.dart';
 import 'package:capivara_2048/presentation/screens/game/game_screen.dart';
 import '../_harness/scenario.dart';
+import '../_harness/test_harness.dart';
 import '../_harness/tester_extensions.dart';
 
 // Helper: boot → splash → home
-Future<void> _bootToHome(WidgetTester tester, dynamic harness) async {
+Future<void> _bootToHome(WidgetTester tester, GameTestHarness harness) async {
   final widget = await tester.runAsync(() => harness.boot());
   await tester.pumpWidget(widget!);
   await tester.pumpAndSettle(const Duration(seconds: 5));

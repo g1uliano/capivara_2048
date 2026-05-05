@@ -5,6 +5,7 @@ import 'package:capivara_2048/data/models/game_state.dart';
 import 'package:capivara_2048/domain/game_engine/game_engine.dart';
 import 'package:capivara_2048/presentation/controllers/game_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/personal_records_notifier.dart';
+import 'package:capivara_2048/presentation/controllers/settings_notifier.dart';
 import 'test_harness.dart';
 
 void main() {
@@ -55,6 +56,29 @@ void main() {
       h.container.read(personalRecordsProvider).highestLevelEver,
       7,
       reason: 'restart() must reload Hive — same data, new container',
+    );
+  });
+
+  test('restart() persiste SharedPreferences entre sessões', () async {
+    final h = GameTestHarness();
+    addTearDown(h.teardown);
+
+    // First boot — muda um valor de settings (escreve em SharedPreferences).
+    await h.boot();
+    h.container.read(settingsProvider.notifier).setHaptic(false);
+    expect(
+      h.container.read(settingsProvider).hapticEnabled,
+      isFalse,
+      reason: 'pre-condition: haptic escrito em SharedPreferences',
+    );
+
+    // Cold restart — SharedPreferences deve sobreviver como em produção.
+    await h.restart();
+
+    expect(
+      h.container.read(settingsProvider).hapticEnabled,
+      isFalse,
+      reason: 'restart() não pode zerar SharedPreferences',
     );
   });
 
