@@ -7,9 +7,17 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.3.6] — 2026-05-05
+
+### Added
+- CI GitHub Actions workflow (Fase 3.7): roda suite Tier 1 em todo PR/push para main
+- Upload automático de golden diffs como artefato em caso de falha
+- Badge de status CI no README
+
 ## [1.3.5] — 2026-05-05
 
 ### Added
+
 - Fase 3.6: APK Tier 2 com `TestRunnerScreen` visual
   - `integration_test/tier2_runner.dart` — entry point do APK de testes (flavor `tst`)
   - `lib/testing/` — TestRunnerApp, TestRunnerScreen, TestResultsStore, share_results
@@ -22,6 +30,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [v1.3.4] — Fase 3.5 — Golden Tests
 
 ### Added
+
 - 15 golden tests com `alchemist` (5 telas × 3 viewports: 360×640, 414×894, 800×1280)
 - Telas cobertas: `HomeScreen`, `GameScreen`, `PauseOverlay`, `CollectionScreen`, `DailyRewardsScreen`
 - `test/flutter_test_config.dart`: configura alchemist CI mode globalmente (fonteless, sem shadows, sem platform goldens)
