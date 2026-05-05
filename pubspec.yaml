@@ -38,9 +38,12 @@ dependencies:
   shared_preferences: ^2.3.2
   flutter_animate: ^4.5.0
   package_info_plus: ^8.1.2
+  share_plus: ^10.0.0
 
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  integration_test:
     sdk: flutter
   flutter_lints: ^5.0.0
   flutter_native_splash: ^2.4.4
@@ -54,6 +57,9 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
+  path_provider_platform_interface: any
+  plugin_platform_interface: any
+  alchemist: ^0.14.0
 flutter:
 
   # The following line ensures that the Material Icons font is

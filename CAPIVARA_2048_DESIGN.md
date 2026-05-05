@@ -2,13 +2,13 @@
 
 > Documento de especificação para desenvolvimento. Pensado para ser alimentado em ferramentas como Claude Code para implementação iterativa.
 >
-> **Status atual:** Fase 2.12 concluída ✅ (v1.1.0) + bugfixes até v1.1.4. Todas as fases 2.x concluídas.
+> **Status atual:** Fase 3.1 concluída ✅ — `flow.*` (21 cenários). Fases 3.0 e 2.x todas concluídas.
 >
-> **Próximo:** **Fase 2.13 — Redesign da Home + reorganização de assets**
+> **Próximo:** **Fase 3.2 — `engine.*` + `items.*` + `nav.*` (29 cenários) — em andamento 🔄**
 >
 > **Renomeação do jogo:** o nome do jogo passa de **"Capivara 2048"** para **"Olha o Bichim!"**. As referências antigas em seções abaixo serão atualizadas progressivamente; durante a transição, considere "Olha o Bichim!" o nome canônico do produto. O *codename* interno do repositório (`capivara_2048`) permanece — apenas o nome de exibição muda.
 >
-> **Áudio:** segue em **Fase 5**, junto da arte adicional e antes do lançamento; o jogo é desenvolvido sem áudio até lá.
+> **Áudio:** segue em **Fase 6**, junto da arte adicional e antes do lançamento; o jogo é desenvolvido sem áudio até lá.
 
 ---
 
@@ -49,7 +49,7 @@
 | Estado | `flutter_riverpod` | Gerenciamento de estado |
 | ID | `uuid` | IDs dos tiles para animação |
 | Animações | `flutter_animate` | Transições suaves |
-| Áudio | `audioplayers` ou `just_audio` | Sons e música (Fase 5) |
+| Áudio | `audioplayers` ou `just_audio` | Sons e música (Fase 6) |
 | Persistência | `hive` + `shared_preferences` | Local |
 | Tipografia | `google_fonts` | Fredoka, Nunito |
 | Imagens | `Image.asset` (Flutter nativo) | PNGs dos animais e ícones |
@@ -152,9 +152,9 @@ assets/
 │       ├── bomb_3.png   ← Bomba 3 — tema **Mico-leão-dourado**
 │       ├── undo_1.png   ← Desfazer 1 — tema **Capivara**
 │       └── undo_3.png   ← Desfazer 3 — tema **Onça-pintada**
-├── sounds/animals/                   ← Fase 5
-├── sounds/ui/                        ← Fase 5
-├── music/                            ← Fase 5
+├── sounds/animals/                   ← Fase 6
+├── sounds/ui/                        ← Fase 6
+├── music/                            ← Fase 6
 └── fonts/
 ```
 
@@ -259,7 +259,7 @@ Quando o tabuleiro trava e o jogador **não possui nenhum item no inventário**,
 - Ao tocar: `AlertDialog` de confirmação com nome, preço e botões "Cancelar" / "Confirmar compra"
 - Cancelar: retorna ao overlay
 - Confirmar (mock dev): item entregue; overlay fecha; partida continua — **nenhuma vida consumida**
-- Confirmar (produção — Fase 3): abre `in_app_purchase` com o pacote mais barato que contém o item; em sucesso, entrega os itens do pacote completo
+- Confirmar (produção — Fase 4): abre `in_app_purchase` com o pacote mais barato que contém o item; em sucesso, entrega os itens do pacote completo
 
 **Opção 3 — Encerrar:**
 - Botão: `"Encerrar partida"` (TextButton, cinza, menor destaque)
@@ -484,7 +484,7 @@ bool get isEmpty => bomb2 == 0 && bomb3 == 0 && undo1 == 0 && undo3 == 0;
 | Desfazer 1 | Combo Mata Atlântica (2 desfazer por R$ 4,99) | ~R$ 1,00 |
 | Desfazer 3 | 4× Desfazer 3 por R$ 1,99 | ~R$ 0,50 |
 
-> **Nota:** os preços unitários exibidos no overlay são estimativas para contexto. A compra real na Fase 3 sempre passa pelo pacote completo via `in_app_purchase`, não por item unitário. Em dev/mock, a compra é simulada e o item é entregue diretamente.
+> **Nota:** os preços unitários exibidos no overlay são estimativas para contexto. A compra real na Fase 4 sempre passa pelo pacote completo via `in_app_purchase`, não por item unitário. Em dev/mock, a compra é simulada e o item é entregue diretamente.
 
 ### 7.3 Compartilhamento com amigos
 Toda compra gera código único; amigo recebe metade. Código vale 1× pra 1 jogador. Resgate oferece dobrar via anúncio.
@@ -697,7 +697,7 @@ legendsRankings/8192/entries/{userId}   // Fase 2.12
 ---
 
 ## 11. Sons e Música
-*(Implementação na Fase 5 — depois de toda a arte e polimento visual, antes do lançamento)*
+*(Implementação na Fase 6 — depois de toda a arte e polimento visual, antes do lançamento)*
 
 ### 11.1 Sons dos animais
 | Animal | Som sugerido |
@@ -968,9 +968,9 @@ Card de **Gameplay** (branco semi-opaco, borderRadius 12):
 - `SwitchListTile` — **Reduzir Efeitos Visuais**: desativa animações complexas para melhor desempenho — *movido do `PauseOverlay` na Fase 2.12*
 
 Card de **Idioma** (Fase 2.12 — removido):
-- O dropdown de idioma foi removido. O app é exclusivamente PT-BR no lançamento. O card de idioma não é exibido. Quando a expansão de idiomas for implementada (Fase 6), o card é readicionado.
+- O dropdown de idioma foi removido. O app é exclusivamente PT-BR no lançamento. O card de idioma não é exibido. Quando a expansão de idiomas for implementada (Fase 7), o card é readicionado.
 
-Card de **Áudio** (desabilitado até Fase 5):
+Card de **Áudio** (desabilitado até Fase 6):
 - Sliders de volume SFX e música — visíveis mas `enabled: false` com label "Disponível em breve"
 
 ### 12.13 Tela: Debug — Galeria de Animais
@@ -1184,7 +1184,7 @@ class ShareCode {
 
 ---
 
-> **Nota histórica:** a antiga Fase 2.4 — Áudio foi reposicionada para a Fase 5. As fases seguintes foram renumeradas.
+> **Nota histórica:** a antiga Fase 2.4 — Áudio foi reposicionada para a Fase 6 (anteriormente era Fase 5, renumerada quando a Fase 3.0 E2E foi inserida). As fases seguintes foram renumeradas progressivamente.
 
 ### ✅ Fase 2.4 — Recompensas diárias (v0.9.0)
 - `DailyRewardsState`, engine puro, `DailyRewardsNotifier`, `DailyRewardsScreen`, badge + toast na Home. 193 testes.
@@ -1470,7 +1470,180 @@ testWidgets('precacheImage inclui assets/images/home/ e assets/images/inventory/
 
 ---
 
-### 🔜 Fase 3 — Backend, ranking e monetização (3–4 semanas)
+### ✅ Fase 2.13 — Redesign da Home + reorganização de assets (v1.2.0)
+- **A** — `assets/icons/inventory/` movido para `assets/images/inventory/`; `assets/images/home/` registrada com 6 PNGs de botões; `assets/icons/` removida; todos os paths atualizados no código; `pubspec.yaml` e `precacheImage` atualizados
+- **B** — `HomeScreen` redesenhada seguindo `menu.jpeg`: 6 botões ilustrados PNG posicionados nos cantos/base, `LivesIndicator` removido da Home, botões "Continuar Jogo" / "Novo jogo" centrais, badge de recompensa no botão Recompensas
+
+---
+
+### ✅ Fase 3.0 — Harness + smoke tests (v1.3.0)
+- `GameTestHarness` com boot/restart/teardown + Hive em diretório temp
+- `E2EScenario` class + `ScenarioTag` enum + registry `allScenarios`
+- `WidgetTester` extensions semânticas: `tapByKey`, `swipeBoard`, `tapTile`, `useItem`, `gotoScreen`, `forceWin`, `forceGameOver`, `triggerColdRestart`
+- Tier 1 headless runner (`run_all_test.dart`)
+- 5 smoke tests passando: `flow.smoke_boot`, `flow.new_game_basic`, `engine.swipe_up_merges_correctly`, `persistence.inventory_survives_restart`, `nav.home_to_collection`
+
+### ✅ Fase 3.1 — `flow.*` completo (21 cenários)
+- Todos os 21 cenários `flow.*` implementados e passando
+- Helpers semânticos completos validados em fluxos reais
+- Regressões v1.2.9 cobertas: `flow.continue_after_pause`, `flow.continue_after_back_button`
+
+### 🔄 Fase 3.2 — `engine.*` + `items.*` + `nav.*` (29 cenários) — **em andamento**
+> **Spec completa em:** `docs/plans/2026-05-04-e2e-test-framework-design.md`
+
+**Cenários `engine.*` (11):**
+- `engine.swipe_up/down/left/right_merges_correctly`
+- `engine.no_op_swipe_doesnt_consume_turn`
+- `engine.score_accumulates`
+- `engine.high_score_updates_on_new_record`
+- `engine.tile_animation_smooth` *(tier2_only)*
+- `engine.merge_chain_correct`
+- `engine.spawn_only_after_valid_move`
+- `engine.gameover_when_no_moves_possible`
+
+**Cenários `items.*` (9):**
+- `items.bomb2_requires_target_selection`
+- `items.bomb2_cancellable_with_back`
+- `items.bomb3_requires_target_selection`
+- `items.undo1_disabled_at_game_start`
+- `items.undo3_disabled_when_no_history`
+- `items.bomb_dim_overlay_appears`
+- `items.shop_purchase_decrements_currency`
+- `items.item_count_persists_across_sessions`
+- `items.empty_item_pulses_on_attempt`
+
+**Cenários `nav.*` (9):**
+- `nav.home_to_collection/settings/ranking/shop/daily_rewards/tutorial_bottomsheet`
+- `nav.collection_back_returns_home`
+- `nav.settings_back_returns_home`
+- `nav.android_back_from_each_screen`
+
+---
+
+### 🔜 Fase 3.3 — `persistence.*` + `pause.*` + `daily.*` + `settings.*` (23 cenários)
+> **Spec completa em:** `docs/plans/2026-05-04-e2e-test-framework-design.md`
+
+**`persistence.*` (9) — cold restart:**
+- `persistence.collection_survives_restart` *(regressão v1.2.10)*
+- `persistence.inventory/lives/daily_rewards/high_score/personal_records/settings_survive_restart`
+- `persistence.game_records_history_survives_restart`
+- `persistence.in_progress_game_survives_restart`
+
+**`pause.*` (6):**
+- `pause.tap_pause_button_shows_overlay`
+- `pause.continuar_resumes_game`
+- `pause.reiniciar_resets_game`
+- `pause.menu_returns_to_home_resumed`
+- `pause.system_back_keeps_paused_state`
+- `pause.game_doesnt_consume_time_while_paused`
+
+**`daily.*` (4):**
+- `daily.badge_visible_when_available`
+- `daily.badge_hidden_when_claimed`
+- `daily.cycle_resets_after_X_days`
+- `daily.streak_increments`
+
+**`settings.*` (4):**
+- `settings.toggle_reduce_effects_persists`
+- `settings.reduce_effects_disables_blur_in_pause`
+- `settings.toggle_haptics_persists`
+- `settings.language_pt_br_default`
+
+---
+
+### 🔜 Fase 3.4 — `collection.*` + `accessibility.*` + `regression.*` (14 cenários)
+> **Spec completa em:** `docs/plans/2026-05-04-e2e-test-framework-design.md`
+
+**`collection.*` (6):**
+- `collection.shows_X_of_13_animals`
+- `collection.locked_animals_show_question_marks`
+- `collection.unlocked_card_opens_detail_sheet`
+- `collection.detail_shows_scientific_name_when_present`
+- `collection.detail_shows_funfact`
+- `collection.progress_bar_matches_count`
+
+**`accessibility.*` (4):**
+- `a11y.home_buttons_have_semantics_labels`
+- `a11y.game_board_has_semantics`
+- `a11y.contrast_score_panel_meets_aa`
+- `a11y.no_text_overflow_at_max_font_scale`
+
+**`regression.*` (4+ — cresce a cada bugfix):**
+- `regression.v1.2.7_header_grows_with_vertical_slack`
+- `regression.v1.2.8_no_progressive_icon_loading`
+- `regression.v1.2.9_continuar_after_back_unpause`
+- `regression.v1.2.10_collection_survives_cold_start`
+
+---
+
+### 🔜 Fase 3.5 — `golden.*` com `alchemist` (15 cenários × 3 viewports)
+> **Spec completa em:** `docs/plans/2026-05-04-e2e-test-framework-design.md`
+
+15 cenários para `HomeScreen`, `GameScreen`, `PauseOverlay`, `CollectionScreen`, `DailyRewardsScreen` nos viewports **360×640**, **414×894** e **800×1280**.
+
+Biblioteca escolhida: **`alchemist`** (CI mode com fonte fonteless — resolve diff de fonte cross-platform em headless).
+
+---
+
+### 🔜 Fase 3.6 — Tier 2: APK com `TestRunnerScreen` + Share + Demo
+> **Spec completa em:** `docs/plans/2026-05-04-e2e-test-framework-design.md`
+
+- `lib/main_test.dart` — entry point alternativo (flavor `test`)
+- Build flavor Android: `applicationIdSuffix .test`, ícone amarelo "Bichim TEST", instala em paralelo ao app real
+- `TestRunnerScreen`: lista agrupada por categoria, ✓/✗/⟳/○ por cenário, stack trace expansível em falhas, diff visual em goldens falhadas
+- **Share button (📤):** exporta PNG resumo + JSON detalhado via `share_plus` — sem cabo, sem adb
+- **Demo mode (🎬):** filtra tag `demo`, pula `expect()`, loop infinito com delay visual, botão "⏹ Parar"
+
+Demo subset (cenários com tag adicional `demo`):
+- `flow.new_game_basic`, `flow.win_2048_first_time`, `flow.shop_purchase_item`
+- `nav.home_to_collection`, `engine.swipe_*`
+
+---
+
+### 🔜 Fase 3.7 — CI workflow GitHub Actions
+- Tier 1 roda a cada PR: `flutter test test/e2e/run_all_test.dart --concurrency=4`
+- Falha de golden gera diff como artefato do PR
+- Badge de status no README
+
+---
+
+### 🔜 Fase 3.8 — Documentação do framework
+- README de testes: como rodar Tier 1, como instalar APK Tier 2, como adicionar novo cenário (<5 min de boilerplate)
+- Guia de troubleshooting de goldens flaky
+- Marcação da Fase 3 como concluída ao término da 3.8
+
+---
+
+#### Visão geral da Fase 3 — E2E Test Framework
+
+| Subfase | Escopo | Status |
+|---|---|---|
+| 3.0 | Harness + smoke tests | ✅ |
+| 3.1 | `flow.*` (21 cenários) | ✅ |
+| 3.2 | `engine.*` + `items.*` + `nav.*` (29 cenários) | 🔄 em andamento |
+| 3.3 | `persistence.*` + `pause.*` + `daily.*` + `settings.*` (23) | 🔜 |
+| 3.4 | `collection.*` + `accessibility.*` + `regression.*` (14) | 🔜 |
+| 3.5 | `golden.*` com `alchemist` (15 × 3 viewports) | 🔜 |
+| 3.6 | Tier 2: APK + TestRunnerScreen + Share + Demo | 🔜 |
+| 3.7 | CI GitHub Actions | 🔜 |
+| 3.8 | Documentação | 🔜 |
+
+**~110 cenários estimados · ~85 Tier 1 · ~5–8 exclusivos Tier 2 · ~12–14 dias total**
+
+**Spec de referência completa:** `docs/plans/2026-05-04-e2e-test-framework-design.md`
+
+**Critérios de sucesso da Fase 3 completa:**
+1. `flutter test test/e2e/` roda sem device em <60s
+2. Suite Tier 1 captura todas as regressões v1.2.7→v1.2.10
+3. APK Tier 2 instalável em paralelo, resultado visual em 1 toque
+4. Share button gera JSON + PNG sem cabo
+5. Demo mode em loop visualmente atrativo
+6. CI GitHub Actions verde a cada PR (Tier 1)
+7. Adicionar novo cenário leva <5 min
+
+---
+
+### 🔜 Fase 4 — Backend, ranking e monetização (3–4 semanas)
 - Setup Firebase (Auth, Firestore)
 - Login (Google, Apple, anônimo)
 - Sincronização de PlayerProfile
@@ -1489,18 +1662,18 @@ testWidgets('precacheImage inclui assets/images/home/ e assets/images/inventory/
 - `runGoldenTests()` integrado ao `run_all_test.dart`
 - Suite: 95 testes total (80 E2EScenarios + 15 golden)
 
-### 🔜 Fase 4 — Arte adicional e polimento visual
+### 🔜 Fase 5 — Arte adicional e polimento visual
 - Background de floresta na Home
 - Logo do jogo
 - Ícone do app
 - Splash screen final
 - Validação visual completa
 
-### 🔜 Fase 5 — Áudio (1–2 semanas)
-**Sons dos 11 animais e UI + música ambiente.** Esta fase entra **depois** de toda a arte e polimento visual e **antes** do lançamento.
+### 🔜 Fase 6 — Áudio (1–2 semanas)
+**Sons dos 13 animais e UI + música ambiente.** Esta fase entra **depois** de toda a arte e polimento visual e **antes** do lançamento.
 
-- Sound design dos 11 animais (definir tom/duração/estilo) e produção dos clipes
-- Sons dos 11 animais (~50KB cada, OGG/M4A/MP3) — ver tabela 11.1
+- Sound design dos 13 animais (definir tom/duração/estilo) e produção dos clipes
+- Sons dos 13 animais (~50KB cada, M4A/AAC iOS, OGG Android, MP3 fallback) — ver tabela 11.1
 - Sons de UI completos — ver lista 11.2
 - Música ambiente: loop de floresta com flautas + marimba
 - Integrar com `audioplayers` ou `just_audio` (decidir qual)
@@ -1508,7 +1681,7 @@ testWidgets('precacheImage inclui assets/images/home/ e assets/images/inventory/
 - Mixer simples nas Configurações — habilitar controles desabilitados na Fase 2.6
 - Pré-carregar tudo no início do app
 
-### 🔜 Fase 6 — Polimento + Lançamento
+### 🔜 Fase 7 — Polimento + Lançamento
 - Idioma: **PT-BR exclusivamente** no lançamento — EN e outros idiomas em expansão futura
 - Acessibilidade (contraste, leitor de tela, fonte ajustável)
 - Modo escuro (opcional)
@@ -1540,7 +1713,7 @@ testWidgets('precacheImage inclui assets/images/home/ e assets/images/inventory/
 - `const` e Riverpod selectors
 - PNGs em vez de SVGs
 - `precacheImage` para todos os assets no boot (via `SplashScreen`)
-- Pool de AudioPlayers (Fase 5)
+- Pool de AudioPlayers (Fase 6)
 - 60fps em Snapdragon 660+ / iPhone 8+
 - `RepaintBoundary` no `GameBackground`
 - `BackdropFilter` no `PauseOverlay` — fallback se < 50fps
@@ -1569,34 +1742,38 @@ testWidgets('precacheImage inclui assets/images/home/ e assets/images/inventory/
 
 ---
 
-## 17. Prompt Sugerido para o Claude Code (Fase 2.13 — via skill superpowers)
+## 17. Prompt Sugerido para o Claude Code (Fase 4 — via skill superpowers)
 
 > Use a skill `superpowers/brainstorming` pra refinar o design da próxima fase do projeto **Olha o Bichim!** (Flutter, codename `capivara_2048`).
 >
-> **Contexto:** Fase 2.12 concluída (v1.1.0) + bugfixes até v1.1.4. Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente §2.3, §6.2, §12.3 e §15 — Fase 2.13). A referência visual obrigatória para o redesign da Home é o arquivo `menu.jpeg` na raiz do projeto.
+> **Contexto:** Fase 3 (E2E Test Framework, subfases 3.0–3.8) concluída. Use `CAPIVARA_2048_DESIGN.md` como spec geral (especialmente §9, §13, §14.2 e §15 — Fase 4). A spec de E2E está em `docs/plans/2026-05-04-e2e-test-framework-design.md`.
 >
-> **Fases concluídas:** 1 a 2.12 + v1.1.x. Áudio na Fase 5. Backend na Fase 3.
+> **Fases concluídas:** 1 a 2.13, 3.0 a 3.8. Áudio na Fase 6. Lançamento na Fase 7.
 >
-> **Tópico do brainstorm:** **Fase 2.13 — Redesign da Home + reorganização de assets**. Duas sub-entregas independentes: reorganização da estrutura de pastas e implementação do novo layout da `HomeScreen`.
+> **Tópico do brainstorm:** **Fase 4 — Backend, ranking e monetização**. Integração com Firebase (Auth, Firestore), ranking global semanal, Ranking Lendas persistido, sistema de convites, anúncios reais e IAP real.
 >
-> **Duas sub-entregas:**
+> **Sub-entregas principais:**
 >
-> **A — Reorganização de assets:** mover `assets/icons/inventory/` para `assets/images/inventory/`; registrar `assets/images/home/` com os 6 PNGs de botões; atualizar `pubspec.yaml`; busca e substituição de todos os paths `assets/icons/inventory/` no código; deletar pasta `assets/icons/` que ficará vazia; atualizar `precacheImage` na `SplashScreen`.
+> **A — Firebase setup:** `firebase_core`, `firebase_auth` (Google, Apple, anônimo), `cloud_firestore`. Sincronização de `PlayerProfile` local (Hive) → remoto (Firestore). Estratégia de merge quando há conflito offline/online.
 >
-> Arquivos afetados pela substituição de path: `inventory_item_button.dart`, `confirm_use_dialog.dart`, `game_over_item_screen.dart`, `game_over_no_items_overlay.dart` e qualquer outro que referencie os ícones de inventário.
+> **B — Ranking global semanal:** substituir `FakeRankingService` por `FirestoreRankingRepository`. Reset sábado 18h Brasília via Cloud Function ou client-side com verificação de timestamp. Recompensas de ranking entregues ao abrir o app após reset.
 >
-> **B — Redesign da `HomeScreen`:** implementar layout com base em `menu.jpeg`. Remover `LivesIndicator` da Home. Criar 3 widgets auxiliares: `_HomeButton` (PNG como botão com animação de scale), `_HomeButtonWithBadge` (badge vermelho condicional para Recompensas), `_ActionButton` (cápsula semi-transparente para "Continuar Jogo" / "Novo jogo"). Posicionar os 6 botões nos cantos e base da tela via `Positioned` dentro de `Stack`.
+> **C — Ranking Lendas:** persistência de `timesReached4096` e `timesReached8192` no Firestore (`legendsRankings/4096` e `legendsRankings/8192`). Desempate por `firstReachedAt`.
 >
-> PNGs disponíveis em `assets/images/home/`: `Colecao.png`, `ComoJogar.png`, `Configuracao.png`, `IconeLoja.png`, `Ranking.png`, `Recompensas.png`.
+> **D — Sistema de convites:** deep links via `app_links`. Vínculo convidante/convidado no Firestore. Recompensa entregue quando convidado completa 1ª partida.
+>
+> **E — Anúncios reais:** substituir `FakeAdService` por `google_mobile_ads`. Manter limite de 40/dia. Flag `tagForChildDirectedTreatment`.
+>
+> **F — IAP real:** substituir mocks da `ShopScreen` e `GameOverNoItemsOverlay` por `in_app_purchase`. Fluxo: confirmação SO → entrega de itens → geração de `ShareCode` no Firestore.
 >
 > **Pontos abertos pra explorar no brainstorm:**
 >
-> - Sub-entrega A: o `precacheImage` atual na `SplashScreen` lista os assets explicitamente ou usa um glob? Se explícito, quantos paths precisam ser atualizados?
-> - Sub-entrega B: os valores exatos de `top/bottom/left/right` dos `Positioned` devem ser definidos em constantes (`HomeConstants`) para facilitar ajustes por dispositivo — como estruturar essas constantes considerando telas 360×640 e 390×844?
-> - Sub-entrega B: o botão "Continuar Jogo" verifica `current_game` no Hive — essa leitura deve ser feita no `initState` da Home, em um provider reativo, ou via `FutureBuilder`? Qual tem menos jank na transição da splash?
-> - Sub-entrega B: a `GameTitleImage` já alterna laranja/marrom por sessão (escolha em `initState`). Esse comportamento deve ser mantido exatamente igual ou há alguma mudança visual nessa fase?
+> - Sub-entrega A: login anônimo → upgrade para Google/Apple sem perda de dados — qual é a estratégia de merge? O `userId` anônimo deve ser preservado ou substituído?
+> - Sub-entrega B: o reset sábado 18h — client-side é suficiente para o lançamento Brasil-only, ou já vale implementar Cloud Function desde o início para evitar retrabalho?
+> - Sub-entrega C: o Ranking Lendas nunca reseta — como lidar com jogadores que deletam e reinstalam o app? O `firstReachedAt` deve ser vinculado ao `userId` remoto para não ser perdido?
+> - Sub-entrega F: a compra na `GameOverNoItemsOverlay` entrega o pacote completo (ex: 4× Bomba 3) mas o jogador esperava 1× — como comunicar isso claramente na UI antes da confirmação?
 >
-> **Output esperado:** spec detalhada da Fase 2.13 com decisões em cada ponto aberto, lista completa de arquivos a modificar por sub-entrega, casos de teste obrigatórios, critérios de aceite e plano de validação (360×640, 390×844). Ao final: **prompt de brainstorm da Fase 3** (Backend — próxima grande fase).
+> **Output esperado:** spec detalhada da Fase 4 com decisões em cada ponto aberto, arquivos a modificar por sub-entrega, modelo de dados Firestore completo, casos de teste obrigatórios (incluindo cenários e2e da Fase 3 que precisarão de mocks de Firebase) e critérios de aceite. Ao final: **prompt de brainstorm da Fase 5** (Arte adicional e polimento visual).
 >
 > **Não escreva código nesta etapa.**
 

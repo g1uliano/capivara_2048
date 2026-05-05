@@ -1,10 +1,8 @@
 import 'dart:io';
-import 'package:capivara_2048/data/models/game_state.dart';
 import 'package:capivara_2048/data/models/lives_state.dart';
 import 'package:capivara_2048/data/models/lives_state_adapter.dart';
 import 'package:capivara_2048/domain/lives/lives_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/game_notifier.dart';
-import 'package:capivara_2048/presentation/screens/no_lives_screen.dart';
 import 'package:capivara_2048/presentation/widgets/game_over_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

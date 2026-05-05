@@ -20,6 +20,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [1.3.3] - 2026-05-05
 
 ### Added (Fase 3.4 — Collection, Accessibility, Regression E2E)
+
 - **14 novos cenários E2E** (total: 80 no Tier 1)
   - `collection.*` (6): count, locked cards "???", detail sheet, scientific name, funFact, progress bar
   - `accessibility.*` (4): home buttons Semantics labels, board Semantics, contrast score panel, overflow 360×640
@@ -29,6 +30,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [1.3.2] - 2026-05-04
 
 ### Added (Fase 3.3 — Persistence, Pause, Daily, Settings)
+
 - **18 novos cenários E2E** (total: 66 no Tier 1)
   - `persistence.*` (8): inventário, vidas, recompensas, personal records, settings, game records, jogo em andamento
   - `pause.*` (4): botão pausar, reiniciar, system back, timer pausado
@@ -39,6 +41,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [1.3.1] - 2026-05-04
 
 ### Added (Fase 3.2 — Engine, Items e Nav)
+
 - **25 novos cenários E2E** (total: 48 no Tier 1)
   - `engine.*` (10): swipe ↑↓←→, no-op, score, highscore, merge chain, spawn, gameover
   - `items.*` (8): bomb2/3 seleção, cancelamento, undo desabilitado, dim overlay, persistência, shop routing
@@ -47,6 +50,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [1.3.0] - 2026-05-04
 
 ### Added (Fase 3.1 — E2E Flow Scenarios)
+
 - **23 cenários E2E** cobrindo todos os flows principais do jogo (Tier 1 headless)
   - Pause / Resume / Back (regressão v1.2.9 protegida)
   - Game Over overlays — com e sem itens no inventário
@@ -57,6 +61,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
   - Vidas — consumo, tela sem vidas, regeneração
 
 ### Changed
+
 - `GameNotifier.debugSetState` agora chama `_stopTimer()` para evitar timers órfãos nos testes
 - `GameTestHarness.boot()` desabilita Google Fonts runtime fetching (evita timeout 23s em testes headless)
 - `GameTestHarness.teardown()` usa timeout em `Hive.close()` para tolerar writes async não-aguardados
@@ -65,22 +70,27 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [1.2.10] - 2026-05-04
 
 ### Fixed
+
 - **Coleção resetava ao fechar e reabrir o app** — mesmo tendo desbloqueado animais em níveis altos, ao reabrir o app a tela de Coleção mostrava todos os animais bloqueados (`0/13 animais descobertos`). Causa-raiz: `main.dart` chamava `.load()` em `reduceEffectsProvider`, `inventoryProvider` e `dailyRewardsProvider` no boot, mas **não chamava em `personalRecordsProvider`**. Como `PersonalRecordsNotifier()` inicializa com `const PersonalRecords()` (`highestLevelEver = 0`), o estado em memória ficava zerado a cada cold start mesmo com o Hive populado — `updateHighestLevel()` salvava certinho, mas ninguém lia de volta. Como a tela de Coleção deriva o desbloqueio direto de `highestLevelEver`, todos os animais voltavam a aparecer como `???`. Fix: adicionar `await container.read(personalRecordsProvider.notifier).load()` em `main.dart`, seguindo o mesmo padrão dos outros notifiers persistidos.
 
 ### Tests
+
 - Novo teste de regressão em `personal_records_notifier_test.dart` que verifica round-trip de `highestLevelEver` através de duas instâncias do `ProviderContainer` (simulando reinicialização do app). 340/340 passing.
 
 ## [1.2.9] - 2026-05-04
 
 ### Fixed
+
 - **"Continuar Jogo" na Home não despausava o jogo quando o jogador voltava via botão back do Android** — ao pausar o jogo e usar o back do sistema para voltar à Home (em vez do botão "Menu" no overlay, que já chamava `resume()`), o `gameProvider` global ficava com `isPaused = true`. Como `GameScreen` não tinha `PopScope`, o pop default não despausava. Resultado: ao clicar "Continuar Jogo", o jogador caia novamente no `PauseOverlay` e precisava clicar "Continuar" pela segunda vez. Fix: `_continueGame()` agora chama `gameProvider.notifier.resume()` antes de navegar — semântica clara: clicar "Continuar" continua o jogo.
 
 ## [1.2.8] - 2026-05-04
 
 ### Fixed
+
 - **Splashscreen e Home carregando progressivamente em emuladores (Genymotion)** — após a splash nativa do Android 12+ (ícone do app), a `splashscreen.png` sumia rápido demais e a Home aparecia com os 6 ícones e a logo do título carregando um por um, com vários segundos de delay entre eles. Causa-raiz: as chamadas `precacheImage` em `app.dart` eram fire-and-forget (sem `await`/`Future.wait`), o timer fixo de 1500ms da `SplashScreen` navegava sem aguardar o precache, a própria `splashscreen.png` (3.5 MB) não estava na lista de precache (decodificava on-the-spot, podia exceder os 1500ms), e os títulos do jogo (`title_brown.png`/`title_orange.png`) não eram precacheados. Em devices físicos rápidos o problema passava despercebido, mas no Genymotion ficava muito visível.
 
 ### Changed
+
 - Lista de assets críticos extraída para `lib/core/asset_precache.dart` com função `criticalAssetPaths()` (testável) e `precacheCriticalAssets(context)` que decodifica a `splashscreen.png` primeiro (await) e o resto em paralelo (Future.wait).
 - `SplashScreen` agora aceita uma `precacheFuture` opcional e aguarda ela completar (com timeout-cap de 4s e duração mínima de 1500ms) antes de navegar para a Home, garantindo que tudo esteja decodificado quando a Home aparecer.
 - Adicionados ao precache: `splashscreen.png`, `title_brown.png`, `title_orange.png` (que estavam ausentes).
@@ -89,31 +99,37 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [1.2.7] - 2026-05-04
 
 ### Changed
+
 - **Header cresce mais agressivamente quando há folga vertical** — a função de cap horizontal do header foi recalibrada com base na medida real do `StatusPanel` (~146dp) e na constraint correta do `Row` (`host + max(status, pause) ≤ boardSide`, já que o `Spacer` absorve folga). Antes a fórmula reservava 130dp para status+pause juntos e usava divisor 230, o que limitava o header a ~1.13× mesmo com espaço sobrando. Agora o divisor é 152 (só o host) e a reserva é 160dp (status com margem), permitindo o header crescer até ~1.31× em telas com folga vertical (ex: 414×894dp). Header e inventário agora usam escalas independentes (`headerScale`/`invScale`).
 
 ## [1.2.6] - 2026-05-04
 
 ### Changed
+
 - **Game screen: elementos crescem além de 1.0× quando há folga vertical** — em dispositivos onde o tabuleiro (limitado pela largura) não consome toda a altura disponível, o anfitrião, indicador de vidas, botão pausar, ícones do inventário e demais elementos do header crescem proporcionalmente para preencher o espaço (até 1.5× do tamanho de design). Antes o scale era clampado em 1.0, deixando grandes faixas vazias acima e abaixo do tabuleiro em telas com mais de ~844dp de altura útil. A escala respeita também a largura disponível para o header (host + status + pause) e a fileira do inventário, evitando overflow.
 
 ## [1.2.5] - 2026-05-04
 
 ### Changed
+
 - **Layout adaptativo: `vmin` em vez de `vheight`** — tanto `HomeScreen` quanto `GameScreen` agora calculam `scale = min(width/390, height/844)` (equivalente ao `vmin` do CSS). Isso garante que elementos não transbordem horizontalmente em tablets ou telas largas. Antes o scale usava apenas a altura, o que podia gerar elementos grandes demais em paisagem.
 
 ## [1.2.4] - 2026-05-04
 
 ### Changed
+
 - **Layout adaptativo da tela de jogo**: todos os elementos (animal, coração/vidas, botão pausar, ícones do inventário) agora escalam proporcionalmente à altura disponível usando `scale = availableHeight / 844` (844dp = altura de design base), com clamp no tamanho máximo original. O tabuleiro recebe o espaço restante via `AspectRatio(1.0)` e sempre é quadrado. Em telas compactas (~640dp) o tabuleiro passa de ~234dp para ~360dp; em telas normais (~844dp) o layout permanece idêntico ao anterior.
 
 ## [1.2.3] - 2026-05-04
 
 ### Fixed
+
 - **Tabuleiro retangular em telas compactas** (ex: 640dp): substituído `SizedBox(boardSide×boardSide)` — cujo cálculo usava `headerH=72` muito abaixo da altura real do `GameHeader` (~238dp) — por `AspectRatio(1.0)` + `LayoutBuilder` interno. O tabuleiro agora é sempre quadrado em qualquer tamanho de tela, usando todo o espaço disponível entre o header e o inventário.
 
 ## [1.2.2] - 2026-05-04
 
 ### Changed
+
 - **Estilo dos botões de ação** ("Novo jogo" / "Continuar Jogo"): fundo laranja `#FF8C42`, bordas `radius 12`, texto branco com contorno preto via `OutlinedText` + Nunito bold — igualado aos botões da tela de pausa
 - **Layout compacto corrigido** (telas ≤640dp, ex: Genymotion 768×1280): título reduzido de 200dp para 130dp, alinhamento vertical ajustado de `-0.2` para `-0.5` e gap de 20dp para 16dp — elimina a sobreposição dos botões Recompensas/Ranking sobre os botões de jogo
 - Telas normais (>700dp): alinhamento vertical ajustado de `-0.2` para `-0.3` para garantir folga acima dos botões inferiores
@@ -121,12 +137,14 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [1.2.1] - 2026-05-04
 
 ### Changed
+
 - **Polimento da HomeScreen**: logo e botões de ação movidos levemente para cima (`Align(0, -0.2)` em vez de `Center`), deixando o logo acima do pássaro conforme referência visual
 - Botões inferiores com mais respiro: `edgePad` 8→12px, `rowBaseBottom` 8→24px, `rowTopBottom` 120→148px (telas normais) — elimina o encostamento nas bordas e entre as fileiras
 
 ## [1.2.0] - 2026-05-04
 
 ### Added
+
 - **Redesign da HomeScreen** (Fase 2.13): 6 botões ilustrados PNG posicionados nos cantos e base da tela via `Stack + Positioned`, conforme referência visual `menu.jpeg`
 - `HomeConstants`: constantes de layout responsivas com breakpoint 700dp (suporte a 360×640 e 390×844)
 - Contorno branco nos botões PNG via `ColorFiltered + Transform.scale(1.06)` — sem editar assets
@@ -135,11 +153,13 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 - `debugSetState` com `@visibleForTesting` no `GameNotifier` para testes de widget
 
 ### Changed
+
 - `HomeScreen` removeu `LivesIndicator` — indicador de vidas permanece apenas na `GameScreen`
 - `_HomeCard` (grid de ícones Material) substituído pelos botões ilustrados PNG
 - `_PlayButton` substituído pelos `_ActionButton` separados por estado de partida salva
 
 ### Chore
+
 - Assets de inventário movidos de `assets/icons/inventory/` para `assets/images/inventory/`
 - Pasta `assets/icons/` removida; todos os assets consolidados sob `assets/images/`
 - 6 PNGs de `assets/images/home/` registrados no `pubspec.yaml` e adicionados ao `precacheImage`
@@ -147,6 +167,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [1.1.4] - 2026-05-04
 
 ### Fixed
+
 - Itens de Desfazer podem ser usados consecutivamente sem precisar fazer uma jogada entre os usos
 - Desfazer 3 pode ser usado várias vezes seguidas, voltando 3 jogadas a cada uso (desde que haja histórico suficiente)
 - Histórico de undo agora é ilimitado (antes era limitado a 3 entradas)
@@ -156,12 +177,14 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [1.1.3] - 2026-05-03
 
 ### Fixed
+
 - RankingScreen: TabBar "Por Tempo / Por Pontuação" agora tem fundo verde com texto branco — legível sobre o GameBackground
 - RankingScreen: texto de estado vazio substituído por OutlinedText (branco + contorno preto)
 
 ## [1.1.2] - 2026-05-03
 
 ### Fixed
+
 - ShopOverlay agora exibe a seção "Itens avulsos" igual à loja principal
 - Item avulso correspondente ao ícone tocado é destacado com borda laranja no ShopOverlay
 - Assistir anúncio para ganhar item no game over não entrega mais vida extra
@@ -169,11 +192,13 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [1.1.1] - 2026-05-03
 
 ### Fixed
+
 - Assistir anúncio para ganhar item no game over não entrega mais uma vida extra — o fluxo de item agora apenas contabiliza o anúncio no limite diário
 
 ## [1.1.0] - 2026-05-03
 
 ### Added
+
 - Dois novos animais: **Peixe-boi** (nível 12, 4096) e **Jacaré** (nível 13, 8192)
 - `VictoryChoiceDialog` — ao atingir 2048/4096/8192 o jogador escolhe Continuar ou Encerrar; cronômetro pausa enquanto decide
 - Recompensas ao continuar além do 4096: 5 vidas + 2×Bomba2 + 1×Bomba3 + 2×Desfazer1 + 1×Desfazer3
@@ -184,6 +209,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 - `ShopOverlay` acessível pelos ícones desabilitados do inventário (Fase 2.11 integrada neste release)
 
 ### Changed
+
 - `GameConstants.maxLevel` atualizado de 11 → 13
 - `CollectionScreen` exibe `X/13 animais descobertos` (era `/11`)
 - Configuração "Reduzir Efeitos Visuais" movida para a aba Gameplay da `SettingsScreen` (removida do `PauseOverlay`)
@@ -192,86 +218,102 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [1.0.7] - 2026-05-03
 
 ### Fixed
+
 - Cards de itens avulsos na loja agora têm espaçamento reduzido — removida `Padding` duplicada e margem interna excessiva
 - Último item ("Desfazer 3") não é mais cortado: `ListView` agora tem `padding` inferior de 32 dp
 
 ## [1.0.6] - 2026-05-03
 
 ### Fixed
+
 - "Itens avulsos" agora usa `OutlinedText` (branco com contorno preto) — legível sobre o fundo de floresta
 - Último card de item avulso ("Desfazer 1") não é mais cortado na borda inferior da tela
 
 ## [1.0.5] - 2026-05-03
 
 ### Fixed
+
 - Flash branco entre splash nativa e primeiro frame Flutter eliminado — `NormalTheme` agora usa `#1B3610` como `windowBackground` em vez da cor padrão do sistema
 - `SplashScreen` Flutter exibe a arte full-screen corretamente (referência morta a `splash_logo.png` removida)
 
 ## [1.0.4] - 2026-05-03
 
 ### Fixed
+
 - Android 12+: splash exibe ícone do app centralizado sobre fundo verde-selva `#1B3610` em vez da imagem full-screen cortada com crop arredondado
 
 ## [1.0.3] - 2026-05-03
 
 ### Changed
+
 - Splash screen full-screen com arte da floresta amazônica e todos os animais do jogo (1080×1920, `scaleAspectFill`)
 
 ## [1.0.2] - 2026-05-03
 
 ### Fixed
+
 - Usar Bomba 2/3 na `GameOverItemOverlay` agora abre a grade de seleção de tiles corretamente — o item não era mais consumido antes do jogador selecionar os tiles, eliminando o travamento do jogo
 - Botões "Comprar" e "Encerrar partida" no `GameOverNoItemsOverlay` agora legíveis sobre o fundo escuro
 
 ## [1.0.1] - 2026-05-03
 
 ### Fixed
+
 - `GameOverModal` não aparecia mais sobre o `GameOverNoItemsOverlay` — condição legada `|| !hasAnyItem` removida; modal só exibe após o jogador confirmar "Encerrar partida"
 
 ## [1.0.0] - 2026-05-02
 
 ### Added
+
 - **GameOverNoItemsOverlay** (Fase 2.10-B): quando o tabuleiro trava e o inventário está vazio, oferece 3 opções — ver anúncio (rewarded ad via FakeAdService), comprar item avulso, ou encerrar (consome 1 vida). Botão voltar Android bloqueado. Tabuleiro ao fundo não interativo (AbsorbPointer).
 - **Itens avulsos na ShopScreen** (Fase 2.10-C): seção "Itens avulsos" abaixo dos 6 pacotes; 4 cards compactos (ícone + nome + preço) para compra individual de Bomba 3 (R$ 1,99), Desfazer 3 (R$ 0,99), Bomba 2 (R$ 1,19) e Desfazer 1 (R$ 0,49). Preços ~2× o valor por unidade nos pacotes para incentivar compra do pacote.
 - **`kItemUnitPrices`** em `shop_data.dart`: mapa de preços unitários para os 4 tipos de item.
 
 ### Changed
+
 - **GameOverItemOverlay** (Fase 2.10-A): ícone do item em destaque pisca em loop (opacidade 1.0→0.4→1.0, 800ms easeInOut via `flutter_animate`). Haptic sincronizado com cada ciclo (`AnimationController` separado, respeita `hapticEnabled`). Animação e haptic param ao tocar "Usar item"; reiniciam ao trocar de item. `WillPopScope` substituído por `PopScope`.
 
 ## [0.9.9.5] - 2026-05-02
 
 ### Fixed
+
 - Regen de vida não reseta mais imediatamente quando perdida no cap: `applyConsume` agora reseta `lastRegenAt` para `DateTime.now()` quando `lives >= regenCap`, garantindo que o countdown de 30 minutos comece do zero
 
 ## [0.9.9.4] - 2026-05-02
 
 ### Fixed
+
 - Countdown "Restando MM:SS" agora decrementa a cada segundo — o banner tinha `_timerText()` calculado corretamente mas sem `Timer.periodic(1s)` para forçar rebuild do widget
 
 ## [0.9.9.3] - 2026-05-02
 
 ### Fixed
+
 - Splash screen no Android 12+: removida animação de saída (rotação/zoom) que distorcia a imagem antes do Flutter carregar
 - confirmBomb limpa isContinuingWithItem e reseta isGameOver para desbloquear o jogo após usar bomba no fluxo game-over
 
 ## [0.9.9.1] - 2026-05-02
 
 ### Fixed
+
 - GameOverItemOverlay não aparece mais quando inventário está vazio
 - Cancelar bomba durante fluxo "Usar item" volta para o overlay em vez de ir direto para Game Over
 
 ## [0.9.9] - 2026-05-02
 
 ### Added
+
 - Splash screen: native splash + animated logo (Fase 2.9-A)
 - GameOverItemOverlay: "Continuar?" dialog when game ends, lets player use an inventory item (Fase 2.9-B)
 
 ### Changed
+
 - Inventory icons enlarged from 56dp to 72dp (Fase 2.9-C)
 - Board-to-inventory spacing reduced from 12dp to 4dp (Fase 2.9-C)
 - App locked to portrait-only orientation (Fase 2.9-D)
 
 ### Fixed
+
 - Bomba: taps na grade de seleção não respondiam — BombDimOverlay envolvia tudo com
   IgnorePointer(ignoring: false), bloqueando todos os eventos antes de chegarem ao grid.
   Dim e label agora são IgnorePointer; apenas o botão Cancelar absorve eventos.
@@ -281,6 +323,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [0.9.8] — 2026-05-02
 
 ### Fixed
+
 - Bomba: células do overlay invisíveis sobre o tabuleiro — reescrita do BombGridOverlay
   usando exatamente o mesmo layout do BoardWidget (Column/Row/Expanded com mesmos paddings),
   garantindo alinhamento pixel-a-pixel. Fundo branco 60% opaco para contraste real;
@@ -289,6 +332,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [0.9.7] — 2026-05-02
 
 ### Fixed
+
 - Bomba: células da grade de seleção estavam transparentes, impossível ver sobre os tiles.
   Adicionado fundo branco semi-transparente (25%) e borda branca mais visível nas células
   não selecionadas; selecionadas ficam vermelho 55%.
@@ -296,6 +340,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [0.9.6] — 2026-05-02
 
 ### Fixed
+
 - Bomba: grade de seleção desalinhada com o tabuleiro — reescrita da arquitetura do overlay.
   A grade (`BombGridOverlay`) agora vive dentro do Stack que envolve exatamente o BoardWidget,
   eliminando qualquer cálculo de altura de header. `BombDimOverlay` cuida apenas do dim/label/cancelar.
@@ -303,15 +348,18 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [0.9.5] — 2026-05-02
 
 ### Fixed
+
 - Bomba 3: grade de seleção desalinhada com o tabuleiro — overlay agora espelha a estrutura exata do GameScreen (LayoutBuilder + heights fixas de header/inventory)
 - Recompensa Diária: coletar Dia 1 marcava Dia 2 como coletado — condição `isClaimed` corrigida para exigir `claimedThisCycle=true`
 
 ### Changed
+
 - Recompensa Diária: cards dos dias agora responsivos, ocupam toda a largura disponível da tela
 
 ## [0.9.4] — 2026-05-02
 
 ### Added
+
 - ShopScreen com 6 pacotes compráveis (Fase 2.8)
 - Compra simulada entrega itens localmente sem IAP real
 - Bottom sheet "Código para presentear" com UUID truncado e botão copiar
@@ -320,6 +368,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [0.9.3] — 2026-05-02
 
 ### Fixed
+
 - Tabuleiro 4×4 cortado em telas pequenas (360×640) — `LayoutBuilder` no `GameScreen`
 - Badge de Recompensa Diária desalinhava o grid da Home — `SizedBox.expand` + badge "!"
 - Textos ilegíveis sobre fundo dinâmico (`CollectionScreen`, `SettingsScreen`) — `OutlinedText`
@@ -328,6 +377,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [0.9.2] — 2026-05-01
 
 ### Added
+
 - Home redesenhada: grid 2×3 de cards (Loja, Ranking, Recompensa Diária, Coleção, Configurações, Como Jogar)
 - Animação de entrada do logo (`flutter_animate` fade + scale 400ms)
 - `CollectionScreen`: grid 2 colunas, 11 animais, cards desbloqueados/bloqueados, bottom sheet detalhado
@@ -340,6 +390,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [0.9.1] — 2026-05-01
 
 ### Fase 2.5 — Identidade "Olha o Bichim!"
+
 - Rebranding: strings de exibição "Capivara 2048" → "Olha o Bichim!" (app title, Info.plist, README)
 - Novo widget `GameTitleImage` com sorteio por sessão entre variante orange e brown
 - Logo na HomeScreen substituindo placeholder SizedBox(height: 220)
@@ -349,79 +400,94 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [0.8.4] — 2026-04-30
 
 ### Changed
+
 - Botões do inventário: PNG ocupa 56×56 inteiro — o PNG é o botão (sem fundo verde)
 
 ## [0.8.3] — 2026-04-30
 
 ### Fixed
+
 - `HostBanner` colado à esquerda do header sem padding — simetria com `PauseButtonTile` à direita
 
 ## [0.8.2] — 2026-04-30
 
 ### Fixed
+
 - `HostBanner` alinhado com a coluna 1 do tabuleiro (offset `tileSpacing * 1.5` corrigido)
 - Botões do inventário sem label de texto — apenas PNG centralizado no slot
 
 ## [0.8.1] — 2026-04-30
 
 ### Fixed
+
 - `LivesIndicator` centralizado horizontalmente em `GameScreen` e `HomeScreen` (era esquerda/direita)
 - `HostBanner` colado à borda esquerda do tabuleiro — gap eliminado com `Spacer()` (Fase 2.3.12-B)
 - Timer de regen de vidas implementado em `LivesNotifier` — vidas agora incrementam durante sessão ativa (Fase 2.3.12-C)
 - Recálculo offline de vidas ao retornar do background via `AppLifecycleListener` (Fase 2.3.12-C)
 
 ### Changed
+
 - Ícones do inventário agora usam PNGs finais temáticos (Sucuri, Mico-leão, Capivara, Onça) (Fase 2.3.12-D)
 - `ConfirmUseDialog` exibe ícone 40×40 do item no título (Fase 2.3.12-D)
 
 ## [0.8.0] - 2026-04-28
 
 ### Added
+
 - `HostBanner`: Tanajura exibida desde o boot como anfitrião inicial (sem placeholder "Comece!")
 - `HomeScreen`: mesmo `fundo.png` da `GameScreen` — fundo visual unificado entre as telas
 - Galeria de debug: nota informativa sobre Tanajura ser o anfitrião inicial (Fase 2.3.11)
 
 ### Changed
+
 - `maxLevel` inicia em 1 em `GameEngine.newGame()` e `GameNotifier.restart()`
 - `hasSave` na `HomeScreen` usa `score > 0` (corrige falso-positivo causado pelo novo `maxLevel = 1`)
 - `GameBackground`: parâmetro `animal` removido (dead code)
 
 ### Removed
+
 - `_Placeholder` widget do `HostBanner`
 
 ## [0.7.5] - 2026-04-27
 
 ### Changed
+
 - `LivesIndicator`: espaço entre coração e texto reduzido de 6→2dp
 
 ## [0.7.4] - 2026-04-27
 
 ### Changed
+
 - `GameHeader`: bloco direito (StatusPanel + PauseButtonTile) alinhado à direita (`CrossAxisAlignment.end`)
 
 ## [0.7.3] - 2026-04-27
 
 ### Changed
+
 - `HostBanner` placeholder: Capivara visível em tamanho cheio (sem opacidade); "Comece!" no lugar do nome (Fredoka 16sp), mesmo layout de `_AnimalHost`
 
 ## [0.7.2] - 2026-04-27
 
 ### Changed
+
 - `StatusPanel`: conteúdo alinhado à direita (`CrossAxisAlignment.end`)
 
 ## [0.7.1] - 2026-04-27
 
 ### Changed
+
 - `PauseButtonTile`: alinhamento `centerLeft` → `centerRight` dentro do slot 2×1
 
 ## [0.7.0] - 2026-04-27
 
 ### Added
+
 - `GameHeader` widget: extrai cabeçalho da `GameScreen` em componente isolado (`StatelessWidget`)
 - `StatusPanelTest`: testes de regressão para ausência de `PauseButtonTile` na subárvore
 - Galeria de debug: coluna "Host 2×2" mostrando `HostArtwork` no tamanho real (152dp)
 
 ### Changed
+
 - `GameScreen`: usa `GameHeader()`; `Padding(horizontal: 12)` compartilhado entre header e board
 - `HostBanner`: slot fixo 2×2 (152dp); `_Placeholder` com silhueta Capivara (opacity 0.15) + "Comece!"; nome em Fredoka 16sp
 - `HostArtwork`: `BoxFit.cover` (era `contain`) — PNGs são quadrados, sem risco de corte
@@ -431,12 +497,14 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [0.5.0] - 2026-04-27
 
 ### Added
+
 - Confirmation dialog for all inventory item uses
 - LivesIndicator redesign: single heart with number overlay, bonus badge when lives exceed regen cap
 - Lives system: `regenCap` (5) and `earnedCap` (15) caps; purchased lives have no cap; `addEarned`/`addPurchased` methods
 - Inventory 99+ badge when count exceeds 99; long-press tooltip shows exact count
 
 ### Changed
+
 - Migrated all 22 animal assets from SVG to PNG; removed `flutter_svg` dependency
 - `Animal` model: `assetPath`/`hostSvgPath` renamed to `tilePngPath`/`hostPngPath`; removed `texturePattern`, `hostAspectRatio`, `backgroundTexturePath`
 - Fixed game background to solid `#D4F1DE`; removed animated texture system
@@ -445,11 +513,13 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 - PNG images precached with `ResizeImage` on app startup
 
 ### Migration
+
 - Hive data reset to initial state (v2.3.8 migration)
 
 ## [0.4.0] — 2026-04-26
 
 ### Added
+
 - **SVG watermarks nos tiles** — `SvgPicture.asset` com `Opacity(0.27)` e padding `size * 0.08`, substituindo `Image.asset` que era silenciosamente vazio
 - **Host artwork ativo** — `hostSvgPath` populado em todos os 11 animais, `HostArtwork` agora renderiza o SVG correto para cada animal
 - **Sagui no nível 5** — substitui Arara-azul; cor `#A0826D`, `scientificName`, `funFact`
@@ -465,6 +535,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [0.3.6] — 2026-04-26
 
 ### Added
+
 - **Inventory system** — Hive-persisted `Inventory` model with Bomb 2, Bomb 3, Undo 1, Undo 3 items
 - **InventoryBar widget** — 4 item buttons with grayscale when count == 0, red badge for count
 - **Undo 1 and Undo 3** — `undoStack` (max 3 snapshots) in `GameState`, undo action in `GameNotifier`
@@ -473,6 +544,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 - **GameOverModal** — full implementation with lives check, `restart()` or navigate to `NoLivesScreen`
 
 ### Changed
+
 - **Refactored GameScreen** to full Stack layout — all overlays as `Positioned.fill`, `Column` never has conditional children
 - **Fixed OutlinedText** — 8-shadow radial technique replaces Stack/stroke approach, better anti-aliasing
 - **Fixed HostBanner placeholder** — uses `outlinedWhiteTextStyle` consistently
@@ -480,21 +552,25 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [0.3.5] — 2026-04-26
 
 ### Fixed
+
 - Vidas agora só são consumidas no game over (não ao iniciar nova partida)
 - Transição de cor de fundo entre animais sem flicker (TweenAnimationBuilder)
 - Botão de pause reposicionado dinamicamente abaixo do StatusPanel (GlobalKey)
 - Texto branco com contorno preto em StatusPanel e HostBanner para legibilidade
 
 ### Changed
+
 - Cores de fundo dos animais agora são explícitas por animal (backgroundBaseColor)
 - Boto-cor-de-rosa exibe fundo rosa correto (#FBD0DD) em vez de bege derivado
 
 ### Migration
+
 - Primeira abertura pós-update reseta vidas para 5 (goodwill adjustment)
 
 ## [0.3.0] — 2026-04-25
 
 ### Added
+
 - `HomeScreen` como tela inicial: botões Novo Jogo / Continuar / Ranking (placeholder) / Sair; SVG ensemble dos animais
 - Sistema de vidas completo: regen offline (1 vida a cada 30 min), `LivesState` persistido via Hive, `LivesIndicator` com corações, `NoLivesScreen` com mock-anúncio
 - `LivesNotifier` com `consume()`, `rewardFromAd()`, `canWatchAd`, `canPlay`; limite de 40 anúncios/dia com reset à meia-noite
@@ -509,6 +585,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 - `GameConstants.twoCellWidth` para largura alinhada às colunas
 
 ### Changed
+
 - `app.dart`: rota inicial alterada de `GameScreen` para `HomeScreen`
 - `HostBanner` refatorado para usar `HostArtwork` e `GameConstants.twoCellWidth`
 - `ScorePanel` simplificado (cronômetro extraído para `StatusPanel`)
@@ -518,6 +595,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [0.2.0] — 2026-04-25
 
 ### Added
+
 - Identidade visual base: paleta verde-amazônica (`#3FA968`), tipografia Fredoka + Nunito via Google Fonts
 - `AppTheme.light()` centraliza cores e estilos da aplicação
 - `TileWidget` redesenhado: fundo branco, borda colorida por animal, slot para imagem com opacidade (watermark)
@@ -529,16 +607,19 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 - `GameEngine.move()` rastreia `maxLevel` a cada jogada
 
 ### Changed
+
 - `Animal.tileColor` renomeado para `borderColor`; campo `assetPath` adicionado para futuros SVGs
 
 ## [0.1.1] — 2026-04-25
 
 ### Fixed
+
 - Tiles exibiam o nível (1, 2, 3…) em vez do valor correto (2, 4, 8…) — display corrigido em `tile_widget.dart`
 
 ## [0.1.0] — Em desenvolvimento
 
 ### Added
+
 - `CAPIVARA_2048_DESIGN.md` — full game design specification
 - `README.md` — project overview and roadmap
 - `CLAUDE.md` — development guidelines

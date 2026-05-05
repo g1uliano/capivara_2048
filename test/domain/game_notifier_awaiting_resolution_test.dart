@@ -1,9 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:capivara_2048/presentation/controllers/game_notifier.dart';
-import 'package:capivara_2048/data/models/game_state.dart';
 import 'package:capivara_2048/domain/game_engine/bomb_mode.dart';
-import 'package:capivara_2048/domain/game_engine/game_engine.dart';
 import 'package:capivara_2048/data/models/item_type.dart';
 
 void main() {

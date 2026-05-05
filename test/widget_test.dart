@@ -7,7 +7,6 @@ import 'package:path_provider_platform_interface/path_provider_platform_interfac
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'package:capivara_2048/app.dart';
-import 'package:capivara_2048/data/models/lives_state.dart';
 import 'package:capivara_2048/data/models/lives_state_adapter.dart';
 
 class _FakePathProvider extends Fake

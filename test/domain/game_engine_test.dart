@@ -13,7 +13,7 @@ void main() {
     engine = GameEngine();
   });
 
-  GameState _stateWithBoard(List<List<int?>> levels) {
+  GameState stateWithBoard(List<List<int?>> levels) {
     final board = List.generate(4, (r) =>
       List.generate(4, (c) {
         final lv = levels[r][c];
@@ -30,7 +30,7 @@ void main() {
     );
   }
 
-  int? _level(GameState s, int r, int c) => s.board[r][c]?.level;
+  int? level(GameState s, int r, int c) => s.board[r][c]?.level;
 
   group('newGame', () {
     test('starts with exactly 2 tiles on board', () {
@@ -53,71 +53,71 @@ void main() {
 
   group('compactAndMerge — move left', () {
     test('two equal tiles merge into one of next level', () {
-      final state = _stateWithBoard([
+      final state = stateWithBoard([
         [1, 1, null, null],
         [null, null, null, null],
         [null, null, null, null],
         [null, null, null, null],
       ]);
       final next = engine.move(state, Direction.left);
-      expect(_level(next, 0, 0), 2);
+      expect(level(next, 0, 0), 2);
       // board[0][1] may hold the spawned tile — only check merge result
     });
 
     test('different tiles do not merge', () {
-      final state = _stateWithBoard([
+      final state = stateWithBoard([
         [1, 2, null, null],
         [null, null, null, null],
         [null, null, null, null],
         [null, null, null, null],
       ]);
       final next = engine.move(state, Direction.left);
-      expect(_level(next, 0, 0), 1);
-      expect(_level(next, 0, 1), 2);
+      expect(level(next, 0, 0), 1);
+      expect(level(next, 0, 1), 2);
     });
 
     test('three equal tiles: first two merge, third stays', () {
-      final state = _stateWithBoard([
+      final state = stateWithBoard([
         [1, 1, 1, null],
         [null, null, null, null],
         [null, null, null, null],
         [null, null, null, null],
       ]);
       final next = engine.move(state, Direction.left);
-      expect(_level(next, 0, 0), 2);
-      expect(_level(next, 0, 1), 1);
+      expect(level(next, 0, 0), 2);
+      expect(level(next, 0, 1), 1);
       // board[0][2] may hold the spawned tile — only check merge result
     });
 
     test('four equal tiles: two pairs merge', () {
-      final state = _stateWithBoard([
+      final state = stateWithBoard([
         [1, 1, 1, 1],
         [null, null, null, null],
         [null, null, null, null],
         [null, null, null, null],
       ]);
       final next = engine.move(state, Direction.left);
-      expect(_level(next, 0, 0), 2);
-      expect(_level(next, 0, 1), 2);
+      expect(level(next, 0, 0), 2);
+      expect(level(next, 0, 1), 2);
       // board[0][2] and [0][3] may hold the spawned tile — only check merge result
     });
 
     test('tiles slide left filling gaps', () {
-      final state = _stateWithBoard([
+      final state = stateWithBoard([
         [null, null, 1, null],
         [null, null, null, null],
         [null, null, null, null],
         [null, null, null, null],
       ]);
       final next = engine.move(state, Direction.left);
-      expect(_level(next, 0, 0), 1);
+      expect(level(next, 0, 0), 1);
       // board[0][1] may hold the spawned tile — only check that tile slid to col 0
     });
   });
 
   group('score', () {
     test('merge adds value of resulting tile to score', () {
-      final state = _stateWithBoard([
+      final state = stateWithBoard([
         [1, 1, null, null],
         [null, null, null, null],
         [null, null, null, null],
@@ -129,7 +129,7 @@ void main() {
     });
 
     test('multiple merges in one move accumulate score', () {
-      final state = _stateWithBoard([
+      final state = stateWithBoard([
         [1, 1, 1, 1],
         [null, null, null, null],
         [null, null, null, null],
@@ -141,7 +141,7 @@ void main() {
     });
 
     test('highScore updates when score exceeds it', () {
-      final state = _stateWithBoard([
+      final state = stateWithBoard([
         [1, 1, null, null],
         [null, null, null, null],
         [null, null, null, null],
@@ -154,56 +154,56 @@ void main() {
 
   group('directions', () {
     test('move right slides tiles to the right', () {
-      final state = _stateWithBoard([
+      final state = stateWithBoard([
         [1, null, null, null],
         [null, null, null, null],
         [null, null, null, null],
         [null, null, null, null],
       ]);
       final next = engine.move(state, Direction.right);
-      expect(_level(next, 0, 3), 1);
+      expect(level(next, 0, 3), 1);
       // A new tile spawns after the move, so we only assert the tile reached col 3
     });
 
     test('move up slides tiles to the top', () {
-      final state = _stateWithBoard([
+      final state = stateWithBoard([
         [null, null, null, null],
         [1,    null, null, null],
         [null, null, null, null],
         [null, null, null, null],
       ]);
       final next = engine.move(state, Direction.up);
-      expect(_level(next, 0, 0), 1);
+      expect(level(next, 0, 0), 1);
       // A new tile spawns after the move, so we only assert the tile reached row 0
     });
 
     test('move down slides tiles to the bottom', () {
-      final state = _stateWithBoard([
+      final state = stateWithBoard([
         [1,    null, null, null],
         [null, null, null, null],
         [null, null, null, null],
         [null, null, null, null],
       ]);
       final next = engine.move(state, Direction.down);
-      expect(_level(next, 3, 0), 1);
+      expect(level(next, 3, 0), 1);
       // A new tile spawns after the move, so we only assert the tile reached row 3
     });
 
     test('move up merges equal tiles in same column', () {
-      final state = _stateWithBoard([
+      final state = stateWithBoard([
         [1,    null, null, null],
         [1,    null, null, null],
         [null, null, null, null],
         [null, null, null, null],
       ]);
       final next = engine.move(state, Direction.up);
-      expect(_level(next, 0, 0), 2);
+      expect(level(next, 0, 0), 2);
     });
   });
 
   group('spawn', () {
     test('a new tile appears after a valid move', () {
-      final state = _stateWithBoard([
+      final state = stateWithBoard([
         [1, null, null, null],
         [null, null, null, null],
         [null, null, null, null],
@@ -215,7 +215,7 @@ void main() {
     });
 
     test('no new tile spawns when move has no effect', () {
-      final state = _stateWithBoard([
+      final state = stateWithBoard([
         [1, null, null, null],
         [null, null, null, null],
         [null, null, null, null],
@@ -231,7 +231,7 @@ void main() {
   group('game over', () {
     test('isGameOver is true when board is full with no merges possible', () {
       // Checkerboard: no two adjacent tiles are equal
-      final state = _stateWithBoard([
+      final state = stateWithBoard([
         [1, 2, 1, 2],
         [2, 1, 2, 1],
         [1, 2, 1, 2],
@@ -243,7 +243,7 @@ void main() {
     });
 
     test('isGameOver is false when empty cells exist', () {
-      final state = _stateWithBoard([
+      final state = stateWithBoard([
         [1, 2, 1, 2],
         [2, 1, 2, 1],
         [1, 2, 1, 2],
@@ -256,7 +256,7 @@ void main() {
 
   group('undoStack', () {
     test('move pushes previous state onto undoStack', () {
-      final state = _stateWithBoard([
+      final state = stateWithBoard([
         [1, null, null, null],
         [null, null, null, null],
         [null, null, null, null],
@@ -269,7 +269,7 @@ void main() {
     });
 
     test('no-op move does not push to undoStack', () {
-      final state = _stateWithBoard([
+      final state = stateWithBoard([
         [1, null, null, null],
         [null, null, null, null],
         [null, null, null, null],
@@ -280,7 +280,7 @@ void main() {
     });
 
     test('undoStack grows with each valid move', () {
-      GameState state = _stateWithBoard([
+      GameState state = stateWithBoard([
         [1, null, null, null],
         [null, null, null, null],
         [null, null, null, null],
@@ -397,7 +397,7 @@ void main() {
     });
 
     test('maxLevel updates after merge', () {
-      final state = _stateWithBoard([
+      final state = stateWithBoard([
         [1, 1, null, null],
         [null, null, null, null],
         [null, null, null, null],
@@ -408,7 +408,7 @@ void main() {
     });
 
     test('maxLevel reflects highest tile on board', () {
-      final state = _stateWithBoard([
+      final state = stateWithBoard([
         [3, 3, null, null],
         [null, null, null, null],
         [null, null, null, null],
@@ -420,7 +420,7 @@ void main() {
     });
 
     test('maxLevel does not decrease', () {
-      var state = _stateWithBoard([
+      var state = stateWithBoard([
         [5, 5, null, null],
         [null, null, null, null],
         [null, null, null, null],

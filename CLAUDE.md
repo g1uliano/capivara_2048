@@ -54,22 +54,23 @@ lib/
 
 Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 3.5 concluída (v1.3.4) — próximo: Fase 3.6**. O áudio foi reposicionado para a **Fase 5** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
 
-| Fase | Foco |
-|------|------|
-| 1 | Setup, game engine puro, tela básica com placeholders |
-| 2 | Identidade visual, paleta, tipografia, animações, vidas, inventário, recompensas, coleção, loja mock |
-| 2.5 ✅ | Rebranding "Olha o Bichim!", GameTitleImage, ícone do app, launcher name |
-| 2.6 ✅ | Tela Home + Coleção + Configurações + stubs |
-| 2.11 ✅ | ShopOverlay sobre o jogo acessível pelos ícones desabilitados do inventário |
-| 2.12 ✅ | Peixe-boi (4096), Jacaré (8192), multi-vitória, ranking local, PersonalRecords |
-| 3 | Backend, ranking, monetização |
-| 4 | Arte adicional e polimento visual (logo, ícone, splash final) |
-| 5 | Áudio (sound design dos 13 animais, SFX, música) |
-| 6 | Polimento, l10n, acessibilidade, lançamento |
+| Fase    | Foco                                                                                                 |
+| ------- | ---------------------------------------------------------------------------------------------------- |
+| 1       | Setup, game engine puro, tela básica com placeholders                                                |
+| 2       | Identidade visual, paleta, tipografia, animações, vidas, inventário, recompensas, coleção, loja mock |
+| 2.5 ✅  | Rebranding "Olha o Bichim!", GameTitleImage, ícone do app, launcher name                             |
+| 2.6 ✅  | Tela Home + Coleção + Configurações + stubs                                                          |
+| 2.11 ✅ | ShopOverlay sobre o jogo acessível pelos ícones desabilitados do inventário                          |
+| 2.12 ✅ | Peixe-boi (4096), Jacaré (8192), multi-vitória, ranking local, PersonalRecords                       |
+| 3       | Backend, ranking, monetização                                                                        |
+| 4       | Arte adicional e polimento visual (logo, ícone, splash final)                                        |
+| 5       | Áudio (sound design dos 13 animais, SFX, música)                                                     |
+| 6       | Polimento, l10n, acessibilidade, lançamento                                                          |
 
 ## Release checklist
 
 Sempre que lançar uma nova versão (merge + push):
+
 1. Atualizar `CHANGELOG.md` com a versão e as mudanças
 2. Atualizar `README.md` se necessário (roadmap, features, versão)
 3. Atualizar `CLAUDE.md` se houver informações relevantes (convenções novas, decisões de arquitetura, bugs conhecidos, etc.)
@@ -91,6 +92,7 @@ Diretrizes comportamentais para reduzir erros comuns de LLMs. Mesclar com as ins
 **Não assuma. Não esconda confusão. Exponha trade-offs.**
 
 Antes de implementar:
+
 - Declare suas suposições explicitamente. Se incerto, pergunte.
 - Se houver múltiplas interpretações, apresente-as — não escolha silenciosamente.
 - Se existir uma abordagem mais simples, diga. Questione quando justificado.
@@ -113,12 +115,14 @@ Pergunte a si mesmo: "Um engenheiro sênior diria que isso está overcomplicated
 **Toque apenas o necessário. Limpe apenas sua própria bagunça.**
 
 Ao editar código existente:
+
 - Não "melhore" código adjacente, comentários ou formatação.
 - Não refatore coisas que não estão quebradas.
 - Siga o estilo existente, mesmo que você faria diferente.
 - Se notar código morto não relacionado, mencione — não delete.
 
 Quando suas mudanças criarem órfãos:
+
 - Remova imports/variáveis/funções que SUAS mudanças tornaram desnecessários.
 - Não remova código morto pré-existente a menos que solicitado.
 
@@ -129,11 +133,13 @@ O teste: cada linha alterada deve rastrear diretamente ao pedido do usuário.
 **Defina critérios de sucesso. Itere até verificar.**
 
 Transforme tarefas em objetivos verificáveis:
+
 - "Adicionar validação" → "Escrever testes para entradas inválidas, depois fazê-los passar"
 - "Corrigir o bug" → "Escrever um teste que o reproduza, depois fazê-lo passar"
 - "Refatorar X" → "Garantir que os testes passem antes e depois"
 
 Para tarefas de múltiplos passos, declare um plano breve:
+
 ```
 1. [Passo] → verificar: [checagem]
 2. [Passo] → verificar: [checagem]
@@ -145,4 +151,3 @@ Critérios de sucesso fortes permitem iterar de forma independente. Critérios f
 ---
 
 **Estas diretrizes estão funcionando se:** menos mudanças desnecessárias nos diffs, menos reescritas por complicação excessiva, e perguntas de clarificação vêm antes da implementação, não depois dos erros.
-

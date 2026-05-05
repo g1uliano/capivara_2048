@@ -1,4 +1,3 @@
-import 'package:capivara_2048/data/models/personal_records.dart';
 import 'package:capivara_2048/presentation/controllers/personal_records_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -132,7 +131,7 @@ void main() {
   });
 
   group('GameNotifier marcos de vitória', () {
-    GameState _stateWithMaxLevel(int maxLevel) {
+    GameState stateWithMaxLevel(int maxLevel) {
       final board = List.generate(4, (r) => List<Tile?>.filled(4, null));
       return GameState(
         board: board,
@@ -149,7 +148,7 @@ void main() {
       addTearDown(container.dispose);
       final notifier = container.read(gameProvider.notifier);
       notifier.setStateForTest(
-        _stateWithMaxLevel(11).copyWith(pendingMilestone: 11),
+        stateWithMaxLevel(11).copyWith(pendingMilestone: 11),
       );
       notifier.dismissMilestone();
       final state = container.read(gameProvider);
@@ -162,7 +161,7 @@ void main() {
       addTearDown(container.dispose);
       final notifier = container.read(gameProvider.notifier);
       notifier.setStateForTest(
-        _stateWithMaxLevel(11).copyWith(pendingMilestone: 11),
+        stateWithMaxLevel(11).copyWith(pendingMilestone: 11),
       );
       notifier.endGame();
       final state = container.read(gameProvider);
@@ -175,7 +174,7 @@ void main() {
       addTearDown(container.dispose);
       final notifier = container.read(gameProvider.notifier);
       notifier.setStateForTest(
-        _stateWithMaxLevel(11).copyWith(pendingMilestone: 11),
+        stateWithMaxLevel(11).copyWith(pendingMilestone: 11),
       );
       notifier.pause();
       expect(container.read(gameProvider).isPaused, false);

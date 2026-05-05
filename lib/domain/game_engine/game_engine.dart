@@ -61,7 +61,7 @@ class GameEngine {
     final unrotated = List.generate(size, (r) =>
       List.generate(size, (c) {
         final t = rawUnrotated[r][c];
-        return t != null ? t.copyWith(row: r, col: c) : null;
+        return t?.copyWith(row: r, col: c);
       })
     );
     final newScore = state.score + totalGained;

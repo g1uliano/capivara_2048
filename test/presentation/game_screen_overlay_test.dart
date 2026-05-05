@@ -4,7 +4,6 @@ import 'package:capivara_2048/data/models/game_state.dart';
 import 'package:capivara_2048/data/models/inventory.dart';
 import 'package:capivara_2048/domain/game_engine/game_engine.dart';
 import 'package:capivara_2048/data/models/inventory_hive_adapter.dart';
-import 'package:capivara_2048/data/models/item_type.dart';
 import 'package:capivara_2048/data/models/lives_state_adapter.dart';
 import 'package:capivara_2048/data/repositories/inventory_repository.dart';
 import 'package:capivara_2048/data/repositories/lives_repository.dart';
