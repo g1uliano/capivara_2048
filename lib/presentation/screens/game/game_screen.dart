@@ -30,7 +30,7 @@ class GameScreen extends ConsumerStatefulWidget {
 
 class _GameScreenState extends ConsumerState<GameScreen> {
   ItemType? _shopItem;
-  Set<ItemType> _pulsingItems = {};
+  final Set<ItemType> _pulsingItems = {};
 
   void _openShop(ItemType type) {
     if (ref.read(gameProvider).pendingMilestone != null) return;
@@ -57,8 +57,11 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     final hasWon = state.hasWon;
     final notifier = ref.read(gameProvider.notifier);
     final inventory = ref.watch(inventoryProvider);
-    final hasAnyItem = inventory.bomb2 > 0 || inventory.bomb3 > 0 ||
-        inventory.undo1 > 0 || inventory.undo3 > 0;
+    final hasAnyItem =
+        inventory.bomb2 > 0 ||
+        inventory.bomb3 > 0 ||
+        inventory.undo1 > 0 ||
+        inventory.undo3 > 0;
 
     return Scaffold(
       body: GameBackground(
@@ -71,11 +74,14 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               //    distribuído entre header e inventário. Se sobra espaço,
               //    os elementos crescem (acima de 1.0); se falta, encolhem.
               const hPad = 24.0; // 2 * 12 (Padding horizontal da Column)
-              const otherVerticalAtScale1 = 330.0; // header(238) + inv(80) + spacers(12)
-              const baseDesignTotal = 696.0; // otherVerticalAtScale1 + 366 (board design)
+              const otherVerticalAtScale1 =
+                  330.0; // header(238) + inv(80) + spacers(12)
+              const baseDesignTotal =
+                  696.0; // otherVerticalAtScale1 + 366 (board design)
 
               final boardSide = lc.maxWidth - hPad;
-              final maxScaleByWidth = (lc.maxHeight - boardSide) / otherVerticalAtScale1;
+              final maxScaleByWidth =
+                  (lc.maxHeight - boardSide) / otherVerticalAtScale1;
 
               // Cap horizontal independente para header e inventário.
               // Header: o Row tem hostBanner + Spacer + (status/pause column).
@@ -91,8 +97,14 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               if (maxScaleByWidth >= 1.0) {
                 // Há folga vertical: header e inventário crescem até 1.5×,
                 // cada um limitado pela sua própria constraint horizontal.
-                headerScale = min(maxScaleByWidth, maxScaleByHeaderWidth).clamp(1.0, 1.5);
-                invScale = min(maxScaleByWidth, maxScaleByInvWidth).clamp(1.0, 1.5);
+                headerScale = min(
+                  maxScaleByWidth,
+                  maxScaleByHeaderWidth,
+                ).clamp(1.0, 1.5);
+                invScale = min(
+                  maxScaleByWidth,
+                  maxScaleByInvWidth,
+                ).clamp(1.0, 1.5);
               } else {
                 // Tela compacta: encolhe header/inv pra caber, board fica menor.
                 final compact = min(
@@ -103,10 +115,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 invScale = compact;
               }
 
-              final hostSize    = (152.0 * headerScale).clamp(80.0, 228.0);
-              final livesIconSz = (44.0  * headerScale).clamp(28.0, 66.0);
-              final pauseSz     = (72.0  * headerScale).clamp(48.0, 108.0);
-              final invIconSz   = (72.0  * invScale).clamp(44.0, 108.0);
+              final hostSize = (152.0 * headerScale).clamp(80.0, 228.0);
+              final livesIconSz = (44.0 * headerScale).clamp(28.0, 66.0);
+              final pauseSz = (72.0 * headerScale).clamp(48.0, 108.0);
+              final invIconSz = (72.0 * invScale).clamp(44.0, 108.0);
               return Stack(
                 children: [
                   Padding(
@@ -130,34 +142,53 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                                   final side = bc.maxWidth;
                                   return Stack(
                                     children: [
-                                      GestureDetector(
-                                        key: const Key('game_board'),
-                                        behavior: HitTestBehavior.opaque,
-                                        onPanEnd: (details) {
-                                          if (state.isPaused ||
-                                              isGameOver ||
-                                              hasWon ||
-                                              state.bombMode != null) { return; }
-                                          final v = details.velocity.pixelsPerSecond;
-                                          const threshold = 100.0;
-                                          if (v.dx.abs() > v.dy.abs()) {
-                                            if (v.dx > threshold) {
-                                              notifier.onSwipe(Direction.right);
-                                            } else if (v.dx < -threshold) {
-                                              notifier.onSwipe(Direction.left);
+                                      Semantics(
+                                        label: 'Tabuleiro do jogo',
+                                        container: true,
+                                        explicitChildNodes: true,
+                                        child: GestureDetector(
+                                          key: const Key('game_board'),
+                                          behavior: HitTestBehavior.opaque,
+                                          onPanEnd: (details) {
+                                            if (state.isPaused ||
+                                                isGameOver ||
+                                                hasWon ||
+                                                state.bombMode != null) {
+                                              return;
                                             }
-                                          } else {
-                                            if (v.dy > threshold) {
-                                              notifier.onSwipe(Direction.down);
-                                            } else if (v.dy < -threshold) {
-                                              notifier.onSwipe(Direction.up);
+                                            final v = details
+                                                .velocity
+                                                .pixelsPerSecond;
+                                            const threshold = 100.0;
+                                            if (v.dx.abs() > v.dy.abs()) {
+                                              if (v.dx > threshold) {
+                                                notifier.onSwipe(
+                                                  Direction.right,
+                                                );
+                                              } else if (v.dx < -threshold) {
+                                                notifier.onSwipe(
+                                                  Direction.left,
+                                                );
+                                              }
+                                            } else {
+                                              if (v.dy > threshold) {
+                                                notifier.onSwipe(
+                                                  Direction.down,
+                                                );
+                                              } else if (v.dy < -threshold) {
+                                                notifier.onSwipe(Direction.up);
+                                              }
                                             }
-                                          }
-                                        },
-                                        child: RepaintBoundary(child: BoardWidget(size: side)),
+                                          },
+                                          child: RepaintBoundary(
+                                            child: BoardWidget(size: side),
+                                          ),
+                                        ),
                                       ),
                                       if (state.bombMode != null)
-                                        const Positioned.fill(child: BombGridOverlay()),
+                                        const Positioned.fill(
+                                          child: BombGridOverlay(),
+                                        ),
                                     ],
                                   );
                                 },
@@ -165,7 +196,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: GameConstants.boardToInventorySpacing),
+                        const SizedBox(
+                          height: GameConstants.boardToInventorySpacing,
+                        ),
                         AbsorbPointer(
                           absorbing: state.isAwaitingGameOverResolution,
                           child: InventoryBar(
@@ -178,29 +211,38 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       ],
                     ),
                   ),
-              if (state.isPaused) const Positioned.fill(child: PauseOverlay()),
-              if (state.bombMode != null)
-                const Positioned.fill(child: BombDimOverlay()),
-              if (state.isAwaitingGameOverResolution && hasAnyItem)
-                const Positioned.fill(child: GameOverItemOverlay()),
-              if (state.isAwaitingGameOverResolution && !hasAnyItem)
-                const Positioned.fill(child: GameOverNoItemsOverlay()),
-              if (isGameOver && !state.isAwaitingGameOverResolution && !state.isContinuingWithItem)
-                const Positioned.fill(
-                    child: GameOverModal(message: 'Game Over!')),
-              if (hasWon && !isGameOver)
-                const Positioned.fill(
-                    child: GameOverModal(message: 'Capivara Lendária! 🎉')),
-              if (state.pendingMilestone != null && !state.hasWon)
-                Positioned.fill(
-                  child: VictoryChoiceDialog(milestone: state.pendingMilestone!),
-                ),
-              if (_shopItem != null)
-                Positioned.fill(child: ShopOverlay(
-                  itemType: _shopItem!,
-                  onClose: _closeShop,
-                  onItemPurchased: _onItemPurchased,
-                )),
+                  if (state.isPaused)
+                    const Positioned.fill(child: PauseOverlay()),
+                  if (state.bombMode != null)
+                    const Positioned.fill(child: BombDimOverlay()),
+                  if (state.isAwaitingGameOverResolution && hasAnyItem)
+                    const Positioned.fill(child: GameOverItemOverlay()),
+                  if (state.isAwaitingGameOverResolution && !hasAnyItem)
+                    const Positioned.fill(child: GameOverNoItemsOverlay()),
+                  if (isGameOver &&
+                      !state.isAwaitingGameOverResolution &&
+                      !state.isContinuingWithItem)
+                    const Positioned.fill(
+                      child: GameOverModal(message: 'Game Over!'),
+                    ),
+                  if (hasWon && !isGameOver)
+                    const Positioned.fill(
+                      child: GameOverModal(message: 'Capivara Lendária! 🎉'),
+                    ),
+                  if (state.pendingMilestone != null && !state.hasWon)
+                    Positioned.fill(
+                      child: VictoryChoiceDialog(
+                        milestone: state.pendingMilestone!,
+                      ),
+                    ),
+                  if (_shopItem != null)
+                    Positioned.fill(
+                      child: ShopOverlay(
+                        itemType: _shopItem!,
+                        onClose: _closeShop,
+                        onItemPurchased: _onItemPurchased,
+                      ),
+                    ),
                 ],
               );
             },

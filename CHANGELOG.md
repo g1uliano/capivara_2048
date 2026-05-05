@@ -7,6 +7,15 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.3.3] - 2026-05-05
+
+### Added (Fase 3.4 — Collection, Accessibility, Regression E2E)
+- **14 novos cenários E2E** (total: 80 no Tier 1)
+  - `collection.*` (6): count, locked cards "???", detail sheet, scientific name, funFact, progress bar
+  - `accessibility.*` (4): home buttons Semantics labels, board Semantics, contrast score panel, overflow 360×640
+  - `regression.*` (4): v1.2.7 header scale, v1.2.8 no progressive load, v1.2.9 continuar unpause, v1.2.10 collection persists
+- Anotações `Semantics` adicionadas: `_HomeButton` (6 labels) e tabuleiro (`'Tabuleiro do jogo'`)
+
 ## [1.3.2] - 2026-05-04
 
 ### Added (Fase 3.3 — Persistence, Pause, Daily, Settings)

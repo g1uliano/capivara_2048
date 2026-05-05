@@ -41,7 +41,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void _startNewGame() {
     maybeHaptic(ref);
     ref.read(gameProvider.notifier).restart();
-    Navigator.push(context, MaterialPageRoute(builder: (_) => const GameScreen()));
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const GameScreen()),
+    );
   }
 
   void _continueGame() {
@@ -50,7 +53,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     // dispara resume()) e clicar Continuar, o jogo de fato continue — senão
     // o jogador caia novamente no PauseOverlay e teria que clicar Continuar 2x.
     ref.read(gameProvider.notifier).resume();
-    Navigator.push(context, MaterialPageRoute(builder: (_) => const GameScreen()));
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const GameScreen()),
+    );
   }
 
   void _nav(Widget screen) {
@@ -63,7 +69,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final gameState = ref.watch(gameProvider);
     final dailyState = ref.watch(dailyRewardsProvider);
     final rewardAvailable =
-        computeDailyRewardStatus(DateTime.now(), dailyState) == DailyRewardStatus.available;
+        computeDailyRewardStatus(DateTime.now(), dailyState) ==
+        DailyRewardStatus.available;
     final size = MediaQuery.of(context).size;
     final scale = min(size.width / 390.0, size.height / 844.0).clamp(0.1, 1.0);
 
@@ -82,6 +89,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   path: 'assets/images/home/Colecao.png',
                   size: HomeConstants.buttonSize(scale),
                   onTap: () => _nav(const CollectionScreen()),
+                  semanticLabel: 'Coleção',
                 ),
               ),
 
@@ -94,6 +102,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   path: 'assets/images/home/Configuracao.png',
                   size: HomeConstants.buttonSize(scale),
                   onTap: () => _nav(const SettingsScreen()),
+                  semanticLabel: 'Configurações',
                 ),
               ),
 
@@ -103,7 +112,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    GameTitleImage(asset: _titleAsset, height: HomeConstants.titleHeight(scale))
+                    GameTitleImage(
+                          asset: _titleAsset,
+                          height: HomeConstants.titleHeight(scale),
+                        )
                         .animate()
                         .fadeIn(duration: 400.ms)
                         .scale(begin: const Offset(0.85, 0.85)),
@@ -134,6 +146,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   size: HomeConstants.buttonSize(scale),
                   showBadge: rewardAvailable,
                   onTap: () => _nav(const DailyRewardsScreen()),
+                  semanticLabel: 'Recompensas Diárias',
                 ),
               ),
 
@@ -146,6 +159,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   path: 'assets/images/home/Ranking.png',
                   size: HomeConstants.buttonSize(scale),
                   onTap: () => _nav(const RankingScreen()),
+                  semanticLabel: 'Ranking',
                 ),
               ),
 
@@ -158,6 +172,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   path: 'assets/images/home/IconeLoja.png',
                   size: HomeConstants.buttonSize(scale),
                   onTap: () => _nav(const ShopScreen()),
+                  semanticLabel: 'Loja',
                 ),
               ),
 
@@ -169,11 +184,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   key: const Key('home_btn_comojogar'),
                   path: 'assets/images/home/ComoJogar.png',
                   size: HomeConstants.buttonSize(scale),
+                  semanticLabel: 'Como Jogar',
                   onTap: () => showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
                     shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(20),
+                      ),
                     ),
                     builder: (_) => const _HowToPlaySheet(),
                   ),
@@ -197,11 +215,13 @@ class _HomeButton extends StatefulWidget {
     required this.path,
     required this.size,
     required this.onTap,
+    this.semanticLabel,
   });
 
   final String path;
   final double size;
   final VoidCallback onTap;
+  final String? semanticLabel;
 
   @override
   State<_HomeButton> createState() => _HomeButtonState();
@@ -215,30 +235,48 @@ class _HomeButtonState extends State<_HomeButton> {
     setState(() => _scale = 1.0);
     widget.onTap();
   }
+
   void _onTapCancel() => setState(() => _scale = 1.0);
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: _onTapDown,
-      onTapUp: _onTapUp,
-      onTapCancel: _onTapCancel,
-      child: AnimatedScale(
-        scale: _scale,
-        duration: const Duration(milliseconds: 100),
-        child: Stack(
-          children: [
-            // Camada branca (contorno seguindo a silhueta)
-            Transform.scale(
-              scale: 1.06,
-              child: ColorFiltered(
-                colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                child: Image.asset(widget.path, width: widget.size, height: widget.size, fit: BoxFit.contain),
+    return Semantics(
+      label: widget.semanticLabel,
+      button: true,
+      child: GestureDetector(
+        onTapDown: _onTapDown,
+        onTapUp: _onTapUp,
+        onTapCancel: _onTapCancel,
+        child: AnimatedScale(
+          scale: _scale,
+          duration: const Duration(milliseconds: 100),
+          child: Stack(
+            children: [
+              // Camada branca (contorno seguindo a silhueta)
+              Transform.scale(
+                scale: 1.06,
+                child: ColorFiltered(
+                  colorFilter: const ColorFilter.mode(
+                    Colors.white,
+                    BlendMode.srcIn,
+                  ),
+                  child: Image.asset(
+                    widget.path,
+                    width: widget.size,
+                    height: widget.size,
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
-            ),
-            // Imagem real
-            Image.asset(widget.path, width: widget.size, height: widget.size, fit: BoxFit.contain),
-          ],
+              // Imagem real
+              Image.asset(
+                widget.path,
+                width: widget.size,
+                height: widget.size,
+                fit: BoxFit.contain,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -256,19 +294,26 @@ class _HomeButtonWithBadge extends StatelessWidget {
     required this.size,
     required this.onTap,
     required this.showBadge,
+    this.semanticLabel,
   });
 
   final String path;
   final double size;
   final VoidCallback onTap;
   final bool showBadge;
+  final String? semanticLabel;
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        _HomeButton(path: path, size: size, onTap: onTap),
+        _HomeButton(
+          path: path,
+          size: size,
+          onTap: onTap,
+          semanticLabel: semanticLabel,
+        ),
         if (showBadge)
           Positioned(
             top: -4,
@@ -302,7 +347,11 @@ class _HomeButtonWithBadge extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 class _ActionButton extends StatefulWidget {
-  const _ActionButton({required this.label, required this.onTap, required this.scale});
+  const _ActionButton({
+    required this.label,
+    required this.onTap,
+    required this.scale,
+  });
 
   final String label;
   final VoidCallback onTap;
@@ -320,6 +369,7 @@ class _ActionButtonState extends State<_ActionButton> {
     setState(() => _scale = 1.0);
     widget.onTap();
   }
+
   void _onTapCancel() => setState(() => _scale = 1.0);
 
   @override
@@ -338,7 +388,11 @@ class _ActionButtonState extends State<_ActionButton> {
             color: const Color(0xFFFF8C42),
             borderRadius: BorderRadius.circular(12),
             boxShadow: const [
-              BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 3)),
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 8,
+                offset: Offset(0, 3),
+              ),
             ],
           ),
           alignment: Alignment.center,
@@ -386,8 +440,13 @@ class _HowToPlaySheet extends StatelessWidget {
                 ),
               ),
             ),
-            Text('Como Jogar',
-                style: GoogleFonts.fredoka(fontSize: 24, color: AppColors.primary)),
+            Text(
+              'Como Jogar',
+              style: GoogleFonts.fredoka(
+                fontSize: 24,
+                color: AppColors.primary,
+              ),
+            ),
             const SizedBox(height: 12),
             Text(
               '• Deslize o dedo para mover todos os tiles.\n'

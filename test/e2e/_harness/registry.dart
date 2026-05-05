@@ -16,6 +16,9 @@ import '../flows/daily_flows.dart';
 import '../flows/lives_flows.dart';
 import '../persistence/collection_survives_restart.dart';
 import '../persistence/persistence_flows.dart';
+import '../collection/collection_flows.dart';
+import '../accessibility/accessibility_flows.dart';
+import '../regression/regression_flows.dart';
 
 /// Single source of truth for all E2E scenarios.
 ///
@@ -105,4 +108,21 @@ final List<E2EScenario> allScenarios = <E2EScenario>[
   navCollectionBackScenario,
   navSettingsBackScenario,
   navNewGameBackScenario,
+  // Fase 3.4 — collection
+  collectionShowsCountScenario,
+  collectionLockedShowsQuestionMarkScenario,
+  collectionUnlockedCardOpensSheetScenario,
+  collectionDetailScientificNameScenario,
+  collectionDetailFunFactScenario,
+  collectionProgressBarScenario,
+  // Fase 3.4 — accessibility
+  a11yHomeButtonsSemanticsScenario,
+  a11yGameBoardSemanticsScenario,
+  a11yContrastScorePanelScenario,
+  a11yNoTextOverflowScenario,
+  // Fase 3.4 — regression
+  regressionHeaderGrowsScenario,
+  regressionNoProgressiveLoadingScenario,
+  regressionContinuarAfterBackScenario,
+  regressionCollectionSurvivesScenario,
 ];
