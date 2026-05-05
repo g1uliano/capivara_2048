@@ -65,7 +65,40 @@ flutter run -d ios
 ### Testes
 
 ```bash
+# Tier 1 — unit/widget tests (headless, sem device)
 flutter test
+
+# Tier 1 — suite E2E completa
+flutter test test/e2e/run_all_test.dart
+```
+
+### APK Tier 2 — TestRunnerScreen (device real)
+
+Gera um APK instalável em paralelo ao app principal (`com.catraia.capivara_2048.test`).
+Abre o app, toca **▶ Run** e vê os 95+ cenários rodando ao vivo; toca **📤 Compartilhar** para exportar JSON + PNG.
+
+```bash
+# Build release
+flutter build apk \
+  --target=integration_test/tier2_runner.dart \
+  --flavor tst \
+  --release
+# APK: build/app/outputs/flutter-apk/app-tst-release.apk
+
+# Instalar no device conectado
+adb install build/app/outputs/flutter-apk/app-tst-release.apk
+```
+
+### Demo Mode (🎬)
+
+Roda apenas os cenários com tag `demo` e suprime falhas de assertion — ideal para gravação de screencasts.
+
+```bash
+flutter build apk \
+  --target=integration_test/tier2_runner.dart \
+  --flavor tst \
+  --dart-define=DEMO_MODE=true \
+  --debug
 ```
 
 ### Build de produção
