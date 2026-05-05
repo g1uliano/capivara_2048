@@ -12,6 +12,7 @@ import '../flows/win_flows.dart';
 import '../flows/daily_flows.dart';
 import '../flows/lives_flows.dart';
 import '../persistence/collection_survives_restart.dart';
+import '../persistence/persistence_flows.dart';
 
 /// Single source of truth for all E2E scenarios.
 ///
@@ -51,6 +52,15 @@ final List<E2EScenario> allScenarios = <E2EScenario>[
   livesConsumedOnGameOverScenario,
   noLivesScreenScenario,
   livesRegenOverTimeScenario,
+  // Fase 3.3 Task 1 — persistence
+  persistenceInventoryScenario,
+  persistenceLivesScenario,
+  persistenceDailyScenario,
+  persistenceHighScoreScenario,
+  persistencePersonalRecordsScenario,
+  persistenceSettingsScenario,
+  persistenceGameRecordsScenario,
+  persistenceInProgressGameScenario,
   // Fase 3.2 Task 1 — engine
   engineSwipeLeftScenario,
   engineSwipeRightScenario,

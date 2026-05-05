@@ -34,10 +34,14 @@ class LivesNotifier extends StateNotifier<LivesState> {
     await _repo.save(state);
     _ready.complete();
     _startRegenTimer();
-    _lifecycleListener = AppLifecycleListener(
-      onPause: _pauseRegen,
-      onResume: _resumeRegen,
-    );
+    try {
+      _lifecycleListener = AppLifecycleListener(
+        onPause: _pauseRegen,
+        onResume: _resumeRegen,
+      );
+    } catch (_) {
+      // Flutter binding not available (e.g. plain unit tests) — skip lifecycle
+    }
   }
 
   static LivesState calcRegen({required LivesState state, required DateTime now}) {
@@ -172,6 +176,11 @@ class LivesNotifier extends StateNotifier<LivesState> {
 
   @visibleForTesting
   void debugSetState(LivesState s) => state = s;
+
+  /// Waits for [_init] to complete. Use in tests to synchronize before checking
+  /// lives state or calling methods that depend on [_ready].
+  @visibleForTesting
+  Future<void> awaitReady() => _ready.future;
 }
 
 final livesRepositoryProvider = Provider((_) => LivesRepository());

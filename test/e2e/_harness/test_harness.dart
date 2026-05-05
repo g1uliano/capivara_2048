@@ -17,6 +17,7 @@ import 'package:capivara_2048/data/models/personal_records_hive_adapter.dart';
 import 'package:capivara_2048/data/repositories/game_record_repository.dart';
 import 'package:capivara_2048/domain/daily_rewards/daily_rewards_notifier.dart';
 import 'package:capivara_2048/domain/inventory/inventory_notifier.dart';
+import 'package:capivara_2048/domain/lives/lives_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/game_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/personal_records_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/settings_notifier.dart';
@@ -58,6 +59,11 @@ class GameTestHarness {
     await container.read(inventoryProvider.notifier).load();
     await container.read(dailyRewardsProvider.notifier).load();
     await container.read(personalRecordsProvider.notifier).load();
+    // Ensure LivesNotifier._init() completes here (real-async Hive I/O).
+    // Without this, _init() is deferred to FakeAsync (pumpWidget) where Hive I/O
+    // continuations cannot resolve, leaving an orphaned Future that races with
+    // subsequent tests' Hive operations and causes non-deterministic hangs.
+    await container.read(livesProvider.notifier).awaitReady();
 
     if (initialGameState != null) {
       container.read(gameProvider.notifier).debugSetState(initialGameState);
@@ -76,7 +82,10 @@ class GameTestHarness {
   Future<Widget> restart() async {
     assert(_booted, 'GameTestHarness.restart() called before boot()');
     container.dispose();
-    await Hive.close(); // flush all boxes to disk and close them
+    await Hive.close().timeout(
+      const Duration(seconds: 3),
+      onTimeout: () => [],
+    ); // flush all boxes to disk and close them
 
     // Re-use same SharedPreferences mock (no reset — simulates production cold
     // restart where SharedPreferences persists on disk). Same Hive tempDir also
@@ -96,6 +105,7 @@ class GameTestHarness {
     await container.read(inventoryProvider.notifier).load();
     await container.read(dailyRewardsProvider.notifier).load();
     await container.read(personalRecordsProvider.notifier).load();
+    await container.read(livesProvider.notifier).awaitReady();
 
     return UncontrolledProviderScope(
       container: container,
