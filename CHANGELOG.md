@@ -7,6 +7,16 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [v1.3.4] — Fase 3.5 — Golden Tests
+
+### Added
+- 15 golden tests com `alchemist` (5 telas × 3 viewports: 360×640, 414×894, 800×1280)
+- Telas cobertas: `HomeScreen`, `GameScreen`, `PauseOverlay`, `CollectionScreen`, `DailyRewardsScreen`
+- `test/flutter_test_config.dart`: configura alchemist CI mode globalmente (fonteless, sem shadows, sem platform goldens)
+- `test/e2e/golden/golden_tests.dart`: 15 `goldenTest()` organizados em grupos por viewport via `runGoldenTests()`
+- 15 PNGs baseline em `test/e2e/goldens/ci/`
+- Suite total: 95 testes (80 E2EScenarios + 15 golden)
+
 ## [1.3.3] - 2026-05-05
 
 ### Added (Fase 3.4 — Collection, Accessibility, Regression E2E)

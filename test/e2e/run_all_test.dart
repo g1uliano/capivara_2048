@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '_harness/registry.dart';
 import '_harness/scenario.dart';
 import '_harness/test_harness.dart';
+import 'golden/golden_tests.dart';
 
 void main() {
   if (allScenarios.isEmpty) {
@@ -21,4 +22,8 @@ void main() {
       await scenario.run(tester, h);
     });
   }
+
+  // Golden tests — usa goldenTest() do alchemist (cria testWidgets internamente,
+  // não pode ser encapsulado em E2EScenario). Registra 15 testes: 5 telas × 3 viewports.
+  runGoldenTests();
 }

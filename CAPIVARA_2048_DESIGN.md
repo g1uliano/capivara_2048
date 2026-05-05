@@ -1482,6 +1482,13 @@ testWidgets('precacheImage inclui assets/images/home/ e assets/images/inventory/
 - Integração Google Mobile Ads (substitui `FakeAdService`)
 - Integração `in_app_purchase` real (substitui mocks da Fase 2.8 e 2.10)
 
+### ✅ Fase 3.5 — `golden.*` com `alchemist` (v1.3.4)
+- 15 golden tests CI-mode (fonteless): `HomeScreen`, `GameScreen`, `PauseOverlay`,
+  `CollectionScreen` e `DailyRewardsScreen` nos viewports 360×640, 414×894 e 800×1280
+- `flutter_test_config.dart` configura alchemist CI mode globalmente (platform goldens off)
+- `runGoldenTests()` integrado ao `run_all_test.dart`
+- Suite: 95 testes total (80 E2EScenarios + 15 golden)
+
 ### 🔜 Fase 4 — Arte adicional e polimento visual
 - Background de floresta na Home
 - Logo do jogo
