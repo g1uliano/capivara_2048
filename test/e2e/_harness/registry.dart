@@ -7,6 +7,7 @@ import '../flows/items_flows.dart';
 import '../flows/shop_flows.dart';
 import '../flows/win_flows.dart';
 import '../flows/daily_flows.dart';
+import '../flows/lives_flows.dart';
 import '../persistence/collection_survives_restart.dart';
 
 /// Single source of truth for all E2E scenarios.
@@ -43,4 +44,8 @@ final List<E2EScenario> allScenarios = <E2EScenario>[
   // Task 7
   dailyRewardClaimScenario,
   dailyRewardLockedSameDayScenario,
+  // Task 8
+  livesConsumedOnGameOverScenario,
+  noLivesScreenScenario,
+  livesRegenOverTimeScenario,
 ];
