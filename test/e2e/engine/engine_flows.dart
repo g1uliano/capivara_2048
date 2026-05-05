@@ -43,7 +43,7 @@ void _swipeAndStop(GameTestHarness harness, Direction dir) {
 final engineSwipeLeftScenario = E2EScenario(
   id: 'engine.swipe_left_merges_correctly',
   title: 'swipe esquerda: dois tiles iguais na mesma linha → merge',
-  tags: {ScenarioTag.critical},
+  tags: {ScenarioTag.critical, ScenarioTag.demo},
   run: (tester, harness) async {
     await _bootToGame(tester, harness);
 
@@ -77,7 +77,7 @@ final engineSwipeLeftScenario = E2EScenario(
 final engineSwipeRightScenario = E2EScenario(
   id: 'engine.swipe_right_merges_correctly',
   title: 'swipe direita: dois tiles iguais → merge à direita',
-  tags: {ScenarioTag.critical},
+  tags: {ScenarioTag.critical, ScenarioTag.demo},
   run: (tester, harness) async {
     await _bootToGame(tester, harness);
 

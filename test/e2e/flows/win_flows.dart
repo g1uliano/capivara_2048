@@ -34,7 +34,7 @@ void _setMilestone(GameTestHarness harness, int milestone) {
 final win2048FirstTimeScenario = E2EScenario(
   id: 'flow.win_2048_first_time',
   title: 'milestone 11 → VictoryChoiceDialog mostra título + "Você chegou ao 2048!"',
-  tags: {ScenarioTag.critical},
+  tags: {ScenarioTag.critical, ScenarioTag.demo},
   run: (tester, harness) async {
     await _bootToGame(tester, harness);
     _setMilestone(harness, 11);

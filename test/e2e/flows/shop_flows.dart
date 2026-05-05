@@ -47,7 +47,7 @@ final shopOverlayFromEmptyInventoryScenario = E2EScenario(
 final shopPurchaseItemScenario = E2EScenario(
   id: 'flow.shop_purchase_item',
   title: 'ShopOverlay: tap "Comprar" → confirmar → inventário incrementa',
-  tags: {ScenarioTag.critical},
+  tags: {ScenarioTag.critical, ScenarioTag.demo},
   run: (tester, harness) async {
     await _bootToGame(tester, harness);
     await tester.pump();

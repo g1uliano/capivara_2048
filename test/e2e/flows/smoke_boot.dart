@@ -5,7 +5,7 @@ import '../_harness/scenario.dart';
 final smokeBootScenario = E2EScenario(
   id: 'flow.smoke_boot',
   title: 'app abre, splash navega para HomeScreen',
-  tags: {ScenarioTag.critical},
+  tags: {ScenarioTag.critical, ScenarioTag.demo},
   run: (tester, harness) async {
     final widget = await tester.runAsync(() => harness.boot());
     await tester.pumpWidget(widget!);

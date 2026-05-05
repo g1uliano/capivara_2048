@@ -16,7 +16,7 @@ Future<void> _bootToHome(WidgetTester tester, GameTestHarness harness) async {
 final navHomeToCollectionScenario = E2EScenario(
   id: 'nav.home_to_collection',
   title: 'tap em Coleção navega para CollectionScreen',
-  tags: {ScenarioTag.critical},
+  tags: {ScenarioTag.critical, ScenarioTag.demo},
   run: (tester, harness) async {
     await _bootToHome(tester, harness);
     await tester.tapByKey('home_btn_colecao');
