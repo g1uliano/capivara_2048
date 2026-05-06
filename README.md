@@ -149,6 +149,17 @@ flutter build apk --flavor tst --debug --dart-define=FLAVOR=dev
 > **CI/CD:** os valores de `AD_UNIT_ANDROID`, `AD_UNIT_IOS` e outros segredos
 > são injetados via GitHub Secrets no workflow de release. Ver `.github/workflows/`.
 
+## Builds
+
+| Comando | Flavor | IAP | Uso |
+|---------|--------|-----|-----|
+| `flutter run --dart-define=FLAVOR=dev` | dev | Fake | Desenvolvimento local |
+| `flutter build apk --dart-define=FLAVOR=tst` | tst | Fake | QA — UI sem lojas |
+| `flutter build apk --dart-define=FLAVOR=tst --dart-define=USE_REAL_IAP=true` | tst | Real (sandbox) | QA com Play Store sandbox |
+| `flutter build apk --dart-define=FLAVOR=prd` | prd | Real (produção) | Release |
+
+Para configurar produtos nas lojas e contas de teste, consulte [`IAP.md`](IAP.md).
+
 ## Stack
 
 - **Flutter 3.x** (Dart) — iOS, Android, Web, Desktop
