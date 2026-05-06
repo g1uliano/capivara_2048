@@ -22,6 +22,10 @@ class FirestoreRankingRepository implements RankingRepository {
     String weekId,
     RankingType type,
   ) {
+    assert(
+      type == RankingType.globalTime || type == RankingType.globalScore,
+      '_weeklyCollection called with legends type: $type',
+    );
     final sub = type == RankingType.globalScore ? 'globalScore' : 'globalTime';
     return _firestore.collection('rankings').doc(weekId).collection(sub);
   }
@@ -42,17 +46,19 @@ class FirestoreRankingRepository implements RankingRepository {
     final weekId = WeekId.fromUtc(DateTime.now().toUtc());
     switch (type) {
       case RankingType.globalTime:
-        return _weeklyCollection(weekId, type)
-            .orderBy('bestTimeMs', descending: false)
-            .limit(50);
+        return _weeklyCollection(
+          weekId,
+          type,
+        ).orderBy('bestTimeMs', descending: false).limit(50);
       case RankingType.globalScore:
-        return _weeklyCollection(weekId, type)
-            .orderBy('value', descending: true)
-            .limit(50);
+        return _weeklyCollection(
+          weekId,
+          type,
+        ).orderBy('value', descending: true).limit(50);
       case RankingType.legends4096Time:
-        return _legendsCollection(type)
-            .orderBy('timesReached', descending: true)
-            .limit(50);
+        return _legendsCollection(
+          type,
+        ).orderBy('timesReached', descending: true).limit(50);
       case RankingType.legends8192Count:
         return _legendsCollection(type)
             .orderBy('timesReached', descending: true)
@@ -104,13 +110,15 @@ class FirestoreRankingRepository implements RankingRepository {
         // else rank stays the same (tie)
       }
 
-      entries.add(RankingEntry(
-        rank: rank,
-        playerName: displayName,
-        userId: entryUserId,
-        value: value,
-        isLocalPlayer: entryUserId == userId,
-      ));
+      entries.add(
+        RankingEntry(
+          rank: rank,
+          playerName: displayName,
+          userId: entryUserId,
+          value: value,
+          isLocalPlayer: entryUserId == userId,
+        ),
+      );
     }
 
     return entries;
@@ -126,20 +134,57 @@ class FirestoreRankingRepository implements RankingRepository {
 
   @override
   Stream<List<RankingEntry>> watchWeeklyTop(RankingType type) {
-    return _buildQuery(type).snapshots().map(
-          (snap) => _docsToEntries(snap.docs, type),
-        );
+    return _buildQuery(
+      type,
+    ).snapshots().map((snap) => _docsToEntries(snap.docs, type));
   }
 
   @override
   Future<RankingEntry?> getPlayerEntry(RankingType type) async {
-    final snap = await _buildQuery(type).get();
-    final entries = _docsToEntries(snap.docs, type);
-    try {
-      return entries.firstWhere((e) => e.userId == userId);
-    } catch (_) {
-      return null;
+    final CollectionReference<Map<String, dynamic>> col;
+    if (type == RankingType.globalTime || type == RankingType.globalScore) {
+      final weekId = WeekId.fromUtc(DateTime.now().toUtc());
+      col = _weeklyCollection(weekId, type);
+    } else {
+      col = _legendsCollection(type);
     }
+
+    final docSnap = await col.doc(userId).get();
+    if (!docSnap.exists) return null;
+
+    final data = docSnap.data()!;
+    final displayName = data['displayName'] as String? ?? userId;
+
+    final int playerValue;
+    final int rank;
+
+    if (type == RankingType.globalTime) {
+      playerValue = (data['bestTimeMs'] as num?)?.toInt() ?? 0;
+      final countSnap =
+          await col.where('bestTimeMs', isLessThan: playerValue).count().get();
+      rank = (countSnap.count ?? 0) + 1;
+    } else if (type == RankingType.globalScore) {
+      playerValue = (data['value'] as num?)?.toInt() ?? 0;
+      final countSnap =
+          await col.where('value', isGreaterThan: playerValue).count().get();
+      rank = (countSnap.count ?? 0) + 1;
+    } else {
+      // legends
+      playerValue = (data['timesReached'] as num?)?.toInt() ?? 0;
+      final countSnap = await col
+          .where('timesReached', isGreaterThan: playerValue)
+          .count()
+          .get();
+      rank = (countSnap.count ?? 0) + 1;
+    }
+
+    return RankingEntry(
+      rank: rank,
+      playerName: displayName,
+      userId: userId,
+      value: playerValue,
+      isLocalPlayer: true,
+    );
   }
 
   @override
@@ -199,17 +244,13 @@ class FirestoreRankingRepository implements RankingRepository {
   }
 
   @override
-  Future<WeeklyRewardResult?> checkAndClaimWeeklyReward(
-    String weekId,
-  ) async {
+  Future<WeeklyRewardResult?> checkAndClaimWeeklyReward(String weekId) async {
     // Check if already claimed
     final rewardsBox = await Hive.openBox<String>('ranking_rewards');
     if (rewardsBox.get(weekId) == 'claimed') return null;
 
     // Look up player in the previous week's globalTime ranking
-    final previousWeekId = WeekId.fromUtc(
-      DateTime.now().toUtc().subtract(const Duration(days: 7)),
-    );
+    final previousWeekId = _previousWeekId(weekId);
 
     final snap = await _buildQueryForWeek(
       previousWeekId,
@@ -242,13 +283,21 @@ class FirestoreRankingRepository implements RankingRepository {
     return reward;
   }
 
+  /// Derives the previous week identifier from [currentWeekId].
+  String _previousWeekId(String currentWeekId) {
+    final currentStart = WeekId.weekStartsAt(DateTime.now().toUtc());
+    final prevInstant = currentStart.subtract(const Duration(seconds: 1));
+    return WeekId.fromUtc(prevInstant);
+  }
+
   Query<Map<String, dynamic>> _buildQueryForWeek(
     String weekId,
     RankingType type,
   ) {
-    return _weeklyCollection(weekId, type)
-        .orderBy('bestTimeMs', descending: false)
-        .limit(50);
+    return _weeklyCollection(
+      weekId,
+      type,
+    ).orderBy('bestTimeMs', descending: false).limit(50);
   }
 
   Future<void> _deliverReward(WeeklyRewardResult reward) async {
