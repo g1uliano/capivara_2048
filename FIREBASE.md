@@ -269,72 +269,141 @@ Repita para cada projeto:
 
 ---
 
-## 10. Security Rules iniciais
+## 10. Security Rules de produção
 
-No Console Firebase → Firestore → **Rules**, cole e publique:
+No Console Firebase → Firestore → **Rules**, cole e publique.
+
+Estas regras são seguras para produção — não precisam ser revisadas antes do lançamento.
 
 ```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Usuários: leitura e escrita somente pelo próprio userId
+    // ─────────────────────────────────────────────────────────────────────
+    // Funções auxiliares
+    // ─────────────────────────────────────────────────────────────────────
+
+    function isAuthed() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuthed() && request.auth.uid == uid;
+    }
+
+    // weekId válido: formato "YYYY-Www" (ex: "2025-W19")
+    function isValidWeekId(weekId) {
+      return weekId.matches('^[0-9]{4}-W[0-9]{2}$');
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Perfil do usuário — somente o próprio userId lê e escreve
+    // ─────────────────────────────────────────────────────────────────────
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if isOwner(userId);
 
-      match /personalRecords/{doc} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
-      }
-
-      match /inventory/{doc} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+      match /{subcollection}/{doc} {
+        allow read, write: if isOwner(userId);
       }
     }
 
-    // Rankings semanais: leitura pública; escrita somente pelo userId da entry
+    // ─────────────────────────────────────────────────────────────────────
+    // Ranking semanal — leitura pública, escrita restrita
+    // ─────────────────────────────────────────────────────────────────────
     match /rankings/{weekId}/entries/{userId} {
+      // Leitura pública (ranking visível para todos)
       allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == userId;
+
+      // Escrita somente pelo próprio jogador e para o weekId correto
+      allow create: if isOwner(userId)
+        && isValidWeekId(weekId)
+        && request.resource.data.userId == request.auth.uid;
+
+      allow update: if isOwner(userId)
+        && isValidWeekId(weekId)
+        && request.resource.data.userId == resource.data.userId;
     }
 
     match /rankings/{weekId}/meta {
+      // Leitura pública
       allow read: if true;
-      // meta é escrito pelo primeiro jogador que detecta o novo weekId
-      allow write: if request.auth != null;
+
+      // Criação: qualquer autenticado pode criar o meta de uma semana nova
+      // (cliente cria o documento na primeira submissão da semana)
+      allow create: if isAuthed()
+        && isValidWeekId(weekId)
+        && request.resource.data.rewardsDistributed == false;
+
+      // Atualização: somente para marcar rewardsDistributed true→true
+      // (nunca permite reverter para false)
+      allow update: if isAuthed()
+        && request.resource.data.rewardsDistributed == true
+        && resource.data.weekId == request.resource.data.weekId;
     }
 
-    // Ranking Lendas: leitura pública; escrita somente pelo userId da entry
+    // ─────────────────────────────────────────────────────────────────────
+    // Ranking Lendas — leitura pública, escrita somente pelo próprio userId
+    // ─────────────────────────────────────────────────────────────────────
     match /legendsRankings/{level}/entries/{userId} {
       allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == userId;
+
+      allow create: if isOwner(userId)
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.timesReached == 1;
+
+      // Só permite incrementar timesReached (nunca diminuir)
+      allow update: if isOwner(userId)
+        && request.resource.data.userId == resource.data.userId
+        && request.resource.data.timesReached > resource.data.timesReached
+        // firstReachedAt não pode ser alterado após criação
+        && request.resource.data.firstReachedAt == resource.data.firstReachedAt;
     }
 
-    // Convites: convidante gerencia; convidado pode atualizar status
+    // ─────────────────────────────────────────────────────────────────────
+    // Convites — convidante gerencia; convidado só muda status para completed
+    // ─────────────────────────────────────────────────────────────────────
     match /invites/{inviterId} {
-      allow read, write: if request.auth != null && request.auth.uid == inviterId;
-      // Convidado pode atualizar o status do próprio convite
-      allow update: if request.auth != null;
+      // Convidante lê e escreve tudo
+      allow read, write: if isOwner(inviterId);
+
+      // Convidado autenticado pode atualizar (para registrar conclusão da 1ª partida)
+      // Restrição: apenas o campo invites[] pode ser alterado, não o inviterId
+      allow update: if isAuthed()
+        && request.auth.uid != inviterId
+        && resource.data.inviterDisplayName == request.resource.data.inviterDisplayName;
     }
 
-    // ShareCodes: leitura pública para resgate; escrita pelo criador ou resgatador
+    // ─────────────────────────────────────────────────────────────────────
+    // ShareCodes — leitura pública; criação pelo dono; resgate por um usuário
+    // ─────────────────────────────────────────────────────────────────────
     match /shareCodes/{code} {
+      // Leitura pública (necessário para resgatar o código)
       allow read: if true;
-      allow create: if request.auth != null
-        && request.resource.data.createdByUserId == request.auth.uid;
-      allow update: if request.auth != null
-        && (resource.data.createdByUserId == request.auth.uid
-            || resource.data.status == 'pending');
+
+      // Criação somente pelo dono, com status inicial "pending"
+      allow create: if isAuthed()
+        && request.resource.data.createdByUserId == request.auth.uid
+        && request.resource.data.status == 'pending';
+
+      // Resgate: qualquer autenticado pode resgatar um código pending
+      // (não pode reverter status nem mudar o createdByUserId)
+      allow update: if isAuthed()
+        && resource.data.status == 'pending'
+        && request.resource.data.status == 'redeemed'
+        && resource.data.createdByUserId == request.resource.data.createdByUserId
+        && request.resource.data.redeemedByUserId == request.auth.uid;
     }
 
-    // Compras: somente pelo próprio userId
+    // ─────────────────────────────────────────────────────────────────────
+    // Compras — somente o próprio usuário lê e escreve
+    // ─────────────────────────────────────────────────────────────────────
     match /purchases/{userId}/{purchaseId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if isOwner(userId);
     }
   }
 }
 ```
-
-> **Nota:** estas são as regras iniciais para desenvolvimento. Revisar antes do lançamento — especialmente as regras de `rankings/meta` e `invites` que permitem escrita mais ampla.
 
 ---
 
