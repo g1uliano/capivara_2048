@@ -118,15 +118,17 @@ Firebase configurado. Ver **[docs/TESTING.md](docs/TESTING.md)** para o guia com
 
 ### Build de produção
 
+> **Importante:** sempre especifique `--flavor` no build para evitar erros do Google Services.
+
 ```bash
 # Android APK — produção
-flutter build apk --release --dart-define=FLAVOR=prd
+flutter build apk --flavor prod --release --dart-define=FLAVOR=prd
 
 # iOS — produção
-flutter build ios --release --dart-define=FLAVOR=prd
+flutter build ios --flavor prod --release --dart-define=FLAVOR=prd
 
-# Android APK — desenvolvimento/QA
-flutter build apk --debug --dart-define=FLAVOR=dev
+# Android APK — desenvolvimento/QA (flavor tst)
+flutter build apk --flavor tst --debug --dart-define=FLAVOR=dev
 ```
 
 > **CI/CD:** os valores de `AD_UNIT_ANDROID`, `AD_UNIT_IOS` e outros segredos
