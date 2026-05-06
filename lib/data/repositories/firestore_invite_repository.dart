@@ -47,14 +47,15 @@ class FirestoreInviteRepository implements InviteService {
               'inviteeId': inviteeId,
               'inviteeDisplayName': inviteeDisplayName,
               'status': 'pending',
-            }
+            },
           ],
           'totalRewardsClaimed': 0,
         });
         return;
       }
       final invites = List<Map<String, dynamic>>.from(
-          snap.data()?['invites'] as List? ?? []);
+        snap.data()?['invites'] as List? ?? [],
+      );
       // No-op if already registered
       if (invites.any((i) => i['inviteeId'] == inviteeId)) return;
       // Max 20 active invites
@@ -88,9 +89,11 @@ class FirestoreInviteRepository implements InviteService {
       if (!snap.exists) return;
 
       final invites = List<Map<String, dynamic>>.from(
-          snap.data()?['invites'] as List? ?? []);
+        snap.data()?['invites'] as List? ?? [],
+      );
       final idx = invites.indexWhere(
-          (i) => i['inviteeId'] == inviteeId && i['status'] == 'pending');
+        (i) => i['inviteeId'] == inviteeId && i['status'] == 'pending',
+      );
       if (idx == -1) return;
 
       invites[idx] = {
@@ -101,14 +104,9 @@ class FirestoreInviteRepository implements InviteService {
 
       // Deliver reward to inviter (Firestore — remote)
       final inviterRef = _firestore.collection('users').doc(inviterId);
-      tx.set(
-          inviterRef,
-          {
-            'inventory': {
-              'bomb2': FieldValue.increment(1),
-            },
-          },
-          SetOptions(merge: true));
+      tx.set(inviterRef, {
+        'inventory': {'bomb2': FieldValue.increment(1)},
+      }, SetOptions(merge: true));
       // Note: lives for inviter via separate update (outside transaction is fine for non-critical reward)
 
       tx.update(ref, {
@@ -132,20 +130,22 @@ class FirestoreInviteRepository implements InviteService {
   Future<void> _deliverLocalReward() async {
     // 2 lives
     final livesBox = await Hive.openBox<LivesState>('lives');
-    final ls = livesBox.get('state');
-    if (ls != null) {
-      await livesBox.put(
-          'state', ls.copyWith(lives: (ls.lives + 2).clamp(0, 15)));
-    }
+    final ls = livesBox.get('state') ?? LivesState.initial();
+    await livesBox.put(
+      'state',
+      ls.copyWith(lives: (ls.lives + 2).clamp(0, 15)),
+    );
     // 1× Bomb2
     final invBox = await Hive.openBox<Inventory>('inventory');
     final inv = invBox.get('inventory') ?? Inventory.empty();
     await invBox.put(
-        'inventory',
-        Inventory(
-            bomb2: inv.bomb2 + 1,
-            bomb3: inv.bomb3,
-            undo1: inv.undo1,
-            undo3: inv.undo3));
+      'inventory',
+      Inventory(
+        bomb2: inv.bomb2 + 1,
+        bomb3: inv.bomb3,
+        undo1: inv.undo1,
+        undo3: inv.undo3,
+      ),
+    );
   }
 }
