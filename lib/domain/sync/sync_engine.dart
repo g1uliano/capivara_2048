@@ -2,6 +2,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/pending_event.dart';
+import '../../data/repositories/firebase_sync_engine.dart';
 
 enum SyncStatus { idle, syncing, error }
 
@@ -45,4 +46,9 @@ class FakeSyncEngine implements SyncEngine {
   Stream<SyncStatus> get statusStream => Stream.value(SyncStatus.idle);
 }
 
-final syncEngineProvider = Provider<SyncEngine>((_) => FakeSyncEngine());
+// TODO(fase4b): Replace FakeSyncEngine with FirebaseSyncEngine for prd flavor.
+final syncEngineProvider = Provider<SyncEngine>((ref) {
+  const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
+  if (flavor == 'prd') return FirebaseSyncEngine();
+  return FakeSyncEngine();
+});
