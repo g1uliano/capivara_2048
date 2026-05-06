@@ -63,25 +63,35 @@ O flavor é selecionado via `--dart-define=FLAVOR=dev|prd`.
 
 ### Executar
 
+**Cenário 1 — Genymotion ou celular via WiFi**
 ```bash
-# Desenvolvimento — celular via USB (usa adb reverse)
-flutter run --dart-define=FLAVOR=dev
+# Inicie o emulador Firebase em outro terminal primeiro:
+firebase emulators:start
 
-# Desenvolvimento — Genymotion ou celular via WiFi (IP fixo na rede)
+# Rode o app apontando para o IP fixo da sua máquina na rede
 flutter run --dart-define=FLAVOR=dev --dart-define=EMULATOR_HOST=10.0.0.2
-
-# Produção (usa Firebase real)
-flutter run --dart-define=FLAVOR=prd
-
-# Sem flag: equivalente a FLAVOR=dev (default seguro)
-flutter run
 ```
 
-> Para celular via USB: rode `adb reverse tcp:8080 tcp:8080 && adb reverse tcp:9099 tcp:9099`
-> antes do `flutter run` para redirecionar as portas do emulador.
->
-> Para Genymotion ou celular via WiFi: use `--dart-define=EMULATOR_HOST=<IP-do-computador>`.
-> O IP fixo da rede local padrão do projeto é `10.0.0.2`.
+**Cenário 2 — Celular físico via USB**
+```bash
+# Inicie o emulador Firebase em outro terminal primeiro:
+firebase emulators:start
+
+# Redirecione as portas do emulador para o celular:
+adb reverse tcp:8080 tcp:8080
+adb reverse tcp:9099 tcp:9099
+
+# Rode o app
+flutter run --dart-define=FLAVOR=dev
+```
+
+**Cenário 3 — Produção (Firebase real, sem emulador)**
+```bash
+flutter run --dart-define=FLAVOR=prd
+```
+
+> `EMULATOR_HOST` só tem efeito com `FLAVOR=dev` — em produção é ignorado.
+> Omitir `FLAVOR` equivale a `FLAVOR=dev` (default seguro).
 
 ### Testes
 
