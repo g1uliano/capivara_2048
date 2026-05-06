@@ -52,43 +52,59 @@ cd capivara_2048
 flutter pub get
 ```
 
+### Flavors e Firebase
+
+O projeto usa dois flavors: `dev` (emulador Firebase local) e `prd` (Firebase de produção).
+O flavor é selecionado via `--dart-define=FLAVOR=dev|prd`.
+
+> **Pré-requisito:** antes do primeiro build ou `flutter run`, execute o `flutterfire configure`
+> conforme descrito em [`FIREBASE.md`](FIREBASE.md) para gerar os arquivos
+> `lib/firebase_options_dev.dart` e `lib/firebase_options_prd.dart`.
+
 ### Executar
 
 ```bash
-# Web (Chrome)
-flutter run -d chrome
+# Desenvolvimento (usa Firebase Emulator local)
+flutter run --dart-define=FLAVOR=dev
 
-# Android (emulador ou dispositivo conectado)
-flutter run -d android
+# Produção (usa Firebase real)
+flutter run --dart-define=FLAVOR=prd
 
-# iOS (macOS com Xcode)
-flutter run -d ios
+# Sem flag: equivalente a FLAVOR=dev (default seguro)
+flutter run
 ```
+
+> Para usar o emulador Firebase em dev, rode `firebase emulators:start` em outro terminal
+> antes de `flutter run`. Ver [`FIREBASE.md §11`](FIREBASE.md) para detalhes.
 
 ### Testes
 
 ```bash
-# Tier 1 — unit/widget tests (headless, sem device)
+# Tier 1 — unit/widget tests (headless, sem device, sem Firebase)
 flutter test
 
 # Tier 1 — suite E2E completa (95+ cenários)
 flutter test test/e2e/run_all_test.dart
 ```
 
-Ver **[docs/TESTING.md](docs/TESTING.md)** para o guia completo: Tier 1, APK Tier 2, como adicionar cenários e troubleshooting de golden tests.
+Os testes sempre usam Fakes (FakeAuthService, FakeSyncEngine, etc.) — sem necessidade de
+Firebase configurado. Ver **[docs/TESTING.md](docs/TESTING.md)** para o guia completo.
 
 ### Build de produção
 
 ```bash
-# Web
-flutter build web
+# Android APK — produção
+flutter build apk --release --dart-define=FLAVOR=prd
 
-# Android APK
-flutter build apk --release
+# iOS — produção
+flutter build ios --release --dart-define=FLAVOR=prd
 
-# iOS
-flutter build ios --release
+# Android APK — desenvolvimento/QA
+flutter build apk --debug --dart-define=FLAVOR=dev
 ```
+
+> **CI/CD:** os valores de `AD_UNIT_ANDROID`, `AD_UNIT_IOS` e outros segredos
+> são injetados via GitHub Secrets no workflow de release. Ver `.github/workflows/`.
 
 ## Stack
 
