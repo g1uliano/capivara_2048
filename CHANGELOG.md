@@ -7,6 +7,23 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.4.4] — 2026-05-06
+
+### Added — Fase 4B: Ranking Global Semanal + Ranking Lendas
+
+- `WeekId` — cálculo determinístico de weekId ISO 8601 com reset sábado 21h UTC; testado em boundary de virada de ano
+- `WeeklyRewardResult` — model imutável com tabela de recompensas por posição (1º–50º)
+- `FirestoreRankingRepository` — ranking global semanal (globalTime, globalScore) e Ranking Lendas (4096, 8192) via Firestore; direct doc lookup com count query para rank; reward delivery ao inventário Hive
+- `WeeklyRewardModal` — dialog de recompensa semanal com itens recebidos e botão Continuar
+- `RankingController` — notifier Riverpod para verificação de recompensa semanal no startup
+
+### Changed
+
+- `RankingRepository` — novos métodos `checkAndClaimWeeklyReward`, `watchWeeklyTop`; `RankingEntry` ganha `userId` opcional; `submitScore` aceita `displayName` nomeado
+- `rankingRepositoryProvider` — usa `FirestoreRankingRepository` no flavor `prd`; fallback para `FakeRankingService` em dev/debug
+- `game_notifier` — submete `globalScore` (sempre) e `globalTime` (apenas em vitória) ao ranking após game over
+- `SyncEngine.init()` — aceita `displayName` opcional; `FirebaseSyncEngine` usa displayName real do perfil nos entries de legendReached no Firestore
+
 ## [1.4.3] — 2026-05-06
 
 ### Fixed
