@@ -7,6 +7,22 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.4.7] — 2026-05-06
+
+### Fixed
+
+- **Bug crítico:** `IAPServiceImpl`, `FirestoreInviteRepository` e `FirestoreRankingRepository` escreviam itens no Hive com key `'inventory'` em vez de `'data'` — inventário nunca era atualizado por entregas externas (IAP, convites, recompensas de ranking)
+- `IAPServiceImpl`: `PurchaseStatus.restored` agora entrega itens idempotentemente via Firestore; `PurchaseStatus.pending` não encerra a subscription, aguarda status final
+- `InventoryNotifier`: `Box.watch(key: 'data')` recarrega estado automaticamente quando IAP ou ranking entregam itens diretamente no Hive — UI atualiza sem restart
+- `LivesNotifier`: idem com `Box.watch(key: 'state')` para vidas recebidas via IAP ou ranking
+
+### Added
+
+- `IAPStartupService`: subscription permanente no `purchaseStream` inicializada pelo `AuthController` após login; processa compras pendentes de sessões anteriores de forma idempotente (`pending_orphan` no Firestore para auditoria)
+- `iapServiceProvider`: aceita `--dart-define=USE_REAL_IAP=true` no flavor `tst` para ativar `IAPServiceImpl` real no sandbox das lojas
+- `IAP.md`: guia completo para cadastrar produtos no Google Play Console e App Store Connect, configurar contas de teste sandbox, StoreKit Configuration e builds por ambiente
+- `README.md`: tabela de builds com variantes IAP
+
 ## [1.4.6] — 2026-05-06
 
 ### Fixed — Fase 4 gaps
