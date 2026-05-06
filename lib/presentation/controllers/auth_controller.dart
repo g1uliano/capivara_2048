@@ -8,6 +8,7 @@ import '../../data/models/player_profile.dart';
 import '../../domain/auth/auth_service.dart';
 import '../../domain/invites/invite_service.dart';
 import '../../domain/sync/sync_engine.dart';
+import '../../data/repositories/iap_startup_service.dart';
 
 class AuthController extends StateNotifier<PlayerProfile?> {
   AuthController(this._authService, this._syncEngine, this._ref) : super(null) {
@@ -25,6 +26,7 @@ class AuthController extends StateNotifier<PlayerProfile?> {
       await _syncEngine.init(profile.userId, displayName: profile.displayName);
       await _syncEngine.syncProfile();
       await _syncEngine.drainPendingEvents();
+      _initIAPStartup(profile.userId);
       unawaited(_registerPendingInvite(profile));
     } catch (_) {
       state = null;
@@ -39,6 +41,7 @@ class AuthController extends StateNotifier<PlayerProfile?> {
       await _syncEngine.init(profile.userId, displayName: profile.displayName);
       await _syncEngine.syncProfile();
       await _syncEngine.drainPendingEvents();
+      _initIAPStartup(profile.userId);
       unawaited(_registerPendingInvite(profile));
     } catch (_) {
       state = null;
@@ -53,6 +56,7 @@ class AuthController extends StateNotifier<PlayerProfile?> {
       await _syncEngine.init(profile.userId, displayName: profile.displayName);
       await _syncEngine.syncProfile();
       await _syncEngine.drainPendingEvents();
+      _initIAPStartup(profile.userId);
       unawaited(_registerPendingInvite(profile));
     } catch (_) {
       state = null;
@@ -65,7 +69,14 @@ class AuthController extends StateNotifier<PlayerProfile?> {
     state = profile;
     // New account: no remote data to sync yet — only init the engine.
     await _syncEngine.init(profile.userId, displayName: profile.displayName);
+    _initIAPStartup(profile.userId);
     unawaited(_registerPendingInvite(profile));
+  }
+
+  /// Initializes IAPStartupService after successful login.
+  /// No-op in dev (FakeIAPStartupService).
+  void _initIAPStartup(String userId) {
+    unawaited(_ref.read(iapStartupServiceProvider).initialize(userId));
   }
 
   /// Called after every successful login.
@@ -89,6 +100,7 @@ class AuthController extends StateNotifier<PlayerProfile?> {
 
   Future<void> signOut() async {
     await _authService.signOut();
+    unawaited(_ref.read(iapStartupServiceProvider).dispose());
     await _syncEngine.dispose();
     state = null;
   }
