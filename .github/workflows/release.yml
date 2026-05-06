@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      flavor:
+        description: "Flavor to build (prod)"
+        required: true
+        default: "prod"
+
+jobs:
+  build-android:
+    name: Build Android APK (prod)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.41.7"
+          channel: "stable"
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # firebase_options_prd.dart é gitignored — injetado via secret (base64)
+      - name: Write firebase_options_prd.dart
+        run: echo "${{ secrets.FIREBASE_OPTIONS_PRD_BASE64 }}" | base64 -d > lib/firebase_options_prd.dart
+
+      # firebase_options_dev.dart também necessário para compilar (mesmo em prd)
+      - name: Write firebase_options_dev.dart
+        run: echo "${{ secrets.FIREBASE_OPTIONS_DEV_BASE64 }}" | base64 -d > lib/firebase_options_dev.dart
+
+      # google-services.json para o flavor prod
+      - name: Write google-services.json
+        run: echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 -d > android/app/google-services.json
+
+      # Keystore de upload
+      - name: Write upload keystore
+        run: echo "${{ secrets.UPLOAD_KEYSTORE_BASE64 }}" | base64 -d > android/app/upload-keystore.jks
+
+      - name: Build release APK
+        run: |
+          flutter build apk \
+            --flavor prod \
+            --release \
+            --dart-define=FLAVOR=prd \
+            --dart-define=AD_UNIT_ANDROID=${{ secrets.AD_UNIT_ANDROID }} \
+            --dart-define=AD_UNIT_IOS=${{ secrets.AD_UNIT_IOS }}
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: upload
+          KEY_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-prod-release
+          path: build/app/outputs/flutter-apk/app-prod-release.apk
+          retention-days: 30
