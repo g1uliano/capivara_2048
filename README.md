@@ -52,43 +52,87 @@ cd capivara_2048
 flutter pub get
 ```
 
+### Flavors e Firebase
+
+O projeto usa dois flavors: `dev` (emulador Firebase local) e `prd` (Firebase de produção).
+O flavor é selecionado via `--dart-define=FLAVOR=dev|prd`.
+
+> **Pré-requisito:** antes do primeiro build ou `flutter run`, execute o `flutterfire configure`
+> conforme descrito em [`FIREBASE.md`](FIREBASE.md) para gerar os arquivos
+> `lib/firebase_options_dev.dart` e `lib/firebase_options_prd.dart`.
+
 ### Executar
 
+**Cenário 1 — Genymotion ou celular via WiFi**
+
 ```bash
-# Web (Chrome)
-flutter run -d chrome
+# Inicie o emulador Firebase em outro terminal primeiro:
+firebase emulators:start
 
-# Android (emulador ou dispositivo conectado)
-flutter run -d android
-
-# iOS (macOS com Xcode)
-flutter run -d ios
+# Rode o app apontando para o IP fixo da sua máquina na rede
+flutter run \
+  --dart-define=FLAVOR=dev \
+  --dart-define=EMULATOR_HOST=10.0.0.2 \
+  --dart-define=AD_UNIT_ANDROID=ca-app-pub-3940256099942544/5224354917 \
+  --dart-define=AD_UNIT_IOS=ca-app-pub-3940256099942544/1712485313
 ```
+
+**Cenário 2 — Celular físico via USB**
+
+```bash
+# Inicie o emulador Firebase em outro terminal primeiro:
+firebase emulators:start
+
+# Redirecione as portas do emulador para o celular:
+adb reverse tcp:8080 tcp:8080
+adb reverse tcp:9099 tcp:9099
+
+# Rode o app
+flutter run \
+  --dart-define=FLAVOR=dev \
+  --dart-define=AD_UNIT_ANDROID=ca-app-pub-3940256099942544/5224354917 \
+  --dart-define=AD_UNIT_IOS=ca-app-pub-3940256099942544/1712485313
+```
+
+**Cenário 3 — Produção (Firebase real, sem emulador)**
+
+```bash
+flutter run --dart-define=FLAVOR=prd
+```
+
+> `EMULATOR_HOST` só tem efeito com `FLAVOR=dev` — em produção é ignorado.
+> Omitir `FLAVOR` equivale a `FLAVOR=dev` (default seguro).
 
 ### Testes
 
 ```bash
-# Tier 1 — unit/widget tests (headless, sem device)
+# Tier 1 — unit/widget tests (headless, sem device, sem Firebase)
 flutter test
 
 # Tier 1 — suite E2E completa (95+ cenários)
 flutter test test/e2e/run_all_test.dart
 ```
 
-Ver **[docs/TESTING.md](docs/TESTING.md)** para o guia completo: Tier 1, APK Tier 2, como adicionar cenários e troubleshooting de golden tests.
+Os testes sempre usam Fakes (FakeAuthService, FakeSyncEngine, etc.) — sem necessidade de
+Firebase configurado. Ver **[docs/TESTING.md](docs/TESTING.md)** para o guia completo.
 
 ### Build de produção
 
+> **Importante:** sempre especifique `--flavor` no build para evitar erros do Google Services.
+
 ```bash
-# Web
-flutter build web
+# Android APK — produção
+flutter build apk --flavor prod --release --dart-define=FLAVOR=prd
 
-# Android APK
-flutter build apk --release
+# iOS — produção
+flutter build ios --flavor prod --release --dart-define=FLAVOR=prd
 
-# iOS
-flutter build ios --release
+# Android APK — desenvolvimento/QA (flavor tst)
+flutter build apk --flavor tst --debug --dart-define=FLAVOR=dev
 ```
+
+> **CI/CD:** os valores de `AD_UNIT_ANDROID`, `AD_UNIT_IOS` e outros segredos
+> são injetados via GitHub Secrets no workflow de release. Ver `.github/workflows/`.
 
 ## Stack
 

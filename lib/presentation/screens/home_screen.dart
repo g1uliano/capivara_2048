@@ -19,6 +19,8 @@ import 'game/game_screen.dart';
 import 'ranking_screen.dart';
 import 'settings_screen.dart';
 import 'shop_screen.dart';
+import 'profile_screen.dart';
+import '../controllers/auth_controller.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -68,6 +70,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final gameState = ref.watch(gameProvider);
     final dailyState = ref.watch(dailyRewardsProvider);
+    final playerProfile = ref.watch(authControllerProvider);
     final rewardAvailable =
         computeDailyRewardStatus(DateTime.now(), dailyState) ==
         DailyRewardStatus.available;
@@ -90,6 +93,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   size: HomeConstants.buttonSize(scale),
                   onTap: () => _nav(const CollectionScreen()),
                   semanticLabel: 'Coleção',
+                ),
+              ),
+
+              // Topo centro — Perfil
+              Positioned(
+                top: HomeConstants.edgePad(scale),
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: IconButton(
+                    key: const Key('home_btn_perfil'),
+                    icon: Icon(
+                      playerProfile != null
+                          ? Icons.person
+                          : Icons.person_outline,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                    tooltip: 'Perfil',
+                    onPressed: () => _nav(const ProfileScreen()),
+                  ),
                 ),
               ),
 
