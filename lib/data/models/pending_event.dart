@@ -3,7 +3,7 @@
 enum PendingEventType { legendReached, inventoryConsume }
 
 class PendingEvent {
-  static const int hiveTypeId = 11;
+  static const int hiveTypeId = 12;
 
   final String id;
   final PendingEventType type;

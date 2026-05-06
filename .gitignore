@@ -56,6 +56,8 @@ cache/removed_bg/
 #google-services.json
 android/app/src/dev/google-services.json
 android/app/src/prd/google-services.json
+android/app/src/prod/google-services.json
+android/app/src/tst/google-services.json
 
 # Firebase options (contém API keys — gerado por flutterfire configure)
 lib/firebase_options_dev.dart

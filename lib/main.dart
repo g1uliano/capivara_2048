@@ -37,12 +37,16 @@ void main() async {
       : dev_options.DefaultFirebaseOptions.currentPlatform;
   await Firebase.initializeApp(options: firebaseOptions);
 
-  // Emulador local — ativo apenas no flavor dev
+  // Emulador local — ativo apenas quando USE_EMULATOR=true
+  // Ex: flutter run --dart-define=FLAVOR=dev --dart-define=USE_EMULATOR=true
   // Host configurável via --dart-define=EMULATOR_HOST=...
   // Padrões: 'localhost' (USB + adb reverse), '10.0.3.2' (Genymotion), IP fixo da rede (WiFi)
-  const emulatorHost =
-      String.fromEnvironment('EMULATOR_HOST', defaultValue: 'localhost');
-  if (flavor == 'dev') {
+  const useEmulator = bool.fromEnvironment('USE_EMULATOR', defaultValue: false);
+  const emulatorHost = String.fromEnvironment(
+    'EMULATOR_HOST',
+    defaultValue: 'localhost',
+  );
+  if (useEmulator) {
     FirebaseFirestore.instance.useFirestoreEmulator(emulatorHost, 8080);
     await FirebaseAuth.instance.useAuthEmulator(emulatorHost, 9099);
   }

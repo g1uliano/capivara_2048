@@ -7,6 +7,19 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.4.1] — 2026-05-06
+
+### Fixed
+
+- `PendingEvent.hiveTypeId` conflitava com `GameRecord.hiveTypeId` (ambos = 11) → app travava na splash screen com `HiveError: There is already a TypeAdapter for typeId 11`; corrigido para `12`
+- Emulador Firebase ativado automaticamente com `FLAVOR=dev`, causando travamento em dispositivos físicos sem emulador rodando; agora requer `--dart-define=USE_EMULATOR=true` explícito
+- Flavors Android inconsistentes: `prod` sem `applicationId` explícito, `src/prd/` nunca lido pelo Gradle (flavor chama `prod`), `defaultConfig.applicationId` com underscore divergindo do Firebase Console; tudo corrigido e `src/prod/google-services.json` criado
+- `pubspec.yaml` com versão `1.2.10+1` divergindo do CHANGELOG; corrigido para `1.4.0+1`
+
+### Changed
+
+- README: seção de flavors/Firebase atualizada com tabela `prod`/`tst`, novos cenários de execução e flag `USE_EMULATOR`
+
 ## [1.4.0] — 2026-05-06
 
 ### Added (Fase 4A — Firebase + Auth + Sync Engine)

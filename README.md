@@ -54,8 +54,15 @@ flutter pub get
 
 ### Flavors e Firebase
 
-O projeto usa dois flavors: `dev` (emulador Firebase local) e `prd` (Firebase de produção).
-O flavor é selecionado via `--dart-define=FLAVOR=dev|prd`.
+O projeto usa dois flavors Android:
+
+| Flavor | Package                        | Firebase            | Uso                        |
+| ------ | ------------------------------ | ------------------- | -------------------------- |
+| `prod` | `com.catraia.capivara2048`     | `bichim-prd`        | Release / produção         |
+| `tst`  | `com.catraia.capivara2048.dev` | `olha-o-bichim-dev` | QA / testes em dispositivo |
+
+O Firebase (dev ou prd) é selecionado via `--dart-define=FLAVOR=dev|prd`.
+O emulador local é ativado **separadamente** via `--dart-define=USE_EMULATOR=true`.
 
 > **Pré-requisito:** antes do primeiro build ou `flutter run`, execute o `flutterfire configure`
 > conforme descrito em [`FIREBASE.md`](FIREBASE.md) para gerar os arquivos
@@ -63,21 +70,22 @@ O flavor é selecionado via `--dart-define=FLAVOR=dev|prd`.
 
 ### Executar
 
-**Cenário 1 — Genymotion ou celular via WiFi**
+**Cenário 1 — Emulador Firebase + Genymotion ou WiFi**
 
 ```bash
 # Inicie o emulador Firebase em outro terminal primeiro:
 firebase emulators:start
 
 # Rode o app apontando para o IP fixo da sua máquina na rede
-flutter run \
+flutter run --flavor tst \
   --dart-define=FLAVOR=dev \
+  --dart-define=USE_EMULATOR=true \
   --dart-define=EMULATOR_HOST=10.0.0.2 \
   --dart-define=AD_UNIT_ANDROID=ca-app-pub-3940256099942544/5224354917 \
   --dart-define=AD_UNIT_IOS=ca-app-pub-3940256099942544/1712485313
 ```
 
-**Cenário 2 — Celular físico via USB**
+**Cenário 2 — Emulador Firebase + celular físico via USB**
 
 ```bash
 # Inicie o emulador Firebase em outro terminal primeiro:
@@ -88,20 +96,27 @@ adb reverse tcp:8080 tcp:8080
 adb reverse tcp:9099 tcp:9099
 
 # Rode o app
-flutter run \
+flutter run --flavor tst \
   --dart-define=FLAVOR=dev \
+  --dart-define=USE_EMULATOR=true \
   --dart-define=AD_UNIT_ANDROID=ca-app-pub-3940256099942544/5224354917 \
   --dart-define=AD_UNIT_IOS=ca-app-pub-3940256099942544/1712485313
 ```
 
-**Cenário 3 — Produção (Firebase real, sem emulador)**
+**Cenário 3 — Dispositivo físico sem emulador (Firebase dev real)**
 
 ```bash
-flutter run --dart-define=FLAVOR=prd
+flutter run --flavor tst --dart-define=FLAVOR=dev
 ```
 
-> `EMULATOR_HOST` só tem efeito com `FLAVOR=dev` — em produção é ignorado.
+**Cenário 4 — Produção (Firebase prd)**
+
+```bash
+flutter run --flavor prod --dart-define=FLAVOR=prd
+```
+
 > Omitir `FLAVOR` equivale a `FLAVOR=dev` (default seguro).
+> `USE_EMULATOR=true` é necessário apenas para desenvolvimento local com emuladores Firebase.
 
 ### Testes
 
@@ -127,7 +142,7 @@ flutter build apk --flavor prod --release --dart-define=FLAVOR=prd
 # iOS — produção
 flutter build ios --flavor prod --release --dart-define=FLAVOR=prd
 
-# Android APK — desenvolvimento/QA (flavor tst)
+# Android APK — QA / testes em dispositivo (flavor tst, Firebase dev real)
 flutter build apk --flavor tst --debug --dart-define=FLAVOR=dev
 ```
 
@@ -173,7 +188,11 @@ assets/
   - 3.6 — APK Tier 2 com TestRunnerScreen + Share + Demo mode
   - 3.7 — CI GitHub Actions (Tier 1 em PR/push, golden diffs como artefato)
   - 3.8 — Documentação do framework de testes
-- **Fase 4** — Arte adicional e polimento visual (logo, ícone, splash final)
+- **Fase 4A** — Firebase + Auth + Sync Engine ✅ _(v1.4.0)_
+  - PlayerProfile, AuthService (Google, Apple, Email), SyncEngine, SyncConflictResolver
+  - OnboardingAuthScreen, ProfileScreen, AuthBanner
+  - Firebase inicializado com flavors prod/tst, emulador local opcional (`USE_EMULATOR=true`)
+- **Fase 4B** — Arte adicional e polimento visual (logo, ícone, splash final)
 - **Fase 5** — Áudio (sound design dos 13 animais, SFX, música)
 - **Fase 6** — Polimento, l10n, acessibilidade, lançamento
 
