@@ -1,5 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+// Gerados pelo FlutterFire CLI — executar FIREBASE.md §5.1 e §5.2 antes do build
+import 'firebase_options_dev.dart' as dev_options;
+import 'firebase_options_prd.dart' as prd_options;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,6 +27,14 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+
+  // Firebase — flavor selecionado via --dart-define=FLAVOR=dev|prd
+  const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
+  final firebaseOptions = flavor == 'prd'
+      ? prd_options.DefaultFirebaseOptions.currentPlatform
+      : dev_options.DefaultFirebaseOptions.currentPlatform;
+  await Firebase.initializeApp(options: firebaseOptions);
+
   await Hive.initFlutter();
   Hive.registerAdapter(LivesStateAdapter());
   Hive.registerAdapter(InventoryHiveAdapter());

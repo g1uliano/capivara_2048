@@ -52,3 +52,7 @@ cache/removed_bg/
 
 # Pi coding agent state
 .pi/
+
+# Firebase options (contém API keys — gerado por flutterfire configure)
+lib/firebase_options_dev.dart
+lib/firebase_options_prd.dart

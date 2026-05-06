@@ -31,16 +31,17 @@ class PlayerProfile {
     DateTime? createdAt,
     DateTime? lastSeenAt,
     Object? email = _sentinel,
-  }) =>
-      PlayerProfile(
-        userId: userId ?? this.userId,
-        displayName: displayName ?? this.displayName,
-        avatarUrl: identical(avatarUrl, _sentinel) ? this.avatarUrl : avatarUrl as String?,
-        email: identical(email, _sentinel) ? this.email : email as String?,
-        provider: provider ?? this.provider,
-        createdAt: createdAt ?? this.createdAt,
-        lastSeenAt: lastSeenAt ?? this.lastSeenAt,
-      );
+  }) => PlayerProfile(
+    userId: userId ?? this.userId,
+    displayName: displayName ?? this.displayName,
+    avatarUrl: identical(avatarUrl, _sentinel)
+        ? this.avatarUrl
+        : avatarUrl as String?,
+    email: identical(email, _sentinel) ? this.email : email as String?,
+    provider: provider ?? this.provider,
+    createdAt: createdAt ?? this.createdAt,
+    lastSeenAt: lastSeenAt ?? this.lastSeenAt,
+  );
 
   Map<String, dynamic> toJson() => {
     'userId': userId,

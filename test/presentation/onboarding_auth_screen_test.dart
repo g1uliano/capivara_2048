@@ -9,12 +9,13 @@ Widget _wrap() {
   final fakeAuth = FakeAuthService();
   addTearDown(fakeAuth.dispose);
   return ProviderScope(
-  overrides: [
-    authServiceProvider.overrideWithValue(fakeAuth),
-    syncEngineProvider.overrideWithValue(FakeSyncEngine()),
-  ],
-  child: const MaterialApp(home: OnboardingAuthScreen()),
-);}
+    overrides: [
+      authServiceProvider.overrideWithValue(fakeAuth),
+      syncEngineProvider.overrideWithValue(FakeSyncEngine()),
+    ],
+    child: const MaterialApp(home: OnboardingAuthScreen()),
+  );
+}
 
 void main() {
   testWidgets('exibe botão Entrar com Google', (tester) async {

@@ -82,7 +82,9 @@ void main() {
 
     test('rewardCollected4096: OR — false OR true → true', () {
       final local = const PersonalRecords();
-      final remote = const PersonalRecords().copyWith(rewardCollected4096: true);
+      final remote = const PersonalRecords().copyWith(
+        rewardCollected4096: true,
+      );
       final result = SyncConflictResolver.mergePersonalRecords(local, remote);
       expect(result.rewardCollected4096, isTrue);
     });
