@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/repositories/firestore_invite_repository.dart';
+import '../../presentation/controllers/auth_controller.dart';
 
 abstract class InviteService {
   /// Generates (or retrieves) an invite link for the given userId.
@@ -56,4 +58,16 @@ class FakeInviteService implements InviteService {
   }
 }
 
-final inviteServiceProvider = Provider<InviteService>((_) => FakeInviteService());
+final inviteServiceProvider = Provider<InviteService>((ref) {
+  const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
+  if (flavor == 'prd') {
+    final profile = ref.watch(authControllerProvider);
+    if (profile != null) {
+      return FirestoreInviteRepository(
+        userId: profile.userId,
+        displayName: profile.displayName,
+      );
+    }
+  }
+  return FakeInviteService();
+});

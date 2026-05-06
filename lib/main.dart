@@ -1,3 +1,4 @@
+import 'package:app_links/app_links.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -51,6 +52,13 @@ void main() async {
     await FirebaseAuth.instance.useAuthEmulator(emulatorHost, 9099);
   }
 
+  // Deep link listener for invite system
+  final appLinks = AppLinks();
+  final initialUri =
+      await appLinks.getInitialLink().catchError((_) => null as Uri?);
+  if (initialUri != null) _handleInviteDeepLink(initialUri);
+  appLinks.uriLinkStream.listen(_handleInviteDeepLink);
+
   await Hive.initFlutter();
   Hive.registerAdapter(LivesStateAdapter());
   Hive.registerAdapter(InventoryHiveAdapter());
@@ -74,4 +82,15 @@ void main() async {
   runApp(
     UncontrolledProviderScope(container: container, child: const CapivaraApp()),
   );
+}
+
+void _handleInviteDeepLink(Uri uri) {
+  if (uri.scheme == 'olhabichim' && uri.host == 'invite') {
+    final ref = uri.queryParameters['ref'];
+    if (ref != null && ref.isNotEmpty) {
+      Hive.openBox<String>('invite_refs').then((box) {
+        box.put('pending_ref', ref);
+      });
+    }
+  }
 }
