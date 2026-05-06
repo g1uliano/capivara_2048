@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 import '../../data/models/lives_state.dart';
 import '../../data/repositories/lives_repository.dart';
 
@@ -10,6 +11,7 @@ class LivesNotifier extends StateNotifier<LivesState> {
   final LivesRepository _repo;
   final _ready = Completer<void>();
   Timer? _regenTimer;
+  StreamSubscription<BoxEvent>? _boxSub;
   AppLifecycleListener? _lifecycleListener;
 
   LivesNotifier(this._repo) : super(LivesState.initial()) {
@@ -25,6 +27,14 @@ class LivesNotifier extends StateNotifier<LivesState> {
       await _repo.setMigrationFlag(_migrationKeyV238);
       state = fresh;
       _ready.complete();
+      final migBox = await Hive.openBox<LivesState>('lives');
+      await _boxSub?.cancel();
+      _boxSub = migBox.watch(key: 'state').listen((event) {
+        final updated = event.value as LivesState?;
+        if (updated != null && mounted) {
+          state = updated;
+        }
+      });
       return;
     }
 
@@ -34,6 +44,16 @@ class LivesNotifier extends StateNotifier<LivesState> {
     await _repo.save(state);
     _ready.complete();
     _startRegenTimer();
+    final box = await Hive.openBox<LivesState>('lives');
+    await _boxSub?.cancel();
+    _boxSub = box.watch(key: 'state').listen((event) {
+      final updated = event.value as LivesState?;
+      if (updated != null && mounted) {
+        state = updated;
+        // Restart regen timer with the new state
+        _startRegenTimer();
+      }
+    });
     try {
       _lifecycleListener = AppLifecycleListener(
         onPause: _pauseRegen,
@@ -167,6 +187,7 @@ class LivesNotifier extends StateNotifier<LivesState> {
   @override
   void dispose() {
     _regenTimer?.cancel();
+    _boxSub?.cancel();
     _lifecycleListener?.dispose();
     super.dispose();
   }
