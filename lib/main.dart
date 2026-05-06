@@ -38,9 +38,13 @@ void main() async {
   await Firebase.initializeApp(options: firebaseOptions);
 
   // Emulador local — ativo apenas no flavor dev
+  // Host configurável via --dart-define=EMULATOR_HOST=...
+  // Padrões: 'localhost' (USB + adb reverse), '10.0.3.2' (Genymotion), IP fixo da rede (WiFi)
+  const emulatorHost =
+      String.fromEnvironment('EMULATOR_HOST', defaultValue: 'localhost');
   if (flavor == 'dev') {
-    FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
-    await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+    FirebaseFirestore.instance.useFirestoreEmulator(emulatorHost, 8080);
+    await FirebaseAuth.instance.useAuthEmulator(emulatorHost, 9099);
   }
 
   await Hive.initFlutter();

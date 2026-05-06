@@ -64,8 +64,11 @@ O flavor é selecionado via `--dart-define=FLAVOR=dev|prd`.
 ### Executar
 
 ```bash
-# Desenvolvimento (usa Firebase Emulator local)
+# Desenvolvimento — celular via USB (usa adb reverse)
 flutter run --dart-define=FLAVOR=dev
+
+# Desenvolvimento — Genymotion ou celular via WiFi (IP fixo na rede)
+flutter run --dart-define=FLAVOR=dev --dart-define=EMULATOR_HOST=10.0.0.2
 
 # Produção (usa Firebase real)
 flutter run --dart-define=FLAVOR=prd
@@ -74,8 +77,11 @@ flutter run --dart-define=FLAVOR=prd
 flutter run
 ```
 
-> Para usar o emulador Firebase em dev, rode `firebase emulators:start` em outro terminal
-> antes de `flutter run`. Ver [`FIREBASE.md §11`](FIREBASE.md) para detalhes.
+> Para celular via USB: rode `adb reverse tcp:8080 tcp:8080 && adb reverse tcp:9099 tcp:9099`
+> antes do `flutter run` para redirecionar as portas do emulador.
+>
+> Para Genymotion ou celular via WiFi: use `--dart-define=EMULATOR_HOST=<IP-do-computador>`.
+> O IP fixo da rede local padrão do projeto é `10.0.0.2`.
 
 ### Testes
 
