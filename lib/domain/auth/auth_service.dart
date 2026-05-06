@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/player_profile.dart';
+import '../../data/repositories/firebase_auth_service.dart';
 
 abstract class AuthService {
   Stream<PlayerProfile?> get authStateChanges;
@@ -78,4 +79,8 @@ class FakeAuthService implements AuthService {
 
 // TODO(fase4b): Replace FakeAuthService with FirebaseAuthService for prd flavor.
 // See docs/plans/2026-05-05-fase4a-firebase-auth-sync.md Task 13.
-final authServiceProvider = Provider<AuthService>((_) => FakeAuthService());
+final authServiceProvider = Provider<AuthService>((ref) {
+  const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
+  if (flavor == 'prd') return FirebaseAuthService();
+  return FakeAuthService();
+});
