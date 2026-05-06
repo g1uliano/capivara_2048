@@ -74,17 +74,17 @@ void main() {
     expect(find.text('50%'), findsWidgets);
   });
 
-  testWidgets('tap Comprar → AlertDialog de confirmação aparece', (tester) async {
+  testWidgets('tap Comprar → IAPConfirmationSheet aparece', (tester) async {
     await tester.pumpWidget(_buildShop());
     await tester.pumpAndSettle();
 
     await tester.tap(find.widgetWithText(ElevatedButton, 'Comprar').first);
     await tester.pumpAndSettle();
 
-    expect(find.text('Confirmar compra'), findsOneWidget);
+    expect(find.textContaining('Confirmar —'), findsOneWidget);
   });
 
-  testWidgets('cancelar AlertDialog → sem sheet aberto', (tester) async {
+  testWidgets('cancelar IAPConfirmationSheet → sem PurchaseSuccessSheet', (tester) async {
     await tester.pumpWidget(_buildShop());
     await tester.pumpAndSettle();
 
@@ -93,52 +93,46 @@ void main() {
     await tester.tap(find.widgetWithText(TextButton, 'Cancelar'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Presente gerado!'), findsNothing);
+    expect(find.text('Compra realizada!'), findsNothing);
   });
 
-  testWidgets('confirmar compra p1 → GiftCodeSheet aparece após confirmação', (tester) async {
+  testWidgets('confirmar compra p1 → PurchaseSuccessSheet aparece após confirmação', (tester) async {
     await tester.pumpWidget(_buildShop());
     await tester.pumpAndSettle();
 
     await tester.tap(find.widgetWithText(ElevatedButton, 'Comprar').first);
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ElevatedButton, 'Confirmar'));
+    await tester.tap(find.textContaining('Confirmar —'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Presente gerado!'), findsOneWidget);
+    expect(find.text('Compra realizada!'), findsOneWidget);
   });
 
-  testWidgets('_GiftCodeSheet → código em formato xxxx-xxxx-xxxx', (tester) async {
+  testWidgets('PurchaseSuccessSheet → shareCode da FakeIAPService visível', (tester) async {
     await tester.pumpWidget(_buildShop());
     await tester.pumpAndSettle();
 
     await tester.tap(find.widgetWithText(ElevatedButton, 'Comprar').first);
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ElevatedButton, 'Confirmar'));
+    await tester.tap(find.textContaining('Confirmar —'));
     await tester.pumpAndSettle();
 
-    final codePattern = RegExp(r'^[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}$');
-    final textWidgets = tester.widgetList<Text>(find.byType(Text));
-    final codeText = textWidgets
-        .map((t) => t.data ?? '')
-        .where((s) => codePattern.hasMatch(s))
-        .firstOrNull;
-    expect(codeText, isNotNull);
+    expect(find.text('CAPIVARA-1234-AB'), findsOneWidget);
   });
 
-  testWidgets('botão Copiar → snackbar "Copiado!" aparece', (tester) async {
+  testWidgets('botão Copiar → snackbar "Código copiado!" aparece', (tester) async {
     await tester.pumpWidget(_buildShop());
     await tester.pumpAndSettle();
 
     await tester.tap(find.widgetWithText(ElevatedButton, 'Comprar').first);
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ElevatedButton, 'Confirmar'));
+    await tester.tap(find.textContaining('Confirmar —'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byIcon(Icons.copy_outlined));
+    await tester.tap(find.textContaining('Copiar'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Copiado!'), findsOneWidget);
+    expect(find.text('Código copiado!'), findsOneWidget);
   });
 
   testWidgets('seção Itens avulsos presente abaixo dos pacotes', (tester) async {

@@ -64,5 +64,18 @@
 		</array>
 		<key>UIStatusBarHidden</key>
 		<false/>
-	</dict>
+		<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-3940256099942544~3347511713</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>olhabichim</string>
+			</array>
+			<key>CFBundleURLName</key>
+			<string>com.catraia.capivara2048</string>
+		</dict>
+	</array>
+</dict>
 </plist>

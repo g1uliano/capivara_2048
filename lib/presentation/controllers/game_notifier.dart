@@ -12,6 +12,7 @@ import '../../domain/game_engine/direction.dart';
 import '../../domain/game_engine/game_engine.dart';
 import '../../domain/inventory/inventory_notifier.dart';
 import '../../domain/ranking/ranking_repository.dart';
+import '../../domain/invites/invite_service.dart';
 import '../controllers/auth_controller.dart';
 import '../controllers/personal_records_notifier.dart';
 
@@ -47,7 +48,8 @@ class GameNotifier extends StateNotifier<GameState> {
     final before = state;
     final after = _engine.move(state, dir);
     // Detect if anything changed on the board (a valid move)
-    final boardChanged = after.score != before.score ||
+    final boardChanged =
+        after.score != before.score ||
         after.isGameOver != before.isGameOver ||
         after.hasWon != before.hasWon ||
         _boardDiffers(before.board, after.board);
@@ -56,13 +58,15 @@ class GameNotifier extends StateNotifier<GameState> {
     state = justLost
         ? after.copyWith(isAwaitingGameOverResolution: true)
         : after.isGameOver
-            ? after
-            : after.copyWith(isContinuingWithItem: false);
+        ? after
+        : after.copyWith(isContinuingWithItem: false);
 
     // Atualizar nível mais alto já alcançado (persistido para coleção)
     if (state.maxLevel > before.maxLevel) {
       unawaited(
-        _ref.read(personalRecordsProvider.notifier).updateHighestLevel(state.maxLevel),
+        _ref
+            .read(personalRecordsProvider.notifier)
+            .updateHighestLevel(state.maxLevel),
       );
     }
 
@@ -89,9 +93,11 @@ class GameNotifier extends StateNotifier<GameState> {
           updated = updated.copyWith(pendingMilestone: milestone);
         }
         state = updated;
-        unawaited(_ref
-            .read(personalRecordsProvider.notifier)
-            .recordMilestone(milestone, DateTime.now()));
+        unawaited(
+          _ref
+              .read(personalRecordsProvider.notifier)
+              .recordMilestone(milestone, DateTime.now()),
+        );
         break; // Apenas um marco por vez
       }
     }
@@ -117,7 +123,9 @@ class GameNotifier extends StateNotifier<GameState> {
   }
 
   void pause() {
-    if (state.isGameOver || state.hasWon || state.pendingMilestone != null) return;
+    if (state.isGameOver || state.hasWon || state.pendingMilestone != null) {
+      return;
+    }
     _stopTimer();
     state = state.copyWith(isPaused: true);
   }
@@ -142,10 +150,7 @@ class GameNotifier extends StateNotifier<GameState> {
     _stopTimer();
     _timerStarted = false;
     final fresh = _engine.newGame();
-    state = fresh.copyWith(
-      elapsedMs: 0,
-      isPaused: false,
-    );
+    state = fresh.copyWith(elapsedMs: 0, isPaused: false);
   }
 
   // ignore: invalid_use_of_protected_member
@@ -268,6 +273,21 @@ class GameNotifier extends StateNotifier<GameState> {
         maxLevel: state.maxLevel,
       );
       await _ref.read(gameRecordRepositoryProvider).add(record);
+
+      // Complete pending invite reward on first game
+      try {
+        final allRecords = _ref.read(gameRecordRepositoryProvider).all;
+        if (allRecords.length == 1) {
+          final inviteService = _ref.read(inviteServiceProvider);
+          final authProfile = _ref.read(authControllerProvider);
+          if (authProfile != null) {
+            unawaited(inviteService.completeInviteReward(
+              inviteeId: authProfile.userId,
+              inviteeDisplayName: authProfile.displayName,
+            ));
+          }
+        }
+      } catch (_) {}
     } catch (_) {
       // Não bloquear o jogo se o save falhar
     }
@@ -280,20 +300,24 @@ class GameNotifier extends StateNotifier<GameState> {
 
       // Submit score always
       if (state.score > 0) {
-        unawaited(rankingRepo.submitScore(
-          RankingType.globalScore,
-          state.score,
-          displayName: displayName,
-        ));
+        unawaited(
+          rankingRepo.submitScore(
+            RankingType.globalScore,
+            state.score,
+            displayName: displayName,
+          ),
+        );
       }
 
       // Submit time only when player won (reached level 11 = 2048)
       if (state.hasWon && state.elapsedMs > 0) {
-        unawaited(rankingRepo.submitScore(
-          RankingType.globalTime,
-          state.elapsedMs,
-          displayName: displayName,
-        ));
+        unawaited(
+          rankingRepo.submitScore(
+            RankingType.globalTime,
+            state.elapsedMs,
+            displayName: displayName,
+          ),
+        );
       }
     } catch (_) {
       // Never block the game for ranking errors
@@ -312,12 +336,10 @@ class GameNotifier extends StateNotifier<GameState> {
 
 final gameEngineProvider = Provider<GameEngine>((ref) => GameEngine());
 
-final gameProvider = StateNotifierProvider<GameNotifier, GameState>(
-  (ref) {
-    final notifier = GameNotifier(ref.read(gameEngineProvider), ref);
-    notifier.setConsumeCallback(
-      (type) => ref.read(inventoryProvider.notifier).consume(type),
-    );
-    return notifier;
-  },
-);
+final gameProvider = StateNotifierProvider<GameNotifier, GameState>((ref) {
+  final notifier = GameNotifier(ref.read(gameEngineProvider), ref);
+  notifier.setConsumeCallback(
+    (type) => ref.read(inventoryProvider.notifier).consume(type),
+  );
+  return notifier;
+});

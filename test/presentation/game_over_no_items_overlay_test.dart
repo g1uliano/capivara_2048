@@ -74,12 +74,12 @@ void main() {
     expect(find.textContaining('não possui mais itens'), findsOneWidget);
   });
 
-  testWidgets('tap buy shows AlertDialog with price', (tester) async {
+  testWidgets('tap buy shows IAPConfirmationSheet', (tester) async {
     await tester.pumpWidget(_buildOverlay());
     await tester.pumpAndSettle();
     await tester.tap(find.textContaining('Comprar'));
     await tester.pumpAndSettle();
-    expect(find.text('Confirmar compra'), findsWidgets);
+    expect(find.textContaining('Confirmar —'), findsOneWidget);
     expect(find.textContaining('R\$'), findsWidgets);
   });
 
@@ -116,7 +116,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.textContaining('Comprar'));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ElevatedButton, 'Confirmar compra'));
+    await tester.tap(find.textContaining('Confirmar —'));
     await tester.pumpAndSettle();
     expect(find.textContaining('não possui mais itens'), findsNothing);
   });
