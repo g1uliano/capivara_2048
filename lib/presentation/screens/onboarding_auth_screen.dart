@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/theme/text_styles.dart';
 import '../controllers/auth_controller.dart';
 import '../widgets/game_background.dart';
+import '../widgets/game_title_image.dart';
 import 'home_screen.dart';
 
 class OnboardingAuthScreen extends ConsumerStatefulWidget {
@@ -55,22 +57,13 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  'Olha o Bichim!',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.fredoka(
-                    fontSize: 36,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                GameTitleImage(asset: GameTitleImage.pickAsset(), height: 80),
                 const SizedBox(height: 8),
                 Text(
                   'Salve seu progresso e dispute o ranking global.',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.nunito(
-                    fontSize: 15,
-                    color: Colors.white70,
+                  style: outlinedWhiteTextStyle(
+                    GoogleFonts.nunito(fontSize: 15),
                   ),
                 ),
                 const SizedBox(height: 48),
@@ -104,10 +97,11 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
                     onPressed: _navigateHome,
                     child: Text(
                       'Jogar sem conta →',
-                      style: GoogleFonts.nunito(
-                        color: Colors.white70,
-                        decoration: TextDecoration.underline,
-                        decorationColor: Colors.white70,
+                      style: outlinedWhiteTextStyle(
+                        GoogleFonts.nunito(
+                          decoration: TextDecoration.underline,
+                          decorationColor: Colors.white,
+                        ),
                       ),
                     ),
                   ),

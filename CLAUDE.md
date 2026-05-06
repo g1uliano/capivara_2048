@@ -50,9 +50,20 @@ lib/
 - Models imutáveis com `copyWith`
 - IDs de tiles como UUID para controle de animações
 
+## Legibilidade de texto sobre o fundo
+
+Todas as telas usam `GameBackground` com a imagem `fundo.png` (floresta amazônica colorida). **Texto branco puro sem sombra é ilegível sobre esse fundo.**
+
+Regra obrigatória ao criar telas ou adicionar textos:
+
+- Sempre usar `outlinedWhiteTextStyle()` de `lib/core/theme/text_styles.dart` para textos sobre o fundo do jogo
+- Nunca usar `color: Colors.white` ou `color: Colors.white70` diretamente em `TextStyle` sem sombra
+- Referência: `OutlinedText` widget em `lib/presentation/widgets/outlined_text.dart`
+- Exceção: textos dentro de componentes com fundo sólido próprio (ex: `AppBar`, cards, dialogs, `ElevatedButton`)
+
 ## Fases do roadmap
 
-Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 3 concluída (v1.3.7) — próximo: Fase 4**. O áudio foi reposicionado para a **Fase 5** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
+Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 3 concluída (v1.3.7) — próximo: Fase 4**. O áudio foi reposicionado para a **Fase 6** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
 
 | Fase    | Foco                                                                                                 |
 | ------- | ---------------------------------------------------------------------------------------------------- |
@@ -62,7 +73,7 @@ Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 3
 | 2.6 ✅  | Tela Home + Coleção + Configurações + stubs                                                          |
 | 2.11 ✅ | ShopOverlay sobre o jogo acessível pelos ícones desabilitados do inventário                          |
 | 2.12 ✅ | Peixe-boi (4096), Jacaré (8192), multi-vitória, ranking local, PersonalRecords                       |
-| 3 ✅    | E2E Test Framework: 95+ cenários, golden tests, APK Tier 2, CI GitHub Actions, documentação         |
+| 3 ✅    | E2E Test Framework: 95+ cenários, golden tests, APK Tier 2, CI GitHub Actions, documentação          |
 | 4       | Arte adicional e polimento visual (logo, ícone, splash final)                                        |
 | 5       | Áudio (sound design dos 13 animais, SFX, música)                                                     |
 | 6       | Polimento, l10n, acessibilidade, lançamento                                                          |

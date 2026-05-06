@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/theme/text_styles.dart';
 import '../controllers/auth_controller.dart';
 import '../widgets/game_background.dart';
 import '../../data/models/player_profile.dart';
@@ -62,7 +63,7 @@ class _NotLoggedIn extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'Você não está conectado.',
-              style: GoogleFonts.nunito(color: Colors.white, fontSize: 16),
+              style: outlinedWhiteTextStyle(GoogleFonts.nunito(fontSize: 16)),
             ),
             const SizedBox(height: 24),
             ElevatedButton(
@@ -109,10 +110,8 @@ class _LoggedIn extends StatelessWidget {
         Center(
           child: Text(
             profile.displayName,
-            style: GoogleFonts.fredoka(
-              fontSize: 24,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+            style: outlinedWhiteTextStyle(
+              GoogleFonts.fredoka(fontSize: 24, fontWeight: FontWeight.bold),
             ),
           ),
         ),
@@ -121,7 +120,7 @@ class _LoggedIn extends StatelessWidget {
           Center(
             child: Text(
               profile.email!,
-              style: GoogleFonts.nunito(color: Colors.white70, fontSize: 14),
+              style: outlinedWhiteTextStyle(GoogleFonts.nunito(fontSize: 14)),
             ),
           ),
         ],
@@ -132,7 +131,7 @@ class _LoggedIn extends StatelessWidget {
           leading: const Icon(Icons.restore, color: Colors.white70),
           title: Text(
             'Restaurar compras',
-            style: GoogleFonts.nunito(color: Colors.white),
+            style: outlinedWhiteTextStyle(GoogleFonts.nunito()),
           ),
           onTap: () {
             ScaffoldMessenger.of(context).showSnackBar(

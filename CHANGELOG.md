@@ -7,6 +7,17 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.4.2] — 2026-05-06
+
+### Fixed
+
+- `OnboardingAuthScreen`: texto 'Olha o Bichim!' substituído pela `GameTitleImage` (logo); textos sobre fundo corrigidos com `outlinedWhiteTextStyle`
+- `ProfileScreen`: textos sobre `GameBackground` corrigidos com `outlinedWhiteTextStyle` (eram ilegíveis sobre o `fundo.png`)
+
+### Changed
+
+- `AGENTS.md` e `CLAUDE.md`: adicionada regra obrigatória de legibilidade — todo texto sobre `GameBackground` deve usar `outlinedWhiteTextStyle()` ou `OutlinedText`
+
 ## [1.4.1] — 2026-05-06
 
 ### Fixed
@@ -46,6 +57,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 - `README.md`: instruções de build/run por cenário (Genymotion, USB, produção)
 - `.gitignore`: `firebase_options_*.dart` adicionado (contém API keys)
+
 ## [1.3.7] — 2026-05-05
 
 ### Added (Fase 3.8 — Documentação do framework de testes)
