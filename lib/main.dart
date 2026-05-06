@@ -8,6 +8,7 @@ import 'data/models/inventory_hive_adapter.dart';
 import 'data/models/daily_rewards_state_adapter.dart';
 import 'data/models/personal_records_hive_adapter.dart';
 import 'data/models/game_record_hive_adapter.dart';
+import 'data/models/pending_event_hive_adapter.dart';
 import 'data/repositories/game_record_repository.dart';
 import 'core/providers/reduce_effects_provider.dart';
 import 'domain/inventory/inventory_notifier.dart';
@@ -28,6 +29,7 @@ void main() async {
   Hive.registerAdapter(DailyRewardsStateAdapter());
   Hive.registerAdapter(PersonalRecordsHiveAdapter());
   Hive.registerAdapter(GameRecordHiveAdapter());
+  Hive.registerAdapter(PendingEventHiveAdapter());
   final gameRecordRepo = GameRecordRepository();
   await gameRecordRepo.load();
   final sharedPrefs = await SharedPreferences.getInstance();
