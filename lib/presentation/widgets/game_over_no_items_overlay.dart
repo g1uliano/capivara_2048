@@ -6,11 +6,14 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/item_type.dart';
+import '../../data/models/shop_package.dart';
 import '../../data/shop_data.dart';
 import '../../domain/daily_rewards/ad_service.dart';
 import '../../domain/inventory/inventory_notifier.dart';
 import '../../domain/lives/lives_notifier.dart';
+import '../../domain/shop/iap_service.dart';
 import '../../presentation/controllers/game_notifier.dart';
+import 'iap_confirmation_sheet.dart';
 import 'outlined_text.dart';
 
 String _pngFor(ItemType t) => switch (t) {
@@ -80,30 +83,40 @@ class _GameOverNoItemsOverlayState extends ConsumerState<GameOverNoItemsOverlay>
   }
 
   Future<void> _confirmBuy() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Confirmar compra'),
-        content: Text('Você receberá 1× ${_nameFor(_drawnItem)} por $_price'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Confirmar compra'),
-          ),
-        ],
-      ),
+    // Use the cheapest package (last in list, sorted by price desc)
+    // Per spec: IAP always delivers the full package
+    const cheapestPkg = ShopPackage(
+      id: 'p2',
+      name: '4× Desfazer 3',
+      description: '4 desfazeres de 3 jogadas',
+      originalPrice: 3.99,
+      currentPrice: 1.99,
+      discountPercent: 50,
+      contents: RewardBundle(lives: 0, bomb2: 0, bomb3: 0, undo1: 0, undo3: 4),
+      giftContents: RewardBundle(lives: 0, bomb2: 0, bomb3: 0, undo1: 0, undo3: 2),
     );
-    if (confirmed != true || !mounted) return;
-    // fire-and-forget Hive persistence; state update is synchronous
-    unawaited(ref.read(inventoryProvider.notifier).add(_drawnItem, 1));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('${_nameFor(_drawnItem)} adicionado! Boa sorte! 🎉')),
-    );
-    _dismiss();
+
+    if (!mounted) return;
+    final confirmed = await IAPConfirmationSheet.show(context, cheapestPkg);
+    if (!confirmed || !mounted) return;
+
+    final iapService = ref.read(iapServiceProvider);
+    final result = await iapService.buyPackage(cheapestPkg);
+    if (!mounted) return;
+
+    if (result.success) {
+      // Deliver in dev/fake
+      const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
+      if (flavor != 'prd') {
+        unawaited(ref.read(inventoryProvider.notifier).add(ItemType.undo3, 4));
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Itens adicionados! Boa sorte! 🎉')));
+      _dismiss();
+    } else if (result.error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro: ${result.error}')));
+    }
   }
 
   Future<void> _confirmQuit() async {
