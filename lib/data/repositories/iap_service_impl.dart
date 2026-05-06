@@ -41,18 +41,22 @@ class IAPServiceImpl implements IAPService {
         if (purchase.productID != 'bichim_pack_${package.id}') continue;
         switch (purchase.status) {
           case PurchaseStatus.purchased:
+          case PurchaseStatus.restored:
+            // restored: Firestore idempotency prevents duplicate delivery
             final result = await _deliverAndRecord(purchase, package);
             await iap.completePurchase(purchase);
             if (!completer.isCompleted) completer.complete(result);
             await sub.cancel();
+          case PurchaseStatus.pending:
+            // Pending payment (boleto, Google Pay, carrier billing)
+            // Do NOT close subscription — wait for final status
+            // Do NOT call completePurchase here
+            break;
           case PurchaseStatus.error:
             await iap.completePurchase(purchase);
             if (!completer.isCompleted) {
-              completer.complete(
-                PurchaseResult.failed(
-                  purchase.error?.message ?? 'Erro desconhecido',
-                ),
-              );
+              completer.complete(PurchaseResult.failed(
+                  purchase.error?.message ?? 'Erro desconhecido'));
             }
             await sub.cancel();
           case PurchaseStatus.canceled:
@@ -60,8 +64,6 @@ class IAPServiceImpl implements IAPService {
               completer.complete(const PurchaseResult.cancelled());
             }
             await sub.cancel();
-          default:
-            break;
         }
       }
     });
