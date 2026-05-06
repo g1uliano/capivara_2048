@@ -44,5 +44,13 @@ void main() {
       final id = WeekId.fromUtc(wednesday);
       expect(id, '2025-W19');
     });
+
+    test('ano-limite ISO: 29/12/2025 22h UTC → 2026-W01', () {
+      // Dec 27, 2025 (Saturday) is the reset boundary.
+      // Dec 29, 2025 (Monday) 22:00 UTC is after that reset.
+      // ISO week: w=53 > 52 weeks in 2025 → rolls to 2026-W01.
+      final d = DateTime.utc(2025, 12, 29, 22, 0);
+      expect(WeekId.fromUtc(d), '2026-W01');
+    });
   });
 }
