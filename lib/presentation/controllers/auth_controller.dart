@@ -17,7 +17,7 @@ class AuthController extends StateNotifier<PlayerProfile?> {
     final profile = await _authService.signInWithGoogle();
     state = profile;
     try {
-      await _syncEngine.init(profile.userId);
+      await _syncEngine.init(profile.userId, displayName: profile.displayName);
       await _syncEngine.syncProfile();
       await _syncEngine.drainPendingEvents();
     } catch (_) {
@@ -30,7 +30,7 @@ class AuthController extends StateNotifier<PlayerProfile?> {
     final profile = await _authService.signInWithApple();
     state = profile;
     try {
-      await _syncEngine.init(profile.userId);
+      await _syncEngine.init(profile.userId, displayName: profile.displayName);
       await _syncEngine.syncProfile();
       await _syncEngine.drainPendingEvents();
     } catch (_) {
@@ -43,7 +43,7 @@ class AuthController extends StateNotifier<PlayerProfile?> {
     final profile = await _authService.signInWithEmail(email, password);
     state = profile;
     try {
-      await _syncEngine.init(profile.userId);
+      await _syncEngine.init(profile.userId, displayName: profile.displayName);
       await _syncEngine.syncProfile();
       await _syncEngine.drainPendingEvents();
     } catch (_) {
@@ -56,7 +56,7 @@ class AuthController extends StateNotifier<PlayerProfile?> {
     final profile = await _authService.createAccountWithEmail(email, password);
     state = profile;
     // New account: no remote data to sync yet — only init the engine.
-    await _syncEngine.init(profile.userId);
+    await _syncEngine.init(profile.userId, displayName: profile.displayName);
   }
 
   Future<void> signOut() async {

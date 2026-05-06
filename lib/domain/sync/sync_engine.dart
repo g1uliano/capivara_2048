@@ -7,7 +7,7 @@ import '../../data/repositories/firebase_sync_engine.dart';
 enum SyncStatus { idle, syncing, error }
 
 abstract class SyncEngine {
-  Future<void> init(String userId);
+  Future<void> init(String userId, {String? displayName});
   Future<void> dispose();
   Future<void> syncProfile();
   Future<void> drainPendingEvents();
@@ -22,7 +22,7 @@ class FakeSyncEngine implements SyncEngine {
   final List<PendingEvent> enqueued = [];
 
   @override
-  Future<void> init(String userId) async => initCalled = true;
+  Future<void> init(String userId, {String? displayName}) async => initCalled = true;
 
   @override
   Future<void> dispose() async => disposeCalled = true;
@@ -47,8 +47,6 @@ class FakeSyncEngine implements SyncEngine {
 }
 
 // TODO(fase4b): Replace FakeSyncEngine with FirebaseSyncEngine for prd flavor.
-// Note: displayName is set to null here; it could be wired via init() in a
-// future refactor to avoid authControllerProvider ↔ syncEngineProvider cycle.
 final syncEngineProvider = Provider<SyncEngine>((ref) {
   const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
   if (flavor == 'prd') return FirebaseSyncEngine();
