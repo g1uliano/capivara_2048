@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/providers/ranking_provider.dart';
 import '../../data/models/game_record.dart';
 import '../../data/models/game_state.dart';
 import '../../data/models/item_type.dart';
@@ -10,6 +11,8 @@ import '../../domain/game_engine/bomb_mode.dart';
 import '../../domain/game_engine/direction.dart';
 import '../../domain/game_engine/game_engine.dart';
 import '../../domain/inventory/inventory_notifier.dart';
+import '../../domain/ranking/ranking_repository.dart';
+import '../controllers/auth_controller.dart';
 import '../controllers/personal_records_notifier.dart';
 
 class GameNotifier extends StateNotifier<GameState> {
@@ -267,6 +270,33 @@ class GameNotifier extends StateNotifier<GameState> {
       await _ref.read(gameRecordRepositoryProvider).add(record);
     } catch (_) {
       // Não bloquear o jogo se o save falhar
+    }
+
+    // Submit to ranking (fire-and-forget, never block the game)
+    try {
+      final rankingRepo = _ref.read(rankingRepositoryProvider);
+      final authProfile = _ref.read(authControllerProvider);
+      final displayName = authProfile?.displayName;
+
+      // Submit score always
+      if (state.score > 0) {
+        unawaited(rankingRepo.submitScore(
+          RankingType.globalScore,
+          state.score,
+          displayName: displayName,
+        ));
+      }
+
+      // Submit time only when player won (reached level 11 = 2048)
+      if (state.hasWon && state.elapsedMs > 0) {
+        unawaited(rankingRepo.submitScore(
+          RankingType.globalTime,
+          state.elapsedMs,
+          displayName: displayName,
+        ));
+      }
+    } catch (_) {
+      // Never block the game for ranking errors
     }
   }
 

@@ -1,4 +1,5 @@
 import '../../domain/ranking/ranking_repository.dart';
+import '../../domain/ranking/weekly_reward_result.dart';
 
 class FakeRankingService implements RankingRepository {
   @override
@@ -43,5 +44,12 @@ class FakeRankingService implements RankingRepository {
   }
 
   @override
-  Future<void> submitScore(RankingType type, int value) async {}
+  Future<void> submitScore(RankingType type, int value, {String? displayName}) async {}
+
+  @override
+  Future<WeeklyRewardResult?> checkAndClaimWeeklyReward(String weekId) async => null;
+
+  @override
+  Stream<List<RankingEntry>> watchWeeklyTop(RankingType type) =>
+      Stream.fromFuture(getWeeklyTop(type));
 }

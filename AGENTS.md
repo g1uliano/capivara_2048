@@ -63,7 +63,7 @@ Regra obrigatória ao criar telas ou adicionar textos:
 
 ## Fases do roadmap
 
-Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 3 concluída (v1.3.7) — próximo: Fase 4**. O áudio foi reposicionado para a **Fase 6** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
+Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 4B concluída (v1.4.4) — próximo: Fase 4C (Convites + Anúncios + IAP)**. O áudio foi reposicionado para a **Fase 6** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
 
 | Fase    | Foco                                                                                                 |
 | ------- | ---------------------------------------------------------------------------------------------------- |
@@ -78,6 +78,8 @@ Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 3
 | 3.6 ✅  | Tier 2: APK flavor `tst` + TestRunnerScreen + Share + Demo (integration_test)                        |
 | 3.7 ✅  | CI GitHub Actions: suite Tier 1 em PR/push, golden diffs como artefato, badge no README              |
 | 3.8 ✅  | Documentação do framework de testes (`docs/TESTING.md`)                                              |
+| 4A ✅   | Firebase + Auth + Sync Engine (PlayerProfile, AuthService, SyncEngine, OnboardingAuthScreen, ProfileScreen) |
+| 4B ✅   | Ranking Global Semanal (Firestore) + Ranking Lendas persistido                                             |
 | 4       | Arte adicional e polimento visual (logo, ícone, splash final)                                        |
 | 5       | Áudio (sound design dos 13 animais, SFX, música)                                                     |
 | 6       | Polimento, l10n, acessibilidade, lançamento                                                          |

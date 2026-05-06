@@ -7,7 +7,7 @@ import '../../data/repositories/firebase_sync_engine.dart';
 enum SyncStatus { idle, syncing, error }
 
 abstract class SyncEngine {
-  Future<void> init(String userId);
+  Future<void> init(String userId, {String? displayName});
   Future<void> dispose();
   Future<void> syncProfile();
   Future<void> drainPendingEvents();
@@ -22,7 +22,7 @@ class FakeSyncEngine implements SyncEngine {
   final List<PendingEvent> enqueued = [];
 
   @override
-  Future<void> init(String userId) async => initCalled = true;
+  Future<void> init(String userId, {String? displayName}) async => initCalled = true;
 
   @override
   Future<void> dispose() async => disposeCalled = true;

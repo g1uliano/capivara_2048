@@ -15,6 +15,10 @@ class FirebaseSyncEngine implements SyncEngine {
   static const _personalRecordsBox = 'personal_records';
   static const _personalRecordsKey = 'records';
 
+  String? displayName;
+
+  FirebaseSyncEngine({this.displayName});
+
   String? _userId;
   StreamSubscription<DocumentSnapshot>? _profileListener;
   StreamSubscription<List<ConnectivityResult>>? _connectivityListener;
@@ -25,8 +29,10 @@ class FirebaseSyncEngine implements SyncEngine {
   Stream<SyncStatus> get statusStream => _statusController.stream;
 
   @override
-  Future<void> init(String userId) async {
+  @override
+  Future<void> init(String userId, {String? displayName}) async {
     _userId = userId;
+    if (displayName != null) this.displayName = displayName;
     _startSnapshotListener();
     _startConnectivityListener();
     await drainPendingEvents();
@@ -130,7 +136,7 @@ class FirebaseSyncEngine implements SyncEngine {
           } else {
             tx.set(ref, {
               'userId': _userId,
-              'displayName': 'Jogador',
+              'displayName': displayName ?? 'Jogador',
               'timesReached': 1,
               'firstReachedAt': Timestamp.fromDate(event.occurredAt),
             });
