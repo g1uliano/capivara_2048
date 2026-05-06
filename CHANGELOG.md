@@ -7,6 +7,14 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.4.3] — 2026-05-06
+
+### Fixed
+
+- `ProfileScreen._NotLoggedIn`: ícone avatar `white54` sem fundo substituído por `CircleAvatar` com fundo `AppColors.primary`
+- `ProfileScreen._LoggedIn`: texto "Sair" ganhou sombra de contorno via `outlinedWhiteTextStyle().copyWith(color: Colors.redAccent)`; ícone "Restaurar compras" de `white70` para `white`
+- Flavor `tst` agora exibe **"Bichim TEST"** no launcher; `AndroidManifest.xml` corrigido para usar `@string/app_name` em vez de nome hardcoded
+
 ## [1.4.2] — 2026-05-06
 
 ### Fixed

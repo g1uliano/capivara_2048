@@ -59,7 +59,15 @@ class _NotLoggedIn extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.person_outline, size: 64, color: Colors.white54),
+            CircleAvatar(
+              radius: 32,
+              backgroundColor: AppColors.primary,
+              child: const Icon(
+                Icons.person_outline,
+                size: 36,
+                color: Colors.white,
+              ),
+            ),
             const SizedBox(height: 16),
             Text(
               'Você não está conectado.',
@@ -128,7 +136,7 @@ class _LoggedIn extends StatelessWidget {
         const Divider(color: Colors.white24),
         const SizedBox(height: 16),
         ListTile(
-          leading: const Icon(Icons.restore, color: Colors.white70),
+          leading: const Icon(Icons.restore, color: Colors.white),
           title: Text(
             'Restaurar compras',
             style: outlinedWhiteTextStyle(GoogleFonts.nunito()),
@@ -144,7 +152,9 @@ class _LoggedIn extends StatelessWidget {
           leading: const Icon(Icons.logout, color: Colors.redAccent),
           title: Text(
             'Sair',
-            style: GoogleFonts.nunito(color: Colors.redAccent),
+            style: outlinedWhiteTextStyle(
+              GoogleFonts.nunito(),
+            ).copyWith(color: Colors.redAccent),
           ),
           onTap: onSignOut,
         ),
