@@ -17,10 +17,16 @@ class InventoryNotifier extends StateNotifier<Inventory> {
     // React to external Hive writes (IAP, ranking rewards, invite rewards)
     final box = await Hive.openBox<Inventory>('inventory');
     await _boxSub?.cancel();
-    _boxSub = box.watch(key: 'data').listen((event) {
-      final updated = event.value as Inventory?;
-      if (updated != null && mounted) state = updated;
-    });
+    try {
+      _boxSub = box.watch(key: 'data').listen(
+        (event) {
+          final updated = event.value as Inventory?;
+          if (updated != null && mounted) state = updated;
+        },
+        onError: (_) {}, // Ignore errors from closed box (e.g. in tests)
+        cancelOnError: false,
+      );
+    } catch (_) {} // box.watch() throws synchronously if box is already closed
   }
 
   Future<void> consume(ItemType type) async {
@@ -58,7 +64,6 @@ final inventoryRepositoryProvider = Provider<InventoryRepository>(
   (ref) => InventoryRepository(),
 );
 
-final inventoryProvider =
-    StateNotifierProvider<InventoryNotifier, Inventory>(
+final inventoryProvider = StateNotifierProvider<InventoryNotifier, Inventory>(
   (ref) => InventoryNotifier(ref.read(inventoryRepositoryProvider)),
 );

@@ -29,12 +29,18 @@ class LivesNotifier extends StateNotifier<LivesState> {
       _ready.complete();
       final migBox = await Hive.openBox<LivesState>('lives');
       await _boxSub?.cancel();
-      _boxSub = migBox.watch(key: 'state').listen((event) {
-        final updated = event.value as LivesState?;
-        if (updated != null && mounted) {
-          state = updated;
-        }
-      });
+      try {
+        _boxSub = migBox.watch(key: 'state').listen(
+          (event) {
+            final updated = event.value as LivesState?;
+            if (updated != null && mounted) {
+              state = updated;
+            }
+          },
+          onError: (_) {}, // Ignore errors from closed box (e.g. in tests)
+          cancelOnError: false,
+        );
+      } catch (_) {} // box.watch() throws synchronously if box is already closed
       return;
     }
 
@@ -46,14 +52,20 @@ class LivesNotifier extends StateNotifier<LivesState> {
     _startRegenTimer();
     final box = await Hive.openBox<LivesState>('lives');
     await _boxSub?.cancel();
-    _boxSub = box.watch(key: 'state').listen((event) {
-      final updated = event.value as LivesState?;
-      if (updated != null && mounted) {
-        state = updated;
-        // Restart regen timer with the new state
-        _startRegenTimer();
-      }
-    });
+    try {
+      _boxSub = box.watch(key: 'state').listen(
+        (event) {
+          final updated = event.value as LivesState?;
+          if (updated != null && mounted) {
+            state = updated;
+            // Restart regen timer with the new state
+            _startRegenTimer();
+          }
+        },
+        onError: (_) {}, // Ignore errors from closed box (e.g. in tests)
+        cancelOnError: false,
+      );
+    } catch (_) {} // box.watch() throws synchronously if box is already closed
     try {
       _lifecycleListener = AppLifecycleListener(
         onPause: _pauseRegen,
@@ -64,7 +76,10 @@ class LivesNotifier extends StateNotifier<LivesState> {
     }
   }
 
-  static LivesState calcRegen({required LivesState state, required DateTime now}) {
+  static LivesState calcRegen({
+    required LivesState state,
+    required DateTime now,
+  }) {
     if (state.lives >= state.regenCap) return state;
     final delta = now.difference(state.lastRegenAt);
     final totalMinutes = delta.inMinutes;
@@ -128,7 +143,10 @@ class LivesNotifier extends StateNotifier<LivesState> {
 
   void _startRegenTimer() {
     _regenTimer?.cancel();
-    _regenTimer = Timer.periodic(const Duration(seconds: 30), (_) => _onRegenTick());
+    _regenTimer = Timer.periodic(
+      const Duration(seconds: 30),
+      (_) => _onRegenTick(),
+    );
   }
 
   void _onRegenTick() {
