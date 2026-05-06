@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/shop_package.dart';
+import '../../data/repositories/iap_service_impl.dart';
+import '../../presentation/controllers/auth_controller.dart';
 
 class PurchaseResult {
   final bool success;
@@ -9,19 +11,19 @@ class PurchaseResult {
   const PurchaseResult({required this.success, this.error, this.shareCode});
 
   const PurchaseResult.succeeded({required String shareCode})
-      : success = true,
-        error = null,
-        shareCode = shareCode;
+    : success = true,
+      error = null,
+      shareCode = shareCode;
 
   const PurchaseResult.failed(String error)
-      : success = false,
-        error = error,
-        shareCode = null;
+    : success = false,
+      error = error,
+      shareCode = null;
 
   const PurchaseResult.cancelled()
-      : success = false,
-        error = null,
-        shareCode = null;
+    : success = false,
+      error = null,
+      shareCode = null;
 
   bool get isCancelled => !success && error == null;
 }
@@ -46,4 +48,11 @@ class FakeIAPService implements IAPService {
   Future<void> restorePurchases() async {}
 }
 
-final iapServiceProvider = Provider<IAPService>((_) => FakeIAPService());
+final iapServiceProvider = Provider<IAPService>((ref) {
+  const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
+  if (flavor == 'prd') {
+    final profile = ref.watch(authControllerProvider);
+    if (profile != null) return IAPServiceImpl(userId: profile.userId);
+  }
+  return FakeIAPService();
+});
