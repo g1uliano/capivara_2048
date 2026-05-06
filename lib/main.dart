@@ -1,5 +1,6 @@
 import 'package:app_links/app_links.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -58,6 +59,18 @@ void main() async {
       await appLinks.getInitialLink().catchError((_) => null as Uri?);
   if (initialUri != null) _handleInviteDeepLink(initialUri);
   appLinks.uriLinkStream.listen(_handleInviteDeepLink);
+
+  // AdMob — only in prd flavor
+  if (flavor == 'prd') {
+    await MobileAds.instance.initialize();
+    await MobileAds.instance.updateRequestConfiguration(
+      RequestConfiguration(
+        tagForChildDirectedTreatment: TagForChildDirectedTreatment.yes,
+        tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.yes,
+        maxAdContentRating: MaxAdContentRating.g,
+      ),
+    );
+  }
 
   await Hive.initFlutter();
   Hive.registerAdapter(LivesStateAdapter());
