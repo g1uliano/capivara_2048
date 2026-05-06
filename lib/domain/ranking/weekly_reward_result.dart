@@ -17,26 +17,59 @@ class WeeklyRewardResult {
 
   bool get hasReward => lives > 0 || bomb3 > 0 || bomb2 > 0 || undo1 > 0;
 
-  factory WeeklyRewardResult.forPosition(int position, {String weekId = ''}) {
+  factory WeeklyRewardResult.forPosition(int position, {String weekId = 'unknown'}) {
     if (position == 1) {
       return WeeklyRewardResult(
-          position: position, weekId: weekId, lives: 5, bomb3: 3, undo1: 3);
+        position: position,
+        weekId: weekId,
+        lives: 5,
+        bomb3: 3,
+        undo1: 3,
+      );
     } else if (position == 2) {
       return WeeklyRewardResult(
-          position: position, weekId: weekId, lives: 4, bomb3: 2, undo1: 2);
+        position: position,
+        weekId: weekId,
+        lives: 4,
+        bomb3: 2,
+        undo1: 2,
+      );
     } else if (position == 3) {
       return WeeklyRewardResult(
-          position: position, weekId: weekId, lives: 3, bomb2: 2, undo1: 1);
+        position: position,
+        weekId: weekId,
+        lives: 3,
+        bomb2: 2,
+        undo1: 1,
+      );
     } else if (position >= 4 && position <= 10) {
       return WeeklyRewardResult(
-          position: position, weekId: weekId, lives: 2, bomb2: 1);
+        position: position,
+        weekId: weekId,
+        lives: 2,
+        bomb2: 1,
+      );
     } else if (position >= 11 && position <= 50) {
-      return WeeklyRewardResult(
-          position: position, weekId: weekId, lives: 1);
+      return WeeklyRewardResult(position: position, weekId: weekId, lives: 1);
     } else {
       return WeeklyRewardResult(position: position, weekId: weekId);
     }
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is WeeklyRewardResult &&
+          other.position == position &&
+          other.weekId == weekId &&
+          other.lives == lives &&
+          other.bomb3 == bomb3 &&
+          other.bomb2 == bomb2 &&
+          other.undo1 == undo1;
+
+  @override
+  int get hashCode =>
+      Object.hash(position, weekId, lives, bomb3, bomb2, undo1);
 
   WeeklyRewardResult copyWith({
     int? position,

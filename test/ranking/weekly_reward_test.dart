@@ -10,6 +10,7 @@ void main() {
       expect(r.bomb2, 0);
       expect(r.undo1, 3);
       expect(r.hasReward, true);
+      expect(r.weekId, '2025-W19');
     });
 
     test('position 2 → lives=4, bomb3=2, bomb2=0, undo1=2', () {
@@ -85,7 +86,12 @@ void main() {
 
   group('WeeklyRewardResult.copyWith', () {
     test('copies with updated field', () {
-      const r = WeeklyRewardResult(position: 1, weekId: 'x', lives: 5, bomb3: 3);
+      const r = WeeklyRewardResult(
+        position: 1,
+        weekId: 'x',
+        lives: 5,
+        bomb3: 3,
+      );
       final r2 = r.copyWith(lives: 10);
       expect(r2.lives, 10);
       expect(r2.bomb3, 3);
