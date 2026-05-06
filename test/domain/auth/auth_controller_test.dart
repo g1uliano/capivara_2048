@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:capivara_2048/domain/auth/auth_service.dart';
 import 'package:capivara_2048/domain/sync/sync_engine.dart';
 import 'package:capivara_2048/presentation/controllers/auth_controller.dart';
@@ -9,6 +10,10 @@ void main() {
   late FakeAuthService fakeAuth;
   late FakeSyncEngine fakeSyncEngine;
   late ProviderContainer container;
+
+  setUpAll(() async {
+    Hive.init('/tmp/capivara_auth_test');
+  });
 
   setUp(() {
     fakeAuth = FakeAuthService();
@@ -24,6 +29,10 @@ void main() {
   tearDown(() {
     fakeAuth.dispose();
     container.dispose();
+  });
+
+  tearDownAll(() async {
+    await Hive.close();
   });
 
   test('estado inicial é null (não logado)', () {

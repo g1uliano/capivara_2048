@@ -63,7 +63,7 @@ Regra obrigatória ao criar telas ou adicionar textos:
 
 ## Fases do roadmap
 
-Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 4C concluída (v1.4.5) — Fase 4 completa — próximo: Fase 5 (Arte adicional e polimento visual)**. O áudio foi reposicionado para a **Fase 6** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
+Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 4 completa (v1.4.6) — próximo: Fase 5 (Arte adicional e polimento visual)**. O áudio foi reposicionado para a **Fase 6** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
 
 | Fase    | Foco                                                                                                        |
 | ------- | ----------------------------------------------------------------------------------------------------------- |
@@ -80,7 +80,8 @@ Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 4
 | 3.8 ✅  | Documentação do framework de testes (`docs/TESTING.md`)                                                     |
 | 4A ✅   | Firebase + Auth + Sync Engine (PlayerProfile, AuthService, SyncEngine, OnboardingAuthScreen, ProfileScreen) |
 | 4B ✅   | Ranking Global Semanal (Firestore) + Ranking Lendas persistido                                              |
-| 4C ✅   | Convites (deep links, Firestore) + Anúncios Reais (Google Mobile Ads) + IAP Real (in_app_purchase) |
+| 4C ✅   | Convites (deep links, Firestore) + Anúncios Reais (Google Mobile Ads) + IAP Real (in_app_purchase)          |
+| 4 gaps ✅ | registerInvite pós-login, ProfileScreen Convidar Amigos + Restaurar Compras real                          |
 | 4       | Arte adicional e polimento visual (logo, ícone, splash final)                                               |
 | 5       | Áudio (sound design dos 13 animais, SFX, música)                                                            |
 | 6       | Polimento, l10n, acessibilidade, lançamento                                                                 |

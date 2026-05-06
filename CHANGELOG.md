@@ -7,11 +7,20 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.4.6] — 2026-05-06
+
+### Fixed — Fase 4 gaps
+
+- `AuthController`: `registerInvite` chamado após cada login — lê `pending_ref` do Hive e registra convite no Firestore; corrige fluxo Sub-D onde `completeInviteReward` sempre retornava `false`
+- `ProfileScreen`: adicionado botão "Convidar Amigos" que navega para `InviteFriendsScreen`
+- `ProfileScreen`: "Restaurar compras" agora chama `iapService.restorePurchases()` (real em prd, no-op em dev) em vez de Snackbar stub
+
 ## [1.4.5] — 2026-05-06
 
 ### Added — Fase 4C: Convites + Anúncios Reais + IAP Real
 
 #### Sub-D — Sistema de Convites
+
 - `InviteService` — interface abstrata + `FakeInviteService` (in-memory, testável)
 - `FirestoreInviteRepository` — convites persistidos no Firestore; recompensa de 2 vidas + 1× Bomba 2 para convidante e convidado
 - `InviteController` — Riverpod notifier para geração de link; `inviteServiceProvider` usa Firestore em prd
@@ -20,6 +29,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 - Hook no `game_notifier`: convite completado automaticamente na 1ª partida do convidado
 
 #### Sub-E — Anúncios Reais (Google Mobile Ads)
+
 - `GoogleMobileAdsService` — substitui `FakeAdService` em prd; pré-carrega o próximo anúncio após cada exibição
 - `adServiceProvider` usa `GoogleMobileAdsService` em prd, `FakeAdService` em dev/testes
 - AdMob inicializado prd-only com `tagForChildDirectedTreatment=yes`, `maxAdContentRating=G`
@@ -27,6 +37,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 - iOS Info.plist: `GADApplicationIdentifier` (test App ID para dev)
 
 #### Sub-F — IAP Real (in_app_purchase)
+
 - `IAPService` — interface abstrata + `FakeIAPService` (retorna `PurchaseResult.succeeded` com shareCode fake)
 - `IAPServiceImpl` — purchase stream com `in_app_purchase`; entrega idempotente via Firestore (`purchases/{userId}/items/{purchaseId}`); gera ShareCode no Firestore (`shareCodes/{code}`)
 - `IAPConfirmationSheet` — bottom sheet mostra nome do pacote, conteúdo (❤️🧨💣↩️), presente para amigo e preço; substitui `AlertDialog` simples
@@ -35,6 +46,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 - `iapServiceProvider` usa `IAPServiceImpl` em prd quando usuário logado
 
 ### Dependencies Added
+
 - `app_links: ^6.1.1`
 - `google_mobile_ads: ^5.1.0`
 - `in_app_purchase: ^3.2.0`

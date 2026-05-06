@@ -7,6 +7,8 @@ import '../controllers/auth_controller.dart';
 import '../widgets/game_background.dart';
 import '../../data/models/player_profile.dart';
 import 'onboarding_auth_screen.dart';
+import 'invite_friends_screen.dart';
+import '../../domain/shop/iap_service.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -92,13 +94,13 @@ class _NotLoggedIn extends StatelessWidget {
   }
 }
 
-class _LoggedIn extends StatelessWidget {
+class _LoggedIn extends ConsumerWidget {
   const _LoggedIn({required this.profile, required this.onSignOut});
   final PlayerProfile profile;
   final VoidCallback onSignOut;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
@@ -136,15 +138,30 @@ class _LoggedIn extends StatelessWidget {
         const Divider(color: Colors.white24),
         const SizedBox(height: 16),
         ListTile(
+          leading: const Icon(Icons.person_add, color: Colors.white),
+          title: Text(
+            'Convidar Amigos',
+            style: outlinedWhiteTextStyle(GoogleFonts.nunito()),
+          ),
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const InviteFriendsScreen()),
+          ),
+        ),
+        const SizedBox(height: 8),
+        ListTile(
           leading: const Icon(Icons.restore, color: Colors.white),
           title: Text(
             'Restaurar compras',
             style: outlinedWhiteTextStyle(GoogleFonts.nunito()),
           ),
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Disponível na Fase 4F (IAP)')),
-            );
+          onTap: () async {
+            final iapService = ref.read(iapServiceProvider);
+            await iapService.restorePurchases();
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Compras restauradas!')),
+              );
+            }
           },
         ),
         const SizedBox(height: 8),
