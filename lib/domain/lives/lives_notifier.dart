@@ -27,20 +27,26 @@ class LivesNotifier extends StateNotifier<LivesState> {
       await _repo.setMigrationFlag(_migrationKeyV238);
       state = fresh;
       _ready.complete();
-      final migBox = await Hive.openBox<LivesState>('lives');
-      await _boxSub?.cancel();
-      try {
-        _boxSub = migBox.watch(key: 'state').listen(
+      // runZonedGuarded absorbs orphaned Hive-internal Future rejections
+      // that escape try-catch when Hive is not initialized (e.g. in tests).
+      Box<LivesState>? migBox;
+      await runZonedGuarded<Future<void>>(
+        () async { migBox = await Hive.openBox<LivesState>('lives'); },
+        (_, __) {},
+      );
+      if (migBox != null) {
+        await _boxSub?.cancel();
+        _boxSub = migBox!.watch(key: 'state').listen(
           (event) {
             final updated = event.value as LivesState?;
             if (updated != null && mounted) {
               state = updated;
             }
           },
-          onError: (_) {}, // Ignore errors from closed box (e.g. in tests)
+          onError: (_) {},
           cancelOnError: false,
         );
-      } catch (_) {} // box.watch() throws synchronously if box is already closed
+      }
       return;
     }
 
@@ -50,10 +56,16 @@ class LivesNotifier extends StateNotifier<LivesState> {
     await _repo.save(state);
     _ready.complete();
     _startRegenTimer();
-    final box = await Hive.openBox<LivesState>('lives');
-    await _boxSub?.cancel();
-    try {
-      _boxSub = box.watch(key: 'state').listen(
+    // runZonedGuarded absorbs orphaned Hive-internal Future rejections
+    // that escape try-catch when Hive is not initialized (e.g. in tests).
+    Box<LivesState>? box;
+    await runZonedGuarded<Future<void>>(
+      () async { box = await Hive.openBox<LivesState>('lives'); },
+      (_, __) {},
+    );
+    if (box != null) {
+      await _boxSub?.cancel();
+      _boxSub = box!.watch(key: 'state').listen(
         (event) {
           final updated = event.value as LivesState?;
           if (updated != null && mounted) {
@@ -62,10 +74,10 @@ class LivesNotifier extends StateNotifier<LivesState> {
             _startRegenTimer();
           }
         },
-        onError: (_) {}, // Ignore errors from closed box (e.g. in tests)
+        onError: (_) {},
         cancelOnError: false,
       );
-    } catch (_) {} // box.watch() throws synchronously if box is already closed
+    }
     try {
       _lifecycleListener = AppLifecycleListener(
         onPause: _pauseRegen,

@@ -14,19 +14,26 @@ class InventoryNotifier extends StateNotifier<Inventory> {
 
   Future<void> load() async {
     state = await _repo.load();
-    // React to external Hive writes (IAP, ranking rewards, invite rewards)
-    final box = await Hive.openBox<Inventory>('inventory');
-    await _boxSub?.cancel();
-    try {
-      _boxSub = box.watch(key: 'data').listen(
+    // React to external Hive writes (IAP, ranking rewards, invite rewards).
+    // Wrapped in runZonedGuarded: Hive.openBox() creates an orphaned rejected
+    // completer.future internally when Hive is not initialized, which escapes
+    // our try-catch as an unhandled zone error. runZonedGuarded absorbs it.
+    Box<Inventory>? box;
+    await runZonedGuarded<Future<void>>(
+      () async { box = await Hive.openBox<Inventory>('inventory'); },
+      (_, __) {}, // absorb orphaned Hive-internal Future rejections
+    );
+    if (box != null) {
+      await _boxSub?.cancel();
+      _boxSub = box!.watch(key: 'data').listen(
         (event) {
           final updated = event.value as Inventory?;
           if (updated != null && mounted) state = updated;
         },
-        onError: (_) {}, // Ignore errors from closed box (e.g. in tests)
+        onError: (_) {},
         cancelOnError: false,
       );
-    } catch (_) {} // box.watch() throws synchronously if box is already closed
+    }
   }
 
   Future<void> consume(ItemType type) async {
