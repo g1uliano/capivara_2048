@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 import '../../data/models/inventory.dart';
 import '../../data/models/item_type.dart';
 import '../../data/repositories/inventory_repository.dart';
@@ -8,9 +10,30 @@ class InventoryNotifier extends StateNotifier<Inventory> {
   InventoryNotifier(this._repo) : super(Inventory.empty());
 
   final InventoryRepository _repo;
+  StreamSubscription<BoxEvent>? _boxSub;
 
   Future<void> load() async {
     state = await _repo.load();
+    // React to external Hive writes (IAP, ranking rewards, invite rewards).
+    // Wrapped in runZonedGuarded: Hive.openBox() creates an orphaned rejected
+    // completer.future internally when Hive is not initialized, which escapes
+    // our try-catch as an unhandled zone error. runZonedGuarded absorbs it.
+    Box<Inventory>? box;
+    await runZonedGuarded<Future<void>>(
+      () async { box = await Hive.openBox<Inventory>('inventory'); },
+      (_, __) {}, // absorb orphaned Hive-internal Future rejections
+    );
+    if (box != null) {
+      await _boxSub?.cancel();
+      _boxSub = box!.watch(key: 'data').listen(
+        (event) {
+          final updated = event.value as Inventory?;
+          if (updated != null && mounted) state = updated;
+        },
+        onError: (_) {},
+        cancelOnError: false,
+      );
+    }
   }
 
   Future<void> consume(ItemType type) async {
@@ -31,6 +54,12 @@ class InventoryNotifier extends StateNotifier<Inventory> {
     state = const Inventory(bomb2: 5, bomb3: 5, undo1: 5, undo3: 5);
   }
 
+  @override
+  void dispose() {
+    _boxSub?.cancel();
+    super.dispose();
+  }
+
   @visibleForTesting
   void setStateForTest(Inventory inventory) => state = inventory;
 
@@ -42,7 +71,6 @@ final inventoryRepositoryProvider = Provider<InventoryRepository>(
   (ref) => InventoryRepository(),
 );
 
-final inventoryProvider =
-    StateNotifierProvider<InventoryNotifier, Inventory>(
+final inventoryProvider = StateNotifierProvider<InventoryNotifier, Inventory>(
   (ref) => InventoryNotifier(ref.read(inventoryRepositoryProvider)),
 );

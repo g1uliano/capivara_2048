@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 import '../../data/models/lives_state.dart';
 import '../../data/repositories/lives_repository.dart';
 
@@ -10,6 +11,7 @@ class LivesNotifier extends StateNotifier<LivesState> {
   final LivesRepository _repo;
   final _ready = Completer<void>();
   Timer? _regenTimer;
+  StreamSubscription<BoxEvent>? _boxSub;
   AppLifecycleListener? _lifecycleListener;
 
   LivesNotifier(this._repo) : super(LivesState.initial()) {
@@ -25,6 +27,26 @@ class LivesNotifier extends StateNotifier<LivesState> {
       await _repo.setMigrationFlag(_migrationKeyV238);
       state = fresh;
       _ready.complete();
+      // runZonedGuarded absorbs orphaned Hive-internal Future rejections
+      // that escape try-catch when Hive is not initialized (e.g. in tests).
+      Box<LivesState>? migBox;
+      await runZonedGuarded<Future<void>>(
+        () async { migBox = await Hive.openBox<LivesState>('lives'); },
+        (_, __) {},
+      );
+      if (migBox != null) {
+        await _boxSub?.cancel();
+        _boxSub = migBox!.watch(key: 'state').listen(
+          (event) {
+            final updated = event.value as LivesState?;
+            if (updated != null && mounted) {
+              state = updated;
+            }
+          },
+          onError: (_) {},
+          cancelOnError: false,
+        );
+      }
       return;
     }
 
@@ -34,6 +56,28 @@ class LivesNotifier extends StateNotifier<LivesState> {
     await _repo.save(state);
     _ready.complete();
     _startRegenTimer();
+    // runZonedGuarded absorbs orphaned Hive-internal Future rejections
+    // that escape try-catch when Hive is not initialized (e.g. in tests).
+    Box<LivesState>? box;
+    await runZonedGuarded<Future<void>>(
+      () async { box = await Hive.openBox<LivesState>('lives'); },
+      (_, __) {},
+    );
+    if (box != null) {
+      await _boxSub?.cancel();
+      _boxSub = box!.watch(key: 'state').listen(
+        (event) {
+          final updated = event.value as LivesState?;
+          if (updated != null && mounted) {
+            state = updated;
+            // Restart regen timer with the new state
+            _startRegenTimer();
+          }
+        },
+        onError: (_) {},
+        cancelOnError: false,
+      );
+    }
     try {
       _lifecycleListener = AppLifecycleListener(
         onPause: _pauseRegen,
@@ -44,7 +88,10 @@ class LivesNotifier extends StateNotifier<LivesState> {
     }
   }
 
-  static LivesState calcRegen({required LivesState state, required DateTime now}) {
+  static LivesState calcRegen({
+    required LivesState state,
+    required DateTime now,
+  }) {
     if (state.lives >= state.regenCap) return state;
     final delta = now.difference(state.lastRegenAt);
     final totalMinutes = delta.inMinutes;
@@ -108,7 +155,10 @@ class LivesNotifier extends StateNotifier<LivesState> {
 
   void _startRegenTimer() {
     _regenTimer?.cancel();
-    _regenTimer = Timer.periodic(const Duration(seconds: 30), (_) => _onRegenTick());
+    _regenTimer = Timer.periodic(
+      const Duration(seconds: 30),
+      (_) => _onRegenTick(),
+    );
   }
 
   void _onRegenTick() {
@@ -167,6 +217,7 @@ class LivesNotifier extends StateNotifier<LivesState> {
   @override
   void dispose() {
     _regenTimer?.cancel();
+    _boxSub?.cancel();
     _lifecycleListener?.dispose();
     super.dispose();
   }
