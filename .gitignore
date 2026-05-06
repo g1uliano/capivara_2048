@@ -52,3 +52,7 @@ cache/removed_bg/
 
 # Pi coding agent state
 .pi/
+
+#google-services.json
+android/app/src/dev/google-services.json
+android/app/src/prd/google-services.json
