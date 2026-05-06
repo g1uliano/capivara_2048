@@ -7,6 +7,32 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.4.0] — 2026-05-06
+
+### Added (Fase 4A — Firebase + Auth + Sync Engine)
+
+- `PlayerProfile` model com `AuthProvider` enum (google, apple, email)
+- `PendingEvent` model + Hive adapter para eventos offline (Lendas, etc.)
+- `AuthService` interface + `FakeAuthService` + `FirebaseAuthService` (prd)
+- `SyncEngine` interface + `FakeSyncEngine` + `FirebaseSyncEngine` (prd)
+- `SyncConflictResolver`: lógica de merge campo a campo (best value wins)
+- `AuthController` Riverpod notifier com sign-in, sign-out e sync
+- `OnboardingAuthScreen`: tela de login no primeiro launch (Google, Apple, Email)
+- `ProfileScreen`: perfil do jogador acessível via avatar na HomeScreen
+- `AuthBanner`: banner persistente para usuários sem conta
+- Ícone de avatar na HomeScreen → navega para ProfileScreen
+- Firebase inicializado em `main.dart` com flavors dev/prd
+- Conexão ao emulador Firebase local no flavor dev (Auth 9099, Firestore 8080)
+- `EMULATOR_HOST` configurável via `--dart-define` (Genymotion, WiFi, USB)
+- `AdConfig`: constantes de anúncios com IDs de teste como default
+- `FIREBASE.md`: guia completo de configuração Firebase
+- Workflow de release CI (`.github/workflows/release.yml`) com injeção de secrets
+- Security Rules de produção para Firestore
+
+### Changed
+
+- `README.md`: instruções de build/run por cenário (Genymotion, USB, produção)
+- `.gitignore`: `firebase_options_*.dart` adicionado (contém API keys)
 ## [1.3.7] — 2026-05-05
 
 ### Added (Fase 3.8 — Documentação do framework de testes)
