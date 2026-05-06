@@ -57,6 +57,7 @@ Este documento descreve o passo a passo completo para configurar o Firebase no p
 ### 2.2 Projeto de produção
 
 Repita os passos acima com:
+
 - Nome: `Olha o Bichim` / ID sugerido: `bichim-prd`
 - **Ative** o Google Analytics (necessário para dados de uso em produção)
 
@@ -85,6 +86,7 @@ Repita para cada projeto (`bichim-dev` e `bichim-prd`):
    - Prd: `android/app/src/prd/google-services.json`
 
 > **Atenção:** não commite `google-services.json` no repositório. Adicione ao `.gitignore`:
+>
 > ```
 > android/app/src/dev/google-services.json
 > android/app/src/prd/google-services.json
@@ -108,6 +110,7 @@ Repita para cada projeto (`bichim-dev` e `bichim-prd`):
    - Prd: `ios/Runner/prd/GoogleService-Info.plist`
 
 > **Atenção:** não commite `GoogleService-Info.plist`. Adicione ao `.gitignore`:
+>
 > ```
 > ios/Runner/dev/GoogleService-Info.plist
 > ios/Runner/prd/GoogleService-Info.plist
@@ -123,7 +126,7 @@ O FlutterFire CLI gera o arquivo `firebase_options.dart` automaticamente com as 
 
 ```bash
 flutterfire configure \
-  --project=bichim-dev \
+  --project=olha-o-bichim-dev \
   --out=lib/firebase_options_dev.dart \
   --platforms=android,ios
 ```
@@ -188,21 +191,35 @@ keytool -list -v \
 
 Adicione o SHA-1 no Console Firebase → Project Settings → Seu app Android.
 
-### 7.2 android/app/build.gradle
+### 7.2 android/app/build.gradle.kts
 
-Confirme que o `google-services` plugin está aplicado:
+> **Nota:** este projeto usa Kotlin DSL (`.gradle.kts`), não Groovy.
 
-```groovy
-apply plugin: 'com.google.gms.google-services'
-```
+O `flutterfire configure` já adiciona automaticamente o plugin. Confirme que
+`android/app/build.gradle.kts` contém:
 
-### 7.3 android/build.gradle
-
-```groovy
-dependencies {
-    classpath 'com.google.gms:google-services:4.4.2'
+```kotlin
+plugins {
+    // ...
+    // START: FlutterFire Configuration
+    id("com.google.gms.google-services")
+    // END: FlutterFire Configuration
+    // ...
 }
 ```
+
+### 7.3 android/settings.gradle.kts
+
+Confirme que `android/settings.gradle.kts` contém na seção `plugins`:
+
+```kotlin
+// START: FlutterFire Configuration
+id("com.google.gms.google-services") version("4.3.15") apply false
+// END: FlutterFire Configuration
+```
+
+Se os blocos `// START: FlutterFire Configuration` já estiverem presentes (adicionados
+pelo `flutterfire configure`), nenhuma ação manual é necessária.
 
 ---
 
@@ -227,6 +244,7 @@ Apple Sign-In requer configuração no Apple Developer Console **além** do Fire
 ### 8.2 Firebase Console — Apple provider
 
 Em Authentication → Sign-in method → Apple:
+
 - **Services ID:** `com.seunome.capivara2048.signin`
 - **Apple Team ID:** (do Developer Console)
 - **Key ID:** (da Key criada)
@@ -411,6 +429,7 @@ Os valores de produção são armazenados como **GitHub Secrets** e injetados no
 Antes de iniciar a implementação da Sub-A, confirme:
 
 ### Firebase Console
+
 - [ ] Projeto `bichim-dev` criado
 - [ ] Projeto `bichim-prd` criado
 - [ ] App Android registrado em ambos os projetos (com SHA-1 debug e release)
@@ -422,12 +441,14 @@ Antes de iniciar a implementação da Sub-A, confirme:
 - [ ] Security Rules publicadas
 
 ### Apple Developer (iOS)
+
 - [ ] Sign In with Apple habilitado no App ID
 - [ ] Service ID criado com domínio Firebase configurado
 - [ ] Key `.p8` criada e upada no Firebase Console
 - [ ] Capability adicionada no Xcode
 
 ### Ambiente local
+
 - [ ] `firebase-tools` 13+ instalado
 - [ ] `flutterfire_cli` instalado
 - [ ] `firebase_options_dev.dart` gerado via FlutterFire CLI
@@ -437,6 +458,7 @@ Antes de iniciar a implementação da Sub-A, confirme:
 - [ ] `google-services.json` e `GoogleService-Info.plist` no `.gitignore`
 
 ### Build de verificação
+
 - [ ] `flutter run --dart-define=FLAVOR=dev` sem crash
 - [ ] `Firebase.initializeApp()` sem erro de configuração
 - [ ] Auth Sign-In com Google abre o fluxo OAuth (mesmo que ainda não persista dados)
