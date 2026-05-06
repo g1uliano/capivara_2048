@@ -160,13 +160,17 @@ class FirestoreRankingRepository implements RankingRepository {
 
     if (type == RankingType.globalTime) {
       playerValue = (data['bestTimeMs'] as num?)?.toInt() ?? 0;
-      final countSnap =
-          await col.where('bestTimeMs', isLessThan: playerValue).count().get();
+      final countSnap = await col
+          .where('bestTimeMs', isLessThan: playerValue)
+          .count()
+          .get();
       rank = (countSnap.count ?? 0) + 1;
     } else if (type == RankingType.globalScore) {
       playerValue = (data['value'] as num?)?.toInt() ?? 0;
-      final countSnap =
-          await col.where('value', isGreaterThan: playerValue).count().get();
+      final countSnap = await col
+          .where('value', isGreaterThan: playerValue)
+          .count()
+          .get();
       rank = (countSnap.count ?? 0) + 1;
     } else {
       // legends
@@ -303,9 +307,9 @@ class FirestoreRankingRepository implements RankingRepository {
   Future<void> _deliverReward(WeeklyRewardResult reward) async {
     // Inventory
     final invBox = await Hive.openBox<Inventory>('inventory');
-    final inv = invBox.get('inventory') ?? Inventory.empty();
+    final inv = invBox.get('data') ?? Inventory.empty();
     await invBox.put(
-      'inventory',
+      'data',
       Inventory(
         bomb2: inv.bomb2 + reward.bomb2,
         bomb3: inv.bomb3 + reward.bomb3,

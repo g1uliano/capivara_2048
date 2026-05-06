@@ -13,7 +13,7 @@ class IAPServiceImpl implements IAPService {
   final FirebaseFirestore _firestore;
 
   IAPServiceImpl({required this.userId, FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   @override
   bool get isAvailable => true;
@@ -26,8 +26,9 @@ class IAPServiceImpl implements IAPService {
     }
 
     // Load product details
-    final response =
-        await iap.queryProductDetails({'bichim_pack_${package.id}'});
+    final response = await iap.queryProductDetails({
+      'bichim_pack_${package.id}',
+    });
     if (response.productDetails.isEmpty) {
       return const PurchaseResult.failed('Produto não encontrado na loja.');
     }
@@ -47,8 +48,11 @@ class IAPServiceImpl implements IAPService {
           case PurchaseStatus.error:
             await iap.completePurchase(purchase);
             if (!completer.isCompleted) {
-              completer.complete(PurchaseResult.failed(
-                  purchase.error?.message ?? 'Erro desconhecido'));
+              completer.complete(
+                PurchaseResult.failed(
+                  purchase.error?.message ?? 'Erro desconhecido',
+                ),
+              );
             }
             await sub.cancel();
           case PurchaseStatus.canceled:
@@ -80,9 +84,11 @@ class IAPServiceImpl implements IAPService {
   }
 
   Future<PurchaseResult> _deliverAndRecord(
-      PurchaseDetails purchase, ShopPackage package) async {
-    final purchaseId = purchase.purchaseID ??
-        purchase.verificationData.serverVerificationData;
+    PurchaseDetails purchase,
+    ShopPackage package,
+  ) async {
+    final purchaseId =
+        purchase.purchaseID ?? purchase.verificationData.serverVerificationData;
     final docRef = _firestore
         .collection('purchases')
         .doc(userId)
@@ -93,7 +99,8 @@ class IAPServiceImpl implements IAPService {
     final existing = await docRef.get();
     if (existing.exists && existing.data()?['status'] == 'delivered') {
       return PurchaseResult.succeeded(
-          shareCode: existing.data()?['shareCode'] as String? ?? '');
+        shareCode: existing.data()?['shareCode'] as String? ?? '',
+      );
     }
 
     await docRef.set({
@@ -119,7 +126,8 @@ class IAPServiceImpl implements IAPService {
       'createdByUserId': userId,
       'createdAt': FieldValue.serverTimestamp(),
       'expiresAt': Timestamp.fromDate(
-          DateTime.now().add(const Duration(days: 30))),
+        DateTime.now().add(const Duration(days: 30)),
+      ),
     });
 
     await docRef.update({
@@ -133,9 +141,9 @@ class IAPServiceImpl implements IAPService {
 
   Future<void> _deliverToHive(RewardBundle contents) async {
     final invBox = await Hive.openBox<Inventory>('inventory');
-    final inv = invBox.get('inventory') ?? Inventory.empty();
+    final inv = invBox.get('data') ?? Inventory.empty();
     await invBox.put(
-      'inventory',
+      'data',
       Inventory(
         bomb2: inv.bomb2 + contents.bomb2,
         bomb3: inv.bomb3 + contents.bomb3,
@@ -147,7 +155,9 @@ class IAPServiceImpl implements IAPService {
       final livesBox = await Hive.openBox<LivesState>('lives');
       final ls = livesBox.get('state') ?? LivesState.initial();
       await livesBox.put(
-          'state', ls.copyWith(lives: (ls.lives + contents.lives).clamp(0, 15)));
+        'state',
+        ls.copyWith(lives: (ls.lives + contents.lives).clamp(0, 15)),
+      );
     }
   }
 
@@ -158,12 +168,13 @@ class IAPServiceImpl implements IAPService {
       'BOTO',
       'SUCURI',
       'TUCANO',
-      'PREGUICA'
+      'PREGUICA',
     ];
     final animal = animals[Random().nextInt(animals.length)];
     final digits = (1000 + Random().nextInt(9000)).toString();
     final letters = String.fromCharCodes(
-        List.generate(2, (_) => 65 + Random().nextInt(26)));
+      List.generate(2, (_) => 65 + Random().nextInt(26)),
+    );
     return '$animal-$digits-$letters';
   }
 }

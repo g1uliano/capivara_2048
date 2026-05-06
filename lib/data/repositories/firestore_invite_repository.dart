@@ -137,9 +137,9 @@ class FirestoreInviteRepository implements InviteService {
     );
     // 1× Bomb2
     final invBox = await Hive.openBox<Inventory>('inventory');
-    final inv = invBox.get('inventory') ?? Inventory.empty();
+    final inv = invBox.get('data') ?? Inventory.empty();
     await invBox.put(
-      'inventory',
+      'data',
       Inventory(
         bomb2: inv.bomb2 + 1,
         bomb3: inv.bomb3,
