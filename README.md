@@ -64,15 +64,21 @@ O flavor é selecionado via `--dart-define=FLAVOR=dev|prd`.
 ### Executar
 
 **Cenário 1 — Genymotion ou celular via WiFi**
+
 ```bash
 # Inicie o emulador Firebase em outro terminal primeiro:
 firebase emulators:start
 
 # Rode o app apontando para o IP fixo da sua máquina na rede
-flutter run --dart-define=FLAVOR=dev --dart-define=EMULATOR_HOST=10.0.0.2
+flutter run \
+  --dart-define=FLAVOR=dev \
+  --dart-define=EMULATOR_HOST=10.0.0.2 \
+  --dart-define=AD_UNIT_ANDROID=ca-app-pub-3940256099942544/5224354917 \
+  --dart-define=AD_UNIT_IOS=ca-app-pub-3940256099942544/1712485313
 ```
 
 **Cenário 2 — Celular físico via USB**
+
 ```bash
 # Inicie o emulador Firebase em outro terminal primeiro:
 firebase emulators:start
@@ -82,10 +88,14 @@ adb reverse tcp:8080 tcp:8080
 adb reverse tcp:9099 tcp:9099
 
 # Rode o app
-flutter run --dart-define=FLAVOR=dev
+flutter run \
+  --dart-define=FLAVOR=dev \
+  --dart-define=AD_UNIT_ANDROID=ca-app-pub-3940256099942544/5224354917 \
+  --dart-define=AD_UNIT_IOS=ca-app-pub-3940256099942544/1712485313
 ```
 
 **Cenário 3 — Produção (Firebase real, sem emulador)**
+
 ```bash
 flutter run --dart-define=FLAVOR=prd
 ```
