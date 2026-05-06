@@ -15,6 +15,10 @@ class FirebaseSyncEngine implements SyncEngine {
   static const _personalRecordsBox = 'personal_records';
   static const _personalRecordsKey = 'records';
 
+  final String? displayName;
+
+  FirebaseSyncEngine({this.displayName});
+
   String? _userId;
   StreamSubscription<DocumentSnapshot>? _profileListener;
   StreamSubscription<List<ConnectivityResult>>? _connectivityListener;
@@ -130,7 +134,7 @@ class FirebaseSyncEngine implements SyncEngine {
           } else {
             tx.set(ref, {
               'userId': _userId,
-              'displayName': 'Jogador',
+              'displayName': displayName ?? 'Jogador',
               'timesReached': 1,
               'firstReachedAt': Timestamp.fromDate(event.occurredAt),
             });
