@@ -48,9 +48,11 @@ class FirebaseSyncEngine implements SyncEngine {
       final doc = await _firestore.collection('users').doc(_userId).get();
       if (doc.exists) {
         await _mergeRemotePersonalRecords(
-            doc.data()?['personalRecords'] as Map<String, dynamic>?);
+          doc.data()?['personalRecords'] as Map<String, dynamic>?,
+        );
         await _mergeRemoteInventory(
-            doc.data()?['inventory'] as Map<String, dynamic>?);
+          doc.data()?['inventory'] as Map<String, dynamic>?,
+        );
       } else {
         await _writeLocalProfileToFirestore();
       }
@@ -93,18 +95,21 @@ class FirebaseSyncEngine implements SyncEngine {
         .doc(_userId)
         .snapshots()
         .listen((snapshot) async {
-      if (!snapshot.exists) return;
-      final data = snapshot.data()!;
-      await _mergeRemotePersonalRecords(
-          data['personalRecords'] as Map<String, dynamic>?);
-      await _mergeRemoteInventory(
-          data['inventory'] as Map<String, dynamic>?);
-    });
+          if (!snapshot.exists) return;
+          final data = snapshot.data()!;
+          await _mergeRemotePersonalRecords(
+            data['personalRecords'] as Map<String, dynamic>?,
+          );
+          await _mergeRemoteInventory(
+            data['inventory'] as Map<String, dynamic>?,
+          );
+        });
   }
 
   void _startConnectivityListener() {
-    _connectivityListener =
-        Connectivity().onConnectivityChanged.listen((results) async {
+    _connectivityListener = Connectivity().onConnectivityChanged.listen((
+      results,
+    ) async {
       if (results.any((r) => r != ConnectivityResult.none)) {
         await drainPendingEvents();
       }
@@ -118,8 +123,7 @@ class FirebaseSyncEngine implements SyncEngine {
         final level = event.payload['level'] as int;
         final collectionPath = 'legendsRankings/$level/entries';
         await _firestore.runTransaction((tx) async {
-          final ref =
-              _firestore.collection(collectionPath).doc(_userId);
+          final ref = _firestore.collection(collectionPath).doc(_userId);
           final snap = await tx.get(ref);
           if (snap.exists) {
             tx.update(ref, {'timesReached': FieldValue.increment(1)});
@@ -132,13 +136,14 @@ class FirebaseSyncEngine implements SyncEngine {
             });
           }
         });
-        final field = level == 4096
-            ? 'personalRecords.timesReached4096'
-            : 'personalRecords.timesReached8192';
-        await _firestore
-            .collection('users')
-            .doc(_userId)
-            .update({field: FieldValue.increment(1)});
+        final field = switch (level) {
+          2048 => 'personalRecords.timesReached2048',
+          4096 => 'personalRecords.timesReached4096',
+          _ => 'personalRecords.timesReached8192',
+        };
+        await _firestore.collection('users').doc(_userId).update({
+          field: FieldValue.increment(1),
+        });
       case PendingEventType.inventoryConsume:
         // Handled by direct transaction at purchase time — not via queue
         break;
@@ -146,19 +151,17 @@ class FirebaseSyncEngine implements SyncEngine {
   }
 
   Future<void> _mergeRemotePersonalRecords(
-      Map<String, dynamic>? remoteData) async {
+    Map<String, dynamic>? remoteData,
+  ) async {
     if (remoteData == null) return;
     final box = await Hive.openBox<PersonalRecords>(_personalRecordsBox);
-    final local =
-        box.get(_personalRecordsKey) ?? const PersonalRecords();
+    final local = box.get(_personalRecordsKey) ?? const PersonalRecords();
     final remote = _personalRecordsFromMap(remoteData);
-    final merged =
-        SyncConflictResolver.mergePersonalRecords(local, remote);
+    final merged = SyncConflictResolver.mergePersonalRecords(local, remote);
     await box.put(_personalRecordsKey, merged);
   }
 
-  Future<void> _mergeRemoteInventory(
-      Map<String, dynamic>? remoteData) async {
+  Future<void> _mergeRemoteInventory(Map<String, dynamic>? remoteData) async {
     if (remoteData == null) return;
     final box = await Hive.openBox<Inventory>('inventory');
     final local = box.get('inventory') ?? Inventory.empty();
@@ -174,33 +177,31 @@ class FirebaseSyncEngine implements SyncEngine {
 
   Future<void> _writeLocalProfileToFirestore() async {
     if (_userId == null) return;
-    final prBox =
-        await Hive.openBox<PersonalRecords>(_personalRecordsBox);
-    final pr =
-        prBox.get(_personalRecordsKey) ?? const PersonalRecords();
-    await _firestore.collection('users').doc(_userId).set(
-      {
-        'userId': _userId,
-        'createdAt': FieldValue.serverTimestamp(),
-        'lastSeenAt': FieldValue.serverTimestamp(),
-        'personalRecords': {
-          'timesReached2048': pr.timesReached2048,
-          'timesReached4096': pr.timesReached4096,
-          'timesReached8192': pr.timesReached8192,
-          'highestLevelEver': pr.highestLevelEver,
-          if (pr.firstReached4096At != null)
-            'firstReached4096At':
-                Timestamp.fromDate(pr.firstReached4096At!),
-          if (pr.firstReached8192At != null)
-            'firstReached8192At':
-                Timestamp.fromDate(pr.firstReached8192At!),
-        },
+    final prBox = await Hive.openBox<PersonalRecords>(_personalRecordsBox);
+    final pr = prBox.get(_personalRecordsKey) ?? const PersonalRecords();
+    await _firestore.collection('users').doc(_userId).set({
+      'userId': _userId,
+      'createdAt': FieldValue.serverTimestamp(),
+      'lastSeenAt': FieldValue.serverTimestamp(),
+      'personalRecords': {
+        'timesReached2048': pr.timesReached2048,
+        'timesReached4096': pr.timesReached4096,
+        'timesReached8192': pr.timesReached8192,
+        'highestLevelEver': pr.highestLevelEver,
+        'rewardCollected4096': pr.rewardCollected4096,
+        'rewardCollected8192': pr.rewardCollected8192,
+        if (pr.firstReached2048At != null)
+          'firstReached2048At': Timestamp.fromDate(pr.firstReached2048At!),
+        if (pr.firstReached4096At != null)
+          'firstReached4096At': Timestamp.fromDate(pr.firstReached4096At!),
+        if (pr.firstReached8192At != null)
+          'firstReached8192At': Timestamp.fromDate(pr.firstReached8192At!),
       },
-      SetOptions(merge: true),
-    );
+    }, SetOptions(merge: true));
   }
 
   PersonalRecords _personalRecordsFromMap(Map<String, dynamic> m) {
+    final ts2048 = m['firstReached2048At'] as Timestamp?;
     final ts4096 = m['firstReached4096At'] as Timestamp?;
     final ts8192 = m['firstReached8192At'] as Timestamp?;
     return PersonalRecords(
@@ -208,6 +209,9 @@ class FirebaseSyncEngine implements SyncEngine {
       timesReached4096: (m['timesReached4096'] as int?) ?? 0,
       timesReached8192: (m['timesReached8192'] as int?) ?? 0,
       highestLevelEver: (m['highestLevelEver'] as int?) ?? 0,
+      rewardCollected4096: (m['rewardCollected4096'] as bool?) ?? false,
+      rewardCollected8192: (m['rewardCollected8192'] as bool?) ?? false,
+      firstReached2048At: ts2048?.toDate(),
       firstReached4096At: ts4096?.toDate(),
       firstReached8192At: ts8192?.toDate(),
     );
