@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -34,6 +36,12 @@ void main() async {
       ? prd_options.DefaultFirebaseOptions.currentPlatform
       : dev_options.DefaultFirebaseOptions.currentPlatform;
   await Firebase.initializeApp(options: firebaseOptions);
+
+  // Emulador local — ativo apenas no flavor dev
+  if (flavor == 'dev') {
+    FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+    await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+  }
 
   await Hive.initFlutter();
   Hive.registerAdapter(LivesStateAdapter());
