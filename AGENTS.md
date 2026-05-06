@@ -63,26 +63,27 @@ Regra obrigatória ao criar telas ou adicionar textos:
 
 ## Fases do roadmap
 
-Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 4B concluída (v1.4.4) — próximo: Fase 4C (Convites + Anúncios + IAP)**. O áudio foi reposicionado para a **Fase 6** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
+Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 4C concluída (v1.4.5) — Fase 4 completa — próximo: Fase 5 (Arte adicional e polimento visual)**. O áudio foi reposicionado para a **Fase 6** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
 
-| Fase    | Foco                                                                                                 |
-| ------- | ---------------------------------------------------------------------------------------------------- |
-| 1       | Setup, game engine puro, tela básica com placeholders                                                |
-| 2       | Identidade visual, paleta, tipografia, animações, vidas, inventário, recompensas, coleção, loja mock |
-| 2.5 ✅  | Rebranding "Olha o Bichim!", GameTitleImage, ícone do app, launcher name                             |
-| 2.6 ✅  | Tela Home + Coleção + Configurações + stubs                                                          |
-| 2.11 ✅ | ShopOverlay sobre o jogo acessível pelos ícones desabilitados do inventário                          |
-| 2.12 ✅ | Peixe-boi (4096), Jacaré (8192), multi-vitória, ranking local, PersonalRecords                       |
-| 3 ✅    | E2E Test Framework: 95+ cenários, golden tests, APK Tier 2, CI GitHub Actions, documentação          |
-| 3.5 ✅  | `golden.*` com `alchemist` — 15 testes (5 telas × 3 viewports)                                       |
-| 3.6 ✅  | Tier 2: APK flavor `tst` + TestRunnerScreen + Share + Demo (integration_test)                        |
-| 3.7 ✅  | CI GitHub Actions: suite Tier 1 em PR/push, golden diffs como artefato, badge no README              |
-| 3.8 ✅  | Documentação do framework de testes (`docs/TESTING.md`)                                              |
+| Fase    | Foco                                                                                                        |
+| ------- | ----------------------------------------------------------------------------------------------------------- |
+| 1       | Setup, game engine puro, tela básica com placeholders                                                       |
+| 2       | Identidade visual, paleta, tipografia, animações, vidas, inventário, recompensas, coleção, loja mock        |
+| 2.5 ✅  | Rebranding "Olha o Bichim!", GameTitleImage, ícone do app, launcher name                                    |
+| 2.6 ✅  | Tela Home + Coleção + Configurações + stubs                                                                 |
+| 2.11 ✅ | ShopOverlay sobre o jogo acessível pelos ícones desabilitados do inventário                                 |
+| 2.12 ✅ | Peixe-boi (4096), Jacaré (8192), multi-vitória, ranking local, PersonalRecords                              |
+| 3 ✅    | E2E Test Framework: 95+ cenários, golden tests, APK Tier 2, CI GitHub Actions, documentação                 |
+| 3.5 ✅  | `golden.*` com `alchemist` — 15 testes (5 telas × 3 viewports)                                              |
+| 3.6 ✅  | Tier 2: APK flavor `tst` + TestRunnerScreen + Share + Demo (integration_test)                               |
+| 3.7 ✅  | CI GitHub Actions: suite Tier 1 em PR/push, golden diffs como artefato, badge no README                     |
+| 3.8 ✅  | Documentação do framework de testes (`docs/TESTING.md`)                                                     |
 | 4A ✅   | Firebase + Auth + Sync Engine (PlayerProfile, AuthService, SyncEngine, OnboardingAuthScreen, ProfileScreen) |
-| 4B ✅   | Ranking Global Semanal (Firestore) + Ranking Lendas persistido                                             |
-| 4       | Arte adicional e polimento visual (logo, ícone, splash final)                                        |
-| 5       | Áudio (sound design dos 13 animais, SFX, música)                                                     |
-| 6       | Polimento, l10n, acessibilidade, lançamento                                                          |
+| 4B ✅   | Ranking Global Semanal (Firestore) + Ranking Lendas persistido                                              |
+| 4C ✅   | Convites (deep links, Firestore) + Anúncios Reais (Google Mobile Ads) + IAP Real (in_app_purchase) |
+| 4       | Arte adicional e polimento visual (logo, ícone, splash final)                                               |
+| 5       | Áudio (sound design dos 13 animais, SFX, música)                                                            |
+| 6       | Polimento, l10n, acessibilidade, lançamento                                                                 |
 
 ## Release checklist
 

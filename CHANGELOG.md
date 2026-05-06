@@ -7,6 +7,38 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.4.5] — 2026-05-06
+
+### Added — Fase 4C: Convites + Anúncios Reais + IAP Real
+
+#### Sub-D — Sistema de Convites
+- `InviteService` — interface abstrata + `FakeInviteService` (in-memory, testável)
+- `FirestoreInviteRepository` — convites persistidos no Firestore; recompensa de 2 vidas + 1× Bomba 2 para convidante e convidado
+- `InviteController` — Riverpod notifier para geração de link; `inviteServiceProvider` usa Firestore em prd
+- `InviteFriendsScreen` — implementação real com geração de link, botões Copiar e Compartilhar; `AuthBanner` para usuários não logados
+- Deep link `olhabichim://invite?ref={userId}` capturado via `app_links` em cold start e foreground (AndroidManifest intent-filter + iOS URL scheme)
+- Hook no `game_notifier`: convite completado automaticamente na 1ª partida do convidado
+
+#### Sub-E — Anúncios Reais (Google Mobile Ads)
+- `GoogleMobileAdsService` — substitui `FakeAdService` em prd; pré-carrega o próximo anúncio após cada exibição
+- `adServiceProvider` usa `GoogleMobileAdsService` em prd, `FakeAdService` em dev/testes
+- AdMob inicializado prd-only com `tagForChildDirectedTreatment=yes`, `maxAdContentRating=G`
+- AndroidManifest: `com.google.android.gms.ads.APPLICATION_ID` (test App ID para dev)
+- iOS Info.plist: `GADApplicationIdentifier` (test App ID para dev)
+
+#### Sub-F — IAP Real (in_app_purchase)
+- `IAPService` — interface abstrata + `FakeIAPService` (retorna `PurchaseResult.succeeded` com shareCode fake)
+- `IAPServiceImpl` — purchase stream com `in_app_purchase`; entrega idempotente via Firestore (`purchases/{userId}/items/{purchaseId}`); gera ShareCode no Firestore (`shareCodes/{code}`)
+- `IAPConfirmationSheet` — bottom sheet mostra nome do pacote, conteúdo (❤️🧨💣↩️), presente para amigo e preço; substitui `AlertDialog` simples
+- `PurchaseSuccessSheet` — exibe ShareCode com botões Copiar e Compartilhar; `share_plus` integrado
+- `ShopScreen` e `GameOverNoItemsOverlay` usam `IAPConfirmationSheet` + `IAPService` (Fake em dev)
+- `iapServiceProvider` usa `IAPServiceImpl` em prd quando usuário logado
+
+### Dependencies Added
+- `app_links: ^6.1.1`
+- `google_mobile_ads: ^5.1.0`
+- `in_app_purchase: ^3.2.0`
+
 ## [1.4.4] — 2026-05-06
 
 ### Added — Fase 4B: Ranking Global Semanal + Ranking Lendas
