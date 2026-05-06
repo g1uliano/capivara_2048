@@ -8,6 +8,7 @@ import 'package:capivara_2048/data/models/player_profile.dart';
 
 Widget _wrap(Widget child, {PlayerProfile? profile}) {
   final fakeAuth = FakeAuthService(initialProfile: profile);
+  addTearDown(fakeAuth.dispose);
   return ProviderScope(
     overrides: [
       authServiceProvider.overrideWithValue(fakeAuth),
@@ -24,7 +25,9 @@ void main() {
     expect(find.textContaining('Faça login'), findsOneWidget);
   });
 
-  testWidgets('AuthBanner oculto (SizedBox.shrink) quando logado', (tester) async {
+  testWidgets('AuthBanner oculto (SizedBox.shrink) quando logado', (
+    tester,
+  ) async {
     final profile = PlayerProfile(
       userId: 'u1',
       displayName: 'Teste',

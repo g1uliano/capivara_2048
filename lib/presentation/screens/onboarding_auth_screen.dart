@@ -25,9 +25,9 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
       if (mounted) _navigateHome();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao entrar: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erro ao entrar: $e')));
       }
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -68,18 +68,21 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
                 Text(
                   'Salve seu progresso e dispute o ranking global.',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.nunito(fontSize: 15, color: Colors.white70),
+                  style: GoogleFonts.nunito(
+                    fontSize: 15,
+                    color: Colors.white70,
+                  ),
                 ),
                 const SizedBox(height: 48),
                 if (_loading)
                   const Center(
-                      child: CircularProgressIndicator(color: Colors.white))
+                    child: CircularProgressIndicator(color: Colors.white),
+                  )
                 else ...[
                   _AuthButton(
                     label: 'Entrar com Google',
                     icon: Icons.g_mobiledata,
-                    onPressed: () =>
-                        _handleSignIn(controller.signInWithGoogle),
+                    onPressed: () => _handleSignIn(controller.signInWithGoogle),
                   ),
                   if (Platform.isIOS) ...[
                     const SizedBox(height: 12),
@@ -147,8 +150,12 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              _handleSignIn(() => controller.signInWithEmail(
-                  emailCtrl.text.trim(), passCtrl.text));
+              _handleSignIn(
+                () => controller.signInWithEmail(
+                  emailCtrl.text.trim(),
+                  passCtrl.text,
+                ),
+              );
             },
             child: const Text('Entrar'),
           ),
@@ -179,8 +186,7 @@ class _AuthButton extends StatelessWidget {
         backgroundColor: Colors.white,
         foregroundColor: AppColors.primary,
         minimumSize: const Size(double.infinity, 52),
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }

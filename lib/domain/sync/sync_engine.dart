@@ -41,6 +41,7 @@ class FakeSyncEngine implements SyncEngine {
   }
 
   @override
+  // Emits a single idle event. Real implementation uses a broadcast StreamController.
   Stream<SyncStatus> get statusStream => Stream.value(SyncStatus.idle);
 }
 

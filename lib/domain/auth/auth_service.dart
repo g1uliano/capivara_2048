@@ -48,7 +48,10 @@ class FakeAuthService implements AuthService {
   }
 
   @override
-  Future<PlayerProfile> createAccountWithEmail(String email, String password) async {
+  Future<PlayerProfile> createAccountWithEmail(
+    String email,
+    String password,
+  ) async {
     _profile = _fakeProfile(AuthProvider.email, email: email);
     _controller.add(_profile);
     return _profile!;
@@ -73,4 +76,6 @@ class FakeAuthService implements AuthService {
       );
 }
 
+// TODO(fase4b): Replace FakeAuthService with FirebaseAuthService for prd flavor.
+// See docs/plans/2026-05-05-fase4a-firebase-auth-sync.md Task 13.
 final authServiceProvider = Provider<AuthService>((_) => FakeAuthService());

@@ -18,8 +18,10 @@ class ProfileScreen extends ConsumerWidget {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          title: Text('Perfil',
-              style: GoogleFonts.fredoka(fontSize: 22, color: Colors.white)),
+          title: Text(
+            'Perfil',
+            style: GoogleFonts.fredoka(fontSize: 22, color: Colors.white),
+          ),
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
           elevation: 0,
@@ -28,7 +30,8 @@ class ProfileScreen extends ConsumerWidget {
             ? _NotLoggedIn(
                 onLogin: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                      builder: (_) => const OnboardingAuthScreen()),
+                    builder: (_) => const OnboardingAuthScreen(),
+                  ),
                 ),
               )
             : _LoggedIn(
@@ -57,8 +60,10 @@ class _NotLoggedIn extends StatelessWidget {
           children: [
             const Icon(Icons.person_outline, size: 64, color: Colors.white54),
             const SizedBox(height: 16),
-            Text('Você não está conectado.',
-                style: GoogleFonts.nunito(color: Colors.white, fontSize: 16)),
+            Text(
+              'Você não está conectado.',
+              style: GoogleFonts.nunito(color: Colors.white, fontSize: 16),
+            ),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: onLogin,
@@ -66,9 +71,10 @@ class _NotLoggedIn extends StatelessWidget {
                 backgroundColor: const Color(0xFFFF8C42),
                 minimumSize: const Size(200, 48),
               ),
-              child: Text('Entrar',
-                  style:
-                      GoogleFonts.fredoka(fontSize: 18, color: Colors.white)),
+              child: Text(
+                'Entrar',
+                style: GoogleFonts.fredoka(fontSize: 18, color: Colors.white),
+              ),
             ),
           ],
         ),
@@ -104,9 +110,10 @@ class _LoggedIn extends StatelessWidget {
           child: Text(
             profile.displayName,
             style: GoogleFonts.fredoka(
-                fontSize: 24,
-                color: Colors.white,
-                fontWeight: FontWeight.bold),
+              fontSize: 24,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         if (profile.email != null) ...[
@@ -123,8 +130,10 @@ class _LoggedIn extends StatelessWidget {
         const SizedBox(height: 16),
         ListTile(
           leading: const Icon(Icons.restore, color: Colors.white70),
-          title: Text('Restaurar compras',
-              style: GoogleFonts.nunito(color: Colors.white)),
+          title: Text(
+            'Restaurar compras',
+            style: GoogleFonts.nunito(color: Colors.white),
+          ),
           onTap: () {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Disponível na Fase 4F (IAP)')),
@@ -134,8 +143,10 @@ class _LoggedIn extends StatelessWidget {
         const SizedBox(height: 8),
         ListTile(
           leading: const Icon(Icons.logout, color: Colors.redAccent),
-          title:
-              Text('Sair', style: GoogleFonts.nunito(color: Colors.redAccent)),
+          title: Text(
+            'Sair',
+            style: GoogleFonts.nunito(color: Colors.redAccent),
+          ),
           onTap: onSignOut,
         ),
       ],

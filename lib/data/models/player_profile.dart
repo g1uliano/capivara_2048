@@ -21,44 +21,46 @@ class PlayerProfile {
     required this.lastSeenAt,
   });
 
+  static const _sentinel = Object();
+
   PlayerProfile copyWith({
     String? userId,
     String? displayName,
-    String? avatarUrl,
-    String? email,
+    Object? avatarUrl = _sentinel,
     AuthProvider? provider,
     DateTime? createdAt,
     DateTime? lastSeenAt,
+    Object? email = _sentinel,
   }) =>
       PlayerProfile(
         userId: userId ?? this.userId,
         displayName: displayName ?? this.displayName,
-        avatarUrl: avatarUrl ?? this.avatarUrl,
-        email: email ?? this.email,
+        avatarUrl: identical(avatarUrl, _sentinel) ? this.avatarUrl : avatarUrl as String?,
+        email: identical(email, _sentinel) ? this.email : email as String?,
         provider: provider ?? this.provider,
         createdAt: createdAt ?? this.createdAt,
         lastSeenAt: lastSeenAt ?? this.lastSeenAt,
       );
 
   Map<String, dynamic> toJson() => {
-        'userId': userId,
-        'displayName': displayName,
-        if (avatarUrl != null) 'avatarUrl': avatarUrl,
-        if (email != null) 'email': email,
-        'provider': provider.name,
-        'createdAt': createdAt.toIso8601String(),
-        'lastSeenAt': lastSeenAt.toIso8601String(),
-      };
+    'userId': userId,
+    'displayName': displayName,
+    if (avatarUrl != null) 'avatarUrl': avatarUrl,
+    if (email != null) 'email': email,
+    'provider': provider.name,
+    'createdAt': createdAt.toIso8601String(),
+    'lastSeenAt': lastSeenAt.toIso8601String(),
+  };
 
   factory PlayerProfile.fromJson(Map<String, dynamic> json) => PlayerProfile(
-        userId: json['userId'] as String,
-        displayName: json['displayName'] as String,
-        avatarUrl: json['avatarUrl'] as String?,
-        email: json['email'] as String?,
-        provider: AuthProvider.values.byName(json['provider'] as String),
-        createdAt: DateTime.parse(json['createdAt'] as String),
-        lastSeenAt: DateTime.parse(json['lastSeenAt'] as String),
-      );
+    userId: json['userId'] as String,
+    displayName: json['displayName'] as String,
+    avatarUrl: json['avatarUrl'] as String?,
+    email: json['email'] as String?,
+    provider: AuthProvider.values.byName(json['provider'] as String),
+    createdAt: DateTime.parse(json['createdAt'] as String),
+    lastSeenAt: DateTime.parse(json['lastSeenAt'] as String),
+  );
 
   @override
   bool operator ==(Object other) =>
@@ -74,5 +76,12 @@ class PlayerProfile {
 
   @override
   int get hashCode => Object.hash(
-        userId, displayName, avatarUrl, email, provider, createdAt, lastSeenAt);
+    userId,
+    displayName,
+    avatarUrl,
+    email,
+    provider,
+    createdAt,
+    lastSeenAt,
+  );
 }

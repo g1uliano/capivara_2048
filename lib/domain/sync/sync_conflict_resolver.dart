@@ -16,11 +16,22 @@ class SyncConflictResolver {
       timesReached2048: _max(local.timesReached2048, remote.timesReached2048),
       timesReached4096: _max(local.timesReached4096, remote.timesReached4096),
       timesReached8192: _max(local.timesReached8192, remote.timesReached8192),
-      firstReached2048At: _oldest(local.firstReached2048At, remote.firstReached2048At),
-      firstReached4096At: _oldest(local.firstReached4096At, remote.firstReached4096At),
-      firstReached8192At: _oldest(local.firstReached8192At, remote.firstReached8192At),
-      rewardCollected4096: local.rewardCollected4096 || remote.rewardCollected4096,
-      rewardCollected8192: local.rewardCollected8192 || remote.rewardCollected8192,
+      firstReached2048At: _oldest(
+        local.firstReached2048At,
+        remote.firstReached2048At,
+      ),
+      firstReached4096At: _oldest(
+        local.firstReached4096At,
+        remote.firstReached4096At,
+      ),
+      firstReached8192At: _oldest(
+        local.firstReached8192At,
+        remote.firstReached8192At,
+      ),
+      rewardCollected4096:
+          local.rewardCollected4096 || remote.rewardCollected4096,
+      rewardCollected8192:
+          local.rewardCollected8192 || remote.rewardCollected8192,
       highestLevelEver: _max(local.highestLevelEver, remote.highestLevelEver),
     );
   }

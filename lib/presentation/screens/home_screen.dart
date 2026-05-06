@@ -105,7 +105,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   child: IconButton(
                     key: const Key('home_btn_perfil'),
                     icon: Icon(
-                      playerProfile != null ? Icons.person : Icons.person_outline,
+                      playerProfile != null
+                          ? Icons.person
+                          : Icons.person_outline,
                       color: Colors.white,
                       size: 28,
                     ),

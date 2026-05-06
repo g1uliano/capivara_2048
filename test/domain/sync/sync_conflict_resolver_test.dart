@@ -37,7 +37,9 @@ void main() {
       final older = DateTime(2024, 1, 1);
       final newer = DateTime(2025, 6, 1);
       final local = const PersonalRecords().copyWith(firstReached4096At: newer);
-      final remote = const PersonalRecords().copyWith(firstReached4096At: older);
+      final remote = const PersonalRecords().copyWith(
+        firstReached4096At: older,
+      );
       final result = SyncConflictResolver.mergePersonalRecords(local, remote);
       expect(result.firstReached4096At, older);
     });
@@ -47,7 +49,9 @@ void main() {
         firstReached4096At: DateTime(2024, 3, 15),
       );
       final result = SyncConflictResolver.mergePersonalRecords(
-          const PersonalRecords(), remote);
+        const PersonalRecords(),
+        remote,
+      );
       expect(result.firstReached4096At, DateTime(2024, 3, 15));
     });
 
@@ -56,7 +60,9 @@ void main() {
         firstReached4096At: DateTime(2024, 3, 15),
       );
       final result = SyncConflictResolver.mergePersonalRecords(
-          local, const PersonalRecords());
+        local,
+        const PersonalRecords(),
+      );
       expect(result.firstReached4096At, DateTime(2024, 3, 15));
     });
 
@@ -72,6 +78,20 @@ void main() {
       final remote = const PersonalRecords().copyWith(timesReached2048: 8);
       final result = SyncConflictResolver.mergePersonalRecords(local, remote);
       expect(result.timesReached2048, 10);
+    });
+
+    test('rewardCollected4096: OR — false OR true → true', () {
+      final local = const PersonalRecords();
+      final remote = const PersonalRecords().copyWith(rewardCollected4096: true);
+      final result = SyncConflictResolver.mergePersonalRecords(local, remote);
+      expect(result.rewardCollected4096, isTrue);
+    });
+
+    test('rewardCollected4096: OR — true OR false → true', () {
+      final local = const PersonalRecords().copyWith(rewardCollected4096: true);
+      final remote = const PersonalRecords();
+      final result = SyncConflictResolver.mergePersonalRecords(local, remote);
+      expect(result.rewardCollected4096, isTrue);
     });
   });
 

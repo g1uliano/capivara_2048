@@ -43,6 +43,7 @@ void main() async {
   await container.read(inventoryProvider.notifier).load();
   await container.read(dailyRewardsProvider.notifier).load();
   await container.read(personalRecordsProvider.notifier).load();
-  runApp(UncontrolledProviderScope(container: container, child: const CapivaraApp()));
+  runApp(
+    UncontrolledProviderScope(container: container, child: const CapivaraApp()),
+  );
 }
-

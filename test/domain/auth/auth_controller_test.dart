@@ -13,10 +13,12 @@ void main() {
   setUp(() {
     fakeAuth = FakeAuthService();
     fakeSyncEngine = FakeSyncEngine();
-    container = ProviderContainer(overrides: [
-      authServiceProvider.overrideWithValue(fakeAuth),
-      syncEngineProvider.overrideWithValue(fakeSyncEngine),
-    ]);
+    container = ProviderContainer(
+      overrides: [
+        authServiceProvider.overrideWithValue(fakeAuth),
+        syncEngineProvider.overrideWithValue(fakeSyncEngine),
+      ],
+    );
   });
 
   tearDown(() {
@@ -54,5 +56,24 @@ void main() {
   test('signIn chama syncEngine.init', () async {
     await container.read(authControllerProvider.notifier).signInWithGoogle();
     expect(fakeSyncEngine.initCalled, isTrue);
+  });
+
+  test('createAccountWithEmail cria perfil e inicializa sync engine', () async {
+    await container
+        .read(authControllerProvider.notifier)
+        .createAccountWithEmail('novo@example.com', 'senha123');
+    final profile = container.read(authControllerProvider);
+    expect(profile, isNotNull);
+    expect(profile!.email, 'novo@example.com');
+    expect(fakeSyncEngine.initCalled, isTrue);
+    // New account: syncProfile and drainPendingEvents NOT called
+    expect(fakeSyncEngine.drained, isEmpty);
+  });
+
+  test('signInWithApple atualiza estado com AuthProvider.apple', () async {
+    await container.read(authControllerProvider.notifier).signInWithApple();
+    final profile = container.read(authControllerProvider);
+    expect(profile, isNotNull);
+    expect(profile!.provider, AuthProvider.apple);
   });
 }

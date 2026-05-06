@@ -16,30 +16,46 @@ class AuthController extends StateNotifier<PlayerProfile?> {
   Future<void> signInWithGoogle() async {
     final profile = await _authService.signInWithGoogle();
     state = profile;
-    await _syncEngine.init(profile.userId);
-    await _syncEngine.syncProfile();
-    await _syncEngine.drainPendingEvents();
+    try {
+      await _syncEngine.init(profile.userId);
+      await _syncEngine.syncProfile();
+      await _syncEngine.drainPendingEvents();
+    } catch (_) {
+      state = null;
+      rethrow;
+    }
   }
 
   Future<void> signInWithApple() async {
     final profile = await _authService.signInWithApple();
     state = profile;
-    await _syncEngine.init(profile.userId);
-    await _syncEngine.syncProfile();
-    await _syncEngine.drainPendingEvents();
+    try {
+      await _syncEngine.init(profile.userId);
+      await _syncEngine.syncProfile();
+      await _syncEngine.drainPendingEvents();
+    } catch (_) {
+      state = null;
+      rethrow;
+    }
   }
 
   Future<void> signInWithEmail(String email, String password) async {
     final profile = await _authService.signInWithEmail(email, password);
     state = profile;
-    await _syncEngine.init(profile.userId);
-    await _syncEngine.syncProfile();
-    await _syncEngine.drainPendingEvents();
+    try {
+      await _syncEngine.init(profile.userId);
+      await _syncEngine.syncProfile();
+      await _syncEngine.drainPendingEvents();
+    } catch (_) {
+      state = null;
+      rethrow;
+    }
   }
 
   Future<void> createAccountWithEmail(String email, String password) async {
     final profile = await _authService.createAccountWithEmail(email, password);
     state = profile;
+    // New account: no remote data to sync yet — only init the engine.
     await _syncEngine.init(profile.userId);
   }
 
@@ -54,7 +70,7 @@ class AuthController extends StateNotifier<PlayerProfile?> {
 
 final authControllerProvider =
     StateNotifierProvider<AuthController, PlayerProfile?>((ref) {
-  final authService = ref.watch(authServiceProvider);
-  final syncEngine = ref.watch(syncEngineProvider);
-  return AuthController(authService, syncEngine);
-});
+      final authService = ref.watch(authServiceProvider);
+      final syncEngine = ref.watch(syncEngineProvider);
+      return AuthController(authService, syncEngine);
+    });
