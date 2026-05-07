@@ -120,7 +120,7 @@ class _LoggedIn extends ConsumerWidget {
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => AvatarPickerScreen(
-                        onDone: () => Navigator.of(context).pop(),
+                        onDone: (ctx) => Navigator.of(ctx).pop(),
                       ),
                     ),
                   ),

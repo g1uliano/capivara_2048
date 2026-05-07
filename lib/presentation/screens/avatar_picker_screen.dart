@@ -14,7 +14,7 @@ import '../widgets/game_background.dart';
 class AvatarPickerScreen extends ConsumerStatefulWidget {
   const AvatarPickerScreen({super.key, required this.onDone});
 
-  final VoidCallback onDone;
+  final void Function(BuildContext context) onDone;
 
   @override
   ConsumerState<AvatarPickerScreen> createState() => _AvatarPickerScreenState();
@@ -31,7 +31,7 @@ class _AvatarPickerScreenState extends ConsumerState<AvatarPickerScreen> {
       await ref
           .read(authControllerProvider.notifier)
           .updateAvatar('tile:$_selected');
-      if (mounted) widget.onDone();
+      if (mounted) widget.onDone(context);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
@@ -43,7 +43,7 @@ class _AvatarPickerScreenState extends ConsumerState<AvatarPickerScreen> {
     }
   }
 
-  void _skip() => widget.onDone();
+  void _skip() => widget.onDone(context);
 
   @override
   Widget build(BuildContext context) {

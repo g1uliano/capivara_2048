@@ -92,7 +92,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
               builder: (_) => AvatarPickerScreen(
-                onDone: () => Navigator.of(context).pushAndRemoveUntil(
+                onDone: (ctx) => Navigator.of(ctx).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (_) => const HomeScreen()),
                   (_) => false,
                 ),
