@@ -55,20 +55,12 @@ Widget _buildScreen({
 }) {
   return ProviderScope(
     overrides: [
-      gameProvider.overrideWith((ref) {
-        final notifier = GameNotifier(GameEngine(), ref);
-        notifier.state = gameState;
-        return notifier;
-      }),
+      gameProvider.overrideWithBuild((ref, n) => gameState),
       inventoryRepositoryProvider.overrideWithValue(InventoryRepository()),
-      inventoryProvider.overrideWith((ref) {
-        final notifier = InventoryNotifier(ref.read(inventoryRepositoryProvider));
-        notifier.setStateForTest(inventory);
-        return notifier;
-      }),
+      inventoryProvider.overrideWithBuild((ref, n) => inventory),
       livesRepositoryProvider.overrideWithValue(LivesRepository()),
-      livesProvider.overrideWith((ref) => LivesNotifier(ref.read(livesRepositoryProvider))),
-      settingsProvider.overrideWith((ref) => SettingsNotifier(prefs)),
+      livesProvider.overrideWith(LivesNotifier.new),
+      sharedPreferencesProvider.overrideWithValue(prefs),
     ],
     child: const MaterialApp(home: GameScreen()),
   );
@@ -136,32 +128,28 @@ void main() {
       'usar Bomba 3 na overlay → inventário não consumido imediatamente, BombMode ativo',
       (tester) async {
     final inv = const Inventory(bomb2: 0, bomb3: 1, undo1: 0, undo3: 0);
-    late ProviderContainer container;
+
+    final container = ProviderContainer(
+      overrides: [
+        inventoryRepositoryProvider.overrideWithValue(InventoryRepository()),
+        inventoryProvider.overrideWithBuild((ref, n) => inv),
+        livesRepositoryProvider.overrideWithValue(LivesRepository()),
+        livesProvider.overrideWith(LivesNotifier.new),
+        sharedPreferencesProvider.overrideWithValue(prefs),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    // Initialize game notifier and set its state to awaiting-resolution game-over.
+    container.read(gameProvider.notifier)
+      ..setConsumeCallback(
+        (type) => container.read(inventoryProvider.notifier).consume(type),
+      )
+      ..debugSetState(_awaitingState(isAwaitingResolution: true));
 
     await tester.pumpWidget(
-      ProviderScope(
-        observers: [
-          _ContainerCapture((c) => container = c),
-        ],
-        overrides: [
-          gameProvider.overrideWith((ref) {
-            final notifier = GameNotifier(GameEngine(), ref);
-            notifier.setConsumeCallback(
-              (type) => ref.read(inventoryProvider.notifier).consume(type),
-            );
-            notifier.state = _awaitingState(isAwaitingResolution: true);
-            return notifier;
-          }),
-          inventoryRepositoryProvider.overrideWithValue(InventoryRepository()),
-          inventoryProvider.overrideWith((ref) {
-            final notifier = InventoryNotifier(ref.read(inventoryRepositoryProvider));
-            notifier.setStateForTest(inv);
-            return notifier;
-          }),
-          livesRepositoryProvider.overrideWithValue(LivesRepository()),
-          livesProvider.overrideWith((ref) => LivesNotifier(ref.read(livesRepositoryProvider))),
-          settingsProvider.overrideWith((ref) => SettingsNotifier(prefs)),
-        ],
+      UncontrolledProviderScope(
+        container: container,
         child: const MaterialApp(home: GameScreen()),
       ),
     );
@@ -177,14 +165,4 @@ void main() {
     // BombMode deve estar ativo (overlay de seleção visível)
     expect(container.read(gameProvider).bombMode, isNotNull);
   });
-}
-
-class _ContainerCapture extends ProviderObserver {
-  _ContainerCapture(this._capture);
-  final void Function(ProviderContainer) _capture;
-
-  @override
-  void didAddProvider(ProviderBase provider, Object? value, ProviderContainer container) {
-    _capture(container);
-  }
 }

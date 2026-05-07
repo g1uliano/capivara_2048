@@ -10,12 +10,7 @@ Widget buildSubject({Inventory? inventory}) {
   return ProviderScope(
     overrides: [
       if (inventory != null)
-        inventoryProvider.overrideWith((ref) {
-          final notifier =
-              InventoryNotifier(ref.read(inventoryRepositoryProvider));
-          notifier.state = inventory;
-          return notifier;
-        }),
+        inventoryProvider.overrideWithBuild((ref, n) => inventory),
     ],
     child: const MaterialApp(
       home: Scaffold(body: InventoryBar()),

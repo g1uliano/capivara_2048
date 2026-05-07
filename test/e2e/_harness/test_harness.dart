@@ -50,7 +50,7 @@ class GameTestHarness {
 
     container = ProviderContainer(
       overrides: [
-        settingsProvider.overrideWith((ref) => SettingsNotifier(prefs)),
+        sharedPreferencesProvider.overrideWithValue(prefs),
         gameRecordRepositoryProvider.overrideWithValue(repo),
       ],
     );
@@ -96,7 +96,7 @@ class GameTestHarness {
 
     container = ProviderContainer(
       overrides: [
-        settingsProvider.overrideWith((ref) => SettingsNotifier(prefs)),
+        sharedPreferencesProvider.overrideWithValue(prefs),
         gameRecordRepositoryProvider.overrideWithValue(repo),
       ],
     );

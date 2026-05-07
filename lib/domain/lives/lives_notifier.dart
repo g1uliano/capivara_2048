@@ -36,7 +36,6 @@ class LivesNotifier extends Notifier<LivesState> {
           .read(livesRepositoryProvider)
           .setMigrationFlag(_migrationKeyV238);
       state = fresh;
-      _ready.complete();
       // runZonedGuarded absorbs orphaned Hive-internal Future rejections
       // that escape try-catch when Hive is not initialized (e.g. in tests).
       Box<LivesState>? migBox;
@@ -58,6 +57,8 @@ class LivesNotifier extends Notifier<LivesState> {
               cancelOnError: false,
             );
       }
+      // Complete _ready only after Hive box subscription is set up.
+      if (!_ready.isCompleted) _ready.complete();
       return;
     }
 
@@ -65,7 +66,6 @@ class LivesNotifier extends Notifier<LivesState> {
     loaded = calcRegen(state: loaded, now: DateTime.now());
     state = loaded;
     await ref.read(livesRepositoryProvider).save(state);
-    _ready.complete();
     _startRegenTimer();
     // runZonedGuarded absorbs orphaned Hive-internal Future rejections
     // that escape try-catch when Hive is not initialized (e.g. in tests).
@@ -90,6 +90,8 @@ class LivesNotifier extends Notifier<LivesState> {
             cancelOnError: false,
           );
     }
+    // Complete _ready only after Hive box subscription is set up.
+    if (!_ready.isCompleted) _ready.complete();
     try {
       _lifecycleListener = AppLifecycleListener(
         onPause: _pauseRegen,

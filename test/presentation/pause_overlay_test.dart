@@ -29,11 +29,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          reduceEffectsProvider.overrideWith((ref) {
-            final notifier = ReduceEffectsNotifier();
-            notifier.state = true;
-            return notifier;
-          }),
+          reduceEffectsProvider.overrideWithBuild((ref, n) => true),
         ],
         child: const MaterialApp(
           home: Scaffold(body: PauseOverlay()),

@@ -29,12 +29,8 @@ Widget _buildOverlay({required Inventory inventory, required SharedPreferences p
   return ProviderScope(
     overrides: [
       inventoryRepositoryProvider.overrideWithValue(InventoryRepository()),
-      inventoryProvider.overrideWith((ref) {
-        final notifier = InventoryNotifier(ref.read(inventoryRepositoryProvider));
-        notifier.setStateForTest(inventory);
-        return notifier;
-      }),
-      settingsProvider.overrideWith((ref) => SettingsNotifier(prefs)),
+      inventoryProvider.overrideWithBuild((ref, n) => inventory),
+      sharedPreferencesProvider.overrideWithValue(prefs),
     ],
     child: const MaterialApp(home: Scaffold(body: GameOverItemOverlay())),
   );

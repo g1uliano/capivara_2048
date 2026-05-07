@@ -37,14 +37,7 @@ Widget _wrap(Widget child, {required int lives}) {
   final livesState = _stateWithLives(lives);
   return ProviderScope(
     overrides: [
-      livesProvider.overrideWith(
-        (ref) {
-          final n = LivesNotifier(ref.read(livesRepositoryProvider));
-          // Force-set the state before async _init() can overwrite it.
-          n.state = livesState;
-          return n;
-        },
-      ),
+      livesProvider.overrideWithBuild((ref, n) => livesState),
     ],
     child: MaterialApp(home: Scaffold(body: child)),
   );
@@ -101,18 +94,8 @@ void main() {
     final observer = _MockNavigatorObserver();
     final container = ProviderContainer(
       overrides: [
-        livesProvider.overrideWith(
-          (ref) {
-            final n = LivesNotifier(ref.read(livesRepositoryProvider));
-            n.state = _stateWithLives(0);
-            return n;
-          },
-        ),
-        gameProvider.overrideWith((ref) {
-          final n = GameNotifier(ref.read(gameEngineProvider), ref);
-          n.setConsumeCallback((_) {});
-          return n;
-        }),
+        livesProvider.overrideWithBuild((ref, n) => _stateWithLives(0)),
+        gameProvider.overrideWith(GameNotifier.new),
       ],
     );
     addTearDown(container.dispose);
@@ -144,21 +127,10 @@ void main() {
 
   testWidgets('5. Pressing button when has lives calls restart()',
       (tester) async {
-    final livesState = _stateWithLives(3);
     final container = ProviderContainer(
       overrides: [
-        livesProvider.overrideWith(
-          (ref) {
-            final n = LivesNotifier(ref.read(livesRepositoryProvider));
-            n.state = livesState;
-            return n;
-          },
-        ),
-        gameProvider.overrideWith((ref) {
-          final n = GameNotifier(ref.read(gameEngineProvider), ref);
-          n.setConsumeCallback((_) {});
-          return n;
-        }),
+        livesProvider.overrideWithBuild((ref, n) => _stateWithLives(3)),
+        gameProvider.overrideWith(GameNotifier.new),
       ],
     );
     addTearDown(container.dispose);

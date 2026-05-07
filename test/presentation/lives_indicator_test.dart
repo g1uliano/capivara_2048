@@ -1,5 +1,4 @@
 import 'package:capivara_2048/data/models/lives_state.dart';
-import 'package:capivara_2048/data/repositories/lives_repository.dart';
 import 'package:capivara_2048/domain/lives/lives_notifier.dart';
 import 'package:capivara_2048/presentation/widgets/lives_indicator.dart';
 import 'package:capivara_2048/presentation/widgets/lives_status_banner.dart';
@@ -10,27 +9,10 @@ import 'package:flutter_test/flutter_test.dart';
 Widget _wrap({required LivesState livesState}) {
   return ProviderScope(
     overrides: [
-      livesProvider.overrideWith((_) => _FakeLivesNotifier(livesState)),
+      livesProvider.overrideWithBuild((ref, n) => livesState),
     ],
     child: const MaterialApp(home: Scaffold(body: LivesIndicator())),
   );
-}
-
-class _FakeLivesNotifier extends LivesNotifier {
-  _FakeLivesNotifier(LivesState initial) : super(_FakeRepo(initial));
-}
-
-class _FakeRepo extends LivesRepository {
-  final LivesState _state;
-  _FakeRepo(this._state);
-  @override
-  Future<LivesState> load() async => _state;
-  @override
-  Future<void> save(LivesState state) async {}
-  @override
-  Future<bool> getMigrationFlag(String key) async => true;
-  @override
-  Future<void> setMigrationFlag(String key) async {}
 }
 
 LivesState _state({

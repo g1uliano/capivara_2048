@@ -7,6 +7,19 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-05-07
+### Changed
+- Upgraded 47 packages to latest versions
+- Bumped Firebase suite: firebase_core v4, firebase_auth v6, cloud_firestore v6
+- Bumped Android Gradle Plugin to 8.12.1, google-services plugin to 4.4.2
+- Migrated 11 StateNotifier → Notifier/AsyncNotifier (Riverpod 3)
+- Rewrote Google Sign-In flow for google_sign_in 7.x (singleton + authenticate() API)
+- Migrated Share.share() → SharePlus.instance.share() (share_plus 13)
+- Bumped google_mobile_ads to 8.0.0, google_fonts 8.1, plus plugins to latest
+- Fixed LivesNotifier._ready to complete after Hive box subscription (eliminates race in tests)
+- Updated all test overrides from StateNotifier pattern to Riverpod 3 Notifier pattern
+- Updated google_fonts font-cache seed hashes for google_fonts 8.1.0 in test config
+
 ## [1.4.7] — 2026-05-06
 
 ### Fixed

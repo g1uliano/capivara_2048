@@ -21,7 +21,7 @@ class _FakePersonalRecordsNotifier extends PersonalRecordsNotifier {
 ProviderContainer _createContainer() {
   return ProviderContainer(
     overrides: [
-      personalRecordsProvider.overrideWith((ref) => _FakePersonalRecordsNotifier()),
+      personalRecordsProvider.overrideWith(() => _FakePersonalRecordsNotifier()),
     ],
   );
 }
