@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/home_constants.dart';
 import '../../core/theme/text_styles.dart';
+import '../../domain/auth/auth_service.dart';
 import '../controllers/auth_controller.dart';
 import '../widgets/game_background.dart';
 import '../widgets/game_title_image.dart';
@@ -20,6 +21,7 @@ class EmailAuthScreen extends ConsumerStatefulWidget {
 
 class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   final _confirmCtrl = TextEditingController();
@@ -31,10 +33,18 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
 
   @override
   void dispose() {
+    _nameCtrl.dispose();
     _emailCtrl.dispose();
     _passCtrl.dispose();
     _confirmCtrl.dispose();
     super.dispose();
+  }
+
+  String? _validateName(String? v) {
+    if (v == null || v.trim().isEmpty) return 'Informe seu nome';
+    if (v.trim().length < 2) return 'Mínimo 2 caracteres';
+    if (v.trim().length > 30) return 'Máximo 30 caracteres';
+    return null;
   }
 
   String? _validateEmail(String? v) {
@@ -78,6 +88,38 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
     }
   }
 
+  Future<void> _handleForgotPassword() async {
+    final email = _emailCtrl.text.trim();
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Informe o e-mail para redefinir a senha.'),
+        ),
+      );
+      return;
+    }
+    setState(() => _loading = true);
+    try {
+      await ref.read(authServiceProvider).sendPasswordReset(email);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('E-mail de redefinição enviado para $email'),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Erro ao enviar e-mail. Tente novamente.')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _loading = true);
@@ -87,7 +129,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
         await controller.createAccountWithEmail(
           _emailCtrl.text.trim(),
           _passCtrl.text,
-          '', // display name placeholder — Task 12 adds the name field
+          _nameCtrl.text.trim(),
         );
         if (mounted) {
           Navigator.of(context).pushAndRemoveUntil(
@@ -154,7 +196,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                     height: HomeConstants.titleHeight(scale),
                   ),
                   const SizedBox(height: 32),
-                  // Toggle Entrar / Criar Conta
+                  // Toggle Entrar / Criar Conta — clear name on tab switch handled in _ToggleTab onTap
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.9),
@@ -172,7 +214,10 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                         _ToggleTab(
                           label: 'Entrar',
                           selected: !_isSignUp,
-                          onTap: () => setState(() => _isSignUp = false),
+                          onTap: () => setState(() {
+                            _isSignUp = false;
+                            _nameCtrl.clear();
+                          }),
                         ),
                         _ToggleTab(
                           label: 'Criar conta',
@@ -183,6 +228,15 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
+                  if (_isSignUp) ...[  
+                    _AuthField(
+                      controller: _nameCtrl,
+                      label: 'Nome',
+                      validator: _validateName,
+                      textInputAction: TextInputAction.next,
+                    ),
+                    const SizedBox(height: 12),
+                  ],
                   _AuthField(
                     controller: _emailCtrl,
                     label: 'E-mail',
@@ -244,6 +298,19 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                         style: GoogleFonts.fredoka(fontSize: 18),
                       ),
                     ),
+                  if (!_isSignUp) ...[  
+                    const SizedBox(height: 8),
+                    TextButton(
+                      onPressed: _loading ? null : _handleForgotPassword,
+                      child: Text(
+                        'Esqueci minha senha',
+                        style: outlinedWhiteTextStyle(
+                          GoogleFonts.fredoka(
+                              fontSize: 14, color: Colors.white70),
+                        ),
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 16),
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
@@ -311,6 +378,7 @@ class _AuthField extends StatelessWidget {
     this.obscureText = false,
     this.validator,
     this.suffix,
+    this.textInputAction,
   });
 
   final TextEditingController controller;
@@ -320,6 +388,7 @@ class _AuthField extends StatelessWidget {
   final bool obscureText;
   final String? Function(String?)? validator;
   final Widget? suffix;
+  final TextInputAction? textInputAction;
 
   @override
   Widget build(BuildContext context) {
@@ -329,6 +398,7 @@ class _AuthField extends StatelessWidget {
       autofillHints: autofillHints,
       obscureText: obscureText,
       validator: validator,
+      textInputAction: textInputAction,
       style: const TextStyle(color: Colors.black87, fontSize: 16),
       decoration: InputDecoration(
         labelText: label,
