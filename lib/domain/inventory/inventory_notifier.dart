@@ -6,14 +6,19 @@ import '../../data/models/inventory.dart';
 import '../../data/models/item_type.dart';
 import '../../data/repositories/inventory_repository.dart';
 
-class InventoryNotifier extends StateNotifier<Inventory> {
-  InventoryNotifier(this._repo) : super(Inventory.empty());
-
-  final InventoryRepository _repo;
+class InventoryNotifier extends Notifier<Inventory> {
   StreamSubscription<BoxEvent>? _boxSub;
 
+  @override
+  Inventory build() {
+    ref.onDispose(() {
+      _boxSub?.cancel();
+    });
+    return Inventory.empty();
+  }
+
   Future<void> load() async {
-    state = await _repo.load();
+    state = await ref.read(inventoryRepositoryProvider).load();
     // React to external Hive writes (IAP, ranking rewards, invite rewards).
     // Wrapped in runZonedGuarded: Hive.openBox() creates an orphaned rejected
     // completer.future internally when Hive is not initialized, which escapes
@@ -21,14 +26,14 @@ class InventoryNotifier extends StateNotifier<Inventory> {
     Box<Inventory>? box;
     await runZonedGuarded<Future<void>>(
       () async { box = await Hive.openBox<Inventory>('inventory'); },
-      (_, __) {}, // absorb orphaned Hive-internal Future rejections
+      (_, _) {}, // absorb orphaned Hive-internal Future rejections
     );
     if (box != null) {
       await _boxSub?.cancel();
       _boxSub = box!.watch(key: 'data').listen(
         (event) {
           final updated = event.value as Inventory?;
-          if (updated != null && mounted) state = updated;
+          if (updated != null) state = updated;
         },
         onError: (_) {},
         cancelOnError: false,
@@ -38,13 +43,13 @@ class InventoryNotifier extends StateNotifier<Inventory> {
 
   Future<void> consume(ItemType type) async {
     state = state.consume(type);
-    await _repo.save(state);
+    await ref.read(inventoryRepositoryProvider).save(state);
   }
 
   Future<void> add(ItemType type, int amount) async {
     assert(amount > 0, 'amount must be positive; use consume() to decrease');
     state = state.add(type, amount);
-    await _repo.save(state);
+    await ref.read(inventoryRepositoryProvider).save(state);
   }
 
   int count(ItemType type) => state.count(type);
@@ -52,12 +57,6 @@ class InventoryNotifier extends StateNotifier<Inventory> {
   void addDebugItems() {
     if (!kDebugMode) return;
     state = const Inventory(bomb2: 5, bomb3: 5, undo1: 5, undo3: 5);
-  }
-
-  @override
-  void dispose() {
-    _boxSub?.cancel();
-    super.dispose();
   }
 
   @visibleForTesting
@@ -71,6 +70,6 @@ final inventoryRepositoryProvider = Provider<InventoryRepository>(
   (ref) => InventoryRepository(),
 );
 
-final inventoryProvider = StateNotifierProvider<InventoryNotifier, Inventory>(
-  (ref) => InventoryNotifier(ref.read(inventoryRepositoryProvider)),
+final inventoryProvider = NotifierProvider<InventoryNotifier, Inventory>(
+  InventoryNotifier.new,
 );
