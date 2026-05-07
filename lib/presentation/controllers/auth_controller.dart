@@ -58,6 +58,11 @@ class AuthController extends Notifier<PlayerProfile?> {
           .read(syncEngineProvider)
           .init(profile.userId, displayName: profile.displayName);
       await ref.read(syncEngineProvider).syncProfile();
+      // Restore tile avatar for email accounts (saved in Firestore)
+      final tileAvatar = ref.read(syncEngineProvider).remoteAvatarUrl;
+      if (tileAvatar != null && tileAvatar.startsWith('tile:')) {
+        state = state!.copyWith(avatarUrl: tileAvatar);
+      }
       await ref.read(syncEngineProvider).drainPendingEvents();
       _initIAPStartup(profile.userId);
       unawaited(_registerPendingInvite(profile));
@@ -107,6 +112,54 @@ class AuthController extends Notifier<PlayerProfile?> {
     } catch (_) {
       // Never block login for invite failures
     }
+  }
+
+  Future<void> updateDisplayName(String name) async {
+    if (state == null) return;
+    state = state!.copyWith(displayName: name);
+    try {
+      await ref.read(authServiceProvider).updateDisplayName(name);
+      await ref.read(syncEngineProvider).updateDisplayName(name);
+    } catch (_) {
+      // Local state already updated; remote failure is non-fatal
+    }
+  }
+
+  Future<void> deleteAccount({String? senha}) async {
+    // 1. Deletar dados no Firestore primeiro (pode falhar sem bloquear)
+    try {
+      await ref.read(syncEngineProvider).deleteUserData();
+    } catch (_) {}
+
+    // 2. Limpar todos os boxes Hive locais
+    const boxNames = [
+      'inventory',
+      'lives',
+      'personal_records',
+      'pending_events',
+      'daily_rewards',
+      'invite_refs',
+      'game_records',
+      'ranking_rewards',
+    ];
+    for (final name in boxNames) {
+      try {
+        final box = await Hive.openBox(name);
+        await box.clear();
+      } catch (_) {}
+    }
+
+    // 3. Deletar conta no Firebase Auth (inclui re-autenticação)
+    await ref.read(authServiceProvider).deleteAccount(senha: senha);
+
+    // 4. Dispose serviços
+    unawaited(ref.read(iapStartupServiceProvider).dispose());
+    try {
+      await ref.read(syncEngineProvider).dispose();
+    } catch (_) {}
+
+    // 5. Limpar state
+    state = null;
   }
 
   Future<void> signOut() async {
