@@ -25,6 +25,4 @@ class InviteController extends AsyncNotifier<String?> {
 }
 
 final inviteControllerProvider =
-    AsyncNotifierProvider<InviteController, String?>(
-  InviteController.new,
-);
+    AsyncNotifierProvider<InviteController, String?>(InviteController.new);

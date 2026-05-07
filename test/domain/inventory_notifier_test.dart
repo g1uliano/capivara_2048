@@ -3,6 +3,7 @@ import 'package:capivara_2048/data/models/inventory_hive_adapter.dart';
 import 'package:capivara_2048/data/models/item_type.dart';
 import 'package:capivara_2048/data/repositories/inventory_repository.dart';
 import 'package:capivara_2048/domain/inventory/inventory_notifier.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'dart:io';
@@ -60,33 +61,49 @@ void main() {
   group('InventoryNotifier', () {
     test('consume decreases count and saves', () async {
       final repo = InventoryRepository();
-      final notifier = InventoryNotifier(repo);
-      notifier.state = const Inventory(bomb2: 2, bomb3: 0, undo1: 0, undo3: 0);
+      final container = ProviderContainer(
+        overrides: [inventoryRepositoryProvider.overrideWithValue(repo)],
+      );
+      addTearDown(container.dispose);
+      final notifier = container.read(inventoryProvider.notifier);
+      notifier.setStateForTest(const Inventory(bomb2: 2, bomb3: 0, undo1: 0, undo3: 0));
       await notifier.consume(ItemType.bomb2);
-      expect(notifier.state.bomb2, 1);
+      expect(container.read(inventoryProvider).bomb2, 1);
     });
 
     test('consume at 0 does not go negative', () async {
       final repo = InventoryRepository();
-      final notifier = InventoryNotifier(repo);
+      final container = ProviderContainer(
+        overrides: [inventoryRepositoryProvider.overrideWithValue(repo)],
+      );
+      addTearDown(container.dispose);
+      final notifier = container.read(inventoryProvider.notifier);
       await notifier.consume(ItemType.bomb3);
-      expect(notifier.state.bomb3, 0);
+      expect(container.read(inventoryProvider).bomb3, 0);
     });
 
     test('add increases count and saves', () async {
       final repo = InventoryRepository();
-      final notifier = InventoryNotifier(repo);
+      final container = ProviderContainer(
+        overrides: [inventoryRepositoryProvider.overrideWithValue(repo)],
+      );
+      addTearDown(container.dispose);
+      final notifier = container.read(inventoryProvider.notifier);
       await notifier.add(ItemType.undo3, 2);
-      expect(notifier.state.undo3, 2);
+      expect(container.read(inventoryProvider).undo3, 2);
     });
 
     test('load restores persisted inventory', () async {
       final repo = InventoryRepository();
       await repo.save(const Inventory(bomb2: 3, bomb3: 1, undo1: 0, undo3: 2));
-      final notifier = InventoryNotifier(repo);
+      final container = ProviderContainer(
+        overrides: [inventoryRepositoryProvider.overrideWithValue(repo)],
+      );
+      addTearDown(container.dispose);
+      final notifier = container.read(inventoryProvider.notifier);
       await notifier.load();
-      expect(notifier.state.bomb2, 3);
-      expect(notifier.state.undo3, 2);
+      expect(container.read(inventoryProvider).bomb2, 3);
+      expect(container.read(inventoryProvider).undo3, 2);
     });
   });
 }

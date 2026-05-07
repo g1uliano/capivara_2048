@@ -26,32 +26,37 @@ class LivesNotifier extends Notifier<LivesState> {
 
   Future<void> _init() async {
     // Migration v238: reset to initial (new schema with regenCap/earnedCap)
-    final hasResetV238 = await ref.read(livesRepositoryProvider).getMigrationFlag(_migrationKeyV238);
+    final hasResetV238 = await ref
+        .read(livesRepositoryProvider)
+        .getMigrationFlag(_migrationKeyV238);
     if (!hasResetV238) {
       final fresh = LivesState.initial();
       await ref.read(livesRepositoryProvider).save(fresh);
-      await ref.read(livesRepositoryProvider).setMigrationFlag(_migrationKeyV238);
+      await ref
+          .read(livesRepositoryProvider)
+          .setMigrationFlag(_migrationKeyV238);
       state = fresh;
       _ready.complete();
       // runZonedGuarded absorbs orphaned Hive-internal Future rejections
       // that escape try-catch when Hive is not initialized (e.g. in tests).
       Box<LivesState>? migBox;
-      await runZonedGuarded<Future<void>>(
-        () async { migBox = await Hive.openBox<LivesState>('lives'); },
-        (_, _) {},
-      );
+      await runZonedGuarded<Future<void>>(() async {
+        migBox = await Hive.openBox<LivesState>('lives');
+      }, (_, _) {});
       if (migBox != null) {
         await _boxSub?.cancel();
-        _boxSub = migBox!.watch(key: 'state').listen(
-          (event) {
-            final updated = event.value as LivesState?;
-            if (updated != null) {
-              state = updated;
-            }
-          },
-          onError: (_) {},
-          cancelOnError: false,
-        );
+        _boxSub = migBox!
+            .watch(key: 'state')
+            .listen(
+              (event) {
+                final updated = event.value as LivesState?;
+                if (updated != null) {
+                  state = updated;
+                }
+              },
+              onError: (_) {},
+              cancelOnError: false,
+            );
       }
       return;
     }
@@ -65,24 +70,25 @@ class LivesNotifier extends Notifier<LivesState> {
     // runZonedGuarded absorbs orphaned Hive-internal Future rejections
     // that escape try-catch when Hive is not initialized (e.g. in tests).
     Box<LivesState>? box;
-    await runZonedGuarded<Future<void>>(
-      () async { box = await Hive.openBox<LivesState>('lives'); },
-      (_, _) {},
-    );
+    await runZonedGuarded<Future<void>>(() async {
+      box = await Hive.openBox<LivesState>('lives');
+    }, (_, _) {});
     if (box != null) {
       await _boxSub?.cancel();
-      _boxSub = box!.watch(key: 'state').listen(
-        (event) {
-          final updated = event.value as LivesState?;
-          if (updated != null) {
-            state = updated;
-            // Restart regen timer with the new state
-            _startRegenTimer();
-          }
-        },
-        onError: (_) {},
-        cancelOnError: false,
-      );
+      _boxSub = box!
+          .watch(key: 'state')
+          .listen(
+            (event) {
+              final updated = event.value as LivesState?;
+              if (updated != null) {
+                state = updated;
+                // Restart regen timer with the new state
+                _startRegenTimer();
+              }
+            },
+            onError: (_) {},
+            cancelOnError: false,
+          );
     }
     try {
       _lifecycleListener = AppLifecycleListener(

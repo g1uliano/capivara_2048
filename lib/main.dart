@@ -1,4 +1,5 @@
 import 'package:app_links/app_links.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -38,6 +39,7 @@ void main() async {
       ? prd_options.DefaultFirebaseOptions.currentPlatform
       : dev_options.DefaultFirebaseOptions.currentPlatform;
   await Firebase.initializeApp(options: firebaseOptions);
+  await GoogleSignIn.instance.initialize();
 
   // Emulador local — ativo apenas quando USE_EMULATOR=true
   // Ex: flutter run --dart-define=FLAVOR=dev --dart-define=USE_EMULATOR=true
@@ -55,8 +57,9 @@ void main() async {
 
   // Deep link listener for invite system
   final appLinks = AppLinks();
-  final initialUri =
-      await appLinks.getInitialLink().catchError((_) => null as Uri?);
+  final initialUri = await appLinks.getInitialLink().catchError(
+    (_) => null as Uri?,
+  );
   if (initialUri != null) _handleInviteDeepLink(initialUri);
   appLinks.uriLinkStream.listen(_handleInviteDeepLink);
 

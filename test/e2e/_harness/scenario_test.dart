@@ -20,7 +20,7 @@ void main() {
     final s = E2EScenario(
       id: 'x', title: 'x',
       tags: {ScenarioTag.golden},
-      run: (_, __) async {},
+      run: (_, _) async {},
     );
     expect(s.matchesTag(ScenarioTag.golden), isTrue);
     expect(s.matchesTag(ScenarioTag.tier2Only), isFalse);

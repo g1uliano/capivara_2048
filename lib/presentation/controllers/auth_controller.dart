@@ -49,8 +49,9 @@ class AuthController extends Notifier<PlayerProfile?> {
   }
 
   Future<void> signInWithEmail(String email, String password) async {
-    final profile =
-        await ref.read(authServiceProvider).signInWithEmail(email, password);
+    final profile = await ref
+        .read(authServiceProvider)
+        .signInWithEmail(email, password);
     state = profile;
     try {
       await ref
@@ -114,5 +115,6 @@ class AuthController extends Notifier<PlayerProfile?> {
   bool get isLoggedIn => state != null;
 }
 
-final authControllerProvider =
-    NotifierProvider<AuthController, PlayerProfile?>(AuthController.new);
+final authControllerProvider = NotifierProvider<AuthController, PlayerProfile?>(
+  AuthController.new,
+);

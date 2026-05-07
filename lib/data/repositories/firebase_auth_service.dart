@@ -6,12 +6,9 @@ import '../../data/models/player_profile.dart';
 import '../../domain/auth/auth_service.dart';
 
 class FirebaseAuthService implements AuthService {
-  FirebaseAuthService()
-      : _auth = fb.FirebaseAuth.instance,
-        _googleSignIn = GoogleSignIn();
+  FirebaseAuthService() : _auth = fb.FirebaseAuth.instance;
 
   final fb.FirebaseAuth _auth;
-  final GoogleSignIn _googleSignIn;
 
   @override
   Stream<PlayerProfile?> get authStateChanges =>
@@ -22,11 +19,9 @@ class FirebaseAuthService implements AuthService {
 
   @override
   Future<PlayerProfile> signInWithGoogle() async {
-    final googleUser = await _googleSignIn.signIn();
-    if (googleUser == null) throw Exception('Login cancelado');
-    final googleAuth = await googleUser.authentication;
+    final googleUser = await GoogleSignIn.instance.authenticate();
+    final googleAuth = googleUser.authentication;
     final credential = fb.GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
     final result = await _auth.signInWithCredential(credential);
@@ -55,7 +50,7 @@ class FirebaseAuthService implements AuthService {
 
   @override
   Future<void> signOut() async {
-    await _googleSignIn.signOut();
+    await GoogleSignIn.instance.signOut();
     await _auth.signOut();
   }
 

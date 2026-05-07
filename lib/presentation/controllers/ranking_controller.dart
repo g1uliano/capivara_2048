@@ -27,5 +27,5 @@ class RankingController extends AsyncNotifier<WeeklyRewardResult?> {
 
 final rankingControllerProvider =
     AsyncNotifierProvider<RankingController, WeeklyRewardResult?>(
-  RankingController.new,
-);
+      RankingController.new,
+    );

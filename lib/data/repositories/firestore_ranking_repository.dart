@@ -230,7 +230,7 @@ class FirestoreRankingRepository implements RankingRepository {
           await docRef.update({
             'bestTimeMs': value,
             'submittedAt': FieldValue.serverTimestamp(),
-            if (displayName != null) 'displayName': displayName,
+            'displayName': ?displayName,
           });
         }
       } else {
@@ -240,7 +240,7 @@ class FirestoreRankingRepository implements RankingRepository {
           await docRef.update({
             'value': value,
             'submittedAt': FieldValue.serverTimestamp(),
-            if (displayName != null) 'displayName': displayName,
+            'displayName': ?displayName,
           });
         }
       }

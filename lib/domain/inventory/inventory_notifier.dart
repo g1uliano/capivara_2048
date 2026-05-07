@@ -25,19 +25,23 @@ class InventoryNotifier extends Notifier<Inventory> {
     // our try-catch as an unhandled zone error. runZonedGuarded absorbs it.
     Box<Inventory>? box;
     await runZonedGuarded<Future<void>>(
-      () async { box = await Hive.openBox<Inventory>('inventory'); },
+      () async {
+        box = await Hive.openBox<Inventory>('inventory');
+      },
       (_, _) {}, // absorb orphaned Hive-internal Future rejections
     );
     if (box != null) {
       await _boxSub?.cancel();
-      _boxSub = box!.watch(key: 'data').listen(
-        (event) {
-          final updated = event.value as Inventory?;
-          if (updated != null) state = updated;
-        },
-        onError: (_) {},
-        cancelOnError: false,
-      );
+      _boxSub = box!
+          .watch(key: 'data')
+          .listen(
+            (event) {
+              final updated = event.value as Inventory?;
+              if (updated != null) state = updated;
+            },
+            onError: (_) {},
+            cancelOnError: false,
+          );
     }
   }
 

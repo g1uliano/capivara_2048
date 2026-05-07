@@ -288,10 +288,12 @@ class GameNotifier extends Notifier<GameState> {
           final inviteService = ref.read(inviteServiceProvider);
           final authProfile = ref.read(authControllerProvider);
           if (authProfile != null) {
-            unawaited(inviteService.completeInviteReward(
-              inviteeId: authProfile.userId,
-              inviteeDisplayName: authProfile.displayName,
-            ));
+            unawaited(
+              inviteService.completeInviteReward(
+                inviteeId: authProfile.userId,
+                inviteeDisplayName: authProfile.displayName,
+              ),
+            );
           }
         }
       } catch (_) {}
@@ -337,4 +339,6 @@ class GameNotifier extends Notifier<GameState> {
 
 final gameEngineProvider = Provider<GameEngine>((ref) => GameEngine());
 
-final gameProvider = NotifierProvider<GameNotifier, GameState>(GameNotifier.new);
+final gameProvider = NotifierProvider<GameNotifier, GameState>(
+  GameNotifier.new,
+);

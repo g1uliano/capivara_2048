@@ -22,6 +22,7 @@ final shareCodesRepositoryProvider = Provider<ShareCodesRepository>(
   (_) => ShareCodesRepository(),
 );
 
-final shareCodesProvider = NotifierProvider<ShareCodesNotifier, List<ShareCode>>(
-  ShareCodesNotifier.new,
-);
+final shareCodesProvider =
+    NotifierProvider<ShareCodesNotifier, List<ShareCode>>(
+      ShareCodesNotifier.new,
+    );

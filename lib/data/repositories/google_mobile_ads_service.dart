@@ -24,11 +24,11 @@ class GoogleMobileAdsService implements AdService {
       onAdDismissedFullScreenContent: (_) {
         if (!completer.isCompleted) completer.complete(false);
       },
-      onAdFailedToShowFullScreenContent: (_, __) {
+      onAdFailedToShowFullScreenContent: (_, _) {
         if (!completer.isCompleted) completer.complete(false);
       },
     );
-    ad.show(onUserEarnedReward: (_, __) {
+    ad.show(onUserEarnedReward: (_, _) {
       if (!completer.isCompleted) completer.complete(true);
     });
     return completer.future;

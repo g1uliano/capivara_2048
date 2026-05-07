@@ -48,15 +48,12 @@ void main() {
     // Use GameNotifier directly (no Hive) — no consume callback wired.
     final container2 = ProviderContainer(
       overrides: [
-        gameProvider.overrideWith((ref) {
-          final n = GameNotifier(ref.read(gameEngineProvider), ref);
-          n.setConsumeCallback((_) {});
-          return n;
-        }),
+        gameProvider.overrideWith(() => GameNotifier()),
       ],
     );
     addTearDown(container2.dispose);
     final notifier = container2.read(gameProvider.notifier);
+    notifier.setConsumeCallback((_) {}); // override after build() so Hive is not needed
     notifier.setAwaitingResolution(true);
     notifier.startContinueWithItem();
     notifier.enterBombMode(BombMode.bomb3, ItemType.bomb3);

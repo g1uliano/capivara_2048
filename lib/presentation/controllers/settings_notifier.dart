@@ -7,7 +7,8 @@ class SettingsState {
 
   const SettingsState({this.hapticEnabled = true, this.locale = 'pt'});
 
-  SettingsState copyWith({bool? hapticEnabled, String? locale}) => SettingsState(
+  SettingsState copyWith({bool? hapticEnabled, String? locale}) =>
+      SettingsState(
         hapticEnabled: hapticEnabled ?? this.hapticEnabled,
         locale: locale ?? this.locale,
       );

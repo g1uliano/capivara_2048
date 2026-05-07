@@ -52,10 +52,14 @@ class PersonalRecordsNotifier extends Notifier<PersonalRecords> {
 
   bool isFirstTime(int level) {
     switch (level) {
-      case 11: return state.timesReached2048 == 0;
-      case 12: return state.timesReached4096 == 0;
-      case 13: return state.timesReached8192 == 0;
-      default: return false;
+      case 11:
+        return state.timesReached2048 == 0;
+      case 12:
+        return state.timesReached4096 == 0;
+      case 13:
+        return state.timesReached8192 == 0;
+      default:
+        return false;
     }
   }
 
@@ -78,5 +82,5 @@ class PersonalRecordsNotifier extends Notifier<PersonalRecords> {
 
 final personalRecordsProvider =
     NotifierProvider<PersonalRecordsNotifier, PersonalRecords>(
-  PersonalRecordsNotifier.new,
-);
+      PersonalRecordsNotifier.new,
+    );
