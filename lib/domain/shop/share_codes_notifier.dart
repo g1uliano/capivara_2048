@@ -4,18 +4,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/share_code.dart';
 import '../../data/repositories/share_codes_repository.dart';
 
-class ShareCodesNotifier extends StateNotifier<List<ShareCode>> {
-  ShareCodesNotifier(this._repo) : super([]);
-
-  final ShareCodesRepository _repo;
+class ShareCodesNotifier extends Notifier<List<ShareCode>> {
+  @override
+  List<ShareCode> build() => [];
 
   Future<void> load() async {
-    state = await _repo.load();
+    state = await ref.read(shareCodesRepositoryProvider).load();
   }
 
   Future<void> add(ShareCode code) async {
     state = [...state, code];
-    await _repo.save(state);
+    await ref.read(shareCodesRepositoryProvider).save(state);
   }
 }
 
@@ -23,7 +22,6 @@ final shareCodesRepositoryProvider = Provider<ShareCodesRepository>(
   (_) => ShareCodesRepository(),
 );
 
-final shareCodesProvider =
-    StateNotifierProvider<ShareCodesNotifier, List<ShareCode>>(
-  (ref) => ShareCodesNotifier(ref.read(shareCodesRepositoryProvider)),
+final shareCodesProvider = NotifierProvider<ShareCodesNotifier, List<ShareCode>>(
+  ShareCodesNotifier.new,
 );
