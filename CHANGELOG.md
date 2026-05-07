@@ -3,9 +3,6 @@
 All notable changes to Capivara 2048 will be documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
-Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
-
-## [Unreleased]
 
 ## [1.5.0] - 2026-05-07
 ### Changed
