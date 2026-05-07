@@ -9,6 +9,7 @@ import '../controllers/invite_controller.dart';
 import '../widgets/auth_banner.dart';
 import '../widgets/game_background.dart';
 import '../widgets/outlined_text.dart';
+import '../../core/theme/text_styles.dart';
 
 class InviteFriendsScreen extends ConsumerWidget {
   const InviteFriendsScreen({super.key});
@@ -49,9 +50,8 @@ class InviteFriendsScreen extends ConsumerWidget {
                     const SizedBox(height: 8),
                     Text(
                       'Você e seu amigo recebem 2 vidas + 1× Bomba 2\nquando ele completar a primeira partida.',
-                      style: GoogleFonts.nunito(
-                        fontSize: 14,
-                        color: Colors.white70,
+                      style: outlinedWhiteTextStyle(
+                        GoogleFonts.nunito(fontSize: 14),
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -59,9 +59,8 @@ class InviteFriendsScreen extends ConsumerWidget {
                     if (profile == null)
                       Text(
                         'Faça login para convidar amigos.',
-                        style: GoogleFonts.nunito(
-                          fontSize: 15,
-                          color: Colors.white70,
+                        style: outlinedWhiteTextStyle(
+                          GoogleFonts.nunito(fontSize: 15),
                         ),
                       )
                     else
