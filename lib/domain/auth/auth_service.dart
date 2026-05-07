@@ -77,10 +77,10 @@ class FakeAuthService implements AuthService {
       );
 }
 
-// TODO(fase4b): Replace FakeAuthService with FirebaseAuthService for prd flavor.
-// See docs/plans/2026-05-05-fase4a-firebase-auth-sync.md Task 13.
 final authServiceProvider = Provider<AuthService>((ref) {
   const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
-  if (flavor == 'prd') return FirebaseAuthService();
+  if (flavor == 'prd' || flavor == 'dev' || flavor == 'tst') {
+    return FirebaseAuthService();
+  }
   return FakeAuthService();
 });

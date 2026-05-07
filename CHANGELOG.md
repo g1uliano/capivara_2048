@@ -4,6 +4,12 @@ All notable changes to Capivara 2048 will be documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.5.1] — 2026-05-07
+
+### Fixed
+
+- **Auth:** `authServiceProvider` retornava `FakeAuthService` para os flavors `dev` e `tst`, fazendo o login com Google simular uma conta teste em vez de abrir o seletor de contas real. Agora `FirebaseAuthService` é usado para `prd`, `dev` e `tst`; `FakeAuthService` permanece apenas em contextos sem flavor definido (testes unitários/widget)
+
 ## [1.5.0] - 2026-05-07
 ### Changed
 - Upgraded 47 packages to latest versions
