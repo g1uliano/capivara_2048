@@ -8,6 +8,7 @@ import '../../data/models/game_record.dart';
 import '../../data/models/pending_event.dart';
 import '../../data/models/personal_records.dart';
 import '../../data/models/inventory.dart';
+import '../../data/models/game_record_hive_adapter.dart';
 import '../../domain/sync/sync_engine.dart';
 import '../../domain/sync/sync_conflict_resolver.dart';
 
@@ -25,6 +26,7 @@ class FirebaseSyncEngine implements SyncEngine {
   StreamSubscription<List<ConnectivityResult>>? _connectivityListener;
   final _statusController = StreamController<SyncStatus>.broadcast();
   final _firestore = FirebaseFirestore.instance;
+  String? _remoteAvatarUrl;
 
   @override
   Stream<SyncStatus> get statusStream => _statusController.stream;
@@ -53,11 +55,19 @@ class FirebaseSyncEngine implements SyncEngine {
     try {
       final doc = await _firestore.collection('users').doc(_userId).get();
       if (doc.exists) {
+        final data = doc.data()!;
+        // Avatar (para contas e-mail com tile animal)
+        _remoteAvatarUrl = data['avatarUrl'] as String?;
         await _mergeRemotePersonalRecords(
-          doc.data()?['personalRecords'] as Map<String, dynamic>?,
+          data['personalRecords'] as Map<String, dynamic>?,
         );
         await _mergeRemoteInventory(
-          doc.data()?['inventory'] as Map<String, dynamic>?,
+          data['inventory'] as Map<String, dynamic>?,
+        );
+        await _mergeRemoteGameRecords(
+          (data['gameRecords'] as List<dynamic>?)
+              ?.map((e) => e as Map<String, dynamic>)
+              .toList(),
         );
       } else {
         await _writeLocalProfileToFirestore();
@@ -231,17 +241,64 @@ class FirebaseSyncEngine implements SyncEngine {
     );
   }
 
-  // TODO(task5): implement with full Firestore logic
   @override
-  String? get remoteAvatarUrl => null;
-
-  // TODO(task5): implement all three with Firestore
-  @override
-  Future<void> updateDisplayName(String name) async {}
+  String? get remoteAvatarUrl => _remoteAvatarUrl;
 
   @override
-  Future<void> deleteUserData() async {}
+  Future<void> updateDisplayName(String name) async {
+    if (_userId == null) return;
+    await _firestore.collection('users').doc(_userId).set(
+      {'displayName': name},
+      SetOptions(merge: true),
+    );
+  }
 
   @override
-  Future<void> syncGameRecord(GameRecord record) async {}
+  Future<void> deleteUserData() async {
+    if (_userId == null) return;
+    await _firestore.collection('users').doc(_userId).delete();
+  }
+
+  @override
+  Future<void> syncGameRecord(GameRecord record) async {
+    if (_userId == null) return;
+    final docRef = _firestore.collection('users').doc(_userId);
+    final doc = await docRef.get();
+    final existing = ((doc.data()?['gameRecords'] as List<dynamic>?) ?? [])
+        .map((e) => e as Map<String, dynamic>)
+        .toList();
+    existing.add(record.toJson());
+    existing.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
+    final top20 = existing.take(20).toList();
+    await docRef.set({'gameRecords': top20}, SetOptions(merge: true));
+  }
+
+  Future<void> _mergeRemoteGameRecords(
+      List<Map<String, dynamic>>? remoteData) async {
+    if (remoteData == null || remoteData.isEmpty) return;
+    if (!Hive.isAdapterRegistered(GameRecord.hiveTypeId)) {
+      Hive.registerAdapter(GameRecordHiveAdapter());
+    }
+    final box = await Hive.openBox<GameRecord>('game_records');
+    final local = box.values.toList();
+
+    final Map<String, GameRecord> byKey = {};
+    for (final r in local) {
+      byKey['\${r.playedAt.toIso8601String()}_\${r.score}'] = r;
+    }
+    for (final json in remoteData) {
+      try {
+        final r = GameRecord.fromJson(json);
+        byKey['\${r.playedAt.toIso8601String()}_\${r.score}'] = r;
+      } catch (_) {}
+    }
+    final merged = byKey.values.toList()
+      ..sort((a, b) => b.score.compareTo(a.score));
+    final top20 = merged.take(20).toList();
+
+    await box.clear();
+    for (final r in top20) {
+      await box.add(r);
+    }
+  }
 }
