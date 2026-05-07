@@ -11,6 +11,8 @@ import '../../data/models/player_profile.dart';
 import 'onboarding_auth_screen.dart';
 import 'invite_friends_screen.dart';
 import '../../domain/shop/iap_service.dart';
+import '../../domain/auth/auth_service.dart';
+import 'home_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -98,13 +100,23 @@ class _NotLoggedIn extends StatelessWidget {
   }
 }
 
-class _LoggedIn extends ConsumerWidget {
+class _LoggedIn extends ConsumerStatefulWidget {
   const _LoggedIn({required this.profile, required this.onSignOut});
   final PlayerProfile profile;
   final VoidCallback onSignOut;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_LoggedIn> createState() => _LoggedInState();
+}
+
+class _LoggedInState extends ConsumerState<_LoggedIn> {
+  bool _deletingAccount = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final profile = widget.profile;
+    final onSignOut = widget.onSignOut;
+
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
@@ -113,42 +125,57 @@ class _LoggedIn extends ConsumerWidget {
             clipBehavior: Clip.none,
             children: [
               AvatarWidget(radius: 40, profile: profile),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: GestureDetector(
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => AvatarPickerScreen(
-                        onDone: (ctx) => Navigator.of(ctx).pop(),
+              if (profile.provider == AuthProvider.email)
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: GestureDetector(
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => AvatarPickerScreen(
+                          onDone: (ctx) => Navigator.of(ctx).pop(),
+                        ),
+                      ),
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2E7D52),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 1.5),
+                      ),
+                      child: const Icon(
+                        Icons.edit,
+                        color: Colors.white,
+                        size: 14,
                       ),
                     ),
                   ),
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF2E7D52),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 1.5),
-                    ),
-                    child: const Icon(
-                      Icons.edit,
-                      color: Colors.white,
-                      size: 14,
-                    ),
-                  ),
                 ),
-              ),
             ],
           ),
         ),
         const SizedBox(height: 16),
         Center(
-          child: Text(
-            profile.displayName,
-            style: outlinedWhiteTextStyle(
-              GoogleFonts.fredoka(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                profile.displayName,
+                style: outlinedWhiteTextStyle(
+                  GoogleFonts.fredoka(
+                      fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+              ),
+              if (profile.provider == AuthProvider.email) ...[
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () => _editName(context, profile),
+                  child: const Icon(Icons.edit,
+                      color: Colors.white70, size: 18),
+                ),
+              ],
+            ],
           ),
         ),
         if (profile.email != null) ...[
@@ -173,6 +200,17 @@ class _LoggedIn extends ConsumerWidget {
             MaterialPageRoute(builder: (_) => const InviteFriendsScreen()),
           ),
         ),
+        if (profile.provider == AuthProvider.email) ...[
+          const SizedBox(height: 8),
+          ListTile(
+            leading: const Icon(Icons.lock_reset, color: Colors.white),
+            title: Text(
+              'Trocar senha',
+              style: outlinedWhiteTextStyle(GoogleFonts.fredoka()),
+            ),
+            onTap: () => _sendPasswordReset(context, profile),
+          ),
+        ],
         const SizedBox(height: 8),
         ListTile(
           leading: const Icon(Icons.restore, color: Colors.white),
@@ -200,6 +238,238 @@ class _LoggedIn extends ConsumerWidget {
             ).copyWith(color: Colors.redAccent),
           ),
           onTap: onSignOut,
+        ),
+        const SizedBox(height: 16),
+        const Divider(color: Colors.redAccent),
+        ListTile(
+          leading: const Icon(Icons.delete_forever, color: Colors.red),
+          title: Text(
+            'Excluir conta',
+            style: outlinedWhiteTextStyle(GoogleFonts.fredoka())
+                .copyWith(color: Colors.red),
+          ),
+          onTap: _deletingAccount
+              ? null
+              : () => _confirmDeleteAccount(context, profile),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _editName(BuildContext context, PlayerProfile profile) async {
+    final ctrl = TextEditingController(text: profile.displayName);
+    final result = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Editar nome',
+            style: GoogleFonts.fredoka(
+                fontSize: 20, color: const Color(0xFF3E2723))),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          maxLength: 30,
+          decoration: const InputDecoration(labelText: 'Nome'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final v = ctrl.text.trim();
+              if (v.length >= 2) Navigator.pop(ctx, v);
+            },
+            child: const Text('Salvar'),
+          ),
+        ],
+      ),
+    );
+    if (result != null && context.mounted) {
+      await ref
+          .read(authControllerProvider.notifier)
+          .updateDisplayName(result);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Nome atualizado!')),
+        );
+      }
+    }
+  }
+
+  Future<void> _sendPasswordReset(
+      BuildContext context, PlayerProfile profile) async {
+    if (profile.email == null) return;
+    try {
+      await ref
+          .read(authServiceProvider)
+          .sendPasswordReset(profile.email!);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'E-mail de redefinição enviado para ${profile.email}'),
+          ),
+        );
+      }
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Erro ao enviar e-mail. Tente novamente.')),
+        );
+      }
+    }
+  }
+
+  Future<void> _confirmDeleteAccount(
+      BuildContext context, PlayerProfile profile) async {
+    // Dialog 1: general warning
+    final proceed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Excluir conta?',
+            style: GoogleFonts.fredoka(
+                fontSize: 20, color: const Color(0xFF3E2723))),
+        content: Text(
+          'Todos os seus dados serão apagados permanentemente: '
+          'progresso, inventário, histórico e ranking.',
+          style: GoogleFonts.nunito(fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Continuar →',
+                style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+    if (proceed != true || !context.mounted) return;
+
+    // Dialog 2: type EXCLUIR + password for email accounts
+    String? senha;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => _ConfirmDeleteDialog(
+        isEmail: profile.provider == AuthProvider.email,
+        onConfirm: (s) {
+          senha = s;
+          Navigator.pop(ctx, true);
+        },
+        onCancel: () => Navigator.pop(ctx, false),
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    setState(() => _deletingAccount = true);
+    try {
+      await ref
+          .read(authControllerProvider.notifier)
+          .deleteAccount(senha: senha);
+      if (context.mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          (_) => false,
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao excluir conta: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _deletingAccount = false);
+    }
+  }
+}
+
+class _ConfirmDeleteDialog extends StatefulWidget {
+  const _ConfirmDeleteDialog({
+    required this.isEmail,
+    required this.onConfirm,
+    required this.onCancel,
+  });
+  final bool isEmail;
+  final void Function(String? senha) onConfirm;
+  final VoidCallback onCancel;
+
+  @override
+  State<_ConfirmDeleteDialog> createState() => _ConfirmDeleteDialogState();
+}
+
+class _ConfirmDeleteDialogState extends State<_ConfirmDeleteDialog> {
+  final _confirmCtrl = TextEditingController();
+  final _senhaCtrl = TextEditingController();
+  bool _canDelete = false;
+  bool _showSenha = false;
+
+  @override
+  void dispose() {
+    _confirmCtrl.dispose();
+    _senhaCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Confirmar exclusão',
+          style: GoogleFonts.fredoka(
+              fontSize: 20, color: const Color(0xFF3E2723))),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Digite EXCLUIR para confirmar:',
+              style: GoogleFonts.nunito(fontSize: 14)),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _confirmCtrl,
+            decoration: const InputDecoration(labelText: 'EXCLUIR'),
+            onChanged: (v) =>
+                setState(() => _canDelete = v == 'EXCLUIR'),
+          ),
+          if (widget.isEmail) ...[
+            const SizedBox(height: 16),
+            Text('Confirme sua senha:',
+                style: GoogleFonts.nunito(fontSize: 14)),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _senhaCtrl,
+              obscureText: !_showSenha,
+              decoration: InputDecoration(
+                labelText: 'Senha atual',
+                suffixIcon: IconButton(
+                  icon: Icon(
+                      _showSenha ? Icons.visibility_off : Icons.visibility),
+                  onPressed: () =>
+                      setState(() => _showSenha = !_showSenha),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: widget.onCancel,
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+          onPressed: _canDelete
+              ? () => widget.onConfirm(
+                  widget.isEmail ? _senhaCtrl.text : null)
+              : null,
+          child: const Text('Excluir conta',
+              style: TextStyle(color: Colors.white)),
         ),
       ],
     );
