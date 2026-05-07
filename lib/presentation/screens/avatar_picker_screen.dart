@@ -88,30 +88,23 @@ class _AvatarPickerScreenState extends ConsumerState<AvatarPickerScreen> {
                     final isSelected = _selected == animal;
                     return GestureDetector(
                       onTap: () => setState(() => _selected = animal),
-                      child: AnimatedContainer(
+                      child: AnimatedScale(
+                        scale: isSelected ? 1.12 : 1.0,
                         duration: const Duration(milliseconds: 150),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: isSelected
-                                ? Colors.white
-                                : Colors.transparent,
-                            width: 3,
-                          ),
-                          boxShadow: isSelected
-                              ? [
-                                  BoxShadow(
-                                    color: Colors.white.withValues(alpha: 0.4),
-                                    blurRadius: 8,
-                                  ),
-                                ]
-                              : [],
-                        ),
-                        child: ClipOval(
-                          child: Image.asset(
-                            kAnimalTileAssets[animal]!,
-                            fit: BoxFit.cover,
-                          ),
+                        child: Stack(
+                          children: [
+                            Transform.scale(
+                              scale: 1.06,
+                              child: ColorFiltered(
+                                colorFilter: const ColorFilter.mode(
+                                  Colors.white,
+                                  BlendMode.srcIn,
+                                ),
+                                child: Image.asset(kAnimalTileAssets[animal]!),
+                              ),
+                            ),
+                            Image.asset(kAnimalTileAssets[animal]!),
+                          ],
                         ),
                       ),
                     );
