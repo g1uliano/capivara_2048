@@ -87,6 +87,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
         await controller.createAccountWithEmail(
           _emailCtrl.text.trim(),
           _passCtrl.text,
+          '', // display name placeholder — Task 12 adds the name field
         );
         if (mounted) {
           Navigator.of(context).pushAndRemoveUntil(

@@ -42,10 +42,31 @@ class FirebaseAuthService implements AuthService {
 
   @override
   Future<PlayerProfile> createAccountWithEmail(
-      String email, String password) async {
+    String email,
+    String password,
+    String displayName,
+  ) async {
     final result = await _auth.createUserWithEmailAndPassword(
         email: email, password: password);
+    await result.user?.updateDisplayName(displayName);
     return _toProfile(result.user)!;
+  }
+
+  @override
+  Future<void> updateDisplayName(String name) async {
+    // Full implementation in Task 4
+    await _auth.currentUser?.updateDisplayName(name);
+  }
+
+  @override
+  Future<void> sendPasswordReset(String email) async {
+    await _auth.sendPasswordResetEmail(email: email);
+  }
+
+  @override
+  Future<void> deleteAccount({String? senha}) async {
+    // Full implementation with re-auth in Task 4
+    await _auth.currentUser?.delete();
   }
 
   @override

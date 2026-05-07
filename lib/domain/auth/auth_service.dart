@@ -11,7 +11,15 @@ abstract class AuthService {
   Future<PlayerProfile> signInWithGoogle();
   Future<PlayerProfile> signInWithApple();
   Future<PlayerProfile> signInWithEmail(String email, String password);
-  Future<PlayerProfile> createAccountWithEmail(String email, String password);
+  Future<PlayerProfile> createAccountWithEmail(
+    String email,
+    String password,
+    String displayName,
+  );
+  Future<void> updateDisplayName(String name);
+  Future<void> sendPasswordReset(String email);
+  // senha: obrigatório para AuthProvider.email; ignorado para Google
+  Future<void> deleteAccount({String? senha});
   Future<void> signOut();
 }
 
@@ -52,10 +60,27 @@ class FakeAuthService implements AuthService {
   Future<PlayerProfile> createAccountWithEmail(
     String email,
     String password,
+    String displayName,
   ) async {
-    _profile = _fakeProfile(AuthProvider.email, email: email);
+    _profile = _fakeProfile(AuthProvider.email, email: email, name: displayName);
     _controller.add(_profile);
     return _profile!;
+  }
+
+  @override
+  Future<void> updateDisplayName(String name) async {
+    if (_profile == null) return;
+    _profile = _profile!.copyWith(displayName: name);
+    _controller.add(_profile);
+  }
+
+  @override
+  Future<void> sendPasswordReset(String email) async {}
+
+  @override
+  Future<void> deleteAccount({String? senha}) async {
+    _profile = null;
+    _controller.add(null);
   }
 
   @override
@@ -66,10 +91,14 @@ class FakeAuthService implements AuthService {
 
   void dispose() => _controller.close();
 
-  PlayerProfile _fakeProfile(AuthProvider provider, {String? email}) =>
+  PlayerProfile _fakeProfile(
+    AuthProvider provider, {
+    String? email,
+    String? name,
+  }) =>
       PlayerProfile(
         userId: 'fake-user-id',
-        displayName: 'Jogador Teste',
+        displayName: name ?? 'Jogador Teste',
         email: email,
         provider: provider,
         createdAt: DateTime(2025, 1, 1),

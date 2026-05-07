@@ -67,10 +67,14 @@ class AuthController extends Notifier<PlayerProfile?> {
     }
   }
 
-  Future<void> createAccountWithEmail(String email, String password) async {
+  Future<void> createAccountWithEmail(
+    String email,
+    String password,
+    String displayName,
+  ) async {
     final profile = await ref
         .read(authServiceProvider)
-        .createAccountWithEmail(email, password);
+        .createAccountWithEmail(email, password, displayName);
     state = profile;
     // New account: no remote data to sync yet — only init the engine.
     await ref
