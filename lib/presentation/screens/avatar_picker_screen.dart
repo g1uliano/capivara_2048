@@ -88,10 +88,13 @@ class _AvatarPickerScreenState extends ConsumerState<AvatarPickerScreen> {
                     final isSelected = _selected == animal;
                     return GestureDetector(
                       onTap: () => setState(() => _selected = animal),
-                      child: AnimatedScale(
-                        scale: isSelected ? 1.12 : 1.0,
+                      child: AnimatedOpacity(
+                        opacity: (_selected == null || isSelected) ? 1.0 : 0.35,
                         duration: const Duration(milliseconds: 150),
-                        child: Stack(
+                        child: AnimatedScale(
+                          scale: isSelected ? 1.12 : 1.0,
+                          duration: const Duration(milliseconds: 150),
+                          child: Stack(
                           children: [
                             Transform.scale(
                               scale: 1.06,
@@ -105,6 +108,7 @@ class _AvatarPickerScreenState extends ConsumerState<AvatarPickerScreen> {
                             ),
                             Image.asset(kAnimalTileAssets[animal]!),
                           ],
+                        ),
                         ),
                       ),
                     );
