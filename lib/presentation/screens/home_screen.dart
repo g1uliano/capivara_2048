@@ -21,6 +21,7 @@ import 'settings_screen.dart';
 import 'shop_screen.dart';
 import 'profile_screen.dart';
 import '../controllers/auth_controller.dart';
+import '../widgets/avatar_widget.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -102,17 +103,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 left: 0,
                 right: 0,
                 child: Center(
-                  child: IconButton(
-                    key: const Key('home_btn_perfil'),
-                    icon: Icon(
-                      playerProfile != null
-                          ? Icons.person
-                          : Icons.person_outline,
-                      color: Colors.white,
-                      size: 28,
+                  child: Tooltip(
+                    message: 'Perfil',
+                    child: GestureDetector(
+                      key: const Key('home_btn_perfil'),
+                      onTap: () => _nav(const ProfileScreen()),
+                      child: AvatarWidget(radius: 20, profile: playerProfile),
                     ),
-                    tooltip: 'Perfil',
-                    onPressed: () => _nav(const ProfileScreen()),
                   ),
                 ),
               ),

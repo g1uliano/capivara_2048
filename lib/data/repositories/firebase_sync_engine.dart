@@ -29,7 +29,6 @@ class FirebaseSyncEngine implements SyncEngine {
   Stream<SyncStatus> get statusStream => _statusController.stream;
 
   @override
-  @override
   Future<void> init(String userId, {String? displayName}) async {
     _userId = userId;
     if (displayName != null) this.displayName = displayName;
@@ -66,6 +65,14 @@ class FirebaseSyncEngine implements SyncEngine {
     } catch (_) {
       _statusController.add(SyncStatus.error);
     }
+  }
+
+  @override
+  Future<void> updateAvatar(String? avatarUrl) async {
+    if (_userId == null) return;
+    await _firestore.collection('users').doc(_userId).set({
+      'avatarUrl': avatarUrl,
+    }, SetOptions(merge: true));
   }
 
   @override

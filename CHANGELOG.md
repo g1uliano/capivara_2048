@@ -4,6 +4,20 @@ All notable changes to Capivara 2048 will be documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.5.2] — 2026-05-07
+
+### Added
+- **EmailAuthScreen:** tela dedicada de e-mail/senha com toggle Entrar/Criar Conta, validação inline (formato de e-mail, mínimo 8 caracteres + 1 número, confirmação de senha), mostrar/ocultar senha e mensagens de erro em português
+- **AvatarPickerScreen:** tela de seleção de avatar com grid dos 13 animais do jogo (tiles); acessível após cadastro e pela ProfileScreen
+- **AvatarWidget:** widget reutilizável de avatar com suporte a tile animal, URL HTTP (Google/Apple) e inicial do nome sobre fundo verde
+- **updateAvatar()** no SyncEngine e AuthController — persiste escolha de avatar no Firestore (otimista: atualiza local primeiro)
+- Avatar com círculo verde de destaque na Home (topo centro)
+- Botão de editar avatar (ícone lápis) na ProfileScreen
+
+### Fixed
+- Logo na tela de login (`OnboardingAuthScreen`) agora usa `HomeConstants.titleHeight(scale)` — mesmo tamanho responsivo da Home
+- Textos sobre o fundo em `InviteFriendsScreen` agora usam `outlinedWhiteTextStyle` (legíveis)
+
 ## [1.5.1] — 2026-05-07
 
 ### Fixed
@@ -11,7 +25,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - **Auth:** `authServiceProvider` retornava `FakeAuthService` para os flavors `dev` e `tst`, fazendo o login com Google simular uma conta teste em vez de abrir o seletor de contas real. Agora `FirebaseAuthService` é usado para `prd`, `dev` e `tst`; `FakeAuthService` permanece apenas em contextos sem flavor definido (testes unitários/widget)
 
 ## [1.5.0] - 2026-05-07
+
 ### Changed
+
 - Upgraded 47 packages to latest versions
 - Bumped Firebase suite: firebase_core v4, firebase_auth v6, cloud_firestore v6
 - Bumped Android Gradle Plugin to 8.12.1, google-services plugin to 4.4.2
@@ -19,7 +35,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Rewrote Google Sign-In flow for google_sign_in 7.x (singleton + authenticate() API)
 - Migrated Share.share() → SharePlus.instance.share() (share_plus 13)
 - Bumped google_mobile_ads to 8.0.0, google_fonts 8.1, plus plugins to latest
-- Fixed LivesNotifier._ready to complete after Hive box subscription (eliminates race in tests)
+- Fixed LivesNotifier.\_ready to complete after Hive box subscription (eliminates race in tests)
 - Updated all test overrides from StateNotifier pattern to Riverpod 3 Notifier pattern
 - Updated google_fonts font-cache seed hashes for google_fonts 8.1.0 in test config
 
