@@ -20,6 +20,7 @@ import 'ranking_screen.dart';
 import 'settings_screen.dart';
 import 'shop_screen.dart';
 import 'profile_screen.dart';
+import 'onboarding_auth_screen.dart';
 import '../controllers/auth_controller.dart';
 import '../widgets/avatar_widget.dart';
 
@@ -64,6 +65,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   void _nav(Widget screen) {
     maybeHaptic(ref);
+    Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
+  }
+
+  void _navGuarded(Widget screen) {
+    maybeHaptic(ref);
+    final isLoggedIn = ref.read(authControllerProvider) != null;
+    if (!isLoggedIn) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const OnboardingAuthScreen(showSkip: false),
+        ),
+      );
+      return;
+    }
     Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
   }
 
@@ -166,7 +182,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   path: 'assets/images/home/Recompensas.png',
                   size: HomeConstants.buttonSize(scale),
                   showBadge: rewardAvailable,
-                  onTap: () => _nav(const DailyRewardsScreen()),
+                  onTap: () => _navGuarded(const DailyRewardsScreen()),
                   semanticLabel: 'Recompensas Diárias',
                 ),
               ),
@@ -192,7 +208,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   key: const Key('home_btn_loja'),
                   path: 'assets/images/home/IconeLoja.png',
                   size: HomeConstants.buttonSize(scale),
-                  onTap: () => _nav(const ShopScreen()),
+                  onTap: () => _navGuarded(const ShopScreen()),
                   semanticLabel: 'Loja',
                 ),
               ),
