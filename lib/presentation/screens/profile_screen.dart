@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/theme/text_styles.dart';
 import '../controllers/auth_controller.dart';
+import '../widgets/avatar_widget.dart';
+import 'avatar_picker_screen.dart';
 import '../widgets/game_background.dart';
 import '../../data/models/player_profile.dart';
 import 'onboarding_auth_screen.dart';
@@ -105,15 +107,33 @@ class _LoggedIn extends ConsumerWidget {
       padding: const EdgeInsets.all(24),
       children: [
         Center(
-          child: CircleAvatar(
-            radius: 40,
-            backgroundColor: AppColors.primary,
-            backgroundImage: profile.avatarUrl != null
-                ? NetworkImage(profile.avatarUrl!)
-                : null,
-            child: profile.avatarUrl == null
-                ? const Icon(Icons.person, size: 40, color: Colors.white)
-                : null,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              AvatarWidget(radius: 40, profile: profile),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => AvatarPickerScreen(
+                        onDone: () => Navigator.of(context).pop(),
+                      ),
+                    ),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2E7D52),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 1.5),
+                    ),
+                    child: const Icon(Icons.edit, color: Colors.white, size: 14),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 16),
