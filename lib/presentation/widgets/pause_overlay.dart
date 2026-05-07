@@ -150,7 +150,7 @@ class _OverlayButton extends StatelessWidget {
         onPressed: onPressed,
         child: OutlinedText(
           text: label,
-          style: GoogleFonts.nunito(
+          style: GoogleFonts.fredoka(
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),

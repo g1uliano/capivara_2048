@@ -19,12 +19,12 @@ class ScorePanel extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text('Pontuação: $score',
-              style: GoogleFonts.nunito(
+              style: GoogleFonts.fredoka(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.white)),
           Text('Recorde: $highScore',
-              style: GoogleFonts.nunito(fontSize: 14, color: Colors.white70)),
+              style: GoogleFonts.fredoka(fontSize: 14, color: Colors.white70)),
         ],
       ),
     );

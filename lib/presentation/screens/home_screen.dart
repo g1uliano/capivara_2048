@@ -419,7 +419,7 @@ class _ActionButtonState extends State<_ActionButton> {
           alignment: Alignment.center,
           child: OutlinedText(
             text: widget.label,
-            style: GoogleFonts.nunito(
+            style: GoogleFonts.fredoka(
               fontSize: HomeConstants.actionButtonFontSize(widget.scale),
               fontWeight: FontWeight.bold,
             ),

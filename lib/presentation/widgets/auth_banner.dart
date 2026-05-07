@@ -24,7 +24,7 @@ class AuthBanner extends ConsumerWidget {
           Expanded(
             child: Text(
               'Faça login para salvar seu progresso e acessar o ranking.',
-              style: GoogleFonts.nunito(color: Colors.white, fontSize: 12),
+              style: GoogleFonts.fredoka(color: Colors.white, fontSize: 12),
             ),
           ),
           TextButton(

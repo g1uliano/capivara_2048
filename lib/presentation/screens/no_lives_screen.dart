@@ -93,7 +93,7 @@ class _NoLivesScreenState extends ConsumerState<NoLivesScreen> {
                     final ss = (secs % 60).toString().padLeft(2, '0');
                     return Text(
                       'Próxima vida em $mm:$ss',
-                      style: GoogleFonts.nunito(fontSize: 18, color: Colors.white70),
+                      style: GoogleFonts.fredoka(fontSize: 18, color: Colors.white70),
                     );
                   },
                 ),
@@ -103,7 +103,7 @@ class _NoLivesScreenState extends ConsumerState<NoLivesScreen> {
                   icon: const Icon(Icons.play_circle_outline),
                   label: Text(
                     canWatch ? 'Assistir anúncio (+1 vida)' : 'Limite diário atingido',
-                    style: GoogleFonts.nunito(fontWeight: FontWeight.bold),
+                    style: GoogleFonts.fredoka(fontWeight: FontWeight.bold),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -111,7 +111,7 @@ class _NoLivesScreenState extends ConsumerState<NoLivesScreen> {
                   onPressed: () => Navigator.pop(context),
                   child: Text(
                     widget.midGame ? 'Voltar ao jogo' : 'Voltar ao menu',
-                    style: GoogleFonts.nunito(color: Colors.white70),
+                    style: GoogleFonts.fredoka(color: Colors.white70),
                   ),
                 ),
               ],

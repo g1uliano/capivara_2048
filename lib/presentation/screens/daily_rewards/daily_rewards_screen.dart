@@ -183,7 +183,7 @@ class _StreakBrokenBanner extends StatelessWidget {
           Expanded(
             child: Text(
               'Você perdeu a streak! Recomeçando do Dia 1.',
-              style: GoogleFonts.nunito(color: Colors.white, fontWeight: FontWeight.bold),
+              style: GoogleFonts.fredoka(color: Colors.white, fontWeight: FontWeight.bold),
             ),
           ),
         ],

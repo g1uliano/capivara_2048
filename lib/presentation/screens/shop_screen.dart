@@ -55,14 +55,13 @@ class ShopScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 24),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 0),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 0),
               child: OutlinedText(
                 text: 'Itens avulsos',
-                style: TextStyle(
+                style: GoogleFonts.fredoka(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'Fredoka',
                 ),
                 textAlign: TextAlign.left,
               ),

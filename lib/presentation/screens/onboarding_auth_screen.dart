@@ -72,7 +72,7 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
                   'Salve seu progresso e dispute o ranking global.',
                   textAlign: TextAlign.center,
                   style: outlinedWhiteTextStyle(
-                    GoogleFonts.nunito(fontSize: 15),
+                    GoogleFonts.fredoka(fontSize: 17),
                   ),
                 ),
                 const SizedBox(height: 48),
@@ -111,7 +111,9 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
                     child: Text(
                       'Jogar sem conta →',
                       style: outlinedWhiteTextStyle(
-                        GoogleFonts.nunito(
+                        GoogleFonts.fredoka(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
                           decoration: TextDecoration.underline,
                           decorationColor: Colors.white,
                         ),

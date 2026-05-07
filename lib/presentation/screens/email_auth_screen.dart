@@ -156,8 +156,15 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                   // Toggle Entrar / Criar Conta
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
+                      color: Colors.white.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.15),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: Row(
                       children: [
@@ -191,7 +198,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                     suffix: IconButton(
                       icon: Icon(
                         _showPass ? Icons.visibility_off : Icons.visibility,
-                        color: Colors.white70,
+                        color: Colors.black54,
                       ),
                       onPressed: () => setState(() => _showPass = !_showPass),
                     ),
@@ -208,7 +215,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                           _showConfirm
                               ? Icons.visibility_off
                               : Icons.visibility,
-                          color: Colors.white70,
+                          color: Colors.black54,
                         ),
                         onPressed: () =>
                             setState(() => _showConfirm = !_showConfirm),
@@ -241,7 +248,9 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                     onPressed: () => Navigator.of(context).pop(),
                     child: Text(
                       '← Voltar',
-                      style: outlinedWhiteTextStyle(GoogleFonts.nunito()),
+                      style: outlinedWhiteTextStyle(
+                        GoogleFonts.fredoka(fontSize: 16),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -282,7 +291,7 @@ class _ToggleTab extends StatelessWidget {
             label,
             style: GoogleFonts.fredoka(
               fontSize: 16,
-              color: selected ? AppColors.primary : Colors.white,
+              color: selected ? AppColors.primary : Colors.black54,
               fontWeight: selected ? FontWeight.bold : FontWeight.normal,
             ),
           ),
@@ -319,30 +328,33 @@ class _AuthField extends StatelessWidget {
       autofillHints: autofillHints,
       obscureText: obscureText,
       validator: validator,
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.black87, fontSize: 16),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.white70),
+        labelStyle: const TextStyle(color: Colors.black54, fontSize: 15),
         suffixIcon: suffix,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.white54),
+          borderSide: const BorderSide(color: Colors.black26),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.white),
+          borderSide: const BorderSide(color: AppColors.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
+          borderSide: const BorderSide(color: Color(0xFFD32F2F)),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
+          borderSide: const BorderSide(color: Color(0xFFD32F2F), width: 2),
         ),
-        errorStyle: const TextStyle(color: Color(0xFFFF6B6B)),
+        errorStyle: const TextStyle(
+          color: Color(0xFFD32F2F),
+          fontWeight: FontWeight.w600,
+        ),
         filled: true,
-        fillColor: Colors.white.withValues(alpha: 0.1),
+        fillColor: Colors.white.withValues(alpha: 0.92),
       ),
     );
   }

@@ -80,7 +80,7 @@ class _DailyRewardOverlayState extends ConsumerState<DailyRewardOverlay> {
                 onPressed: widget.onDismiss,
                 child: Text(
                   'Não, obrigado',
-                  style: GoogleFonts.nunito(color: Colors.white70, fontSize: 15),
+                  style: GoogleFonts.fredoka(color: Colors.white70, fontSize: 15),
                 ),
               ),
             ],

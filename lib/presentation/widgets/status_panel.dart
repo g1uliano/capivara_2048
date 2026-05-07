@@ -42,7 +42,7 @@ class StatusPanel extends ConsumerWidget {
         Text(
           'Recorde: $highScore',
           style: outlinedWhiteTextStyle(
-            GoogleFonts.nunito(fontSize: 13),
+            GoogleFonts.fredoka(fontSize: 13),
           ),
         ),
       ],

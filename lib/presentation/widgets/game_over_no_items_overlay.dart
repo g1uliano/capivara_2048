@@ -179,7 +179,7 @@ class _GameOverNoItemsOverlayState extends ConsumerState<GameOverNoItemsOverlay>
                 const SizedBox(height: 8),
                 OutlinedText(
                   text: 'Mas você pode conseguir um agora:',
-                  style: const TextStyle(fontSize: 16, fontFamily: 'Nunito'),
+                  style: const TextStyle(fontSize: 16, fontFamily: 'Fredoka'),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),

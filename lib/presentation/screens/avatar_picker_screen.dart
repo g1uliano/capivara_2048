@@ -65,7 +65,12 @@ class _AvatarPickerScreenState extends ConsumerState<AvatarPickerScreen> {
               const SizedBox(height: 16),
               Text(
                 'Qual animal vai te representar?',
-                style: outlinedWhiteTextStyle(GoogleFonts.nunito(fontSize: 15)),
+                style: outlinedWhiteTextStyle(
+                  GoogleFonts.fredoka(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
               Expanded(
@@ -149,7 +154,7 @@ class _AvatarPickerScreenState extends ConsumerState<AvatarPickerScreen> {
                       child: Text(
                         'Pular por agora',
                         style: outlinedWhiteTextStyle(
-                          GoogleFonts.nunito(
+                          GoogleFonts.fredoka(
                             decoration: TextDecoration.underline,
                             decorationColor: Colors.white,
                           ),

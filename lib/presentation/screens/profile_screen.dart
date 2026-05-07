@@ -75,7 +75,9 @@ class _NotLoggedIn extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'Você não está conectado.',
-              style: outlinedWhiteTextStyle(GoogleFonts.nunito(fontSize: 16)),
+              style: outlinedWhiteTextStyle(
+                GoogleFonts.fredoka(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
             ),
             const SizedBox(height: 24),
             ElevatedButton(
@@ -154,7 +156,7 @@ class _LoggedIn extends ConsumerWidget {
           Center(
             child: Text(
               profile.email!,
-              style: outlinedWhiteTextStyle(GoogleFonts.nunito(fontSize: 14)),
+              style: outlinedWhiteTextStyle(GoogleFonts.fredoka(fontSize: 14)),
             ),
           ),
         ],
@@ -165,7 +167,7 @@ class _LoggedIn extends ConsumerWidget {
           leading: const Icon(Icons.person_add, color: Colors.white),
           title: Text(
             'Convidar Amigos',
-            style: outlinedWhiteTextStyle(GoogleFonts.nunito()),
+            style: outlinedWhiteTextStyle(GoogleFonts.fredoka()),
           ),
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const InviteFriendsScreen()),
@@ -176,7 +178,7 @@ class _LoggedIn extends ConsumerWidget {
           leading: const Icon(Icons.restore, color: Colors.white),
           title: Text(
             'Restaurar compras',
-            style: outlinedWhiteTextStyle(GoogleFonts.nunito()),
+            style: outlinedWhiteTextStyle(GoogleFonts.fredoka()),
           ),
           onTap: () async {
             final iapService = ref.read(iapServiceProvider);
@@ -194,7 +196,7 @@ class _LoggedIn extends ConsumerWidget {
           title: Text(
             'Sair',
             style: outlinedWhiteTextStyle(
-              GoogleFonts.nunito(),
+              GoogleFonts.fredoka(),
             ).copyWith(color: Colors.redAccent),
           ),
           onTap: onSignOut,

@@ -20,28 +20,30 @@ class RankingScreen extends ConsumerWidget {
         child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            title: OutlinedText(
-              text: 'Ranking',
-              style: GoogleFonts.fredoka(fontSize: 22),
+            title: Text(
+              'Ranking',
+              style: GoogleFonts.fredoka(fontSize: 22, color: Colors.white),
             ),
             backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
             elevation: 0,
-            bottom: const TabBar(
+            bottom: TabBar(
+              labelStyle: GoogleFonts.fredoka(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+              unselectedLabelStyle: GoogleFonts.fredoka(fontSize: 14),
               labelColor: Colors.white,
               unselectedLabelColor: Colors.white70,
               indicatorColor: Colors.white,
-              tabs: [
+              tabs: const [
                 Tab(text: 'Pessoal'),
                 Tab(text: 'Lendas'),
               ],
             ),
           ),
           body: const TabBarView(
-            children: [
-              _PersonalRankingTab(),
-              _LegendsRankingTab(),
-            ],
+            children: [_PersonalRankingTab(), _LegendsRankingTab()],
           ),
         ),
       ),
@@ -69,6 +71,11 @@ class _PersonalRankingTab extends ConsumerWidget {
           ColoredBox(
             color: AppColors.primary,
             child: TabBar(
+              labelStyle: GoogleFonts.fredoka(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+              unselectedLabelStyle: GoogleFonts.fredoka(fontSize: 14),
               labelColor: Colors.white,
               unselectedLabelColor: Colors.white70,
               indicatorColor: Colors.white,
@@ -109,7 +116,7 @@ class _RecordList extends StatelessWidget {
       return Center(
         child: OutlinedText(
           text: 'Jogue sua primeira partida para aparecer aqui!',
-          style: GoogleFonts.nunito(fontSize: 14),
+          style: GoogleFonts.fredoka(fontSize: 14),
           textAlign: TextAlign.center,
         ),
       );
@@ -124,9 +131,15 @@ class _RecordList extends StatelessWidget {
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: AppColors.primary,
-              child: Text('${i + 1}', style: const TextStyle(color: Colors.white)),
+              child: Text(
+                '${i + 1}',
+                style: const TextStyle(color: Colors.white),
+              ),
             ),
-            title: Text(valueLabel(r), style: GoogleFonts.fredoka(fontSize: 18)),
+            title: Text(
+              valueLabel(r),
+              style: GoogleFonts.fredoka(fontSize: 18),
+            ),
             trailing: Text(
               '${r.playedAt.day}/${r.playedAt.month}',
               style: GoogleFonts.nunito(fontSize: 12, color: Colors.grey),
@@ -150,7 +163,8 @@ class _LegendsRankingTab extends ConsumerWidget {
           type: RankingType.legends4096Time,
           animal: animalForLevel(12),
           title: 'Lendas 4096',
-          emptyMessage: 'Chegue ao nível 12 para entrar no ranking de Lendas 4096!',
+          emptyMessage:
+              'Chegue ao nível 12 para entrar no ranking de Lendas 4096!',
           formatValue: (v) {
             final s = v ~/ 1000;
             final m = s ~/ 60;
@@ -163,7 +177,8 @@ class _LegendsRankingTab extends ConsumerWidget {
           type: RankingType.legends8192Count,
           animal: animalForLevel(13),
           title: 'Lendas 8192',
-          emptyMessage: 'Chegue ao nível 13 para entrar no ranking de Lendas 8192!',
+          emptyMessage:
+              'Chegue ao nível 13 para entrar no ranking de Lendas 8192!',
           formatValue: (v) => '$v ${v == 1 ? 'vez' : 'vezes'}',
         ),
       ],
@@ -201,9 +216,13 @@ class _LegendsCard extends ConsumerWidget {
               children: [
                 Image.asset(animal.tilePngPath, height: 40),
                 const SizedBox(width: 8),
-                OutlinedText(
-                  text: title,
-                  style: GoogleFonts.fredoka(fontSize: 18, fontWeight: FontWeight.bold),
+                Text(
+                  title,
+                  style: GoogleFonts.fredoka(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF3E2723),
+                  ),
                 ),
               ],
             ),
@@ -222,11 +241,18 @@ class _LegendsCard extends ConsumerWidget {
                 }
                 final entries = snapshot.data ?? [];
                 if (entries.isEmpty) {
-                  return Text(emptyMessage, style: GoogleFonts.nunito(fontSize: 13));
+                  return Text(
+                    emptyMessage,
+                    style: GoogleFonts.nunito(fontSize: 13),
+                  );
                 }
                 return Column(
                   children: [
-                    ...entries.take(3).map((e) => _EntryRow(entry: e, formatValue: formatValue)),
+                    ...entries
+                        .take(3)
+                        .map(
+                          (e) => _EntryRow(entry: e, formatValue: formatValue),
+                        ),
                     FutureBuilder<RankingEntry?>(
                       future: repo.getPlayerEntry(type),
                       builder: (context, snap) {
@@ -234,14 +260,22 @@ class _LegendsCard extends ConsumerWidget {
                         if (player == null) {
                           return Padding(
                             padding: const EdgeInsets.only(top: 8),
-                            child: Text(emptyMessage,
-                                style: GoogleFonts.nunito(fontSize: 12, color: Colors.grey)),
+                            child: Text(
+                              emptyMessage,
+                              style: GoogleFonts.nunito(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
                           );
                         }
                         if (player.rank <= 3) return const SizedBox.shrink();
                         return Padding(
                           padding: const EdgeInsets.only(top: 8),
-                          child: _EntryRow(entry: player, formatValue: formatValue),
+                          child: _EntryRow(
+                            entry: player,
+                            formatValue: formatValue,
+                          ),
                         );
                       },
                     ),
@@ -261,7 +295,12 @@ class _EntryRow extends StatelessWidget {
   final String Function(int) formatValue;
   const _EntryRow({required this.entry, required this.formatValue});
 
-  String _medal(int rank) => switch (rank) { 1 => '🥇', 2 => '🥈', 3 => '🥉', _ => '#${entry.rank}' };
+  String _medal(int rank) => switch (rank) {
+    1 => '🥇',
+    2 => '🥈',
+    3 => '🥉',
+    _ => '#${entry.rank}',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -277,10 +316,21 @@ class _EntryRow extends StatelessWidget {
         children: [
           SizedBox(
             width: 40,
-            child: Text(_medal(entry.rank), style: const TextStyle(fontSize: 16)),
+            child: Text(
+              _medal(entry.rank),
+              style: const TextStyle(fontSize: 16),
+            ),
           ),
-          Expanded(child: Text(entry.playerName, style: GoogleFonts.nunito(fontSize: 14))),
-          Text(formatValue(entry.value), style: GoogleFonts.fredoka(fontSize: 14)),
+          Expanded(
+            child: Text(
+              entry.playerName,
+              style: GoogleFonts.nunito(fontSize: 14),
+            ),
+          ),
+          Text(
+            formatValue(entry.value),
+            style: GoogleFonts.fredoka(fontSize: 14),
+          ),
         ],
       ),
     );

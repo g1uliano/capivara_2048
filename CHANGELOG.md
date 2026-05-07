@@ -4,6 +4,14 @@ All notable changes to Capivara 2048 will be documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.5.3] — 2026-05-07
+
+### Fixed
+- **Tipografia consistente (Fase 4.1.1):** todo texto exibido diretamente sobre fundos não-sólidos (fundo do jogo, dark overlay) migrado de `GoogleFonts.nunito()` para `GoogleFonts.fredoka()` em todas as telas e widgets:
+  - Telas: `ProfileScreen`, `OnboardingAuthScreen`, `EmailAuthScreen`, `InviteFriendsScreen`, `AvatarPickerScreen`, `RankingScreen`, `HomeScreen`, `ShopScreen`, `RedeemCodeScreen`, `NoLivesScreen`, `DailyRewardsScreen`
+  - Widgets: `ScorePanel`, `StatusPanel`, `PauseOverlay`, `AuthBanner`, `DailyRewardOverlay`, `GameOverNoItemsOverlay`
+- **CLAUDE.md / AGENTS.md:** atualizados com regras obrigatórias de tipografia (tabela de contextos, Fredoka no fundo, Nunito em cards/dialogs/sheets) e fase atual sincronizada
+
 ## [1.5.2] — 2026-05-07
 
 ### Added

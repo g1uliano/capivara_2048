@@ -23,9 +23,9 @@ class InviteFriendsScreen extends ConsumerWidget {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          title: OutlinedText(
-            text: 'Convidar Amigos',
-            style: GoogleFonts.fredoka(fontSize: 22),
+          title: Text(
+            'Convidar Amigos',
+            style: GoogleFonts.fredoka(fontSize: 22, color: Colors.white),
           ),
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
@@ -51,7 +51,7 @@ class InviteFriendsScreen extends ConsumerWidget {
                     Text(
                       'Você e seu amigo recebem 2 vidas + 1× Bomba 2\nquando ele completar a primeira partida.',
                       style: outlinedWhiteTextStyle(
-                        GoogleFonts.nunito(fontSize: 14),
+                        GoogleFonts.fredoka(fontSize: 14),
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -60,7 +60,7 @@ class InviteFriendsScreen extends ConsumerWidget {
                       Text(
                         'Faça login para convidar amigos.',
                         style: outlinedWhiteTextStyle(
-                          GoogleFonts.nunito(fontSize: 15),
+                          GoogleFonts.fredoka(fontSize: 15),
                         ),
                       )
                     else
@@ -77,7 +77,7 @@ class InviteFriendsScreen extends ConsumerWidget {
                         ),
                         error: (e, _) => Text(
                           'Erro: $e',
-                          style: GoogleFonts.nunito(color: Colors.redAccent),
+                          style: GoogleFonts.fredoka(color: Colors.redAccent),
                         ),
                       ),
                   ],
@@ -125,14 +125,14 @@ class _LinkCard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.15),
+            color: Colors.white.withValues(alpha: 0.9),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
             link,
             style: GoogleFonts.nunito(
               fontSize: 13,
-              color: Colors.white,
+              color: Colors.black87,
               letterSpacing: 0.5,
             ),
             textAlign: TextAlign.center,
@@ -152,7 +152,7 @@ class _LinkCard extends StatelessWidget {
                 icon: const Icon(Icons.copy, color: Colors.white),
                 label: Text(
                   'Copiar',
-                  style: GoogleFonts.nunito(color: Colors.white),
+                  style: GoogleFonts.fredoka(color: Colors.white),
                 ),
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Colors.white54),

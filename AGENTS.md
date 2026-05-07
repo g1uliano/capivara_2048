@@ -50,20 +50,61 @@ lib/
 - Models imutáveis com `copyWith`
 - IDs de tiles como UUID para controle de animações
 
-## Legibilidade de texto sobre o fundo
+## Legibilidade e tipografia — regras obrigatórias
 
 Todas as telas usam `GameBackground` com a imagem `fundo.png` (floresta amazônica colorida). **Texto branco puro sem sombra é ilegível sobre esse fundo.**
 
-Regra obrigatória ao criar telas ou adicionar textos:
+### Texto sobre o fundo do jogo
 
-- Sempre usar `outlinedWhiteTextStyle()` de `lib/core/theme/text_styles.dart` para textos sobre o fundo do jogo
-- Nunca usar `color: Colors.white` ou `color: Colors.white70` diretamente em `TextStyle` sem sombra
-- Referência: `OutlinedText` widget em `lib/presentation/widgets/outlined_text.dart`
-- Exceção: textos dentro de componentes com fundo sólido próprio (ex: `AppBar`, cards, dialogs, `ElevatedButton`)
+**Todo texto que aparece diretamente sobre o fundo do jogo DEVE usar `GoogleFonts.fredoka()` com o tratamento de outline.**
+
+| Contexto | Font | Tratamento | Exemplo |
+|---|---|---|---|
+| Título no AppBar | `fredoka(fontSize: 22, color: Colors.white)` | `Text(...)` simples | "Configurações", "Ranking" |
+| Headers/seções no fundo | `fredoka(fontSize: 14, fontWeight: w600)` | `OutlinedText(...)` | "Gameplay", "Áudio" |
+| Mensagens/corpo no fundo | `fredoka(fontSize: 14–18)` | `outlinedWhiteTextStyle(fredoka(...))` | "Você não está conectado.", "Salve seu progresso..." |
+| Botões de ação no fundo | `fredoka(fontSize: 16–18)` | `outlinedWhiteTextStyle(fredoka(...))` | "Jogar sem conta →", "← Voltar" |
+
+Regras:
+- **Usar `GoogleFonts.fredoka()`** para todo texto sobre o fundo — nunca `GoogleFonts.nunito()` em texto sobre o background
+- **Usar `outlinedWhiteTextStyle()`** de `lib/core/theme/text_styles.dart` ou o widget `OutlinedText` de `lib/presentation/widgets/outlined_text.dart`
+- Nunca usar `color: Colors.white` diretamente sem sombra/outline
+
+### Texto dentro de cards, dialogs e sheets (fundo branco/sólido)
+
+Dentro de `Card`, `AlertDialog`, `BottomSheet`, `ElevatedButton` (que têm fundo sólido):
+- Corpo/labels: `GoogleFonts.nunito(fontSize: 14–16, color: Colors.black87)`
+- Títulos de card: `GoogleFonts.fredoka(fontSize: 16–24, color: Color(0xFF3E2723))`
+- Texto secundário: `GoogleFonts.nunito(fontSize: 12–14, color: Colors.grey)`
+
+### AppBar
+
+Todas as AppBars usam o mesmo padrão — **nunca usar `OutlinedText` no AppBar**:
+```dart
+AppBar(
+  title: Text('Título', style: GoogleFonts.fredoka(fontSize: 22, color: Colors.white)),
+  backgroundColor: AppColors.primary,
+  foregroundColor: Colors.white,
+  elevation: 0,
+)
+```
+
+### TabBar
+
+Todos os `TabBar` devem ter `labelStyle` e `unselectedLabelStyle` explícitos:
+```dart
+TabBar(
+  labelStyle: GoogleFonts.fredoka(fontSize: 14, fontWeight: FontWeight.w600),
+  unselectedLabelStyle: GoogleFonts.fredoka(fontSize: 14),
+  labelColor: Colors.white,
+  unselectedLabelColor: Colors.white70,
+  indicatorColor: Colors.white,
+)
+```
 
 ## Fases do roadmap
 
-Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 4.1 completa (v1.5.2) — próximo: Fase 5 (Arte adicional e polimento visual)**. O áudio foi reposicionado para a **Fase 6** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
+Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 4.1.1 completa (v1.5.3) — próximo: Fase 5 (Arte adicional e polimento visual)**. O áudio foi reposicionado para a **Fase 6** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
 
 | Fase      | Foco                                                                                                        |
 | --------- | ----------------------------------------------------------------------------------------------------------- |
@@ -83,9 +124,10 @@ Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 4
 | 4C ✅     | Convites (deep links, Firestore) + Anúncios Reais (Google Mobile Ads) + IAP Real (in_app_purchase)          |
 | 4 gaps ✅ | registerInvite pós-login, ProfileScreen Convidar Amigos + Restaurar Compras real                            |
 | 4.1 ✅    | EmailAuthScreen, AvatarPickerScreen, AvatarWidget, updateAvatar(), destaque avatar na Home, fix legibilidade InviteFriendsScreen |
-| 4         | Arte adicional e polimento visual (logo, ícone, splash final)                                               |
-| 5         | Áudio (sound design dos 13 animais, SFX, música)                                                            |
-| 6         | Polimento, l10n, acessibilidade, lançamento                                                                 |
+| 4.1.1 ✅  | Tipografia consistente: Fredoka em todas as telas/widgets sobre fundos não-sólidos                          |
+| 5         | Arte adicional e polimento visual (logo, ícone, splash final)                                               |
+| 6         | Áudio (sound design dos 13 animais, SFX, música)                                                            |
+| 7         | Polimento, l10n, acessibilidade, lançamento                                                                 |
 
 ## Release checklist
 
