@@ -13,28 +13,35 @@ class SettingsState {
       );
 }
 
-class SettingsNotifier extends StateNotifier<SettingsState> {
-  SettingsNotifier(this._prefs) : super(_load(_prefs));
+/// Must be overridden in ProviderScope/ProviderContainer with the real instance.
+final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
+  throw UnimplementedError('sharedPreferencesProvider must be overridden');
+});
 
-  final SharedPreferences _prefs;
+class SettingsNotifier extends Notifier<SettingsState> {
+  static const _hapticKey = 'settings.haptic_enabled';
+  static const _localeKey = 'settings.locale';
 
-  static SettingsState _load(SharedPreferences p) => SettingsState(
-        hapticEnabled: p.getBool('settings.haptic_enabled') ?? true,
-        locale: p.getString('settings.locale') ?? 'pt',
-      );
+  @override
+  SettingsState build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return SettingsState(
+      hapticEnabled: prefs.getBool(_hapticKey) ?? true,
+      locale: prefs.getString(_localeKey) ?? 'pt',
+    );
+  }
 
   void setHaptic(bool value) {
-    _prefs.setBool('settings.haptic_enabled', value);
+    ref.read(sharedPreferencesProvider).setBool(_hapticKey, value);
     state = state.copyWith(hapticEnabled: value);
   }
 
   void setLocale(String locale) {
-    _prefs.setString('settings.locale', locale);
+    ref.read(sharedPreferencesProvider).setString(_localeKey, locale);
     state = state.copyWith(locale: locale);
   }
 }
 
-final settingsProvider =
-    StateNotifierProvider<SettingsNotifier, SettingsState>((ref) {
-  throw UnimplementedError('settingsProvider must be overridden with SharedPreferences');
-});
+final settingsProvider = NotifierProvider<SettingsNotifier, SettingsState>(
+  SettingsNotifier.new,
+);

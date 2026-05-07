@@ -84,7 +84,7 @@ void main() async {
   final sharedPrefs = await SharedPreferences.getInstance();
   final container = ProviderContainer(
     overrides: [
-      settingsProvider.overrideWith((ref) => SettingsNotifier(sharedPrefs)),
+      sharedPreferencesProvider.overrideWithValue(sharedPrefs),
       gameRecordRepositoryProvider.overrideWithValue(gameRecordRepo),
     ],
   );

@@ -62,7 +62,9 @@ class PersonalRecordsNotifier extends Notifier<PersonalRecords> {
   Future<void> markRewardCollected(int level) async {
     if (level == 12) {
       state = state.copyWith(rewardCollected4096: true);
-    } else if (level == 13) state = state.copyWith(rewardCollected8192: true);
+    } else if (level == 13) {
+      state = state.copyWith(rewardCollected8192: true);
+    }
     await _save();
   }
 
