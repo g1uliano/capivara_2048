@@ -16,9 +16,8 @@ import '../../domain/invites/invite_service.dart';
 import '../controllers/auth_controller.dart';
 import '../controllers/personal_records_notifier.dart';
 
-class GameNotifier extends StateNotifier<GameState> {
-  final GameEngine _engine;
-  final Ref _ref;
+class GameNotifier extends Notifier<GameState> {
+  late GameEngine _engine;
   Timer? _timer;
   bool _timerStarted = false;
   List<(int, int)> _bombSelection = [];
@@ -27,7 +26,15 @@ class GameNotifier extends StateNotifier<GameState> {
   void Function(ItemType)? _consumeItem;
   final Set<int> _reachedMilestones = {};
 
-  GameNotifier(this._engine, this._ref) : super(_engine.newGame());
+  @override
+  GameState build() {
+    _engine = ref.read(gameEngineProvider);
+    _consumeItem = (type) => ref.read(inventoryProvider.notifier).consume(type);
+    ref.onDispose(() {
+      _timer?.cancel();
+    });
+    return _engine.newGame();
+  }
 
   void _startTimer() {
     _timer?.cancel();
@@ -64,7 +71,7 @@ class GameNotifier extends StateNotifier<GameState> {
     // Atualizar nível mais alto já alcançado (persistido para coleção)
     if (state.maxLevel > before.maxLevel) {
       unawaited(
-        _ref
+        ref
             .read(personalRecordsProvider.notifier)
             .updateHighestLevel(state.maxLevel),
       );
@@ -94,7 +101,7 @@ class GameNotifier extends StateNotifier<GameState> {
         }
         state = updated;
         unawaited(
-          _ref
+          ref
               .read(personalRecordsProvider.notifier)
               .recordMilestone(milestone, DateTime.now()),
         );
@@ -249,7 +256,7 @@ class GameNotifier extends StateNotifier<GameState> {
 
   List<(int, int)> get bombSelection => List.unmodifiable(_bombSelection);
 
-  /// Wired up by the provider factory; not called in unit tests.
+  /// Wired up by build(); can be overridden in tests via setConsumeCallback.
   void setConsumeCallback(void Function(ItemType) callback) {
     _consumeItem = callback;
   }
@@ -272,14 +279,14 @@ class GameNotifier extends StateNotifier<GameState> {
         score: state.score,
         maxLevel: state.maxLevel,
       );
-      await _ref.read(gameRecordRepositoryProvider).add(record);
+      await ref.read(gameRecordRepositoryProvider).add(record);
 
       // Complete pending invite reward on first game
       try {
-        final allRecords = _ref.read(gameRecordRepositoryProvider).all;
+        final allRecords = ref.read(gameRecordRepositoryProvider).all;
         if (allRecords.length == 1) {
-          final inviteService = _ref.read(inviteServiceProvider);
-          final authProfile = _ref.read(authControllerProvider);
+          final inviteService = ref.read(inviteServiceProvider);
+          final authProfile = ref.read(authControllerProvider);
           if (authProfile != null) {
             unawaited(inviteService.completeInviteReward(
               inviteeId: authProfile.userId,
@@ -294,8 +301,8 @@ class GameNotifier extends StateNotifier<GameState> {
 
     // Submit to ranking (fire-and-forget, never block the game)
     try {
-      final rankingRepo = _ref.read(rankingRepositoryProvider);
-      final authProfile = _ref.read(authControllerProvider);
+      final rankingRepo = ref.read(rankingRepositoryProvider);
+      final authProfile = ref.read(authControllerProvider);
       final displayName = authProfile?.displayName;
 
       // Submit score always
@@ -326,20 +333,8 @@ class GameNotifier extends StateNotifier<GameState> {
 
   @visibleForTesting
   void setStateForTest(GameState s) => state = s;
-
-  @override
-  void dispose() {
-    _stopTimer();
-    super.dispose();
-  }
 }
 
 final gameEngineProvider = Provider<GameEngine>((ref) => GameEngine());
 
-final gameProvider = StateNotifierProvider<GameNotifier, GameState>((ref) {
-  final notifier = GameNotifier(ref.read(gameEngineProvider), ref);
-  notifier.setConsumeCallback(
-    (type) => ref.read(inventoryProvider.notifier).consume(type),
-  );
-  return notifier;
-});
+final gameProvider = NotifierProvider<GameNotifier, GameState>(GameNotifier.new);
