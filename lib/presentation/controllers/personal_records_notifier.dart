@@ -3,11 +3,12 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../../data/models/personal_records.dart';
 import '../../data/models/personal_records_hive_adapter.dart';
 
-class PersonalRecordsNotifier extends StateNotifier<PersonalRecords> {
+class PersonalRecordsNotifier extends Notifier<PersonalRecords> {
   static const _boxName = 'personal_records';
   static const _key = 'records';
 
-  PersonalRecordsNotifier() : super(const PersonalRecords());
+  @override
+  PersonalRecords build() => const PersonalRecords();
 
   Future<void> load() async {
     if (!Hive.isAdapterRegistered(PersonalRecords.hiveTypeId)) {
@@ -61,9 +62,7 @@ class PersonalRecordsNotifier extends StateNotifier<PersonalRecords> {
   Future<void> markRewardCollected(int level) async {
     if (level == 12) {
       state = state.copyWith(rewardCollected4096: true);
-    } else if (level == 13) {
-      state = state.copyWith(rewardCollected8192: true);
-    }
+    } else if (level == 13) state = state.copyWith(rewardCollected8192: true);
     await _save();
   }
 
@@ -76,6 +75,6 @@ class PersonalRecordsNotifier extends StateNotifier<PersonalRecords> {
 }
 
 final personalRecordsProvider =
-    StateNotifierProvider<PersonalRecordsNotifier, PersonalRecords>(
-  (ref) => PersonalRecordsNotifier(),
+    NotifierProvider<PersonalRecordsNotifier, PersonalRecords>(
+  PersonalRecordsNotifier.new,
 );
