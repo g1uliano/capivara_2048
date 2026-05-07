@@ -21,6 +21,8 @@ import 'package:capivara_2048/domain/lives/lives_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/game_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/personal_records_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/settings_notifier.dart';
+import 'package:capivara_2048/domain/auth/auth_service.dart';
+import 'package:capivara_2048/domain/sync/sync_engine.dart';
 
 /// Test harness that boots the full app inside [WidgetTester.pumpWidget]
 /// with an isolated Hive directory and mocked SharedPreferences.
@@ -52,6 +54,8 @@ class GameTestHarness {
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
         gameRecordRepositoryProvider.overrideWithValue(repo),
+        authServiceProvider.overrideWithValue(FakeAuthService()),
+        syncEngineProvider.overrideWithValue(FakeSyncEngine()),
       ],
     );
 
@@ -98,6 +102,8 @@ class GameTestHarness {
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
         gameRecordRepositoryProvider.overrideWithValue(repo),
+        authServiceProvider.overrideWithValue(FakeAuthService()),
+        syncEngineProvider.overrideWithValue(FakeSyncEngine()),
       ],
     );
 
