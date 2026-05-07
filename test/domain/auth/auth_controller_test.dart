@@ -70,7 +70,11 @@ void main() {
   test('createAccountWithEmail cria perfil e inicializa sync engine', () async {
     await container
         .read(authControllerProvider.notifier)
-        .createAccountWithEmail('novo@example.com', 'senha123', 'Jogador Teste');
+        .createAccountWithEmail(
+          'novo@example.com',
+          'senha123',
+          'Jogador Teste',
+        );
     final profile = container.read(authControllerProvider);
     expect(profile, isNotNull);
     expect(profile!.email, 'novo@example.com');

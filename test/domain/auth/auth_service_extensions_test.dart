@@ -9,7 +9,9 @@ void main() {
   group('FakeAuthService — novos métodos', () {
     test('createAccountWithEmail aceita displayName', () async {
       final profile = await sut.createAccountWithEmail(
-        'a@b.com', 'senha123', 'Jogador Teste',
+        'a@b.com',
+        'senha123',
+        'Jogador Teste',
       );
       expect(profile.displayName, 'Jogador Teste');
     });
@@ -21,10 +23,7 @@ void main() {
     });
 
     test('sendPasswordReset completa sem lançar', () async {
-      await expectLater(
-        sut.sendPasswordReset('a@b.com'),
-        completes,
-      );
+      await expectLater(sut.sendPasswordReset('a@b.com'), completes);
     });
 
     test('deleteAccount limpa o perfil', () async {

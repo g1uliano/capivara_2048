@@ -62,7 +62,11 @@ class FakeAuthService implements AuthService {
     String password,
     String displayName,
   ) async {
-    _profile = _fakeProfile(AuthProvider.email, email: email, name: displayName);
+    _profile = _fakeProfile(
+      AuthProvider.email,
+      email: email,
+      name: displayName,
+    );
     _controller.add(_profile);
     return _profile!;
   }
@@ -95,15 +99,14 @@ class FakeAuthService implements AuthService {
     AuthProvider provider, {
     String? email,
     String? name,
-  }) =>
-      PlayerProfile(
-        userId: 'fake-user-id',
-        displayName: name ?? 'Jogador Teste',
-        email: email,
-        provider: provider,
-        createdAt: DateTime(2025, 1, 1),
-        lastSeenAt: DateTime.now(),
-      );
+  }) => PlayerProfile(
+    userId: 'fake-user-id',
+    displayName: name ?? 'Jogador Teste',
+    email: email,
+    provider: provider,
+    createdAt: DateTime(2025, 1, 1),
+    lastSeenAt: DateTime.now(),
+  );
 }
 
 final authServiceProvider = Provider<AuthService>((ref) {
