@@ -101,9 +101,7 @@ void main() {
     await container
         .read(authControllerProvider.notifier)
         .updateAvatar('tile:Onca');
-    await container
-        .read(authControllerProvider.notifier)
-        .updateAvatar(null);
+    await container.read(authControllerProvider.notifier).updateAvatar(null);
     final profile = container.read(authControllerProvider);
     expect(profile!.avatarUrl, isNull);
     expect(fakeSyncEngine.lastAvatarUrl, isNull);

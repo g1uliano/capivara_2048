@@ -34,9 +34,9 @@ class _AvatarPickerScreenState extends ConsumerState<AvatarPickerScreen> {
       if (mounted) widget.onDone();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao salvar avatar: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erro ao salvar avatar: $e')));
       }
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -65,9 +65,7 @@ class _AvatarPickerScreenState extends ConsumerState<AvatarPickerScreen> {
               const SizedBox(height: 16),
               Text(
                 'Qual animal vai te representar?',
-                style: outlinedWhiteTextStyle(
-                  GoogleFonts.nunito(fontSize: 15),
-                ),
+                style: outlinedWhiteTextStyle(GoogleFonts.nunito(fontSize: 15)),
               ),
               const SizedBox(height: 16),
               Expanded(
@@ -100,7 +98,7 @@ class _AvatarPickerScreenState extends ConsumerState<AvatarPickerScreen> {
                                   BoxShadow(
                                     color: Colors.white.withValues(alpha: 0.4),
                                     blurRadius: 8,
-                                  )
+                                  ),
                                 ]
                               : [],
                         ),
@@ -120,8 +118,9 @@ class _AvatarPickerScreenState extends ConsumerState<AvatarPickerScreen> {
                 child: Column(
                   children: [
                     ElevatedButton(
-                      onPressed:
-                          (_selected != null && !_saving) ? _confirm : null,
+                      onPressed: (_selected != null && !_saving)
+                          ? _confirm
+                          : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
@@ -135,7 +134,9 @@ class _AvatarPickerScreenState extends ConsumerState<AvatarPickerScreen> {
                               width: 24,
                               height: 24,
                               child: CircularProgressIndicator(
-                                  color: Colors.white, strokeWidth: 2),
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
                             )
                           : Text(
                               'Confirmar',

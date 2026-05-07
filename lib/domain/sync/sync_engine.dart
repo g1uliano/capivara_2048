@@ -25,7 +25,8 @@ class FakeSyncEngine implements SyncEngine {
   static const _sentinel = '__not_set__';
 
   @override
-  Future<void> init(String userId, {String? displayName}) async => initCalled = true;
+  Future<void> init(String userId, {String? displayName}) async =>
+      initCalled = true;
 
   @override
   Future<void> dispose() async => disposeCalled = true;

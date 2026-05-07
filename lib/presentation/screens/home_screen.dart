@@ -108,10 +108,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: GestureDetector(
                       key: const Key('home_btn_perfil'),
                       onTap: () => _nav(const ProfileScreen()),
-                      child: AvatarWidget(
-                        radius: 20,
-                        profile: playerProfile,
-                      ),
+                      child: AvatarWidget(radius: 20, profile: playerProfile),
                     ),
                   ),
                 ),

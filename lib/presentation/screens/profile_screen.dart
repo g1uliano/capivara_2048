@@ -129,7 +129,11 @@ class _LoggedIn extends ConsumerWidget {
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white, width: 1.5),
                     ),
-                    child: const Icon(Icons.edit, color: Colors.white, size: 14),
+                    child: const Icon(
+                      Icons.edit,
+                      color: Colors.white,
+                      size: 14,
+                    ),
                   ),
                 ),
               ),

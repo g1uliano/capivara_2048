@@ -63,7 +63,7 @@ Regra obrigatória ao criar telas ou adicionar textos:
 
 ## Fases do roadmap
 
-Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 4 completa (v1.4.7) — próximo: Fase 5 (Arte adicional e polimento visual)**. O áudio foi reposicionado para a **Fase 6** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
+Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 4.1 completa (v1.5.2) — próximo: Fase 5 (Arte adicional e polimento visual)**. O áudio foi reposicionado para a **Fase 6** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
 
 | Fase      | Foco                                                                                                        |
 | --------- | ----------------------------------------------------------------------------------------------------------- |
@@ -82,6 +82,7 @@ Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 4
 | 4B ✅     | Ranking Global Semanal (Firestore) + Ranking Lendas persistido                                              |
 | 4C ✅     | Convites (deep links, Firestore) + Anúncios Reais (Google Mobile Ads) + IAP Real (in_app_purchase)          |
 | 4 gaps ✅ | registerInvite pós-login, ProfileScreen Convidar Amigos + Restaurar Compras real                            |
+| 4.1 ✅    | EmailAuthScreen, AvatarPickerScreen, AvatarWidget, updateAvatar(), destaque avatar na Home, fix legibilidade InviteFriendsScreen |
 | 4         | Arte adicional e polimento visual (logo, ícone, splash final)                                               |
 | 5         | Áudio (sound design dos 13 animais, SFX, música)                                                            |
 | 6         | Polimento, l10n, acessibilidade, lançamento                                                                 |

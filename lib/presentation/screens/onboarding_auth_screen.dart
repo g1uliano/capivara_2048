@@ -51,8 +51,7 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
     final controller = ref.read(authControllerProvider.notifier);
 
     final size = MediaQuery.of(context).size;
-    final scale =
-        min(size.width / 390.0, size.height / 844.0).clamp(0.1, 1.0);
+    final scale = min(size.width / 390.0, size.height / 844.0).clamp(0.1, 1.0);
 
     return GameBackground(
       child: Scaffold(
@@ -127,7 +126,6 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
       ),
     );
   }
-
 }
 
 class _AuthButton extends StatelessWidget {

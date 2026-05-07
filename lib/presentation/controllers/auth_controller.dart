@@ -114,7 +114,9 @@ class AuthController extends Notifier<PlayerProfile?> {
 
   Future<void> updateAvatar(String? avatarUrl) async {
     if (state == null) return;
-    state = state!.copyWith(avatarUrl: avatarUrl); // optimistic: update local first
+    state = state!.copyWith(
+      avatarUrl: avatarUrl,
+    ); // optimistic: update local first
     try {
       await ref.read(syncEngineProvider).updateAvatar(avatarUrl);
     } catch (_) {

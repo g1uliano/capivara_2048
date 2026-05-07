@@ -21,8 +21,19 @@ const Map<String, String> kAnimalTileAssets = {
 
 /// Lista ordenada dos animais disponíveis como avatar (ordem do jogo).
 const List<String> kAvatarAnimals = [
-  'Tanajura', 'LoboGuara', 'Cururu', 'Tucano', 'Sagui', 'Preguica',
-  'MicoLeao', 'Boto', 'Onca', 'Sucuri', 'Capivara', 'PeixeBoi', 'Jacare',
+  'Tanajura',
+  'LoboGuara',
+  'Cururu',
+  'Tucano',
+  'Sagui',
+  'Preguica',
+  'MicoLeao',
+  'Boto',
+  'Onca',
+  'Sucuri',
+  'Capivara',
+  'PeixeBoi',
+  'Jacare',
 ];
 
 /// Widget de avatar reutilizável.
@@ -33,11 +44,7 @@ const List<String> kAvatarAnimals = [
 /// - null / sem prefixo reconhecido → inicial do displayName sobre fundo verde
 /// - profile null → Icons.person_outline sobre fundo verde
 class AvatarWidget extends StatelessWidget {
-  const AvatarWidget({
-    super.key,
-    required this.radius,
-    this.profile,
-  });
+  const AvatarWidget({super.key, required this.radius, this.profile});
 
   final double radius;
   final PlayerProfile? profile;

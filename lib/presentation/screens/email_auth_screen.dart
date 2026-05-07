@@ -116,9 +116,9 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
     } catch (e) {
       if (mounted) {
         final code = _extractFirebaseErrorCode(e.toString());
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_mapFirebaseError(code))),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(_mapFirebaseError(code))));
       }
     } finally {
       if (mounted) setState(() => _loading = false);
