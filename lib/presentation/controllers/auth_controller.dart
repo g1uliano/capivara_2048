@@ -10,22 +10,19 @@ import '../../domain/invites/invite_service.dart';
 import '../../domain/sync/sync_engine.dart';
 import '../../data/repositories/iap_startup_service.dart';
 
-class AuthController extends StateNotifier<PlayerProfile?> {
-  AuthController(this._authService, this._syncEngine, this._ref) : super(null) {
-    state = _authService.currentProfile;
-  }
-
-  final AuthService _authService;
-  final SyncEngine _syncEngine;
-  final Ref _ref;
+class AuthController extends Notifier<PlayerProfile?> {
+  @override
+  PlayerProfile? build() => ref.read(authServiceProvider).currentProfile;
 
   Future<void> signInWithGoogle() async {
-    final profile = await _authService.signInWithGoogle();
+    final profile = await ref.read(authServiceProvider).signInWithGoogle();
     state = profile;
     try {
-      await _syncEngine.init(profile.userId, displayName: profile.displayName);
-      await _syncEngine.syncProfile();
-      await _syncEngine.drainPendingEvents();
+      await ref
+          .read(syncEngineProvider)
+          .init(profile.userId, displayName: profile.displayName);
+      await ref.read(syncEngineProvider).syncProfile();
+      await ref.read(syncEngineProvider).drainPendingEvents();
       _initIAPStartup(profile.userId);
       unawaited(_registerPendingInvite(profile));
     } catch (_) {
@@ -35,12 +32,14 @@ class AuthController extends StateNotifier<PlayerProfile?> {
   }
 
   Future<void> signInWithApple() async {
-    final profile = await _authService.signInWithApple();
+    final profile = await ref.read(authServiceProvider).signInWithApple();
     state = profile;
     try {
-      await _syncEngine.init(profile.userId, displayName: profile.displayName);
-      await _syncEngine.syncProfile();
-      await _syncEngine.drainPendingEvents();
+      await ref
+          .read(syncEngineProvider)
+          .init(profile.userId, displayName: profile.displayName);
+      await ref.read(syncEngineProvider).syncProfile();
+      await ref.read(syncEngineProvider).drainPendingEvents();
       _initIAPStartup(profile.userId);
       unawaited(_registerPendingInvite(profile));
     } catch (_) {
@@ -50,12 +49,15 @@ class AuthController extends StateNotifier<PlayerProfile?> {
   }
 
   Future<void> signInWithEmail(String email, String password) async {
-    final profile = await _authService.signInWithEmail(email, password);
+    final profile =
+        await ref.read(authServiceProvider).signInWithEmail(email, password);
     state = profile;
     try {
-      await _syncEngine.init(profile.userId, displayName: profile.displayName);
-      await _syncEngine.syncProfile();
-      await _syncEngine.drainPendingEvents();
+      await ref
+          .read(syncEngineProvider)
+          .init(profile.userId, displayName: profile.displayName);
+      await ref.read(syncEngineProvider).syncProfile();
+      await ref.read(syncEngineProvider).drainPendingEvents();
       _initIAPStartup(profile.userId);
       unawaited(_registerPendingInvite(profile));
     } catch (_) {
@@ -65,10 +67,14 @@ class AuthController extends StateNotifier<PlayerProfile?> {
   }
 
   Future<void> createAccountWithEmail(String email, String password) async {
-    final profile = await _authService.createAccountWithEmail(email, password);
+    final profile = await ref
+        .read(authServiceProvider)
+        .createAccountWithEmail(email, password);
     state = profile;
     // New account: no remote data to sync yet — only init the engine.
-    await _syncEngine.init(profile.userId, displayName: profile.displayName);
+    await ref
+        .read(syncEngineProvider)
+        .init(profile.userId, displayName: profile.displayName);
     _initIAPStartup(profile.userId);
     unawaited(_registerPendingInvite(profile));
   }
@@ -76,7 +82,7 @@ class AuthController extends StateNotifier<PlayerProfile?> {
   /// Initializes IAPStartupService after successful login.
   /// No-op in dev (FakeIAPStartupService).
   void _initIAPStartup(String userId) {
-    unawaited(_ref.read(iapStartupServiceProvider).initialize(userId));
+    unawaited(ref.read(iapStartupServiceProvider).initialize(userId));
   }
 
   /// Called after every successful login.
@@ -87,7 +93,7 @@ class AuthController extends StateNotifier<PlayerProfile?> {
       final box = await Hive.openBox<String>('invite_refs');
       final inviterId = box.get('pending_ref');
       if (inviterId == null || inviterId.isEmpty) return;
-      final inviteService = _ref.read(inviteServiceProvider);
+      final inviteService = ref.read(inviteServiceProvider);
       await inviteService.registerInvite(
         inviterId: inviterId,
         inviteeId: profile.userId,
@@ -99,9 +105,9 @@ class AuthController extends StateNotifier<PlayerProfile?> {
   }
 
   Future<void> signOut() async {
-    await _authService.signOut();
-    unawaited(_ref.read(iapStartupServiceProvider).dispose());
-    await _syncEngine.dispose();
+    await ref.read(authServiceProvider).signOut();
+    unawaited(ref.read(iapStartupServiceProvider).dispose());
+    await ref.read(syncEngineProvider).dispose();
     state = null;
   }
 
@@ -109,8 +115,4 @@ class AuthController extends StateNotifier<PlayerProfile?> {
 }
 
 final authControllerProvider =
-    StateNotifierProvider<AuthController, PlayerProfile?>((ref) {
-      final authService = ref.watch(authServiceProvider);
-      final syncEngine = ref.watch(syncEngineProvider);
-      return AuthController(authService, syncEngine, ref);
-    });
+    NotifierProvider<AuthController, PlayerProfile?>(AuthController.new);
