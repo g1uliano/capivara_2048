@@ -32,8 +32,9 @@ Future<void> shareTestResults({
   await jsonFile.writeAsString(json);
 
   // PNG screenshot do widget marcado com screenshotKey
-  final boundary = screenshotKey.currentContext
-      ?.findRenderObject() as RenderRepaintBoundary?;
+  final boundary =
+      screenshotKey.currentContext?.findRenderObject()
+          as RenderRepaintBoundary?;
   final files = <XFile>[XFile(jsonFile.path, mimeType: 'application/json')];
 
   if (boundary != null) {
@@ -46,9 +47,11 @@ Future<void> shareTestResults({
     }
   }
 
-  await Share.shareXFiles(
-    files,
-    text:
-        '🐾 Bichim TEST — ${store.passed}✓ ${store.failed}✗ de ${store.total}',
+  await SharePlus.instance.share(
+    ShareParams(
+      files: files,
+      text:
+          '🐾 Bichim TEST — ${store.passed}✓ ${store.failed}✗ de ${store.total}',
+    ),
   );
 }

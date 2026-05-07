@@ -51,9 +51,10 @@ class PurchaseSuccessSheet extends StatelessWidget {
             Text(
               'Compra realizada!',
               style: GoogleFonts.fredoka(
-                  fontSize: 22,
-                  color: Colors.green[700],
-                  fontWeight: FontWeight.bold),
+                fontSize: 22,
+                color: Colors.green[700],
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 4),
             Text(
@@ -64,12 +65,13 @@ class PurchaseSuccessSheet extends StatelessWidget {
             Text(
               '🎁 Presente para um amigo:',
               style: GoogleFonts.nunito(
-                  fontWeight: FontWeight.bold, fontSize: 15),
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+              ),
             ),
             const SizedBox(height: 12),
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: BoxDecoration(
                 color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(10),
@@ -77,7 +79,10 @@ class PurchaseSuccessSheet extends StatelessWidget {
               child: Text(
                 shareCode,
                 style: GoogleFonts.fredoka(
-                    fontSize: 22, letterSpacing: 2, color: Colors.black87),
+                  fontSize: 22,
+                  letterSpacing: 2,
+                  color: Colors.black87,
+                ),
               ),
             ),
             const SizedBox(height: 12),
@@ -88,16 +93,20 @@ class PurchaseSuccessSheet extends StatelessWidget {
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: shareCode));
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Código copiado!')));
+                      const SnackBar(content: Text('Código copiado!')),
+                    );
                   },
                   icon: const Icon(Icons.copy, size: 18),
                   label: Text('Copiar', style: GoogleFonts.nunito()),
                 ),
                 const SizedBox(width: 12),
                 OutlinedButton.icon(
-                  onPressed: () => Share.share(
-                      'Use este código em Olha o Bichim!: $shareCode',
-                      subject: 'Presente no Olha o Bichim!'),
+                  onPressed: () => SharePlus.instance.share(
+                    ShareParams(
+                      text: 'Use este código em Olha o Bichim!: $shareCode',
+                      subject: 'Presente no Olha o Bichim!',
+                    ),
+                  ),
                   icon: const Icon(Icons.share, size: 18),
                   label: Text('Compartilhar', style: GoogleFonts.nunito()),
                 ),
@@ -118,10 +127,13 @@ class PurchaseSuccessSheet extends StatelessWidget {
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-                child:
-                    Text('Continuar jogando', style: GoogleFonts.fredoka(fontSize: 17)),
+                child: Text(
+                  'Continuar jogando',
+                  style: GoogleFonts.fredoka(fontSize: 17),
+                ),
               ),
             ),
           ],
