@@ -13,6 +13,7 @@ import '../../domain/game_engine/game_engine.dart';
 import '../../domain/inventory/inventory_notifier.dart';
 import '../../domain/ranking/ranking_repository.dart';
 import '../../domain/invites/invite_service.dart';
+import '../../domain/sync/sync_engine.dart';
 import '../controllers/auth_controller.dart';
 import '../controllers/personal_records_notifier.dart';
 
@@ -280,6 +281,12 @@ class GameNotifier extends Notifier<GameState> {
         maxLevel: state.maxLevel,
       );
       await ref.read(gameRecordRepositoryProvider).add(record);
+
+      // Sync to Firestore if logged in
+      final authProfileForSync = ref.read(authControllerProvider);
+      if (authProfileForSync != null) {
+        unawaited(ref.read(syncEngineProvider).syncGameRecord(record));
+      }
 
       // Complete pending invite reward on first game
       try {
