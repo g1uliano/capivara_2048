@@ -5,7 +5,7 @@ import 'package:capivara_2048/domain/auth/auth_service.dart';
 import 'package:capivara_2048/domain/sync/sync_engine.dart';
 import 'package:capivara_2048/presentation/screens/onboarding_auth_screen.dart';
 
-Widget _wrap() {
+Widget _wrap({bool showSkip = false}) {
   final fakeAuth = FakeAuthService();
   addTearDown(fakeAuth.dispose);
   return ProviderScope(
@@ -13,7 +13,7 @@ Widget _wrap() {
       authServiceProvider.overrideWithValue(fakeAuth),
       syncEngineProvider.overrideWithValue(FakeSyncEngine()),
     ],
-    child: const MaterialApp(home: OnboardingAuthScreen()),
+    child: MaterialApp(home: OnboardingAuthScreen(showSkip: showSkip)),
   );
 }
 
@@ -29,12 +29,12 @@ void main() {
   });
 
   testWidgets('exibe botão Jogar sem conta', (tester) async {
-    await tester.pumpWidget(_wrap());
+    await tester.pumpWidget(_wrap(showSkip: true));
     expect(find.textContaining('sem conta'), findsOneWidget);
   });
 
   testWidgets('toque em Jogar sem conta não lança exceção', (tester) async {
-    await tester.pumpWidget(_wrap());
+    await tester.pumpWidget(_wrap(showSkip: true));
     await tester.tap(find.textContaining('sem conta'));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);

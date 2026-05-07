@@ -13,7 +13,8 @@ import 'email_auth_screen.dart';
 import 'home_screen.dart';
 
 class OnboardingAuthScreen extends ConsumerStatefulWidget {
-  const OnboardingAuthScreen({super.key});
+  const OnboardingAuthScreen({super.key, this.showSkip = false});
+  final bool showSkip;
 
   @override
   ConsumerState<OnboardingAuthScreen> createState() =>
@@ -40,10 +41,14 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
   }
 
   void _navigateHome() {
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
-      (_) => false,
-    );
+    if (widget.showSkip) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        (_) => false,
+      );
+    } else {
+      Navigator.of(context).pop();
+    }
   }
 
   @override
@@ -56,6 +61,14 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
     return GameBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
+        appBar: widget.showSkip
+            ? null
+            : AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                foregroundColor: Colors.white,
+                iconTheme: const IconThemeData(color: Colors.white),
+              ),
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -75,6 +88,7 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
                     GoogleFonts.fredoka(fontSize: 17),
                   ),
                 ),
+                if (widget.showSkip) ...[const SizedBox(height: 16), _BenefitsBlock()],
                 const SizedBox(height: 48),
                 if (_loading)
                   const Center(
@@ -105,8 +119,7 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 32),
-                  TextButton(
+                  if (widget.showSkip) ...[const SizedBox(height: 32), TextButton(
                     onPressed: _navigateHome,
                     child: Text(
                       'Jogar sem conta →',
@@ -119,13 +132,55 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
                         ),
                       ),
                     ),
-                  ),
+                  )],
                 ],
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class _BenefitsBlock extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    const items = [
+      (Icons.sync_alt, 'Progresso salvo em todos os dispositivos'),
+      (Icons.emoji_events, 'Ranking global semanal'),
+      (Icons.card_giftcard, 'Recompensas diárias com itens'),
+      (Icons.shopping_bag, 'Acesso à loja de itens'),
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Por que fazer login?',
+          style: outlinedWhiteTextStyle(
+            GoogleFonts.fredoka(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
+        ),
+        const SizedBox(height: 8),
+        ...items.map(
+          (item) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 3),
+            child: Row(
+              children: [
+                Icon(item.$1, color: Colors.white70, size: 18),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    item.$2,
+                    style: outlinedWhiteTextStyle(
+                        GoogleFonts.fredoka(fontSize: 14)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
