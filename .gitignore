@@ -62,3 +62,8 @@ android/app/src/tst/google-services.json
 # Firebase options (contém API keys — gerado por flutterfire configure)
 lib/firebase_options_dev.dart
 lib/firebase_options_prd.dart
+
+# Signing keys — não commitar
+android/key.properties
+*.jks
+*.keystore

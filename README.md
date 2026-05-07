@@ -137,10 +137,18 @@ Firebase configurado. Ver **[docs/TESTING.md](docs/TESTING.md)** para o guia com
 
 ```bash
 # Android APK — produção
-flutter build apk --flavor prod --release --dart-define=FLAVOR=prd
+flutter build apk --flavor prd --release --dart-define=FLAVOR=prd \
+  --dart-define=AD_UNIT_ANDROID=ca-app-pub-3940256099942544/5224354917 \
+  --dart-define=AD_UNIT_IOS=ca-app-pub-3940256099942544/1712485313
+
+# Android AAB — produção (upload para Play Store)
+flutter build appbundle --flavor prod --release --dart-define=FLAVOR=prd \
+  --dart-define=AD_UNIT_ANDROID=ca-app-pub-3940256099942544/5224354917 \
+  --dart-define=AD_UNIT_IOS=ca-app-pub-3940256099942544/1712485313
+# Saída: build/app/outputs/bundle/prdRelease/app-prd-release.aab
 
 # iOS — produção
-flutter build ios --flavor prod --release --dart-define=FLAVOR=prd
+flutter build ios --flavor prd --release --dart-define=FLAVOR=prd
 
 # Android APK — QA / testes em dispositivo (flavor tst, Firebase dev real)
 flutter build apk --flavor tst --debug --dart-define=FLAVOR=dev
@@ -151,12 +159,12 @@ flutter build apk --flavor tst --debug --dart-define=FLAVOR=dev
 
 ## Builds
 
-| Comando | Flavor | IAP | Uso |
-|---------|--------|-----|-----|
-| `flutter run --dart-define=FLAVOR=dev` | dev | Fake | Desenvolvimento local |
-| `flutter build apk --dart-define=FLAVOR=tst` | tst | Fake | QA — UI sem lojas |
-| `flutter build apk --dart-define=FLAVOR=tst --dart-define=USE_REAL_IAP=true` | tst | Real (sandbox) | QA com Play Store sandbox |
-| `flutter build apk --dart-define=FLAVOR=prd` | prd | Real (produção) | Release |
+| Comando                                                                      | Flavor | IAP             | Uso                       |
+| ---------------------------------------------------------------------------- | ------ | --------------- | ------------------------- |
+| `flutter run --dart-define=FLAVOR=dev`                                       | dev    | Fake            | Desenvolvimento local     |
+| `flutter build apk --dart-define=FLAVOR=tst`                                 | tst    | Fake            | QA — UI sem lojas         |
+| `flutter build apk --dart-define=FLAVOR=tst --dart-define=USE_REAL_IAP=true` | tst    | Real (sandbox)  | QA com Play Store sandbox |
+| `flutter build apk --dart-define=FLAVOR=prd`                                 | prd    | Real (produção) | Release                   |
 
 Para configurar produtos nas lojas e contas de teste, consulte [`IAP.md`](IAP.md).
 
