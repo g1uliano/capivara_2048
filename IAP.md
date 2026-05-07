@@ -122,20 +122,22 @@ Para testar sem conectar ao servidor da Apple:
 
 | Comando                                                                      | Flavor | IAP             | Uso                       |
 | ---------------------------------------------------------------------------- | ------ | --------------- | ------------------------- |
-| `flutter run --dart-define=FLAVOR=dev`                                       | dev    | Fake            | Desenvolvimento local     |
-| `flutter build apk --dart-define=FLAVOR=tst`                                 | tst    | Fake            | QA — testa UI sem lojas   |
-| `flutter build apk --dart-define=FLAVOR=tst --dart-define=USE_REAL_IAP=true` | tst    | Real (sandbox)  | QA — testa fluxo completo |
-| `flutter build apk --dart-define=FLAVOR=prd`                                 | prd    | Real (produção) | Release                   |
+| `flutter run --dart-define=FLAVOR=dev`                                                          | dev    | Fake            | Desenvolvimento local     |
+| `flutter build apk --flavor tst --dart-define=FLAVOR=tst`                                       | tst    | Fake            | QA — testa UI sem lojas   |
+| `flutter build apk --flavor tst --dart-define=FLAVOR=tst --dart-define=USE_REAL_IAP=true`       | tst    | Real (sandbox)  | QA — testa fluxo completo |
+| `flutter build apk --flavor prod --release --dart-define=FLAVOR=prd`                            | prd    | Real (produção) | Release                   |
 
 ### Build e instalação rápida (Android)
 
 ```bash
 # Build + install TST com IAP real
-flutter build apk --dart-define=FLAVOR=tst --dart-define=USE_REAL_IAP=true
+flutter build apk --flavor tst --release \
+  --dart-define=FLAVOR=tst \
+  --dart-define=USE_REAL_IAP=true
 flutter install
 
 # Build + install PRD
-flutter build apk --dart-define=FLAVOR=prd
+flutter build apk --flavor prod --release --dart-define=FLAVOR=prd
 flutter install
 ```
 
