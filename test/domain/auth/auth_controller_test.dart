@@ -85,4 +85,35 @@ void main() {
     expect(profile, isNotNull);
     expect(profile!.provider, AuthProvider.apple);
   });
+
+  test('updateAvatar atualiza estado local e chama syncEngine', () async {
+    await container.read(authControllerProvider.notifier).signInWithGoogle();
+    await container
+        .read(authControllerProvider.notifier)
+        .updateAvatar('tile:Capivara');
+    final profile = container.read(authControllerProvider);
+    expect(profile!.avatarUrl, 'tile:Capivara');
+    expect(fakeSyncEngine.lastAvatarUrl, 'tile:Capivara');
+  });
+
+  test('updateAvatar com null limpa o avatar', () async {
+    await container.read(authControllerProvider.notifier).signInWithGoogle();
+    await container
+        .read(authControllerProvider.notifier)
+        .updateAvatar('tile:Onca');
+    await container
+        .read(authControllerProvider.notifier)
+        .updateAvatar(null);
+    final profile = container.read(authControllerProvider);
+    expect(profile!.avatarUrl, isNull);
+    expect(fakeSyncEngine.lastAvatarUrl, isNull);
+  });
+
+  test('updateAvatar não faz nada se não logado', () async {
+    await container
+        .read(authControllerProvider.notifier)
+        .updateAvatar('tile:Tucano');
+    expect(container.read(authControllerProvider), isNull);
+    expect(fakeSyncEngine.lastAvatarUrl, '__not_set__');
+  });
 }

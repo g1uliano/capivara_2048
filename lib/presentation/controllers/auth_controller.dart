@@ -112,6 +112,12 @@ class AuthController extends Notifier<PlayerProfile?> {
     state = null;
   }
 
+  Future<void> updateAvatar(String? avatarAsset) async {
+    if (state == null) return;
+    await ref.read(syncEngineProvider).updateAvatar(avatarAsset);
+    state = state!.copyWith(avatarUrl: avatarAsset);
+  }
+
   bool get isLoggedIn => state != null;
 }
 

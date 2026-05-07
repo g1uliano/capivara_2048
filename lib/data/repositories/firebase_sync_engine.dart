@@ -69,6 +69,15 @@ class FirebaseSyncEngine implements SyncEngine {
   }
 
   @override
+  Future<void> updateAvatar(String? avatarUrl) async {
+    if (_userId == null) return;
+    await _firestore.collection('users').doc(_userId).set(
+      {'avatarUrl': avatarUrl},
+      SetOptions(merge: true),
+    );
+  }
+
+  @override
   Future<void> drainPendingEvents() async {
     final box = await Hive.openBox<PendingEvent>(_pendingEventsBox);
     final events = box.values.toList();

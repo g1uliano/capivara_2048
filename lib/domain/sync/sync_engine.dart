@@ -10,6 +10,7 @@ abstract class SyncEngine {
   Future<void> init(String userId, {String? displayName});
   Future<void> dispose();
   Future<void> syncProfile();
+  Future<void> updateAvatar(String? avatarUrl);
   Future<void> drainPendingEvents();
   Future<void> enqueuePendingEvent(PendingEvent event);
   Stream<SyncStatus> get statusStream;
@@ -20,6 +21,8 @@ class FakeSyncEngine implements SyncEngine {
   bool disposeCalled = false;
   final List<PendingEvent> drained = [];
   final List<PendingEvent> enqueued = [];
+  String? lastAvatarUrl = _sentinel;
+  static const _sentinel = '__not_set__';
 
   @override
   Future<void> init(String userId, {String? displayName}) async => initCalled = true;
@@ -29,6 +32,11 @@ class FakeSyncEngine implements SyncEngine {
 
   @override
   Future<void> syncProfile() async {}
+
+  @override
+  Future<void> updateAvatar(String? avatarUrl) async {
+    lastAvatarUrl = avatarUrl;
+  }
 
   @override
   Future<void> drainPendingEvents() async {
