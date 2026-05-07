@@ -235,6 +235,7 @@ class FirebaseSyncEngine implements SyncEngine {
   @override
   String? get remoteAvatarUrl => null;
 
+  // TODO(task5): implement all three with Firestore
   @override
   Future<void> updateDisplayName(String name) async {}
 
