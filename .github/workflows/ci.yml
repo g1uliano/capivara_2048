@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -26,6 +28,18 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Update golden baselines (CI environment)
+        run: flutter test test/e2e/run_all_test.dart --name "golden" --update-goldens
+
+      - name: Commit updated goldens if changed
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add test/e2e/goldens/
+          git diff --cached --quiet || git commit -m "chore(ci): update golden baselines [skip ci]"
+          git diff --cached --quiet || git push
+
       - name: Run Tier 1 test suite
         run: flutter test test/e2e/run_all_test.dart --concurrency=4
 
@@ -34,6 +48,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: golden-failures
-          path: test/e2e/goldens/failures/
+          path: test/e2e/failures/
           if-no-files-found: ignore
           retention-days: 7
