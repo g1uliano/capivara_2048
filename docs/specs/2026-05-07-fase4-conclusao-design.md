@@ -300,6 +300,49 @@ A aba "Pessoal" permanece inalterada.
 
 ---
 
+### C6b — RankingScreen — aba Pessoal com sync entre dispositivos
+
+Quando o usuário está **logado**, os registros do ranking pessoal são sincronizados com o Firestore, permitindo acesso ao histórico em qualquer dispositivo.
+
+**Regras de negócio:**
+
+- **Não logado →** leitura e gravação apenas no Hive local (comportamento atual)
+- **Logado →** gravação no Hive local + Firestore; leitura preferência do Firestore (fonte da verdade)
+- **Formato Firestore:** campo `gameRecords` dentro do documento `users/{uid}` como array de objetos JSON (máx 20 registros, mesma estrutura do `GameRecord`)
+- **Merge no login:** `syncProfile()` já lê o documento do usuário; passa a incluir `gameRecords` — merge com Hive local tomando os 20 melhores registros combinados (por score desc)
+
+**Fluxo de gravação (fim de partida):**
+
+```
+GameRecordRepository.add(record)
+  └→ sempre: grava no Hive local
+  └→ se logado: envia para Firestore via SyncEngine.syncGameRecord(record)
+```
+
+**Fluxo de leitura (aba Pessoal):**
+
+```
+_PersonalRankingTab
+  └→ não logado: exibe GameRecordRepository.all (Hive)
+  └→ logado: exibe GameRecordRepository.all (já mergeado com Firestore no login)
+```
+
+**Novos contratos:**
+
+```dart
+// SyncEngine (abstract)
+Future<void> syncGameRecord(GameRecord record); // grava registro individual no Firestore
+// (syncProfile() já existe e passará a incluir merge de gameRecords)
+
+// FirebaseSyncEngine
+Future<void> syncGameRecord(GameRecord record);
+// users/{uid}.gameRecords — arrayUnion ou rewrite do array com top 20
+```
+
+`GameRecordRepository` não muda sua interface; o `AuthController` injeta o sync após cada `add()` via listener ou chamada direta na camada de apresentação (game over handler).
+
+---
+
 ### C7 — ShopScreen (tela completa)
 
 O ponto de navegação para `ShopScreen` (onde quer que exista na Home/AppBar) verifica auth antes de navegar, mesmo padrão do C5:
@@ -320,22 +363,23 @@ Navigator.push(context, MaterialPageRoute(
 
 ## Sumário de novos artefatos
 
-| Arquivo                                            | Tipo      | Mudança                                                                                                             |
-| -------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------- |
-| `domain/auth/auth_service.dart`                    | Existente | +`deleteAccount()`, +`updateDisplayName()`, +`sendPasswordReset()`, atualizar assinatura `createAccountWithEmail()` |
-| `data/repositories/firebase_auth_service.dart`     | Existente | Implementar novos métodos acima                                                                                     |
-| `domain/sync/sync_engine.dart`                     | Existente | +`deleteUserData()`, +`updateDisplayName()`, +`remoteAvatarUrl` getter                                              |
-| `data/repositories/firebase_sync_engine.dart`      | Existente | Implementar novos métodos + ler `avatarUrl` em `syncProfile()`                                                      |
-| `presentation/controllers/auth_controller.dart`    | Existente | +`deleteAccount()`, +`updateDisplayName()`, aplicar `remoteAvatarUrl` no login por e-mail                           |
-| `presentation/screens/profile_screen.dart`         | Existente | +exclusão, +editar nome (só email), +trocar senha (só email), ocultar botão avatar para Google                      |
-| `presentation/screens/email_auth_screen.dart`      | Existente | +campo nome no signup, +link esqueci senha                                                                          |
-| `presentation/screens/onboarding_auth_screen.dart` | Existente | +`showSkip` param, +bloco de benefícios, +botão "Jogar sem conta", ajustar navegação pós-login                      |
-| `presentation/screens/splash_screen.dart`          | Existente | Redirecionar para `OnboardingAuthScreen` se não logado                                                              |
-| `presentation/screens/ranking_screen.dart`         | Existente | +banner informativo não-bloqueante na aba Lendas quando não logado                                                 |
-| `data/repositories/firestore_ranking_repository.dart` | Existente | Verificar auth antes de submeter; se não logado, skipa gravação remota                                            |
-| `presentation/screens/home_screen.dart`            | Existente | Auth check antes de navegar para DailyRewards e ShopScreen                                                          |
-| `presentation/widgets/auth_gate_overlay.dart`      | **Novo**  | Widget `AuthGateOverlay` para overlays sobre o jogo                                                                 |
-| `presentation/widgets/shop_overlay.dart`           | Existente | Envolver conteúdo em `AuthGateOverlay`                                                                              |
+| Arquivo                                               | Tipo      | Mudança                                                                                                             |
+| ----------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------- |
+| `domain/auth/auth_service.dart`                       | Existente | +`deleteAccount()`, +`updateDisplayName()`, +`sendPasswordReset()`, atualizar assinatura `createAccountWithEmail()` |
+| `data/repositories/firebase_auth_service.dart`        | Existente | Implementar novos métodos acima                                                                                     |
+| `domain/sync/sync_engine.dart`                        | Existente | +`deleteUserData()`, +`updateDisplayName()`, +`remoteAvatarUrl` getter, +`syncGameRecord()`                         |
+| `data/repositories/firebase_sync_engine.dart`         | Existente | Implementar novos métodos + ler `avatarUrl` e `gameRecords` em `syncProfile()`                                       |
+| `presentation/controllers/auth_controller.dart`       | Existente | +`deleteAccount()`, +`updateDisplayName()`, aplicar `remoteAvatarUrl` no login por e-mail                           |
+| `presentation/screens/profile_screen.dart`            | Existente | +exclusão, +editar nome (só email), +trocar senha (só email), ocultar botão avatar para Google                      |
+| `presentation/screens/email_auth_screen.dart`         | Existente | +campo nome no signup, +link esqueci senha                                                                          |
+| `presentation/screens/onboarding_auth_screen.dart`    | Existente | +`showSkip` param, +bloco de benefícios, +botão "Jogar sem conta", ajustar navegação pós-login                      |
+| `presentation/screens/splash_screen.dart`             | Existente | Redirecionar para `OnboardingAuthScreen` se não logado                                                              |
+| `presentation/screens/ranking_screen.dart`            | Existente | +banner informativo não-bloqueante na aba Lendas quando não logado                                                  |
+| `data/repositories/firestore_ranking_repository.dart` | Existente | Verificar auth antes de submeter ao Lendas; se não logado, skipa gravação remota                                    |
+| `data/repositories/game_record_repository.dart`       | Existente | Após `add()`: se logado, dispara `SyncEngine.syncGameRecord()` para Firestore                                        |
+| `presentation/screens/home_screen.dart`               | Existente | Auth check antes de navegar para DailyRewards e ShopScreen                                                          |
+| `presentation/widgets/auth_gate_overlay.dart`         | **Novo**  | Widget `AuthGateOverlay` para overlays sobre o jogo                                                                 |
+| `presentation/widgets/shop_overlay.dart`              | Existente | Envolver conteúdo em `AuthGateOverlay`                                                                              |
 
 ---
 
