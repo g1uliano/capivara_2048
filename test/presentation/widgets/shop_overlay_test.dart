@@ -2,10 +2,12 @@ import 'dart:io';
 import 'package:capivara_2048/data/models/inventory_hive_adapter.dart';
 import 'package:capivara_2048/data/models/item_type.dart';
 import 'package:capivara_2048/data/models/lives_state_adapter.dart';
+import 'package:capivara_2048/data/models/player_profile.dart';
 import 'package:capivara_2048/data/repositories/inventory_repository.dart';
 import 'package:capivara_2048/data/repositories/lives_repository.dart';
 import 'package:capivara_2048/domain/inventory/inventory_notifier.dart';
 import 'package:capivara_2048/domain/lives/lives_notifier.dart';
+import 'package:capivara_2048/presentation/controllers/auth_controller.dart';
 import 'package:capivara_2048/presentation/widgets/shop_overlay.dart';
 import 'package:capivara_2048/presentation/widgets/shop_package_card.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +29,19 @@ Future<void> _teardownHive() async {
   await _tempDir.delete(recursive: true);
 }
 
+final _fakeProfile = PlayerProfile(
+  userId: 'test-user',
+  displayName: 'Test',
+  provider: AuthProvider.email,
+  createdAt: DateTime(2024),
+  lastSeenAt: DateTime(2024),
+);
+
+class _FakeAuthController extends AuthController {
+  @override
+  PlayerProfile? build() => _fakeProfile;
+}
+
 Widget _buildOverlay({
   ItemType itemType = ItemType.bomb3,
   VoidCallback? onClose,
@@ -36,6 +51,7 @@ Widget _buildOverlay({
     overrides: [
       inventoryRepositoryProvider.overrideWithValue(InventoryRepository()),
       livesRepositoryProvider.overrideWithValue(LivesRepository()),
+      authControllerProvider.overrideWith(_FakeAuthController.new),
     ],
     child: MaterialApp(
       home: Scaffold(

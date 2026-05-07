@@ -8,6 +8,7 @@ import '../../domain/inventory/inventory_notifier.dart';
 import '../../domain/lives/lives_notifier.dart';
 import '../widgets/outlined_text.dart';
 import 'shop_package_card.dart';
+import 'auth_gate_overlay.dart';
 import 'shop_unit_item_card.dart';
 
 class ShopOverlay extends ConsumerStatefulWidget {
@@ -70,6 +71,14 @@ class _ShopOverlayState extends ConsumerState<ShopOverlay> {
 
   @override
   Widget build(BuildContext context) {
+    return AuthGateOverlay(
+      reason: 'Para acessar a Loja você precisa estar conectado.',
+      onClose: widget.onClose,
+      child: _buildShopContent(context),
+    );
+  }
+
+  Widget _buildShopContent(BuildContext context) {
     final packages = ref.watch(shopPackagesProvider);
 
     return PopScope(
