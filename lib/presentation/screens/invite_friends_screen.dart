@@ -50,7 +50,9 @@ class InviteFriendsScreen extends ConsumerWidget {
                     Text(
                       'Você e seu amigo recebem 2 vidas + 1× Bomba 2\nquando ele completar a primeira partida.',
                       style: GoogleFonts.nunito(
-                          fontSize: 14, color: Colors.white70),
+                        fontSize: 14,
+                        color: Colors.white70,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 32),
@@ -58,7 +60,9 @@ class InviteFriendsScreen extends ConsumerWidget {
                       Text(
                         'Faça login para convidar amigos.',
                         style: GoogleFonts.nunito(
-                            fontSize: 15, color: Colors.white70),
+                          fontSize: 15,
+                          color: Colors.white70,
+                        ),
                       )
                     else
                       inviteState.when(
@@ -66,12 +70,16 @@ class InviteFriendsScreen extends ConsumerWidget {
                             ? _GenerateButton(
                                 onPressed: () => ref
                                     .read(inviteControllerProvider.notifier)
-                                    .generateLink())
+                                    .generateLink(),
+                              )
                             : _LinkCard(link: link),
                         loading: () => const CircularProgressIndicator(
-                            color: Colors.white),
-                        error: (e, _) => Text('Erro: $e',
-                            style: GoogleFonts.nunito(color: Colors.redAccent)),
+                          color: Colors.white,
+                        ),
+                        error: (e, _) => Text(
+                          'Erro: $e',
+                          style: GoogleFonts.nunito(color: Colors.redAccent),
+                        ),
                       ),
                   ],
                 ),
@@ -93,8 +101,10 @@ class _GenerateButton extends StatelessWidget {
     return ElevatedButton.icon(
       onPressed: onPressed,
       icon: const Icon(Icons.link),
-      label: Text('Gerar Link de Convite',
-          style: GoogleFonts.fredoka(fontSize: 17)),
+      label: Text(
+        'Gerar Link de Convite',
+        style: GoogleFonts.fredoka(fontSize: 17),
+      ),
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFFFF7A00),
         foregroundColor: Colors.white,
@@ -119,10 +129,15 @@ class _LinkCard extends StatelessWidget {
             color: Colors.white.withOpacity(0.15),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Text(link,
-              style: GoogleFonts.nunito(
-                  fontSize: 13, color: Colors.white, letterSpacing: 0.5),
-              textAlign: TextAlign.center),
+          child: Text(
+            link,
+            style: GoogleFonts.nunito(
+              fontSize: 13,
+              color: Colors.white,
+              letterSpacing: 0.5,
+            ),
+            textAlign: TextAlign.center,
+          ),
         ),
         const SizedBox(height: 12),
         Row(
@@ -132,21 +147,28 @@ class _LinkCard extends StatelessWidget {
                 onPressed: () {
                   Clipboard.setData(ClipboardData(text: link));
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Link copiado!')));
+                    const SnackBar(content: Text('Link copiado!')),
+                  );
                 },
                 icon: const Icon(Icons.copy, color: Colors.white),
-                label: Text('Copiar',
-                    style: GoogleFonts.nunito(color: Colors.white)),
+                label: Text(
+                  'Copiar',
+                  style: GoogleFonts.nunito(color: Colors.white),
+                ),
                 style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.white54)),
+                  side: const BorderSide(color: Colors.white54),
+                ),
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: ElevatedButton.icon(
-                onPressed: () => Share.share(
-                    'Jogue Olha o Bichim! comigo! $link',
-                    subject: 'Convite para Olha o Bichim!'),
+                onPressed: () => SharePlus.instance.share(
+                  ShareParams(
+                    text: 'Jogue Olha o Bichim! comigo! $link',
+                    subject: 'Convite para Olha o Bichim!',
+                  ),
+                ),
                 icon: const Icon(Icons.share),
                 label: Text('Compartilhar', style: GoogleFonts.nunito()),
                 style: ElevatedButton.styleFrom(

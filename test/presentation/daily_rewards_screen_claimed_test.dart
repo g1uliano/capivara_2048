@@ -42,14 +42,11 @@ void main() {
         inventoryRepositoryProvider.overrideWithValue(InventoryRepository()),
         dailyRewardsRepositoryProvider.overrideWithValue(DailyRewardsRepository()),
         adServiceProvider.overrideWithValue(FakeAdService()),
-        dailyRewardsProvider.overrideWith(
-          (ref) => DailyRewardsNotifier(ref.read(dailyRewardsRepositoryProvider), ref)
-            ..debugSetState(DailyRewardsState(
+        dailyRewardsProvider.overrideWithBuild((ref, n) => DailyRewardsState(
               currentDay: 2,
               lastClaimedDate: normalizedToday,
               claimedThisCycle: true,
             )),
-        ),
       ],
       child: const MaterialApp(home: DailyRewardsScreen()),
     ));

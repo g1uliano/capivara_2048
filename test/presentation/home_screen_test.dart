@@ -8,7 +8,9 @@ import 'package:capivara_2048/data/models/daily_rewards_state.dart';
 import 'package:capivara_2048/data/models/daily_rewards_state_adapter.dart';
 import 'package:capivara_2048/data/models/game_state.dart';
 import 'package:capivara_2048/data/models/inventory_hive_adapter.dart';
+import 'package:capivara_2048/data/models/lives_state.dart';
 import 'package:capivara_2048/data/models/lives_state_adapter.dart';
+import 'package:capivara_2048/domain/lives/lives_notifier.dart';
 import 'package:capivara_2048/data/repositories/game_record_repository.dart';
 import 'package:capivara_2048/domain/daily_rewards/daily_rewards_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/game_notifier.dart';
@@ -21,7 +23,6 @@ Future<ProviderScope> _wrap({
   bool rewardAvailable = false,
 }) async {
   final prefs = await SharedPreferences.getInstance();
-  final settingsNotifier = SettingsNotifier(prefs);
 
   final rewardState = rewardAvailable
       ? DailyRewardsState(
@@ -35,20 +36,13 @@ Future<ProviderScope> _wrap({
           claimedThisCycle: true,
         );
 
-  final overrides = <Override>[
-    settingsProvider.overrideWith((ref) => settingsNotifier),
+  final overrides = [
+    sharedPreferencesProvider.overrideWithValue(prefs),
     gameRecordRepositoryProvider.overrideWithValue(GameRecordRepository()),
-    dailyRewardsProvider.overrideWith(
-      (ref) => DailyRewardsNotifier(
-        ref.read(dailyRewardsRepositoryProvider),
-        ref,
-      )..debugSetState(rewardState),
-    ),
+    livesProvider.overrideWithBuild((ref, n) => LivesState.initial()),
+    dailyRewardsProvider.overrideWithBuild((ref, n) => rewardState),
     if (gameState != null)
-      gameProvider.overrideWith(
-        (ref) => GameNotifier(ref.read(gameEngineProvider), ref)
-          ..debugSetState(gameState),
-      ),
+      gameProvider.overrideWithBuild((ref, n) => gameState),
   ];
 
   return ProviderScope(

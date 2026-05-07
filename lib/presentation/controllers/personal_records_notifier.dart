@@ -3,11 +3,12 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../../data/models/personal_records.dart';
 import '../../data/models/personal_records_hive_adapter.dart';
 
-class PersonalRecordsNotifier extends StateNotifier<PersonalRecords> {
+class PersonalRecordsNotifier extends Notifier<PersonalRecords> {
   static const _boxName = 'personal_records';
   static const _key = 'records';
 
-  PersonalRecordsNotifier() : super(const PersonalRecords());
+  @override
+  PersonalRecords build() => const PersonalRecords();
 
   Future<void> load() async {
     if (!Hive.isAdapterRegistered(PersonalRecords.hiveTypeId)) {
@@ -51,10 +52,14 @@ class PersonalRecordsNotifier extends StateNotifier<PersonalRecords> {
 
   bool isFirstTime(int level) {
     switch (level) {
-      case 11: return state.timesReached2048 == 0;
-      case 12: return state.timesReached4096 == 0;
-      case 13: return state.timesReached8192 == 0;
-      default: return false;
+      case 11:
+        return state.timesReached2048 == 0;
+      case 12:
+        return state.timesReached4096 == 0;
+      case 13:
+        return state.timesReached8192 == 0;
+      default:
+        return false;
     }
   }
 
@@ -76,6 +81,6 @@ class PersonalRecordsNotifier extends StateNotifier<PersonalRecords> {
 }
 
 final personalRecordsProvider =
-    StateNotifierProvider<PersonalRecordsNotifier, PersonalRecords>(
-  (ref) => PersonalRecordsNotifier(),
-);
+    NotifierProvider<PersonalRecordsNotifier, PersonalRecords>(
+      PersonalRecordsNotifier.new,
+    );

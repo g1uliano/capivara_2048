@@ -20,7 +20,7 @@ class HostArtwork extends StatelessWidget {
       child: Image.asset(
         animal.hostPngPath,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+        errorBuilder: (_, _, _) => const SizedBox.shrink(),
       ),
     );
   }

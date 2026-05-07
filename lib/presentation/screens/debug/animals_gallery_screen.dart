@@ -14,7 +14,7 @@ class AnimalsGalleryScreen extends StatelessWidget {
       body: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: animals.length + 1,
-        separatorBuilder: (_, __) => const Divider(height: 32),
+        separatorBuilder: (_, _) => const Divider(height: 32),
         itemBuilder: (context, index) {
           if (index == 0) {
             return const Text(
@@ -111,7 +111,7 @@ class _TilePreview extends StatelessWidget {
                 child: Image.asset(
                   animal.tilePngPath,
                   fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                  errorBuilder: (_, _, _) => const SizedBox.shrink(),
                 ),
               ),
             ),

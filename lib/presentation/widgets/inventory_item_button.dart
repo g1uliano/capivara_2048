@@ -65,7 +65,7 @@ class InventoryItemButton extends StatelessWidget {
                 width: size,
                 height: size,
                 fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => _fallbackButton(effectiveTap),
+                errorBuilder: (_, _, _) => _fallbackButton(effectiveTap),
               ),
             )
           : _fallbackButton(effectiveTap),

@@ -5,79 +5,93 @@ import 'package:hive/hive.dart';
 import '../../data/models/lives_state.dart';
 import '../../data/repositories/lives_repository.dart';
 
-class LivesNotifier extends StateNotifier<LivesState> {
+class LivesNotifier extends Notifier<LivesState> {
   static const _migrationKeyV238 = 'lives_reset_v238';
 
-  final LivesRepository _repo;
   final _ready = Completer<void>();
   Timer? _regenTimer;
   StreamSubscription<BoxEvent>? _boxSub;
   AppLifecycleListener? _lifecycleListener;
 
-  LivesNotifier(this._repo) : super(LivesState.initial()) {
-    _init();
+  @override
+  LivesState build() {
+    ref.onDispose(() {
+      _regenTimer?.cancel();
+      _boxSub?.cancel();
+      _lifecycleListener?.dispose();
+    });
+    unawaited(_init());
+    return LivesState.initial();
   }
 
   Future<void> _init() async {
     // Migration v238: reset to initial (new schema with regenCap/earnedCap)
-    final hasResetV238 = await _repo.getMigrationFlag(_migrationKeyV238);
+    final hasResetV238 = await ref
+        .read(livesRepositoryProvider)
+        .getMigrationFlag(_migrationKeyV238);
     if (!hasResetV238) {
       final fresh = LivesState.initial();
-      await _repo.save(fresh);
-      await _repo.setMigrationFlag(_migrationKeyV238);
+      await ref.read(livesRepositoryProvider).save(fresh);
+      await ref
+          .read(livesRepositoryProvider)
+          .setMigrationFlag(_migrationKeyV238);
       state = fresh;
-      _ready.complete();
       // runZonedGuarded absorbs orphaned Hive-internal Future rejections
       // that escape try-catch when Hive is not initialized (e.g. in tests).
       Box<LivesState>? migBox;
-      await runZonedGuarded<Future<void>>(
-        () async { migBox = await Hive.openBox<LivesState>('lives'); },
-        (_, __) {},
-      );
+      await runZonedGuarded<Future<void>>(() async {
+        migBox = await Hive.openBox<LivesState>('lives');
+      }, (_, _) {});
       if (migBox != null) {
         await _boxSub?.cancel();
-        _boxSub = migBox!.watch(key: 'state').listen(
-          (event) {
-            final updated = event.value as LivesState?;
-            if (updated != null && mounted) {
-              state = updated;
-            }
-          },
-          onError: (_) {},
-          cancelOnError: false,
-        );
+        _boxSub = migBox!
+            .watch(key: 'state')
+            .listen(
+              (event) {
+                final updated = event.value as LivesState?;
+                if (updated != null) {
+                  state = updated;
+                }
+              },
+              onError: (_) {},
+              cancelOnError: false,
+            );
       }
+      // Complete _ready only after Hive box subscription is set up.
+      if (!_ready.isCompleted) _ready.complete();
       return;
     }
 
-    var loaded = await _repo.load();
+    var loaded = await ref.read(livesRepositoryProvider).load();
     loaded = calcRegen(state: loaded, now: DateTime.now());
     state = loaded;
-    await _repo.save(state);
-    _ready.complete();
+    await ref.read(livesRepositoryProvider).save(state);
     _startRegenTimer();
     // runZonedGuarded absorbs orphaned Hive-internal Future rejections
     // that escape try-catch when Hive is not initialized (e.g. in tests).
     Box<LivesState>? box;
-    await runZonedGuarded<Future<void>>(
-      () async { box = await Hive.openBox<LivesState>('lives'); },
-      (_, __) {},
-    );
+    await runZonedGuarded<Future<void>>(() async {
+      box = await Hive.openBox<LivesState>('lives');
+    }, (_, _) {});
     if (box != null) {
       await _boxSub?.cancel();
-      _boxSub = box!.watch(key: 'state').listen(
-        (event) {
-          final updated = event.value as LivesState?;
-          if (updated != null && mounted) {
-            state = updated;
-            // Restart regen timer with the new state
-            _startRegenTimer();
-          }
-        },
-        onError: (_) {},
-        cancelOnError: false,
-      );
+      _boxSub = box!
+          .watch(key: 'state')
+          .listen(
+            (event) {
+              final updated = event.value as LivesState?;
+              if (updated != null) {
+                state = updated;
+                // Restart regen timer with the new state
+                _startRegenTimer();
+              }
+            },
+            onError: (_) {},
+            cancelOnError: false,
+          );
     }
+    // Complete _ready only after Hive box subscription is set up.
+    if (!_ready.isCompleted) _ready.complete();
     try {
       _lifecycleListener = AppLifecycleListener(
         onPause: _pauseRegen,
@@ -166,7 +180,7 @@ class LivesNotifier extends StateNotifier<LivesState> {
     final updated = calcRegen(state: state, now: DateTime.now());
     if (updated.lives != before) {
       state = updated;
-      _repo.save(state);
+      ref.read(livesRepositoryProvider).save(state);
     }
   }
 
@@ -179,7 +193,7 @@ class LivesNotifier extends StateNotifier<LivesState> {
     final updated = calcRegen(state: state, now: DateTime.now());
     if (updated.lives != state.lives) {
       state = updated;
-      _repo.save(state);
+      ref.read(livesRepositoryProvider).save(state);
     }
     _startRegenTimer();
   }
@@ -187,39 +201,31 @@ class LivesNotifier extends StateNotifier<LivesState> {
   Future<void> consume() async {
     await _ready.future;
     state = applyConsume(state);
-    await _repo.save(state);
+    await ref.read(livesRepositoryProvider).save(state);
   }
 
   Future<void> addEarned(int amount) async {
     await _ready.future;
     state = applyAddEarned(state, amount);
-    await _repo.save(state);
+    await ref.read(livesRepositoryProvider).save(state);
   }
 
   Future<void> addPurchased(int amount) async {
     await _ready.future;
     state = applyAddPurchased(state, amount);
-    await _repo.save(state);
+    await ref.read(livesRepositoryProvider).save(state);
   }
 
   Future<void> rewardFromAd() async {
     await _ready.future;
     state = applyAdReward(state);
-    await _repo.save(state);
+    await ref.read(livesRepositoryProvider).save(state);
   }
 
   Future<void> recordAdWatched() async {
     await _ready.future;
     state = applyAdWatched(state);
-    await _repo.save(state);
-  }
-
-  @override
-  void dispose() {
-    _regenTimer?.cancel();
-    _boxSub?.cancel();
-    _lifecycleListener?.dispose();
-    super.dispose();
+    await ref.read(livesRepositoryProvider).save(state);
   }
 
   bool get canWatchAd => canWatchAdFor(state);
@@ -236,6 +242,6 @@ class LivesNotifier extends StateNotifier<LivesState> {
 
 final livesRepositoryProvider = Provider((_) => LivesRepository());
 
-final livesProvider = StateNotifierProvider<LivesNotifier, LivesState>(
-  (ref) => LivesNotifier(ref.read(livesRepositoryProvider)),
+final livesProvider = NotifierProvider<LivesNotifier, LivesState>(
+  LivesNotifier.new,
 );

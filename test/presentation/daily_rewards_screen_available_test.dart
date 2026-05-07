@@ -32,10 +32,7 @@ Widget buildScreen(DailyRewardsState initialState) {
       inventoryRepositoryProvider.overrideWithValue(InventoryRepository()),
       dailyRewardsRepositoryProvider.overrideWithValue(DailyRewardsRepository()),
       adServiceProvider.overrideWithValue(FakeAdService()),
-      dailyRewardsProvider.overrideWith(
-        (ref) => DailyRewardsNotifier(ref.read(dailyRewardsRepositoryProvider), ref)
-          ..debugSetState(initialState),
-      ),
+      dailyRewardsProvider.overrideWithBuild((ref, n) => initialState),
     ],
     child: const MaterialApp(home: DailyRewardsScreen()),
   );

@@ -22,11 +22,7 @@ GameState _stateWithMilestone(int milestone) {
 Widget _wrap(int milestone) {
   return ProviderScope(
     overrides: [
-      gameProvider.overrideWith((ref) {
-        final notifier = GameNotifier(ref.read(gameEngineProvider), ref);
-        notifier.setStateForTest(_stateWithMilestone(milestone));
-        return notifier;
-      }),
+      gameProvider.overrideWithBuild((ref, n) => _stateWithMilestone(milestone)),
     ],
     child: MaterialApp(
       home: Scaffold(

@@ -68,7 +68,7 @@ class _FilledTile extends StatelessWidget {
                 child: Image.asset(
                   animal.tilePngPath,
                   fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                  errorBuilder: (_, _, _) => const SizedBox.shrink(),
                 ),
               ),
             ),

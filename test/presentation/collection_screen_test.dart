@@ -14,17 +14,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 late Directory _tempDir;
 
-class _FakePersonalRecordsNotifier extends PersonalRecordsNotifier {
-  _FakePersonalRecordsNotifier(PersonalRecords initial) : super() {
-    state = initial;
-  }
-}
-
 Widget _wrapWithMaxLevel(int maxLevel) {
   final fakeRecords = PersonalRecords(highestLevelEver: maxLevel);
   return ProviderScope(
     overrides: [
-      personalRecordsProvider.overrideWith((ref) => _FakePersonalRecordsNotifier(fakeRecords)),
+      personalRecordsProvider.overrideWithBuild((ref, n) => fakeRecords),
     ],
     child: const MaterialApp(home: CollectionScreen()),
   );
