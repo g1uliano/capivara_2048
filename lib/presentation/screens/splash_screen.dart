@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../controllers/auth_controller.dart';
 import 'home_screen.dart';
+import 'onboarding_auth_screen.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key, this.precacheFuture});
 
   /// Future que completa quando todos os assets críticos foram precarregados.
@@ -20,10 +23,10 @@ class SplashScreen extends StatefulWidget {
   static const Duration maxWait = Duration(seconds: 4);
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends ConsumerState<SplashScreen> {
   Timer? _navTimer;
   bool _navigated = false;
 
@@ -55,8 +58,13 @@ class _SplashScreenState extends State<SplashScreen> {
   void _navigate() {
     if (!mounted || _navigated) return;
     _navigated = true;
+    final isLoggedIn = ref.read(authControllerProvider) != null;
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
+      MaterialPageRoute(
+        builder: (_) => isLoggedIn
+            ? const HomeScreen()
+            : const OnboardingAuthScreen(showSkip: true),
+      ),
     );
   }
 
