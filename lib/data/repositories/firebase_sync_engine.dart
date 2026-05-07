@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import '../../data/models/game_record.dart';
 import '../../data/models/pending_event.dart';
 import '../../data/models/personal_records.dart';
 import '../../data/models/inventory.dart';
@@ -229,4 +230,17 @@ class FirebaseSyncEngine implements SyncEngine {
       firstReached8192At: ts8192?.toDate(),
     );
   }
+
+  // TODO(task5): implement with full Firestore logic
+  @override
+  String? get remoteAvatarUrl => null;
+
+  @override
+  Future<void> updateDisplayName(String name) async {}
+
+  @override
+  Future<void> deleteUserData() async {}
+
+  @override
+  Future<void> syncGameRecord(GameRecord record) async {}
 }

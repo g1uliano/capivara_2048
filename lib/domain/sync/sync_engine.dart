@@ -1,6 +1,7 @@
 // lib/domain/sync/sync_engine.dart
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/models/game_record.dart';
 import '../../data/models/pending_event.dart';
 import '../../data/repositories/firebase_sync_engine.dart';
 
@@ -11,9 +12,13 @@ abstract class SyncEngine {
   Future<void> dispose();
   Future<void> syncProfile();
   Future<void> updateAvatar(String? avatarUrl);
+  Future<void> updateDisplayName(String name);
+  Future<void> deleteUserData();
+  Future<void> syncGameRecord(GameRecord record);
   Future<void> drainPendingEvents();
   Future<void> enqueuePendingEvent(PendingEvent event);
   Stream<SyncStatus> get statusStream;
+  String? get remoteAvatarUrl;
 }
 
 class FakeSyncEngine implements SyncEngine {
@@ -23,6 +28,9 @@ class FakeSyncEngine implements SyncEngine {
   final List<PendingEvent> enqueued = [];
   String? lastAvatarUrl = _sentinel;
   static const _sentinel = '__not_set__';
+
+  @override
+  String? remoteAvatarUrl;
 
   @override
   Future<void> init(String userId, {String? displayName}) async =>
@@ -40,6 +48,15 @@ class FakeSyncEngine implements SyncEngine {
   }
 
   @override
+  Future<void> updateDisplayName(String name) async {}
+
+  @override
+  Future<void> deleteUserData() async {}
+
+  @override
+  Future<void> syncGameRecord(GameRecord record) async {}
+
+  @override
   Future<void> drainPendingEvents() async {
     drained.addAll(enqueued);
     enqueued.clear();
@@ -55,9 +72,10 @@ class FakeSyncEngine implements SyncEngine {
   Stream<SyncStatus> get statusStream => Stream.value(SyncStatus.idle);
 }
 
-// TODO(fase4b): Replace FakeSyncEngine with FirebaseSyncEngine for prd flavor.
 final syncEngineProvider = Provider<SyncEngine>((ref) {
   const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
-  if (flavor == 'prd') return FirebaseSyncEngine();
+  if (flavor == 'prd' || flavor == 'dev' || flavor == 'tst') {
+    return FirebaseSyncEngine();
+  }
   return FakeSyncEngine();
 });
