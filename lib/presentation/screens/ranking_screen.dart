@@ -8,6 +8,9 @@ import '../../data/repositories/game_record_repository.dart';
 import '../../domain/ranking/ranking_repository.dart';
 import '../widgets/game_background.dart';
 import '../widgets/outlined_text.dart';
+import '../controllers/auth_controller.dart';
+import '../../core/theme/text_styles.dart';
+import 'onboarding_auth_screen.dart';
 
 class RankingScreen extends ConsumerWidget {
   const RankingScreen({super.key});
@@ -156,30 +159,41 @@ class _LegendsRankingTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ListView(
-      padding: const EdgeInsets.all(12),
+    final isLoggedIn = ref.watch(authControllerProvider) != null;
+    return Column(
       children: [
-        _LegendsCard(
-          type: RankingType.legends4096Time,
-          animal: animalForLevel(12),
-          title: 'Lendas 4096',
-          emptyMessage:
-              'Chegue ao nível 12 para entrar no ranking de Lendas 4096!',
-          formatValue: (v) {
-            final s = v ~/ 1000;
-            final m = s ~/ 60;
-            final rem = s % 60;
-            return '${m.toString().padLeft(2, '0')}:${rem.toString().padLeft(2, '0')}';
-          },
-        ),
-        const SizedBox(height: 16),
-        _LegendsCard(
-          type: RankingType.legends8192Count,
-          animal: animalForLevel(13),
-          title: 'Lendas 8192',
-          emptyMessage:
-              'Chegue ao nível 13 para entrar no ranking de Lendas 8192!',
-          formatValue: (v) => '$v ${v == 1 ? 'vez' : 'vezes'}',
+        if (!isLoggedIn)
+          _LoginBanner(
+            message: 'Faça login para aparecer neste ranking.',
+          ),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.all(12),
+            children: [
+              _LegendsCard(
+                type: RankingType.legends4096Time,
+                animal: animalForLevel(12),
+                title: 'Lendas 4096',
+                emptyMessage:
+                    'Chegue ao nível 12 para entrar no ranking de Lendas 4096!',
+                formatValue: (v) {
+                  final s = v ~/ 1000;
+                  final m = s ~/ 60;
+                  final rem = s % 60;
+                  return '${m.toString().padLeft(2, '0')}:${rem.toString().padLeft(2, '0')}';
+                },
+              ),
+              const SizedBox(height: 16),
+              _LegendsCard(
+                type: RankingType.legends8192Count,
+                animal: animalForLevel(13),
+                title: 'Lendas 8192',
+                emptyMessage:
+                    'Chegue ao nível 13 para entrar no ranking de Lendas 8192!',
+                formatValue: (v) => '$v ${v == 1 ? 'vez' : 'vezes'}',
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -285,6 +299,54 @@ class _LegendsCard extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _LoginBanner extends ConsumerWidget {
+  const _LoginBanner({required this.message});
+  final String message;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+      width: double.infinity,
+      color: Colors.black38,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        children: [
+          const Icon(Icons.info_outline, color: Colors.white70, size: 18),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              style: outlinedWhiteTextStyle(GoogleFonts.fredoka(fontSize: 13)),
+            ),
+          ),
+          TextButton(
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const OnboardingAuthScreen(showSkip: false),
+              ),
+            ),
+            child: Text(
+              'Entrar',
+              style: outlinedWhiteTextStyle(
+                GoogleFonts.fredoka(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFFFF8C42),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
