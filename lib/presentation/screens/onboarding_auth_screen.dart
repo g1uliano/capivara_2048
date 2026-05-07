@@ -1,12 +1,15 @@
 import 'dart:io' show Platform;
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/constants/home_constants.dart';
 import '../../core/theme/text_styles.dart';
 import '../controllers/auth_controller.dart';
 import '../widgets/game_background.dart';
 import '../widgets/game_title_image.dart';
+import 'email_auth_screen.dart';
 import 'home_screen.dart';
 
 class OnboardingAuthScreen extends ConsumerStatefulWidget {
@@ -47,6 +50,10 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
   Widget build(BuildContext context) {
     final controller = ref.read(authControllerProvider.notifier);
 
+    final size = MediaQuery.of(context).size;
+    final scale =
+        min(size.width / 390.0, size.height / 844.0).clamp(0.1, 1.0);
+
     return GameBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -57,7 +64,10 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                GameTitleImage(asset: GameTitleImage.pickAsset(), height: 80),
+                GameTitleImage(
+                  asset: GameTitleImage.pickAsset(),
+                  height: HomeConstants.titleHeight(scale),
+                ),
                 const SizedBox(height: 8),
                 Text(
                   'Salve seu progresso e dispute o ranking global.',
@@ -90,7 +100,11 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
                   _AuthButton(
                     label: 'Entrar com Email',
                     icon: Icons.email_outlined,
-                    onPressed: () => _showEmailDialog(context, controller),
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const EmailAuthScreen(),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 32),
                   TextButton(
@@ -114,49 +128,6 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
     );
   }
 
-  void _showEmailDialog(BuildContext context, AuthController controller) {
-    final emailCtrl = TextEditingController();
-    final passCtrl = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Entrar com Email'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: emailCtrl,
-              decoration: const InputDecoration(labelText: 'Email'),
-              keyboardType: TextInputType.emailAddress,
-            ),
-            TextField(
-              controller: passCtrl,
-              decoration: const InputDecoration(labelText: 'Senha'),
-              obscureText: true,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _handleSignIn(
-                () => controller.signInWithEmail(
-                  emailCtrl.text.trim(),
-                  passCtrl.text,
-                ),
-              );
-            },
-            child: const Text('Entrar'),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _AuthButton extends StatelessWidget {
