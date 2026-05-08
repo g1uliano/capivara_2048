@@ -6,6 +6,7 @@ import '../../core/providers/ranking_provider.dart';
 import '../../data/animals_data.dart';
 import '../../data/repositories/game_record_repository.dart';
 import '../../domain/ranking/ranking_repository.dart';
+import '../../domain/ranking/week_id.dart';
 import '../widgets/game_background.dart';
 import '../widgets/outlined_text.dart';
 import '../controllers/auth_controller.dart';
@@ -13,13 +14,15 @@ import '../../core/theme/text_styles.dart';
 import 'onboarding_auth_screen.dart';
 
 class RankingScreen extends ConsumerWidget {
-  const RankingScreen({super.key});
+  const RankingScreen({super.key, this.initialTab = 0});
+  final int initialTab;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return GameBackground(
       child: DefaultTabController(
-        length: 2,
+        length: 3,
+        initialIndex: initialTab,
         child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
@@ -41,12 +44,13 @@ class RankingScreen extends ConsumerWidget {
               indicatorColor: Colors.white,
               tabs: const [
                 Tab(text: 'Pessoal'),
+                Tab(text: 'Global'),
                 Tab(text: 'Lendas'),
               ],
             ),
           ),
           body: const TabBarView(
-            children: [_PersonalRankingTab(), _LegendsRankingTab()],
+            children: [_PersonalRankingTab(), _GlobalRankingTab(), _LegendsRankingTab()],
           ),
         ),
       ),
@@ -348,6 +352,143 @@ class _LoginBanner extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _GlobalRankingTab extends ConsumerWidget {
+  const _GlobalRankingTab();
+
+  String _formatMs(int ms) {
+    final s = ms ~/ 1000;
+    final m = s ~/ 60;
+    final rem = s % 60;
+    return '${m.toString().padLeft(2, '0')}:${rem.toString().padLeft(2, '0')}';
+  }
+
+  String _timeUntilReset() {
+    final now = DateTime.now().toUtc();
+    final end = WeekId.weekEndsAt(now);
+    final diff = end.difference(now);
+    if (diff.inDays >= 1) return '${diff.inDays}d ${diff.inHours % 24}h';
+    return '${diff.inHours}h ${diff.inMinutes % 60}min';
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isLoggedIn = ref.watch(authControllerProvider) != null;
+    final rankingRepo = ref.read(rankingRepositoryProvider);
+    final entriesAsync = ref.watch(
+      StreamProvider.autoDispose<List<RankingEntry>>(
+        (ref) => rankingRepo.watchWeeklyTop(RankingType.globalTime),
+      ),
+    );
+
+    return Column(
+      children: [
+        ColoredBox(
+          color: AppColors.primary.withValues(alpha: 0.85),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.timer_outlined, color: Colors.white70, size: 14),
+                const SizedBox(width: 4),
+                Text(
+                  'Reinício em ${_timeUntilReset()}',
+                  style: GoogleFonts.fredoka(fontSize: 13, color: Colors.white70),
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (!isLoggedIn)
+          Expanded(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(
+                  'Entre na sua conta para ver e participar do Ranking Global.',
+                  style: GoogleFonts.fredoka(fontSize: 16, color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          )
+        else
+          Expanded(
+            child: entriesAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(
+                child: Text(
+                  'Erro ao carregar ranking.',
+                  style: GoogleFonts.fredoka(fontSize: 16, color: Colors.white),
+                ),
+              ),
+              data: (entries) {
+                if (entries.isEmpty) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text(
+                        'Forme o 2048 para entrar no ranking desta semana!',
+                        style: GoogleFonts.fredoka(fontSize: 16, color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  );
+                }
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  itemCount: entries.length,
+                  itemBuilder: (_, i) {
+                    final e = entries[i];
+                    return Container(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: e.isLocalPlayer
+                            ? AppColors.primary.withValues(alpha: 0.25)
+                            : Colors.white.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: ListTile(
+                        dense: true,
+                        leading: Text(
+                          '${e.rank}º',
+                          style: GoogleFonts.fredoka(
+                            fontSize: 18,
+                            color: Colors.white,
+                            fontWeight: e.rank <= 3
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                          ),
+                        ),
+                        title: Text(
+                          e.playerName,
+                          style: GoogleFonts.fredoka(
+                            fontSize: 15,
+                            color: Colors.white,
+                          ),
+                        ),
+                        trailing: Text(
+                          _formatMs(e.value),
+                          style: GoogleFonts.fredoka(
+                            fontSize: 15,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+      ],
     );
   }
 }
