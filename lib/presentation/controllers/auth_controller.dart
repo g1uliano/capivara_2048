@@ -12,7 +12,47 @@ import '../../data/repositories/iap_startup_service.dart';
 
 class AuthController extends Notifier<PlayerProfile?> {
   @override
-  PlayerProfile? build() => ref.read(authServiceProvider).currentProfile;
+  PlayerProfile? build() {
+    final profile = ref.read(authServiceProvider).currentProfile;
+    if (profile != null) {
+      // Sessão restaurada do cache local do Firebase Auth — busca dados
+      // canônicos do Firestore em background (avatar tile + displayName).
+      Future.microtask(() => _restoreSessionOnColdStart(profile));
+    }
+    return profile;
+  }
+
+  /// Espelha o que o fluxo de login faz, mas de forma assíncrona e
+  /// não-bloqueante. Seguro chamar mesmo se o usuário fizer signOut
+  /// antes de completar (state?.copyWith retornará null).
+  Future<void> _restoreSessionOnColdStart(PlayerProfile profile) async {
+    try {
+      final syncEngine = ref.read(syncEngineProvider);
+      await syncEngine.init(profile.userId, displayName: profile.displayName);
+      await syncEngine.syncProfile();
+
+      // Aplica avatar tile do Firestore (não existe no Firebase Auth photoURL)
+      final remoteAvatar = syncEngine.remoteAvatarUrl;
+      final remoteName = syncEngine.remoteDisplayName;
+
+      PlayerProfile? updated = state;
+      if (remoteAvatar != null && remoteAvatar.startsWith('tile:')) {
+        updated = updated?.copyWith(avatarUrl: remoteAvatar);
+      }
+      // Corrige displayName vazio/nulo que o cache do Firebase Auth pode retornar
+      if (remoteName != null &&
+          remoteName.isNotEmpty &&
+          (updated?.displayName.isEmpty ?? false)) {
+        updated = updated?.copyWith(displayName: remoteName);
+      }
+      if (updated != null && updated != state) state = updated;
+
+      await syncEngine.drainPendingEvents();
+      _initIAPStartup(profile.userId);
+    } catch (_) {
+      // Não-fatal: sessão permanece ativa, só sem dados remotos
+    }
+  }
 
   Future<void> signInWithGoogle() async {
     final profile = await ref.read(authServiceProvider).signInWithGoogle();
@@ -146,6 +186,7 @@ class AuthController extends Notifier<PlayerProfile?> {
       try {
         final box = await Hive.openBox(name);
         await box.clear();
+        await box.close();
       } catch (_) {}
     }
 

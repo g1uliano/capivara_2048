@@ -39,6 +39,125 @@ void main() {
     expect(container.read(authControllerProvider), isNull);
   });
 
+  group('cold start session restore', () {
+    test(
+      'ao iniciar com sessão existente, busca avatar tile do Firestore',
+      () async {
+        // Simula cold start: auth service já tem perfil salvo (sem avatar)
+        final profileSemAvatar = PlayerProfile(
+          userId: 'fake-user-id',
+          displayName: 'Giuliano',
+          email: 'giuliano@example.com',
+          provider: AuthProvider.email,
+          createdAt: DateTime(2025, 1, 1),
+          lastSeenAt: DateTime.now(),
+        );
+        final authComSessao = FakeAuthService(
+          initialProfile: profileSemAvatar,
+        );
+        final syncComAvatar = FakeSyncEngine()
+          ..remoteAvatarUrl = 'tile:Capivara';
+
+        final c = ProviderContainer(
+          overrides: [
+            authServiceProvider.overrideWithValue(authComSessao),
+            syncEngineProvider.overrideWithValue(syncComAvatar),
+          ],
+        );
+        addTearDown(() {
+          authComSessao.dispose();
+          c.dispose();
+        });
+
+        // Estado inicial (síncrono) vem do cache do Firebase Auth
+        expect(c.read(authControllerProvider)?.avatarUrl, isNull);
+
+        // Aguarda microtask do _restoreSessionOnColdStart
+        await Future<void>.delayed(Duration.zero);
+
+        final profile = c.read(authControllerProvider);
+        expect(profile?.avatarUrl, 'tile:Capivara');
+        expect(syncComAvatar.initCalled, isTrue);
+      },
+    );
+
+    test(
+      'ao iniciar com sessão existente, corrige displayName vazio do Firestore',
+      () async {
+        // Simula Firebase Auth retornando displayName vazio (bug conhecido)
+        final profileNomVazio = PlayerProfile(
+          userId: 'fake-user-id',
+          displayName: '', // Firebase Auth retornou string vazia
+          email: 'giuliano@example.com',
+          provider: AuthProvider.email,
+          createdAt: DateTime(2025, 1, 1),
+          lastSeenAt: DateTime.now(),
+        );
+        final authComSessao = FakeAuthService(
+          initialProfile: profileNomVazio,
+        );
+        final syncComNome = FakeSyncEngine()
+          ..remoteDisplayName = 'Giuliano'
+          ..remoteAvatarUrl = 'tile:Onca';
+
+        final c = ProviderContainer(
+          overrides: [
+            authServiceProvider.overrideWithValue(authComSessao),
+            syncEngineProvider.overrideWithValue(syncComNome),
+          ],
+        );
+        addTearDown(() {
+          authComSessao.dispose();
+          c.dispose();
+        });
+
+        expect(c.read(authControllerProvider)?.displayName, '');
+
+        await Future<void>.delayed(Duration.zero);
+
+        final profile = c.read(authControllerProvider);
+        expect(profile?.displayName, 'Giuliano');
+        expect(profile?.avatarUrl, 'tile:Onca');
+      },
+    );
+
+    test(
+      'não sobrescreve displayName correto com valor remoto',
+      () async {
+        // Firebase Auth já tem nome correto — remoto não deve sobrescrever
+        final profileCorreto = PlayerProfile(
+          userId: 'fake-user-id',
+          displayName: 'Giuliano',
+          email: 'giuliano@example.com',
+          provider: AuthProvider.email,
+          createdAt: DateTime(2025, 1, 1),
+          lastSeenAt: DateTime.now(),
+        );
+        final authComSessao = FakeAuthService(
+          initialProfile: profileCorreto,
+        );
+        final syncComOutroNome = FakeSyncEngine()
+          ..remoteDisplayName = 'Outro Nome';
+
+        final c = ProviderContainer(
+          overrides: [
+            authServiceProvider.overrideWithValue(authComSessao),
+            syncEngineProvider.overrideWithValue(syncComOutroNome),
+          ],
+        );
+        addTearDown(() {
+          authComSessao.dispose();
+          c.dispose();
+        });
+
+        await Future<void>.delayed(Duration.zero);
+
+        // Nome local não-vazio não deve ser sobrescrito
+        expect(c.read(authControllerProvider)?.displayName, 'Giuliano');
+      },
+    );
+  });
+
   test('signInWithGoogle atualiza estado com PlayerProfile', () async {
     await container.read(authControllerProvider.notifier).signInWithGoogle();
     final profile = container.read(authControllerProvider);

@@ -19,6 +19,7 @@ abstract class SyncEngine {
   Future<void> enqueuePendingEvent(PendingEvent event);
   Stream<SyncStatus> get statusStream;
   String? get remoteAvatarUrl;
+  String? get remoteDisplayName;
 }
 
 class FakeSyncEngine implements SyncEngine {
@@ -31,6 +32,9 @@ class FakeSyncEngine implements SyncEngine {
 
   @override
   String? remoteAvatarUrl;
+
+  @override
+  String? remoteDisplayName;
 
   @override
   Future<void> init(String userId, {String? displayName}) async =>

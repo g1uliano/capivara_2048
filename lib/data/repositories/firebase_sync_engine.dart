@@ -24,15 +24,21 @@ class FirebaseSyncEngine implements SyncEngine {
   String? _userId;
   StreamSubscription<DocumentSnapshot>? _profileListener;
   StreamSubscription<List<ConnectivityResult>>? _connectivityListener;
-  final _statusController = StreamController<SyncStatus>.broadcast();
+  StreamController<SyncStatus> _statusController =
+      StreamController<SyncStatus>.broadcast();
   final _firestore = FirebaseFirestore.instance;
   String? _remoteAvatarUrl;
+  String? _remoteDisplayName;
 
   @override
   Stream<SyncStatus> get statusStream => _statusController.stream;
 
   @override
   Future<void> init(String userId, {String? displayName}) async {
+    // Recriar controller se foi fechado por dispose() (re-login após signOut)
+    if (_statusController.isClosed) {
+      _statusController = StreamController<SyncStatus>.broadcast();
+    }
     _userId = userId;
     if (displayName != null) this.displayName = displayName;
     _startSnapshotListener();
@@ -58,12 +64,12 @@ class FirebaseSyncEngine implements SyncEngine {
         final data = doc.data()!;
         // Avatar (para contas e-mail com tile animal)
         _remoteAvatarUrl = data['avatarUrl'] as String?;
+        // displayName canônico do Firestore (mais confiável que o cache do Firebase Auth)
+        _remoteDisplayName = data['displayName'] as String?;
         await _mergeRemotePersonalRecords(
           data['personalRecords'] as Map<String, dynamic>?,
         );
-        await _mergeRemoteInventory(
-          data['inventory'] as Map<String, dynamic>?,
-        );
+        await _mergeRemoteInventory(data['inventory'] as Map<String, dynamic>?);
         await _mergeRemoteGameRecords(
           (data['gameRecords'] as List<dynamic>?)
               ?.map((e) => e as Map<String, dynamic>)
@@ -245,12 +251,14 @@ class FirebaseSyncEngine implements SyncEngine {
   String? get remoteAvatarUrl => _remoteAvatarUrl;
 
   @override
+  String? get remoteDisplayName => _remoteDisplayName;
+
+  @override
   Future<void> updateDisplayName(String name) async {
     if (_userId == null) return;
-    await _firestore.collection('users').doc(_userId).set(
-      {'displayName': name},
-      SetOptions(merge: true),
-    );
+    await _firestore.collection('users').doc(_userId).set({
+      'displayName': name,
+    }, SetOptions(merge: true));
   }
 
   @override
@@ -274,7 +282,8 @@ class FirebaseSyncEngine implements SyncEngine {
   }
 
   Future<void> _mergeRemoteGameRecords(
-      List<Map<String, dynamic>>? remoteData) async {
+    List<Map<String, dynamic>>? remoteData,
+  ) async {
     if (remoteData == null || remoteData.isEmpty) return;
     if (!Hive.isAdapterRegistered(GameRecord.hiveTypeId)) {
       Hive.registerAdapter(GameRecordHiveAdapter());
