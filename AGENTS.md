@@ -104,7 +104,7 @@ TabBar(
 
 ## Fases do roadmap
 
-Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 4.1.1 completa (v1.5.3) — próximo: Fase 5 (Arte adicional e polimento visual)**. O áudio foi reposicionado para a **Fase 6** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
+Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 4.2 completa (v1.6.0) — próximo: Fase 5 (Arte adicional e polimento visual)**. O áudio foi reposicionado para a **Fase 6** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
 
 | Fase      | Foco                                                                                                        |
 | --------- | ----------------------------------------------------------------------------------------------------------- |
@@ -125,6 +125,7 @@ Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 4
 | 4 gaps ✅ | registerInvite pós-login, ProfileScreen Convidar Amigos + Restaurar Compras real                            |
 | 4.1 ✅    | EmailAuthScreen, AvatarPickerScreen, AvatarWidget, updateAvatar(), destaque avatar na Home, fix legibilidade InviteFriendsScreen |
 | 4.1.1 ✅  | Tipografia consistente: Fredoka em todas as telas/widgets sobre fundos não-sólidos                          |
+| 4.2 ✅    | Exclusão de conta LGPD, nome no cadastro, editar nome, trocar/esqueci senha, persistência avatar tile, auth gates (startup, shop, daily, ranking), sync game records |
 | 5         | Arte adicional e polimento visual (logo, ícone, splash final)                                               |
 | 6         | Áudio (sound design dos 13 animais, SFX, música)                                                            |
 | 7         | Polimento, l10n, acessibilidade, lançamento                                                                 |

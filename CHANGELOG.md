@@ -4,6 +4,31 @@ All notable changes to Capivara 2048 will be documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.6.0] — 2026-05-07
+
+### Added
+- **Exclusão de conta (LGPD):** fluxo de 2 etapas na `ProfileScreen` (aviso + digitar "EXCLUIR" + senha para conta e-mail); remove dados do Firestore, Hive local e Firebase Auth com re-autenticação
+- **Campo nome no cadastro:** `EmailAuthScreen` agora exige nome no signup; nome é salvo no Firebase Auth e Firestore
+- **Editar nome de perfil:** botão lápis ao lado do nome na `ProfileScreen` (somente contas e-mail)
+- **Trocar senha:** ListTile na `ProfileScreen` envia e-mail de redefinição (somente contas e-mail)
+- **Esqueci minha senha:** link na `EmailAuthScreen` (modo login) envia e-mail de redefinição
+- **Persistência de avatar tile:** avatar de animal escolhido por contas e-mail agora persiste entre sessões via Firestore
+- **Auth gate no startup:** `SplashScreen` redireciona para `OnboardingAuthScreen` quando não logado
+- **`OnboardingAuthScreen` dual-mode:** modo startup (`showSkip: true`) com bloco de benefícios e botão "Jogar sem conta →"; modo mid-app com AppBar e pop após login
+- **`AuthGateOverlay`:** novo widget para gates de auth em overlays do jogo (ShopOverlay)
+- **Auth gate na Loja (overlay):** `ShopOverlay` exibe `AuthGateOverlay` quando não logado
+- **Auth guard na Home:** navegação para `DailyRewardsScreen` e `ShopScreen` requer login
+- **Banner na aba Lendas:** informação não-bloqueante no `RankingScreen` quando não logado
+- **Sync ranking pessoal:** partidas salvas no Firestore quando logado; merge com dados locais no login
+- **Sync game records:** após fim de partida, registro enviado ao Firestore quando logado
+- **`GameRecord.toJson/fromJson`:** serialização para persistência no Firestore
+
+### Fixed
+- **`signOut()`:** `GoogleSignIn.instance.signOut()` agora é chamado apenas para contas Google (antes chamava incondicionalmente)
+- **`syncEngineProvider`:** usa `FirebaseSyncEngine` para `dev`, `tst` e `prd` (antes só `prd`)
+- **Avatar Google:** botão de editar avatar ocultado na `ProfileScreen` para contas Google
+- **Harness de testes e2e:** `GameTestHarness` inicializa com usuário logado; golden tests da `HomeScreen` atualizados
+
 ## [1.5.3] — 2026-05-07
 
 ### Fixed
