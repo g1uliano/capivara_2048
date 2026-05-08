@@ -4,8 +4,21 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../widgets/outlined_text.dart';
 import '../../../widgets/game_title_image.dart';
 
-class TutorialWelcomePage extends StatelessWidget {
+class TutorialWelcomePage extends StatefulWidget {
   const TutorialWelcomePage({super.key});
+
+  @override
+  State<TutorialWelcomePage> createState() => _TutorialWelcomePageState();
+}
+
+class _TutorialWelcomePageState extends State<TutorialWelcomePage> {
+  late final String _titleAsset;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleAsset = GameTitleImage.pickAsset();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +27,7 @@ class TutorialWelcomePage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          GameTitleImage(asset: GameTitleImage.pickAsset(), height: 120),
+          GameTitleImage(asset: _titleAsset, height: 120),
           const SizedBox(height: 24),
           OutlinedText(
             text: 'Bem-vindo à floresta amazônica!',
@@ -27,7 +40,8 @@ class TutorialWelcomePage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32),
             child: OutlinedText(
-              text: 'Aqui moram bichos de todo tipo — e cabe a você ajudá-los a evoluir até descobrir a lendária Capivara. Bora aprender?',
+              text:
+                  'Aqui moram bichos de todo tipo — e cabe a você ajudá-los a evoluir até descobrir a lendária Capivara. Bora aprender?',
               style: GoogleFonts.fredoka(fontSize: 16, height: 1.5),
               textAlign: TextAlign.center,
             ),
