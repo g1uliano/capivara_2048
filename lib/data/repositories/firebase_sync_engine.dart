@@ -93,10 +93,9 @@ class FirebaseSyncEngine implements SyncEngine {
   @override
   Future<void> updateTutorialCompleted(bool completed) async {
     if (_userId == null) return;
-    await _firestore.collection('users').doc(_userId).set(
-      {'tutorialCompleted': completed},
-      SetOptions(merge: true),
-    );
+    await _firestore.collection('users').doc(_userId).set({
+      'tutorialCompleted': completed,
+    }, SetOptions(merge: true));
   }
 
   @override

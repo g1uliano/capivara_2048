@@ -223,6 +223,11 @@ class AuthController extends Notifier<PlayerProfile?> {
   }
 
   bool get isLoggedIn => state != null;
+
+  void updateProfileTutorialFlag(bool completed) {
+    if (state == null) return;
+    state = state!.copyWith(tutorialCompleted: completed);
+  }
 }
 
 final authControllerProvider = NotifierProvider<AuthController, PlayerProfile?>(
