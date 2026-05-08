@@ -48,12 +48,10 @@ class FirestoreRankingRepository implements RankingRepository {
       case RankingType.globalTime:
         // Secondary sort by maxTile DESC breaks ties (higher tile = better).
         // Requires a Firestore composite index: bestTimeMs ASC + maxTile DESC.
-        return _weeklyCollection(
-          weekId,
-          type,
-        ).orderBy('bestTimeMs', descending: false)
-         .orderBy('maxTile', descending: true)
-         .limit(50);
+        return _weeklyCollection(weekId, type)
+            .orderBy('bestTimeMs', descending: false)
+            .orderBy('maxTile', descending: true)
+            .limit(50);
       case RankingType.globalScore:
         return _weeklyCollection(
           weekId,
@@ -103,15 +101,18 @@ class FirestoreRankingRepository implements RankingRepository {
         final int prevValue;
         if (type == RankingType.globalTime) {
           prevValue = (prevData['bestTimeMs'] as num?)?.toInt() ?? 0;
+          final prevMaxTile = (prevData['maxTile'] as num?)?.toInt() ?? 0;
+          final curMaxTile  = (data['maxTile']    as num?)?.toInt() ?? 0;
+          // Different rank if either value differs OR maxTile differs (tiebreaker)
+          if (value != prevValue || curMaxTile != prevMaxTile) rank = i + 1;
         } else if (type == RankingType.globalScore) {
           prevValue = (prevData['value'] as num?)?.toInt() ?? 0;
+          if (value != prevValue) rank = i + 1;
         } else {
+          // legends
           prevValue = (prevData['timesReached'] as num?)?.toInt() ?? 0;
+          if (value != prevValue) rank = i + 1;
         }
-        if (value != prevValue) {
-          rank = i + 1;
-        }
-        // else rank stays the same (tie)
       }
 
       entries.add(
