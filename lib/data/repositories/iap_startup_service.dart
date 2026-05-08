@@ -108,7 +108,7 @@ class FakeIAPStartupService implements IAPStartupService {
 final iapStartupServiceProvider = Provider<IAPStartupService>((ref) {
   const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
   const useRealIap = bool.fromEnvironment('USE_REAL_IAP', defaultValue: false);
-  if (flavor == 'prd' || (flavor == 'tst' && useRealIap)) {
+  if (flavor == 'prd' || flavor == 'dev' || (flavor == 'tst' && useRealIap)) {
     return IAPStartupServiceImpl();
   }
   return FakeIAPStartupService();

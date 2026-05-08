@@ -52,7 +52,7 @@ final iapServiceProvider = Provider<IAPService>((ref) {
   const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
   const useRealIap = bool.fromEnvironment('USE_REAL_IAP', defaultValue: false);
 
-  if (flavor == 'prd' || (flavor == 'tst' && useRealIap)) {
+  if (flavor == 'prd' || flavor == 'dev' || (flavor == 'tst' && useRealIap)) {
     final profile = ref.watch(authControllerProvider);
     if (profile != null) return IAPServiceImpl(userId: profile.userId);
   }

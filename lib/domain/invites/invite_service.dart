@@ -4,7 +4,7 @@ import '../../presentation/controllers/auth_controller.dart';
 
 abstract class InviteService {
   /// Generates (or retrieves) an invite link for the given userId.
-  /// Returns the URL: "olhabichim://invite?ref={userId}"
+  /// Returns the HTTPS URL: "https://bichim-prd.web.app/invite?ref={userId}"
   Future<String> generateInviteLink(String userId);
 
   /// Registers that inviteeId was referred by inviterId.
@@ -31,7 +31,7 @@ class FakeInviteService implements InviteService {
 
   @override
   Future<String> generateInviteLink(String userId) async =>
-      'olhabichim://invite?ref=$userId';
+      'https://bichim-prd.web.app/invite?ref=$userId';
 
   @override
   Future<void> registerInvite({
@@ -60,14 +60,17 @@ class FakeInviteService implements InviteService {
 
 final inviteServiceProvider = Provider<InviteService>((ref) {
   const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
-  if (flavor == 'prd') {
-    final profile = ref.watch(authControllerProvider);
-    if (profile != null) {
-      return FirestoreInviteRepository(
-        userId: profile.userId,
-        displayName: profile.displayName,
-      );
-    }
+  if (flavor == 'tst') return FakeInviteService();
+
+  final profile = ref.watch(authControllerProvider);
+  if (profile == null) {
+    throw StateError(
+      'inviteServiceProvider acessado sem usuário logado. '
+      'A UI deve checar authControllerProvider antes de usar convites.',
+    );
   }
-  return FakeInviteService();
+  return FirestoreInviteRepository(
+    userId: profile.userId,
+    displayName: profile.displayName,
+  );
 });

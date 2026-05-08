@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:capivara_2048/data/repositories/iap_startup_service.dart';
 import 'package:capivara_2048/domain/auth/auth_service.dart';
 import 'package:capivara_2048/domain/sync/sync_engine.dart';
 import 'package:capivara_2048/presentation/controllers/auth_controller.dart';
@@ -22,6 +23,7 @@ void main() {
       overrides: [
         authServiceProvider.overrideWithValue(fakeAuth),
         syncEngineProvider.overrideWithValue(fakeSyncEngine),
+        iapStartupServiceProvider.overrideWithValue(FakeIAPStartupService()),
       ],
     );
   });
@@ -62,6 +64,7 @@ void main() {
           overrides: [
             authServiceProvider.overrideWithValue(authComSessao),
             syncEngineProvider.overrideWithValue(syncComAvatar),
+            iapStartupServiceProvider.overrideWithValue(FakeIAPStartupService()),
           ],
         );
         addTearDown(() {
@@ -104,6 +107,7 @@ void main() {
           overrides: [
             authServiceProvider.overrideWithValue(authComSessao),
             syncEngineProvider.overrideWithValue(syncComNome),
+            iapStartupServiceProvider.overrideWithValue(FakeIAPStartupService()),
           ],
         );
         addTearDown(() {
@@ -143,6 +147,7 @@ void main() {
           overrides: [
             authServiceProvider.overrideWithValue(authComSessao),
             syncEngineProvider.overrideWithValue(syncComOutroNome),
+            iapStartupServiceProvider.overrideWithValue(FakeIAPStartupService()),
           ],
         );
         addTearDown(() {
