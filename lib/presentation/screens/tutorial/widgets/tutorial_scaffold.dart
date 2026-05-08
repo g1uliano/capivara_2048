@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/constants/app_colors.dart';
 import '../../../../core/theme/text_styles.dart';
 import '../../../widgets/game_background.dart';
 import 'tutorial_dots_indicator.dart';
@@ -33,7 +34,7 @@ class TutorialScaffold extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          backgroundColor: Colors.transparent,
+          backgroundColor: AppColors.primary,
           elevation: 0,
           foregroundColor: Colors.white,
           automaticallyImplyLeading: false,
@@ -46,9 +47,7 @@ class TutorialScaffold extends StatelessWidget {
               onPressed: onSkip,
               child: Text(
                 'Pular',
-                style: outlinedWhiteTextStyle(
-                  GoogleFonts.fredoka(fontSize: 15, color: Colors.white70),
-                ),
+                style: GoogleFonts.fredoka(fontSize: 15, color: Colors.white70),
               ),
             ),
           ],
@@ -93,9 +92,7 @@ class TutorialScaffold extends StatelessWidget {
                             GoogleFonts.fredoka(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: canGoNext
-                                  ? Colors.white
-                                  : Colors.white24,
+                              color: canGoNext ? Colors.white : Colors.white24,
                             ),
                           ),
                         ),
