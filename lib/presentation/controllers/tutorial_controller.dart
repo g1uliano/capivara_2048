@@ -30,5 +30,6 @@ class TutorialController extends Notifier<void> {
   }
 }
 
-final tutorialControllerProvider =
-    NotifierProvider<TutorialController, void>(TutorialController.new);
+final tutorialControllerProvider = NotifierProvider<TutorialController, void>(
+  TutorialController.new,
+);

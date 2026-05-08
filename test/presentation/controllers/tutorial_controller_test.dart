@@ -16,38 +16,41 @@ class _FakeAuthController extends AuthController {
 }
 
 PlayerProfile _makeProfile({bool tutorialCompleted = false}) => PlayerProfile(
-      userId: 'u1',
-      displayName: 'Test',
-      provider: AuthProvider.email,
-      createdAt: DateTime(2026, 1, 1),
-      lastSeenAt: DateTime(2026, 1, 1),
-      tutorialCompleted: tutorialCompleted,
-    );
+  userId: 'u1',
+  displayName: 'Test',
+  provider: AuthProvider.email,
+  createdAt: DateTime(2026, 1, 1),
+  lastSeenAt: DateTime(2026, 1, 1),
+  tutorialCompleted: tutorialCompleted,
+);
 
 void main() {
   group('TutorialController - anonymous user', () {
     setUp(() => SharedPreferences.setMockInitialValues({}));
 
     test('isCompleted returns false by default', () async {
-      final container = ProviderContainer(overrides: [
-        authControllerProvider.overrideWith(() => _FakeAuthController(null)),
-        syncEngineProvider.overrideWithValue(FakeSyncEngine()),
-      ]);
+      final container = ProviderContainer(
+        overrides: [
+          authControllerProvider.overrideWith(() => _FakeAuthController(null)),
+          syncEngineProvider.overrideWithValue(FakeSyncEngine()),
+        ],
+      );
       addTearDown(container.dispose);
-      final result =
-          await container.read(tutorialControllerProvider.notifier).isCompleted();
+      final result = await container
+          .read(tutorialControllerProvider.notifier)
+          .isCompleted();
       expect(result, false);
     });
 
     test('markCompleted saves to SharedPreferences', () async {
-      final container = ProviderContainer(overrides: [
-        authControllerProvider.overrideWith(() => _FakeAuthController(null)),
-        syncEngineProvider.overrideWithValue(FakeSyncEngine()),
-      ]);
+      final container = ProviderContainer(
+        overrides: [
+          authControllerProvider.overrideWith(() => _FakeAuthController(null)),
+          syncEngineProvider.overrideWithValue(FakeSyncEngine()),
+        ],
+      );
       addTearDown(container.dispose);
-      await container
-          .read(tutorialControllerProvider.notifier)
-          .markCompleted();
+      await container.read(tutorialControllerProvider.notifier).markCompleted();
       final prefs = await SharedPreferences.getInstance();
       expect(prefs.getBool('tutorial_completed'), true);
     });
@@ -58,27 +61,34 @@ void main() {
 
     test('isCompleted returns profile.tutorialCompleted', () async {
       final profile = _makeProfile(tutorialCompleted: false);
-      final container = ProviderContainer(overrides: [
-        authControllerProvider.overrideWith(() => _FakeAuthController(profile)),
-        syncEngineProvider.overrideWithValue(FakeSyncEngine()),
-      ]);
+      final container = ProviderContainer(
+        overrides: [
+          authControllerProvider.overrideWith(
+            () => _FakeAuthController(profile),
+          ),
+          syncEngineProvider.overrideWithValue(FakeSyncEngine()),
+        ],
+      );
       addTearDown(container.dispose);
-      final result =
-          await container.read(tutorialControllerProvider.notifier).isCompleted();
+      final result = await container
+          .read(tutorialControllerProvider.notifier)
+          .isCompleted();
       expect(result, false);
     });
 
     test('markCompleted calls syncEngine.updateTutorialCompleted', () async {
       final fake = FakeSyncEngine();
       final profile = _makeProfile(tutorialCompleted: false);
-      final container = ProviderContainer(overrides: [
-        authControllerProvider.overrideWith(() => _FakeAuthController(profile)),
-        syncEngineProvider.overrideWithValue(fake),
-      ]);
+      final container = ProviderContainer(
+        overrides: [
+          authControllerProvider.overrideWith(
+            () => _FakeAuthController(profile),
+          ),
+          syncEngineProvider.overrideWithValue(fake),
+        ],
+      );
       addTearDown(container.dispose);
-      await container
-          .read(tutorialControllerProvider.notifier)
-          .markCompleted();
+      await container.read(tutorialControllerProvider.notifier).markCompleted();
       expect(fake.tutorialCompleted, true);
     });
   });
