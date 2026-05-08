@@ -37,7 +37,9 @@ Future<void> _initHive() async {
   _tempDir = await Directory.systemTemp.createTemp('game_211_test');
   Hive.init(_tempDir.path);
   if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(LivesStateAdapter());
-  if (!Hive.isAdapterRegistered(2)) Hive.registerAdapter(InventoryHiveAdapter());
+  if (!Hive.isAdapterRegistered(2)) {
+    Hive.registerAdapter(InventoryHiveAdapter());
+  }
 }
 
 Widget _buildGame() {
@@ -63,7 +65,9 @@ void main() {
     await _tempDir.delete(recursive: true);
   });
 
-  testWidgets('tap em ícone desabilitado (count==0) → ShopOverlay aparece', (tester) async {
+  testWidgets('tap em ícone desabilitado (count==0) → ShopOverlay aparece', (
+    tester,
+  ) async {
     await tester.binding.setSurfaceSize(const Size(390, 844));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 

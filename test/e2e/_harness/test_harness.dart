@@ -21,8 +21,18 @@ import 'package:capivara_2048/domain/lives/lives_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/game_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/personal_records_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/settings_notifier.dart';
+import 'package:capivara_2048/data/models/player_profile.dart';
 import 'package:capivara_2048/domain/auth/auth_service.dart';
 import 'package:capivara_2048/domain/sync/sync_engine.dart';
+
+/// PlayerProfile de teste: simula usuário logado no harness e2e.
+final _kTestProfile = PlayerProfile(
+  userId: 'test-user',
+  displayName: 'Jogador Teste',
+  provider: AuthProvider.email,
+  createdAt: DateTime(2025),
+  lastSeenAt: DateTime(2025),
+);
 
 /// Test harness that boots the full app inside [WidgetTester.pumpWidget]
 /// with an isolated Hive directory and mocked SharedPreferences.
@@ -54,7 +64,7 @@ class GameTestHarness {
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
         gameRecordRepositoryProvider.overrideWithValue(repo),
-        authServiceProvider.overrideWithValue(FakeAuthService()),
+        authServiceProvider.overrideWithValue(FakeAuthService(initialProfile: _kTestProfile)),
         syncEngineProvider.overrideWithValue(FakeSyncEngine()),
       ],
     );
@@ -102,7 +112,7 @@ class GameTestHarness {
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
         gameRecordRepositoryProvider.overrideWithValue(repo),
-        authServiceProvider.overrideWithValue(FakeAuthService()),
+        authServiceProvider.overrideWithValue(FakeAuthService(initialProfile: _kTestProfile)),
         syncEngineProvider.overrideWithValue(FakeSyncEngine()),
       ],
     );

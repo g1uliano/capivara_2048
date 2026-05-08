@@ -68,13 +68,13 @@ Future<ProviderScope> _wrap({
 }
 
 GameState _savedGameState({bool isPaused = false}) => GameState(
-      board: List.generate(4, (_) => List.filled(4, null)),
-      score: 100,
-      highScore: 0,
-      isGameOver: false,
-      hasWon: false,
-      isPaused: isPaused,
-    );
+  board: List.generate(4, (_) => List.filled(4, null)),
+  score: 100,
+  highScore: 0,
+  isGameOver: false,
+  hasWon: false,
+  isPaused: isPaused,
+);
 
 late Directory _tempDir;
 
@@ -83,8 +83,12 @@ void main() {
     _tempDir = await Directory.systemTemp.createTemp('hive_home_v2');
     Hive.init(_tempDir.path);
     if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(LivesStateAdapter());
-    if (!Hive.isAdapterRegistered(2)) Hive.registerAdapter(InventoryHiveAdapter());
-    if (!Hive.isAdapterRegistered(3)) Hive.registerAdapter(DailyRewardsStateAdapter());
+    if (!Hive.isAdapterRegistered(2)) {
+      Hive.registerAdapter(InventoryHiveAdapter());
+    }
+    if (!Hive.isAdapterRegistered(3)) {
+      Hive.registerAdapter(DailyRewardsStateAdapter());
+    }
   });
   tearDownAll(() async {
     await Hive.close();
@@ -98,7 +102,9 @@ void main() {
     expect(find.byType(LivesIndicator), findsNothing);
   });
 
-  testWidgets('GameTitleImage presente (Image com path title_)', (tester) async {
+  testWidgets('GameTitleImage presente (Image com path title_)', (
+    tester,
+  ) async {
     await tester.pumpWidget(await _wrap());
     await tester.pump(const Duration(milliseconds: 500));
     final images = tester.widgetList<Image>(find.byType(Image));
@@ -128,7 +134,9 @@ void main() {
     expect(find.text('Novo jogo'), findsOneWidget);
   });
 
-  testWidgets('"Continuar Jogo" visível quando há partida salva', (tester) async {
+  testWidgets('"Continuar Jogo" visível quando há partida salva', (
+    tester,
+  ) async {
     await tester.pumpWidget(await _wrap(gameState: _savedGameState()));
     await tester.pump(const Duration(milliseconds: 500));
     expect(find.text('Continuar Jogo'), findsOneWidget);
@@ -140,7 +148,9 @@ void main() {
     expect(find.text('Continuar Jogo'), findsNothing);
   });
 
-  testWidgets('badge "!" visível quando dailyRewardAvailable == true', (tester) async {
+  testWidgets('badge "!" visível quando dailyRewardAvailable == true', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(800, 1400);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -150,7 +160,9 @@ void main() {
     expect(find.text('!'), findsOneWidget);
   });
 
-  testWidgets('badge "!" ausente quando dailyRewardAvailable == false', (tester) async {
+  testWidgets('badge "!" ausente quando dailyRewardAvailable == false', (
+    tester,
+  ) async {
     await tester.pumpWidget(await _wrap(rewardAvailable: false));
     await tester.pump(const Duration(milliseconds: 500));
     expect(find.text('!'), findsNothing);
@@ -192,7 +204,9 @@ void main() {
     expect(find.text('Loja'), findsWidgets);
   });
 
-  testWidgets('tap em Configurações navega para SettingsScreen', (tester) async {
+  testWidgets('tap em Configurações navega para SettingsScreen', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(800, 1400);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -204,7 +218,9 @@ void main() {
     expect(find.text('Configurações'), findsWidgets);
   });
 
-  testWidgets('tap em Recompensas navega para DailyRewardsScreen', (tester) async {
+  testWidgets('tap em Recompensas navega para DailyRewardsScreen', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(800, 1400);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -217,30 +233,37 @@ void main() {
   });
 
   testWidgets(
-      'tap em "Continuar Jogo" desfaz pausa do jogo (regressão: back do Android deixava isPaused=true e ao voltar via Continuar caia no PauseOverlay)',
-      (tester) async {
-    tester.view.physicalSize = const Size(800, 1400);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-    await tester.pumpWidget(
-      await _wrap(gameState: _savedGameState(isPaused: true)),
-    );
-    await tester.pump(const Duration(milliseconds: 500));
+    'tap em "Continuar Jogo" desfaz pausa do jogo (regressão: back do Android deixava isPaused=true e ao voltar via Continuar caia no PauseOverlay)',
+    (tester) async {
+      tester.view.physicalSize = const Size(800, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(
+        await _wrap(gameState: _savedGameState(isPaused: true)),
+      );
+      await tester.pump(const Duration(milliseconds: 500));
 
-    final container = ProviderScope.containerOf(
-      tester.element(find.byType(HomeScreen)),
-    );
-    expect(container.read(gameProvider).isPaused, isTrue,
-        reason: 'pre-condição: jogo começa pausado');
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(HomeScreen)),
+      );
+      expect(
+        container.read(gameProvider).isPaused,
+        isTrue,
+        reason: 'pre-condição: jogo começa pausado',
+      );
 
-    await tester.tap(find.text('Continuar Jogo'));
-    // Não pumpa: resume() é síncrono e o estado já foi atualizado.
-    // Pumpar aqui dispararia render da GameScreen, fora do escopo deste teste.
+      await tester.tap(find.text('Continuar Jogo'));
+      // Não pumpa: resume() é síncrono e o estado já foi atualizado.
+      // Pumpar aqui dispararia render da GameScreen, fora do escopo deste teste.
 
-    expect(container.read(gameProvider).isPaused, isFalse,
-        reason: '"Continuar" deve despausar o jogo antes de navegar');
-  });
+      expect(
+        container.read(gameProvider).isPaused,
+        isFalse,
+        reason: '"Continuar" deve despausar o jogo antes de navegar',
+      );
+    },
+  );
 
   testWidgets('tap em ComoJogar abre BottomSheet', (tester) async {
     tester.view.physicalSize = const Size(800, 1400);
