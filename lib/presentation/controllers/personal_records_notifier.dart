@@ -78,6 +78,19 @@ class PersonalRecordsNotifier extends Notifier<PersonalRecords> {
       await _save();
     }
   }
+
+  /// Atualiza o melhor tempo para atingir 2048.
+  /// Só salva se [timeMs] for melhor que o anterior (ou se for o primeiro).
+  /// Retorna true se o recorde foi quebrado.
+  Future<bool> updateBestTime2048(int timeMs) async {
+    if (timeMs <= 0) return false;
+    final isNewRecord = state.bestTimeMs2048 == 0 || timeMs < state.bestTimeMs2048;
+    if (isNewRecord) {
+      state = state.copyWith(bestTimeMs2048: timeMs);
+      await _save();
+    }
+    return isNewRecord;
+  }
 }
 
 final personalRecordsProvider =

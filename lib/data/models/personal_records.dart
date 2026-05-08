@@ -10,6 +10,7 @@ class PersonalRecords {
   final bool rewardCollected4096;
   final bool rewardCollected8192;
   final int highestLevelEver;
+  final int bestTimeMs2048;
 
   const PersonalRecords({
     this.timesReached2048 = 0,
@@ -21,6 +22,7 @@ class PersonalRecords {
     this.rewardCollected4096 = false,
     this.rewardCollected8192 = false,
     this.highestLevelEver = 0,
+    this.bestTimeMs2048 = 0,
   });
 
   static const _sentinel = Object();
@@ -35,6 +37,7 @@ class PersonalRecords {
     bool? rewardCollected4096,
     bool? rewardCollected8192,
     int? highestLevelEver,
+    int? bestTimeMs2048,
   }) {
     return PersonalRecords(
       timesReached2048: timesReached2048 ?? this.timesReached2048,
@@ -52,6 +55,7 @@ class PersonalRecords {
       rewardCollected4096: rewardCollected4096 ?? this.rewardCollected4096,
       rewardCollected8192: rewardCollected8192 ?? this.rewardCollected8192,
       highestLevelEver: highestLevelEver ?? this.highestLevelEver,
+      bestTimeMs2048: bestTimeMs2048 ?? this.bestTimeMs2048,
     );
   }
 }
