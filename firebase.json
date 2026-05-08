@@ -1,0 +1,49 @@
+{
+  "hosting": {
+    "public": "public",
+    "ignore": ["firebase.json", "**/.*"],
+    "rewrites": [
+      { "source": "/invite", "destination": "/invite.html" }
+    ]
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "bichim-prd",
+          "appId": "1:957303334019:android:dfec2109cc1c2f631d27b6",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options_dev.dart": {
+          "projectId": "olha-o-bichim-dev",
+          "configurations": {
+            "android": "1:274180547668:android:ebaf7734223725be3ef9c1",
+            "ios": "1:274180547668:ios:170c71fb59290df33ef9c1"
+          }
+        },
+        "lib/firebase_options_prd.dart": {
+          "projectId": "bichim-prd",
+          "configurations": {
+            "android": "1:957303334019:android:dfec2109cc1c2f631d27b6",
+            "ios": "1:957303334019:ios:294946babe4c24ea1d27b6"
+          }
+        }
+      }
+    }
+  },
+  "emulators": {
+    "auth": {
+      "port": 9099
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "ui": {
+      "enabled": true,
+      "port": 4000
+    },
+    "singleProjectMode": true
+  }
+}

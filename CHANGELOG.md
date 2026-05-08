@@ -24,7 +24,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - **`GlobalRankingTab`:** `StreamProvider` movido para top-level, evitando recriação em rebuilds; estilos de texto corrigidos com `outlinedWhiteTextStyle`
 - **Exibição de rank globalTime:** posição calculada corretamente com tiebreaker de maxTile
 - **`_mergeRemoteInventory`:** usava chave Hive errada `'inventory'`; corrigido para `'data'`
-- **Fake* providers:** `FakeRankingService`, `FakeAuthService` etc. exclusivos do flavor `tst`; `dev` usa serviços reais
+- **Fake\* providers:** `FakeRankingService`, `FakeAuthService` etc. exclusivos do flavor `tst`; `dev` usa serviços reais
 - **Cold start avatar:** tile e displayName do avatar restaurados corretamente no arranque frio
 - **`RankingScreen`:** todos os textos sobre o fundo usam `outlinedWhiteTextStyle(GoogleFonts.fredoka(...))`
 - **`BombSelectionOverlay` / `InventoryBar`:** ajustes menores de estilo e tipografia

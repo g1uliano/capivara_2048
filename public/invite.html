@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Você foi convidado! — Olha o Bichim!</title>
+    <meta
+      name="description"
+      content="Um amigo te convidou para jogar Olha o Bichim! Vocês dois ganham vidas e bombas quando você jogar a primeira partida."
+    />
+    <meta
+      property="og:title"
+      content="Você foi convidado para Olha o Bichim!"
+    />
+    <meta
+      property="og:description"
+      content="Aceite o convite e ganhem juntos: 2 vidas + 1 bomba."
+    />
+    <meta property="og:image" content="/logo.png" />
+    <link rel="icon" href="/logo.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Nunito", system-ui, sans-serif;
+        min-height: 100vh;
+        color: white;
+        line-height: 1.5;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 20px;
+        background:
+          linear-gradient(
+            180deg,
+            rgba(10, 31, 13, 0.45) 0%,
+            rgba(10, 31, 13, 0.25) 50%,
+            rgba(10, 31, 13, 0.65) 100%
+          ),
+          url("/fundo.png") center center / cover no-repeat fixed;
+        background-color: #1b5e20;
+      }
+
+      .card {
+        width: 100%;
+        max-width: 440px;
+        background: rgba(10, 31, 13, 0.62);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 28px;
+        padding: 36px 28px 32px;
+        text-align: center;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+      }
+
+      /* ─ Capivara hero with glow ─ */
+      .hero {
+        width: 130px;
+        height: 130px;
+        margin: 0 auto 20px;
+        position: relative;
+        animation: float 3s ease-in-out infinite;
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: -10px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 213, 79, 0.55) 0%,
+          rgba(255, 179, 0, 0.25) 45%,
+          transparent 75%
+        );
+        filter: blur(8px);
+        animation: pulse 2.5s ease-in-out infinite;
+      }
+      .hero img {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.4));
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.7;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.08);
+        }
+      }
+
+      /* ─ Headline ─ */
+      .eyebrow {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: 0.85rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: #ffd54f;
+        margin-bottom: 6px;
+      }
+      h1 {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: 1.7rem;
+        line-height: 1.2;
+        margin-bottom: 8px;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      }
+      .subtitle {
+        font-size: 0.98rem;
+        opacity: 0.85;
+        margin-bottom: 24px;
+      }
+
+      /* ─ Rewards ─ */
+      .rewards-label {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: 0.82rem;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+        opacity: 0.7;
+        margin-bottom: 12px;
+      }
+      .rewards {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 28px;
+      }
+      .chip {
+        flex: 1;
+        max-width: 130px;
+        padding: 14px 10px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-radius: 16px;
+      }
+      .chip .icon {
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 6px;
+      }
+      .chip .icon img {
+        max-height: 40px;
+        object-fit: contain;
+      }
+      .chip .icon svg {
+        width: 36px;
+        height: 36px;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+      }
+      .chip .qty {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: 1.15rem;
+      }
+      .chip .lbl {
+        font-size: 0.78rem;
+        opacity: 0.78;
+      }
+
+      /* ─ Status ─ */
+      .status {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        min-height: 28px;
+        font-size: 0.95rem;
+        opacity: 0.92;
+        margin-bottom: 16px;
+      }
+      .spinner {
+        width: 18px;
+        height: 18px;
+        border: 2.5px solid rgba(255, 255, 255, 0.25);
+        border-top-color: #ffd54f;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ─ CTA ─ */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #f5a623;
+        color: #4a2400;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: 1rem;
+        padding: 14px 32px;
+        border-radius: 999px;
+        text-decoration: none;
+        box-shadow: 0 6px 20px rgba(245, 166, 35, 0.4);
+        opacity: 0;
+        transform: translateY(8px);
+        transition:
+          opacity 0.4s,
+          transform 0.4s;
+        pointer-events: none;
+      }
+      .btn.show {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+      }
+      .btn-secondary {
+        display: inline-block;
+        margin-top: 10px;
+        font-size: 0.85rem;
+        opacity: 0.65;
+        color: white;
+        text-decoration: underline;
+        cursor: pointer;
+        background: none;
+        border: none;
+        font-family: inherit;
+      }
+      .btn-secondary.show {
+        opacity: 0.65;
+      }
+      .btn-secondary:hover {
+        opacity: 1;
+      }
+
+      .error {
+        color: #ffcdd2;
+      }
+
+      footer {
+        margin-top: 24px;
+        font-size: 0.78rem;
+        opacity: 0.55;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="hero">
+        <img src="/animals/Capivara.png" alt="Capivara" />
+      </div>
+
+      <div class="eyebrow">🎉 Você foi convidado</div>
+      <h1>Um amigo quer jogar com você!</h1>
+      <p class="subtitle">
+        Bem-vindo ao <strong>Olha o Bichim!</strong> — o puzzle dos animais do
+        Brasil.
+      </p>
+
+      <div class="rewards-label">Vocês dois ganham</div>
+      <div class="rewards">
+        <div class="chip">
+          <div class="icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="#E53935"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 21s-7-4.35-9.5-8.5C.5 8.5 3 4 7 4c2 0 3.5 1 5 3 1.5-2 3-3 5-3 4 0 6.5 4.5 4.5 8.5C19 16.65 12 21 12 21z"
+              />
+            </svg>
+          </div>
+          <div class="qty">+2</div>
+          <div class="lbl">Vidas</div>
+        </div>
+        <div class="chip">
+          <div class="icon">
+            <img src="/bomb_2.png" alt="Bomba" />
+          </div>
+          <div class="qty">+1</div>
+          <div class="lbl">Bomba</div>
+        </div>
+      </div>
+
+      <div class="status" id="status">
+        <span class="spinner" id="spinner"></span>
+        <span id="msg">Abrindo o jogo…</span>
+      </div>
+
+      <a class="btn" id="storeBtn" href="#">📲 Baixar o jogo</a>
+      <div>
+        <button class="btn-secondary" id="retryBtn" onclick="tryOpen()">
+          Já tenho o app — abrir agora
+        </button>
+      </div>
+    </div>
+
+    <footer>© 2025 Olha o Bichim! — Feito no Brasil 🇧🇷</footer>
+
+    <script>
+      var ref = new URLSearchParams(window.location.search).get("ref");
+      var statusMsg = document.getElementById("msg");
+      var spinner = document.getElementById("spinner");
+      var btn = document.getElementById("storeBtn");
+      var retry = document.getElementById("retryBtn");
+
+      function tryOpen() {
+        if (!ref) return;
+        window.location.href =
+          "olhabichim://invite?ref=" + encodeURIComponent(ref);
+      }
+
+      if (!ref) {
+        statusMsg.textContent = "Link de convite inválido.";
+        statusMsg.parentElement.classList.add("error");
+        spinner.style.display = "none";
+      } else {
+        tryOpen();
+        setTimeout(function () {
+          statusMsg.textContent =
+            "O app não abriu? Instale agora para usar o convite:";
+          spinner.style.display = "none";
+          btn.href =
+            "https://play.google.com/store/apps/details?id=com.catraia.capivara2048";
+          btn.classList.add("show");
+          retry.classList.add("show");
+        }, 2000);
+      }
+    </script>
+  </body>
+</html>

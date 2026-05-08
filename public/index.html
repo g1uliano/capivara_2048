@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Olha o Bichim! — Puzzle dos animais do Brasil</title>
+    <meta
+      name="description"
+      content="O puzzle de combinar peças com 13 animais brasileiros. Combine, funda e descubra todos os bichos!"
+    />
+    <meta property="og:title" content="Olha o Bichim!" />
+    <meta
+      property="og:description"
+      content="O puzzle de combinar peças com os animais do Brasil."
+    />
+    <meta property="og:image" content="/logo.png" />
+    <link rel="icon" href="/logo.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --green-deep: #0a1f0d;
+        --green-jungle: #1b5e20;
+        --amber: #f5a623;
+        --amber-dark: #4a2400;
+        --cream: #fff9c4;
+        --white-soft: rgba(255, 255, 255, 0.92);
+        --border-subtle: rgba(255, 255, 255, 0.18);
+        --glass: rgba(10, 31, 13, 0.62);
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: "Nunito", system-ui, sans-serif;
+        min-height: 100vh;
+        color: white;
+        line-height: 1.5;
+        background:
+          linear-gradient(
+            180deg,
+            rgba(10, 31, 13, 0.35) 0%,
+            rgba(10, 31, 13, 0.15) 40%,
+            rgba(10, 31, 13, 0.55) 100%
+          ),
+          url("/fundo.png") center top / cover no-repeat fixed;
+        background-color: var(--green-jungle);
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      /* ─────── Hero ─────── */
+      .hero {
+        text-align: center;
+        padding: 80px 24px 56px;
+      }
+      .hero img.logo {
+        width: min(420px, 88vw);
+        filter: drop-shadow(0 6px 32px rgba(0, 0, 0, 0.55));
+        margin: 0 auto;
+        display: block;
+      }
+      .hero .tagline {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.15rem, 2.5vw, 1.5rem);
+        max-width: 540px;
+        margin: 28px auto 0;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      }
+      .hero .subtagline {
+        max-width: 480px;
+        margin: 12px auto 0;
+        opacity: 0.85;
+        font-size: 1.05rem;
+        text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+      }
+      .badge-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 28px;
+        background: var(--amber);
+        color: var(--amber-dark);
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: 1rem;
+        padding: 14px 32px;
+        border-radius: 999px;
+        box-shadow: 0 6px 24px rgba(245, 166, 35, 0.45);
+        text-decoration: none;
+      }
+
+      /* ─────── Glass card ─────── */
+      .glass {
+        background: var(--glass);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid var(--border-subtle);
+        border-radius: 24px;
+        padding: 32px;
+      }
+
+      /* ─────── Section: Como funciona ─────── */
+      .how {
+        margin: 24px auto 32px;
+      }
+      .section-title {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: clamp(1.4rem, 3vw, 1.85rem);
+        text-align: center;
+        margin-bottom: 8px;
+      }
+      .section-sub {
+        text-align: center;
+        opacity: 0.8;
+        max-width: 520px;
+        margin: 0 auto 28px;
+      }
+      .merge-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .merge-row img {
+        width: 64px;
+        height: 64px;
+        object-fit: contain;
+        filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+      }
+      .merge-row .arrow {
+        font-size: 1.5rem;
+        opacity: 0.7;
+        font-weight: 700;
+      }
+
+      /* ─────── Bento grid ─────── */
+      .bento {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 18px;
+        margin-bottom: 56px;
+      }
+      .bento .cell {
+        background: var(--glass);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid var(--border-subtle);
+        border-radius: 24px;
+        padding: 28px;
+      }
+      .bento h3 {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: 1.25rem;
+        margin-bottom: 6px;
+      }
+      .bento p {
+        opacity: 0.85;
+        font-size: 0.96rem;
+      }
+
+      /* big animals grid card */
+      .animals-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 8px;
+        margin-top: 18px;
+      }
+      .animals-grid img {
+        width: 100%;
+        aspect-ratio: 1/1;
+        object-fit: contain;
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 12px;
+        padding: 4px;
+        transition: transform 0.2s;
+      }
+      .animals-grid img:hover {
+        transform: scale(1.08);
+      }
+
+      .feature-icon {
+        width: 56px;
+        height: 56px;
+        object-fit: contain;
+        margin-bottom: 12px;
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+      }
+      .small-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      /* ─────── Footer ─────── */
+      footer {
+        text-align: center;
+        padding: 40px 24px 60px;
+        font-size: 0.85rem;
+        opacity: 0.55;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+      }
+      footer .made-with {
+        margin-top: 6px;
+        font-size: 0.78rem;
+        opacity: 0.8;
+      }
+
+      /* ─────── Responsive ─────── */
+      @media (max-width: 720px) {
+        .bento {
+          grid-template-columns: 1fr;
+        }
+        .animals-grid {
+          grid-template-columns: repeat(7, 1fr);
+          gap: 6px;
+        }
+        .merge-row img {
+          width: 52px;
+          height: 52px;
+        }
+        .merge-row {
+          gap: 8px;
+        }
+        .merge-row .arrow {
+          font-size: 1.2rem;
+        }
+        .hero {
+          padding: 56px 24px 40px;
+        }
+        .glass,
+        .bento .cell {
+          padding: 24px;
+        }
+      }
+      @media (max-width: 420px) {
+        .animals-grid {
+          grid-template-columns: repeat(5, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <section class="hero">
+      <img class="logo" src="/logo.png" alt="Olha o Bichim!" />
+      <p class="tagline">O puzzle dos animais do Brasil.</p>
+      <p class="subtagline">
+        Combine peças iguais, evolua os bichos e descubra todos os 13 animais —
+        da Tanajura à Capivara Lendária.
+      </p>
+      <a class="badge-cta" href="#novidades">🚀 Em breve na Play Store</a>
+    </section>
+
+    <main class="container">
+      <!-- Como funciona -->
+      <section class="how glass">
+        <h2 class="section-title">Combine. Funda. Evolua.</h2>
+        <p class="section-sub">
+          Junte duas peças iguais e elas viram o próximo bicho da cadeia.
+        </p>
+        <div class="merge-row">
+          <img src="/animals/Tanajura.png" alt="Tanajura" />
+          <span class="arrow">→</span>
+          <img src="/animals/LoboGuara.png" alt="Lobo-guará" />
+          <span class="arrow">→</span>
+          <img src="/animals/Sagui.png" alt="Saguí" />
+          <span class="arrow">→</span>
+          <img src="/animals/Preguica.png" alt="Preguiça" />
+          <span class="arrow">→</span>
+          <img src="/animals/Capivara.png" alt="Capivara Lendária" />
+        </div>
+      </section>
+
+      <!-- Bento -->
+      <section class="bento" id="novidades">
+        <div class="cell">
+          <h3>13 animais brasileiros</h3>
+          <p>
+            Da pequena Tanajura ao Jacaré, passando por Onça, Boto-cor-de-rosa e
+            Capivara Lendária.
+          </p>
+          <div class="animals-grid">
+            <img src="/animals/Tanajura.png" alt="Tanajura" />
+            <img src="/animals/LoboGuara.png" alt="Lobo-guará" />
+            <img src="/animals/Cururu.png" alt="Sapo-cururu" />
+            <img src="/animals/Tucano.png" alt="Tucano" />
+            <img src="/animals/Sagui.png" alt="Saguí" />
+            <img src="/animals/Preguica.png" alt="Preguiça" />
+            <img src="/animals/MicoLeao.png" alt="Mico-leão-dourado" />
+            <img src="/animals/Boto.png" alt="Boto-cor-de-rosa" />
+            <img src="/animals/Onca.png" alt="Onça-pintada" />
+            <img src="/animals/Sucuri.png" alt="Sucuri" />
+            <img src="/animals/Capivara.png" alt="Capivara" />
+            <img src="/animals/PeixeBoi.png" alt="Peixe-boi" />
+            <img src="/animals/Jacare.png" alt="Jacaré" />
+          </div>
+        </div>
+
+        <div class="small-stack">
+          <div class="cell">
+            <img class="feature-icon" src="/icons/Ranking.png" alt="" />
+            <h3>Ranking semanal</h3>
+            <p>
+              Compete com outros jogadores e suba no ranking global toda semana.
+            </p>
+          </div>
+          <div class="cell">
+            <img class="feature-icon" src="/icons/Recompensas.png" alt="" />
+            <h3>Recompensas diárias</h3>
+            <p>Vidas, bombas e itens de presente todo dia que você joga.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div>© 2025 Olha o Bichim! — Todos os direitos reservados</div>
+      <div class="made-with">Feito no Brasil 🇧🇷 com Flutter</div>
+    </footer>
+  </body>
+</html>

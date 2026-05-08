@@ -10,6 +10,7 @@ class PlayerProfile {
   final AuthProvider provider;
   final DateTime createdAt;
   final DateTime lastSeenAt;
+  final bool tutorialCompleted;
 
   const PlayerProfile({
     required this.userId,
@@ -19,6 +20,7 @@ class PlayerProfile {
     required this.provider,
     required this.createdAt,
     required this.lastSeenAt,
+    this.tutorialCompleted = false,
   });
 
   static const _sentinel = Object();
@@ -31,6 +33,7 @@ class PlayerProfile {
     DateTime? createdAt,
     DateTime? lastSeenAt,
     Object? email = _sentinel,
+    bool? tutorialCompleted,
   }) => PlayerProfile(
     userId: userId ?? this.userId,
     displayName: displayName ?? this.displayName,
@@ -41,6 +44,7 @@ class PlayerProfile {
     provider: provider ?? this.provider,
     createdAt: createdAt ?? this.createdAt,
     lastSeenAt: lastSeenAt ?? this.lastSeenAt,
+    tutorialCompleted: tutorialCompleted ?? this.tutorialCompleted,
   );
 
   Map<String, dynamic> toJson() => {
@@ -51,6 +55,7 @@ class PlayerProfile {
     'provider': provider.name,
     'createdAt': createdAt.toIso8601String(),
     'lastSeenAt': lastSeenAt.toIso8601String(),
+    'tutorialCompleted': tutorialCompleted,
   };
 
   factory PlayerProfile.fromJson(Map<String, dynamic> json) => PlayerProfile(
@@ -61,6 +66,7 @@ class PlayerProfile {
     provider: AuthProvider.values.byName(json['provider'] as String),
     createdAt: DateTime.parse(json['createdAt'] as String),
     lastSeenAt: DateTime.parse(json['lastSeenAt'] as String),
+    tutorialCompleted: json['tutorialCompleted'] as bool? ?? false,
   );
 
   @override
@@ -73,7 +79,8 @@ class PlayerProfile {
           email == other.email &&
           provider == other.provider &&
           createdAt == other.createdAt &&
-          lastSeenAt == other.lastSeenAt;
+          lastSeenAt == other.lastSeenAt &&
+          tutorialCompleted == other.tutorialCompleted;
 
   @override
   int get hashCode => Object.hash(
@@ -84,5 +91,6 @@ class PlayerProfile {
     provider,
     createdAt,
     lastSeenAt,
+    tutorialCompleted,
   );
 }
