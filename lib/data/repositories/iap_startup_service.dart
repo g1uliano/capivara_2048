@@ -15,14 +15,14 @@ abstract class IAPStartupService {
   Future<void> dispose();
 }
 
-/// Real implementation — used in prd and tst with USE_REAL_IAP=true.
+/// Real implementation — used in prd, dev, and tst with USE_REAL_IAP=true.
 class IAPStartupServiceImpl implements IAPStartupService {
   final FirebaseFirestore _firestore;
   StreamSubscription<List<PurchaseDetails>>? _sub;
   String? _userId;
 
   IAPStartupServiceImpl({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   @override
   Future<void> initialize(String userId) async {
@@ -87,7 +87,7 @@ class IAPStartupServiceImpl implements IAPStartupService {
   }
 }
 
-/// No-op fake for tests and dev flavor.
+/// No-op fake for tst flavor (without USE_REAL_IAP).
 class FakeIAPStartupService implements IAPStartupService {
   bool initializeCalled = false;
   bool disposeCalled = false;
