@@ -34,6 +34,8 @@ Puzzle game multiplataforma inspirado no 2048 clássico, onde os números são s
 - Música ambiente de floresta amazônica
 - **Modo Desafio Diário** com seed por data e streak
 - **Coleção de animais** — desbloqueie ao alcançar cada nível
+- **Ranking Global semanal** — top 50 por tempo até 2048, reinício todo sábado às 18h
+- **Recompensas por recorde e convite** — ganhe vidas, bombas e desfazeres ao bater seus recordes
 - Localização PT-BR e EN
 - Feedback háptico no merge
 
@@ -159,12 +161,12 @@ flutter build apk --flavor tst --debug --dart-define=FLAVOR=dev
 
 ## Builds
 
-| Comando                                                                      | Flavor | IAP             | Uso                       |
-| ---------------------------------------------------------------------------- | ------ | --------------- | ------------------------- |
-| `flutter run --dart-define=FLAVOR=dev`                                       | dev    | Fake            | Desenvolvimento local     |
-| `flutter build apk --dart-define=FLAVOR=tst`                                 | tst    | Fake            | QA — UI sem lojas         |
-| `flutter build apk --dart-define=FLAVOR=tst --dart-define=USE_REAL_IAP=true` | tst    | Real (sandbox)  | QA com Play Store sandbox |
-| `flutter build apk --dart-define=FLAVOR=prd`                                 | prd    | Real (produção) | Release                   |
+| Comando | Flavor | Serviços | Uso |
+|---------|--------|----------|-----|
+| `flutter run --dart-define=FLAVOR=dev` | dev | Reais (Firebase dev / sandbox) | Desenvolvimento local |
+| `flutter build apk --dart-define=FLAVOR=tst` | tst | Fake (sem Firebase) | QA — testes sem lojas |
+| `flutter build apk --dart-define=FLAVOR=tst --dart-define=USE_REAL_IAP=true` | tst | IAP Real (sandbox) | QA com Play Store sandbox |
+| `flutter build apk --dart-define=FLAVOR=prd` | prd | Reais (produção) | Release |
 
 Para configurar produtos nas lojas e contas de teste, consulte [`IAP.md`](IAP.md).
 
@@ -211,9 +213,31 @@ assets/
   - PlayerProfile, AuthService (Google, Apple, Email), SyncEngine, SyncConflictResolver
   - OnboardingAuthScreen, ProfileScreen, AuthBanner
   - Firebase inicializado com flavors prod/tst, emulador local opcional (`USE_EMULATOR=true`)
-- **Fase 4B** — Arte adicional e polimento visual (logo, ícone, splash final)
-- **Fase 5** — Áudio (sound design dos 13 animais, SFX, música)
-- **Fase 6** — Polimento, l10n, acessibilidade, lançamento
+- **Fase 4B** — Ranking Global Semanal + Ranking Lendas ✅
+  - Ranking semanal Firestore (top 50 por tempo até 2048, reinício automático)
+  - Ranking Lendas persistido localmente
+- **Fase 4C** — Convites, Anúncios Reais e IAP Real ✅
+  - Deep links de convite + Firestore
+  - Google Mobile Ads integrado
+  - in_app_purchase (produtos reais)
+- **Fase 4 gaps** — registerInvite pós-login, Convidar Amigos no ProfileScreen, Restaurar Compras real ✅
+- **Fase 4.1** — EmailAuthScreen, AvatarPickerScreen, AvatarWidget ✅
+  - updateAvatar(), destaque de avatar na Home
+  - Fix legibilidade InviteFriendsScreen
+- **Fase 4.1.1** — Tipografia consistente: Fredoka + OutlinedText em todas as telas sobre fundos não-sólidos ✅
+- **Fase 4.2** — Exclusão de conta LGPD, edição de nome, troca/esqueci senha ✅
+  - Persistência de avatar no tile, auth gates (startup, shop, daily, ranking)
+  - Sync de game records
+- **Fase 4.3** — Ranking Global, Recompensas e Auditoria de Flavors
+  - Aba Global no Ranking (tempo até 2048, reinício semanal, tiebreaker por tile máximo)
+  - Dialogs pós-milestone: posição no ranking (2048), tempo (4096), contagem (8192)
+  - Recompensas por recorde pessoal (combo: vida + bomba3 + desfazer) — novo melhor tempo no 2048 ou novo tile máximo
+  - Recompensas por convite — convidador recebe combo quando convidado joga 1ª partida
+  - Tabela de prêmios semanais revisada (top 10, posições 1–10)
+  - Fake* providers exclusivos para flavor `tst`; `dev` usa serviços reais
+- **Fase 5** — Arte adicional e polimento visual (logo, ícone, splash final)
+- **Fase 6** — Áudio (sound design dos 13 animais, SFX, música)
+- **Fase 7** — Polimento, l10n, acessibilidade, lançamento
 
 ## Design
 
