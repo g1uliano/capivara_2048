@@ -10,6 +10,8 @@ import 'package:capivara_2048/data/models/game_state.dart';
 import 'package:capivara_2048/data/models/inventory_hive_adapter.dart';
 import 'package:capivara_2048/data/models/lives_state.dart';
 import 'package:capivara_2048/data/models/lives_state_adapter.dart';
+import 'package:capivara_2048/data/models/player_profile.dart';
+import 'package:capivara_2048/presentation/controllers/auth_controller.dart';
 import 'package:capivara_2048/domain/lives/lives_notifier.dart';
 import 'package:capivara_2048/data/repositories/game_record_repository.dart';
 import 'package:capivara_2048/domain/daily_rewards/daily_rewards_notifier.dart';
@@ -17,6 +19,19 @@ import 'package:capivara_2048/presentation/controllers/game_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/settings_notifier.dart';
 import 'package:capivara_2048/presentation/screens/home_screen.dart';
 import 'package:capivara_2048/presentation/widgets/lives_indicator.dart';
+
+final _fakeProfile = PlayerProfile(
+  userId: 'u1',
+  displayName: 'Teste',
+  provider: AuthProvider.email,
+  createdAt: DateTime(2025),
+  lastSeenAt: DateTime(2025),
+);
+
+class _FakeAuthController extends AuthController {
+  @override
+  PlayerProfile? build() => _fakeProfile;
+}
 
 Future<ProviderScope> _wrap({
   GameState? gameState,
@@ -37,6 +52,7 @@ Future<ProviderScope> _wrap({
         );
 
   final overrides = [
+    authControllerProvider.overrideWith(_FakeAuthController.new),
     sharedPreferencesProvider.overrideWithValue(prefs),
     gameRecordRepositoryProvider.overrideWithValue(GameRecordRepository()),
     livesProvider.overrideWithBuild((ref, n) => LivesState.initial()),

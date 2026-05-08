@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:capivara_2048/data/models/inventory_hive_adapter.dart';
+import 'package:capivara_2048/data/models/player_profile.dart';
+import 'package:capivara_2048/presentation/controllers/auth_controller.dart';
 import 'package:capivara_2048/data/models/lives_state_adapter.dart';
 import 'package:capivara_2048/data/repositories/inventory_repository.dart';
 import 'package:capivara_2048/data/repositories/lives_repository.dart';
@@ -16,6 +18,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+final _fakeProfile = PlayerProfile(
+  userId: 'u1',
+  displayName: 'Teste',
+  provider: AuthProvider.email,
+  createdAt: DateTime(2025),
+  lastSeenAt: DateTime(2025),
+);
+
+class _FakeAuthController extends AuthController {
+  @override
+  PlayerProfile? build() => _fakeProfile;
+}
+
 late Directory _tempDir;
 
 Future<void> _initHive() async {
@@ -31,6 +46,7 @@ Widget _buildGame() {
       inventoryRepositoryProvider.overrideWithValue(InventoryRepository()),
       livesRepositoryProvider.overrideWithValue(LivesRepository()),
       shareCodesRepositoryProvider.overrideWithValue(ShareCodesRepository()),
+      authControllerProvider.overrideWith(_FakeAuthController.new),
     ],
     child: const MaterialApp(home: GameScreen()),
   );
