@@ -265,7 +265,7 @@ void main() {
     },
   );
 
-  testWidgets('tap em ComoJogar abre BottomSheet', (tester) async {
+  testWidgets('tap em ComoJogar navega para TutorialScreen', (tester) async {
     tester.view.physicalSize = const Size(800, 1400);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -275,6 +275,6 @@ void main() {
     await tester.tap(find.byKey(const Key('home_btn_comojogar')));
     await tester.pump(const Duration(milliseconds: 500));
     await tester.pump(const Duration(milliseconds: 500));
-    expect(find.textContaining('Deslize'), findsOneWidget);
+    expect(find.text('Tutorial'), findsOneWidget);
   });
 }

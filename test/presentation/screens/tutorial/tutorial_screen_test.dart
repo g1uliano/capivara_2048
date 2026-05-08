@@ -8,12 +8,12 @@ import 'package:capivara_2048/presentation/controllers/auth_controller.dart';
 import 'package:capivara_2048/data/models/player_profile.dart';
 
 Widget _makeApp() => ProviderScope(
-      overrides: [
-        syncEngineProvider.overrideWithValue(FakeSyncEngine()),
-        authControllerProvider.overrideWith(() => _FakeAuth()),
-      ],
-      child: const MaterialApp(home: TutorialScreen()),
-    );
+  overrides: [
+    syncEngineProvider.overrideWithValue(FakeSyncEngine()),
+    authControllerProvider.overrideWith(() => _FakeAuth()),
+  ],
+  child: const MaterialApp(home: TutorialScreen()),
+);
 
 class _FakeAuth extends AuthController {
   @override
@@ -44,14 +44,18 @@ void main() {
     expect(find.text('Deslize pra mover'), findsOneWidget);
   });
 
-  testWidgets('Próximo is disabled on interactive page before completing', (tester) async {
+  testWidgets('Próximo is disabled on interactive page before completing', (
+    tester,
+  ) async {
     await tester.pumpWidget(_makeApp());
     await _settle(tester);
     // Navigate to page 2 (movement, interactive)
     await tester.tap(find.text('Próximo →'));
     await _settle(tester);
     // Find the Próximo button — should be disabled (onPressed == null)
-    final btns = tester.widgetList<TextButton>(find.byType(TextButton)).toList();
+    final btns = tester
+        .widgetList<TextButton>(find.byType(TextButton))
+        .toList();
     final nextBtn = btns.firstWhere(
       (b) => b.onPressed == null,
       orElse: () => throw StateError('No disabled button found'),
@@ -61,20 +65,24 @@ void main() {
 
   testWidgets('Pular closes the screen', (tester) async {
     // Use a wrapper with a route so Navigator.pop works
-    await tester.pumpWidget(ProviderScope(
-      overrides: [
-        syncEngineProvider.overrideWithValue(FakeSyncEngine()),
-        authControllerProvider.overrideWith(() => _FakeAuth()),
-      ],
-      child: MaterialApp(
-        home: Builder(builder: (ctx) => ElevatedButton(
-          onPressed: () => Navigator.of(ctx).push(
-            MaterialPageRoute(builder: (_) => const TutorialScreen()),
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          syncEngineProvider.overrideWithValue(FakeSyncEngine()),
+          authControllerProvider.overrideWith(() => _FakeAuth()),
+        ],
+        child: MaterialApp(
+          home: Builder(
+            builder: (ctx) => ElevatedButton(
+              onPressed: () => Navigator.of(
+                ctx,
+              ).push(MaterialPageRoute(builder: (_) => const TutorialScreen())),
+              child: const Text('Open'),
+            ),
           ),
-          child: const Text('Open'),
-        )),
+        ),
       ),
-    ));
+    );
     await tester.tap(find.text('Open'));
     await _settle(tester);
     expect(find.text('Tutorial'), findsOneWidget);

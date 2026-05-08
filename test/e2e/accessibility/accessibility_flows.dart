@@ -27,7 +27,7 @@ final a11yHomeButtonsSemanticsScenario = E2EScenario(
       'Recompensas Diárias',
       'Ranking',
       'Loja',
-      'Como Jogar',
+      'Tutorial',
     ]) {
       expect(
         find.bySemanticsLabel(label),

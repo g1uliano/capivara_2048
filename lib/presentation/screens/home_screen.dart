@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/constants/app_colors.dart';
 import '../../core/constants/home_constants.dart';
 import '../../core/utils/haptic_utils.dart';
 import '../../domain/daily_rewards/daily_rewards_engine.dart';
@@ -18,6 +17,7 @@ import 'daily_rewards/daily_rewards_screen.dart';
 import 'game/game_screen.dart';
 import 'ranking_screen.dart';
 import 'settings_screen.dart';
+import 'tutorial/tutorial_screen.dart';
 import 'shop_screen.dart';
 import 'profile_screen.dart';
 import 'onboarding_auth_screen.dart';
@@ -221,16 +221,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   key: const Key('home_btn_comojogar'),
                   path: 'assets/images/home/ComoJogar.png',
                   size: HomeConstants.buttonSize(scale),
-                  semanticLabel: 'Como Jogar',
-                  onTap: () => showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(20),
-                      ),
-                    ),
-                    builder: (_) => const _HowToPlaySheet(),
+                  semanticLabel: 'Tutorial',
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const TutorialScreen()),
                   ),
                 ),
               ),
@@ -446,57 +439,4 @@ class _ActionButtonState extends State<_ActionButton> {
   }
 }
 
-// ---------------------------------------------------------------------------
-// _HowToPlaySheet — sem alterações
-// ---------------------------------------------------------------------------
 
-class _HowToPlaySheet extends StatelessWidget {
-  const _HowToPlaySheet();
-
-  @override
-  Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      initialChildSize: 0.55,
-      maxChildSize: 0.9,
-      minChildSize: 0.4,
-      expand: false,
-      builder: (context, scrollController) => SingleChildScrollView(
-        controller: scrollController,
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            Text(
-              'Como Jogar',
-              style: GoogleFonts.fredoka(
-                fontSize: 24,
-                color: AppColors.primary,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              '• Deslize o dedo para mover todas as peças.\n'
-              '• Peças com o mesmo animal se fundem ao se encontrar.\n'
-              '• Funda animais até chegar na Capivara Lendária (2048)!\n'
-              '• Cada partida consome uma vida. Vidas se regeneram com o tempo.\n'
-              '• Use bombas e desfazer para sair de situações difíceis.',
-              style: GoogleFonts.nunito(fontSize: 15, height: 1.6),
-            ),
-            const SizedBox(height: 24),
-          ],
-        ),
-      ),
-    );
-  }
-}

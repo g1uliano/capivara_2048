@@ -77,7 +77,7 @@ final navHomeToDailyRewardsScenario = E2EScenario(
 
 final navHomeToTutorialScenario = E2EScenario(
   id: 'nav.home_to_tutorial_bottomsheet',
-  title: 'tap em ComoJogar abre bottom sheet com "Como Jogar"',
+  title: 'tap em ComoJogar navega para TutorialScreen',
   tags: {ScenarioTag.critical},
   run: (tester, harness) async {
     await _bootToHome(tester, harness);
@@ -86,7 +86,7 @@ final navHomeToTutorialScenario = E2EScenario(
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(find.text('Como Jogar'), findsOneWidget);
+    expect(find.text('Tutorial'), findsOneWidget);
   },
 );
 
