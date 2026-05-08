@@ -20,37 +20,34 @@ class WeeklyRewardResult {
   factory WeeklyRewardResult.forPosition(int position, {String weekId = 'unknown'}) {
     if (position == 1) {
       return WeeklyRewardResult(
-        position: position,
-        weekId: weekId,
-        lives: 5,
-        bomb3: 3,
-        undo1: 3,
+        position: position, weekId: weekId,
+        lives: 10, undo1: 10, bomb3: 10,
       );
     } else if (position == 2) {
       return WeeklyRewardResult(
-        position: position,
-        weekId: weekId,
-        lives: 4,
-        bomb3: 2,
-        undo1: 2,
+        position: position, weekId: weekId,
+        lives: 5, undo1: 5, bomb3: 5,
       );
     } else if (position == 3) {
       return WeeklyRewardResult(
-        position: position,
-        weekId: weekId,
-        lives: 3,
-        bomb2: 2,
-        undo1: 1,
+        position: position, weekId: weekId,
+        lives: 3, undo1: 3, bomb3: 3,
       );
-    } else if (position >= 4 && position <= 10) {
+    } else if (position >= 4 && position <= 6) {
       return WeeklyRewardResult(
-        position: position,
-        weekId: weekId,
-        lives: 2,
-        bomb2: 1,
+        position: position, weekId: weekId,
+        lives: 3, bomb3: 3,
       );
-    } else if (position >= 11 && position <= 50) {
-      return WeeklyRewardResult(position: position, weekId: weekId, lives: 1);
+    } else if (position >= 7 && position <= 9) {
+      return WeeklyRewardResult(
+        position: position, weekId: weekId,
+        lives: 3, undo1: 3,
+      );
+    } else if (position == 10) {
+      return WeeklyRewardResult(
+        position: position, weekId: weekId,
+        lives: 3,
+      );
     } else {
       return WeeklyRewardResult(position: position, weekId: weekId);
     }

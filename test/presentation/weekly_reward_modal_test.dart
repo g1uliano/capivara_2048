@@ -16,7 +16,7 @@ void main() {
     await tester.pumpWidget(_wrap(reward));
     expect(find.textContaining('1º'), findsOneWidget);
     expect(find.textContaining('Parabéns'), findsOneWidget);
-    expect(find.textContaining('5'), findsWidgets); // 5 vidas
+    expect(find.textContaining('10'), findsWidgets); // 10 vidas
     expect(find.textContaining('Continuar'), findsOneWidget);
   });
 
