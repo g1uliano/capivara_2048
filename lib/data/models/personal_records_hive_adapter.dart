@@ -48,11 +48,17 @@ class PersonalRecordsHiveAdapter extends TypeAdapter<PersonalRecords> {
     writer.writeInt(obj.timesReached4096);
     writer.writeInt(obj.timesReached8192);
     writer.writeBool(obj.firstReached2048At != null);
-    if (obj.firstReached2048At != null) writer.writeInt(obj.firstReached2048At!.millisecondsSinceEpoch);
+    if (obj.firstReached2048At != null) {
+      writer.writeInt(obj.firstReached2048At!.millisecondsSinceEpoch);
+    }
     writer.writeBool(obj.firstReached4096At != null);
-    if (obj.firstReached4096At != null) writer.writeInt(obj.firstReached4096At!.millisecondsSinceEpoch);
+    if (obj.firstReached4096At != null) {
+      writer.writeInt(obj.firstReached4096At!.millisecondsSinceEpoch);
+    }
     writer.writeBool(obj.firstReached8192At != null);
-    if (obj.firstReached8192At != null) writer.writeInt(obj.firstReached8192At!.millisecondsSinceEpoch);
+    if (obj.firstReached8192At != null) {
+      writer.writeInt(obj.firstReached8192At!.millisecondsSinceEpoch);
+    }
     writer.writeBool(obj.rewardCollected4096);
     writer.writeBool(obj.rewardCollected8192);
     writer.writeInt(obj.highestLevelEver);

@@ -102,7 +102,7 @@ class FirestoreRankingRepository implements RankingRepository {
         if (type == RankingType.globalTime) {
           prevValue = (prevData['bestTimeMs'] as num?)?.toInt() ?? 0;
           final prevMaxTile = (prevData['maxTile'] as num?)?.toInt() ?? 0;
-          final curMaxTile  = (data['maxTile']    as num?)?.toInt() ?? 0;
+          final curMaxTile = (data['maxTile'] as num?)?.toInt() ?? 0;
           // Different rank if either value differs OR maxTile differs (tiebreaker)
           if (value != prevValue || curMaxTile != prevMaxTile) rank = i + 1;
         } else if (type == RankingType.globalScore) {

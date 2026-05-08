@@ -81,7 +81,9 @@ void main() {
     late ProviderContainer container;
 
     setUp(() async {
-      Hive.init('/tmp/capivara_pr_notifier_test_${DateTime.now().millisecondsSinceEpoch}');
+      Hive.init(
+        '/tmp/capivara_pr_notifier_test_${DateTime.now().millisecondsSinceEpoch}',
+      );
       container = ProviderContainer();
       await container.read(personalRecordsProvider.notifier).load();
     });
@@ -100,7 +102,9 @@ void main() {
     });
 
     test('tempo melhor retorna true e atualiza', () async {
-      await container.read(personalRecordsProvider.notifier).updateBestTime2048(5000);
+      await container
+          .read(personalRecordsProvider.notifier)
+          .updateBestTime2048(5000);
       final result = await container
           .read(personalRecordsProvider.notifier)
           .updateBestTime2048(3000);
@@ -109,7 +113,9 @@ void main() {
     });
 
     test('tempo pior retorna false e não atualiza', () async {
-      await container.read(personalRecordsProvider.notifier).updateBestTime2048(3000);
+      await container
+          .read(personalRecordsProvider.notifier)
+          .updateBestTime2048(3000);
       final result = await container
           .read(personalRecordsProvider.notifier)
           .updateBestTime2048(5000);
@@ -118,7 +124,9 @@ void main() {
     });
 
     test('tempo igual retorna false e não atualiza', () async {
-      await container.read(personalRecordsProvider.notifier).updateBestTime2048(3000);
+      await container
+          .read(personalRecordsProvider.notifier)
+          .updateBestTime2048(3000);
       final result = await container
           .read(personalRecordsProvider.notifier)
           .updateBestTime2048(3000);

@@ -10,15 +10,15 @@
 
 Este documento especifica as seguintes features:
 
-| # | Feature | Situação |
-|---|---------|----------|
-| 1 | Editar nome na tela de Perfil | **Já implementado** (ficou oculto pelo bug de cold start — corrigido em f4a3900) |
-| 2 | Aba Global no Ranking (3 tabs: Pessoal · Global · Lendas) | Novo |
-| 3 | Dialogs pós-milestone (2048 → posição global; 4096 → tempo; 8192 → contagem) | Novo |
-| 4 | Recompensa por recorde pessoal (novo melhor tempo em 2048 ou novo tile máximo) | Novo |
-| 5 | Recompensa por convite (convidador recebe 1 combo quando convidado joga 1ª partida) | Atualização |
-| 6 | Tabela de prêmios do ranking semanal — valores revisados | Atualização |
-| 7 | Auditoria de flavors — Fake* exclusivo para `tst` | Correção transversal |
+| #   | Feature                                                                             | Situação                                                                         |
+| --- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| 1   | Editar nome na tela de Perfil                                                       | **Já implementado** (ficou oculto pelo bug de cold start — corrigido em f4a3900) |
+| 2   | Aba Global no Ranking (3 tabs: Pessoal · Global · Lendas)                           | Novo                                                                             |
+| 3   | Dialogs pós-milestone (2048 → posição global; 4096 → tempo; 8192 → contagem)        | Novo                                                                             |
+| 4   | Recompensa por recorde pessoal (novo melhor tempo em 2048 ou novo tile máximo)      | Novo                                                                             |
+| 5   | Recompensa por convite (convidador recebe 1 combo quando convidado joga 1ª partida) | Atualização                                                                      |
+| 6   | Tabela de prêmios do ranking semanal — valores revisados                            | Atualização                                                                      |
+| 7   | Auditoria de flavors — Fake\* exclusivo para `tst`                                  | Correção transversal                                                             |
 
 ---
 
@@ -36,15 +36,15 @@ O `PersonalRecordsHiveAdapter` recebe um novo índice para `bestTimeMs2048`. Com
 
 ### 2.2 `WeeklyRewardResult.forPosition()` — nova tabela
 
-| Posição | Vidas | Desfazer | Bomba3 |
-|---------|-------|----------|--------|
-| 1º      | 10    | 10       | 10     |
-| 2º      | 5     | 5        | 5      |
-| 3º      | 3     | 3        | 3      |
-| 4º–6º   | 3     | —        | 3      |
-| 7º–9º   | 3     | 3        | —      |
-| 10º     | 3     | —        | —      |
-| 11º+    | sem recompensa | | |
+| Posição | Vidas          | Desfazer | Bomba3 |
+| ------- | -------------- | -------- | ------ |
+| 1º      | 10             | 10       | 10     |
+| 2º      | 5              | 5        | 5      |
+| 3º      | 3              | 3        | 3      |
+| 4º–6º   | 3              | —        | 3      |
+| 7º–9º   | 3              | 3        | —      |
+| 10º     | 3              | —        | —      |
+| 11º+    | sem recompensa |          |        |
 
 Obs: `bomb2` deixa de ser utilizado nestas recompensas. O modelo `WeeklyRewardResult` mantém o campo (pode ser usado em outros contextos futuros), mas `forPosition()` não o atribui.
 
@@ -108,11 +108,11 @@ Esses repositórios já existem. A chamada é fire-and-forget com catch silencio
 
 ### 3.5 Edge cases
 
-| Situação | Comportamento |
-|----------|--------------|
-| Firestore timeout / sem conexão | `rankingPosition = null`; dialog exibe "posição indisponível" |
-| Jogador não logado | `rankingPosition = null`; dialog não mostra posição |
-| Múltiplos milestones rápidos | `_reachedMilestones` do `game_notifier` já garante um milestone por vez; controller só reage a transições de null → valor |
+| Situação                         | Comportamento                                                                                                                      |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Firestore timeout / sem conexão  | `rankingPosition = null`; dialog exibe "posição indisponível"                                                                      |
+| Jogador não logado               | `rankingPosition = null`; dialog não mostra posição                                                                                |
+| Múltiplos milestones rápidos     | `_reachedMilestones` do `game_notifier` já garante um milestone por vez; controller só reage a transições de null → valor          |
 | Recompensa falha silenciosamente | Estado local do `earnedCombo` permanece `true`; UI mostra a notificação; a concessão é retentada via `pendingEvents` se disponível |
 
 ---
@@ -135,6 +135,7 @@ TabBar: [ Pessoal ]  [ Global ]  [ Lendas ]
 Reutiliza o estilo do `WeeklyRewardModal` (Dialog branco, borda arredondada, botão "Continuar").
 
 **Variação 2048:**
+
 ```
 🏆 Ranking Global
 Você está em 3º lugar!
@@ -147,6 +148,7 @@ Tempo: 04:37
 "Ver Ranking" fecha o dialog e navega para `RankingScreen` abrindo diretamente na aba Global.
 
 **Variação 4096:**
+
 ```
 🌊 Peixe-boi atingido!
 Seu tempo: 12:14
@@ -156,6 +158,7 @@ Seu tempo: 12:14
 ```
 
 **Variação 8192:**
+
 ```
 🐊 Jacaré atingido!
 Você chegou aqui 3 vezes!
@@ -196,37 +199,37 @@ return RealService(); // prd e dev usam serviços reais
 
 ### Providers a auditar
 
-| Provider | Ação |
-|----------|------|
-| `authServiceProvider` | verificar; garantir real em dev |
-| `syncEngineProvider` | já correto (dev usa `FirebaseSyncEngine`) ✅ |
-| `rankingRepositoryProvider` | verificar; garantir real em dev |
-| `inviteServiceProvider` | verificar; garantir real em dev |
-| `iapServiceProvider` | dev → implementação real com conta sandbox Play Store; `tst` → Fake |
-| `iapStartupServiceProvider` | idem IAP |
-| `adsServiceProvider` | dev → implementação real com test ad unit IDs; `tst` → Fake |
+| Provider                    | Ação                                                                |
+| --------------------------- | ------------------------------------------------------------------- |
+| `authServiceProvider`       | verificar; garantir real em dev                                     |
+| `syncEngineProvider`        | já correto (dev usa `FirebaseSyncEngine`) ✅                        |
+| `rankingRepositoryProvider` | verificar; garantir real em dev                                     |
+| `inviteServiceProvider`     | verificar; garantir real em dev                                     |
+| `iapServiceProvider`        | dev → implementação real com conta sandbox Play Store; `tst` → Fake |
+| `iapStartupServiceProvider` | idem IAP                                                            |
+| `adsServiceProvider`        | dev → implementação real com test ad unit IDs; `tst` → Fake         |
 
 ### Impacto no `README.md`
 
 A tabela de builds deve ser atualizada para refletir que `dev` usa serviços reais (Firebase/Firestore/Ads com IDs de teste):
 
-| Comando | Flavor | Serviços | Uso |
-|---------|--------|----------|-----|
-| `flutter run --dart-define=FLAVOR=dev` | dev | Reais (sandbox) | Desenvolvimento local com Firebase dev |
-| `flutter build apk --dart-define=FLAVOR=tst` | tst | Fake | QA — testes sem Firebase |
-| `flutter build apk --dart-define=FLAVOR=prd` | prd | Reais (produção) | Release |
+| Comando                                      | Flavor | Serviços         | Uso                                    |
+| -------------------------------------------- | ------ | ---------------- | -------------------------------------- |
+| `flutter run --dart-define=FLAVOR=dev`       | dev    | Reais (sandbox)  | Desenvolvimento local com Firebase dev |
+| `flutter build apk --dart-define=FLAVOR=tst` | tst    | Fake             | QA — testes sem Firebase               |
+| `flutter build apk --dart-define=FLAVOR=prd` | prd    | Reais (produção) | Release                                |
 
 ---
 
 ## 6. Tratamento de erros
 
-| Cenário | Comportamento |
-|---------|--------------|
-| Firestore indisponível ao submeter score | já tratado em `game_notifier` (fire-and-forget + catch) |
-| Firestore indisponível ao consultar posição | `rankingPosition = null`, dialog omite linha de posição |
-| Concessão de combo falha | log silencioso; `earnedCombo` continua `true` para UI; item não é entregue (não há retry automático — aceitável dado o valor baixo) |
-| Invite reward falha | já tratado com catch silencioso no `completeInviteReward` |
-| Hive indisponível ao salvar `bestTimeMs2048` | catch silencioso; recorde não é salvo; jogador não recebe recompensa nessa partida |
+| Cenário                                      | Comportamento                                                                                                                       |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Firestore indisponível ao submeter score     | já tratado em `game_notifier` (fire-and-forget + catch)                                                                             |
+| Firestore indisponível ao consultar posição  | `rankingPosition = null`, dialog omite linha de posição                                                                             |
+| Concessão de combo falha                     | log silencioso; `earnedCombo` continua `true` para UI; item não é entregue (não há retry automático — aceitável dado o valor baixo) |
+| Invite reward falha                          | já tratado com catch silencioso no `completeInviteReward`                                                                           |
+| Hive indisponível ao salvar `bestTimeMs2048` | catch silencioso; recorde não é salvo; jogador não recebe recompensa nessa partida                                                  |
 
 ---
 

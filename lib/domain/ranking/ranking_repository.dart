@@ -21,7 +21,12 @@ class RankingEntry {
 abstract class RankingRepository {
   Future<List<RankingEntry>> getWeeklyTop(RankingType type);
   Future<RankingEntry?> getPlayerEntry(RankingType type);
-  Future<void> submitScore(RankingType type, int value, {String? displayName, int? maxTile});
+  Future<void> submitScore(
+    RankingType type,
+    int value, {
+    String? displayName,
+    int? maxTile,
+  });
   Future<WeeklyRewardResult?> checkAndClaimWeeklyReward(String weekId);
   Stream<List<RankingEntry>> watchWeeklyTop(RankingType type);
 }

@@ -130,7 +130,7 @@ Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 4
 | 4.1 ✅    | EmailAuthScreen, AvatarPickerScreen, AvatarWidget, updateAvatar(), destaque avatar na Home, fix legibilidade InviteFriendsScreen                                     |
 | 4.1.1 ✅  | Tipografia consistente: Fredoka em todas as telas/widgets sobre fundos não-sólidos                                                                                   |
 | 4.2 ✅    | Exclusão de conta LGPD, nome no cadastro, editar nome, trocar/esqueci senha, persistência avatar tile, auth gates (startup, shop, daily, ranking), sync game records |
-| 4.3 ✅    | Ranking Global (aba + dialogs pós-milestone), recompensas por recorde pessoal/convite, tabela semanal revisada, flavor audit |
+| 4.3 ✅    | Ranking Global (aba + dialogs pós-milestone), recompensas por recorde pessoal/convite, tabela semanal revisada, flavor audit                                         |
 | 5         | Arte adicional e polimento visual (logo, ícone, splash final)                                                                                                        |
 | 6         | Áudio (sound design dos 13 animais, SFX, música)                                                                                                                     |
 | 7         | Polimento, l10n, acessibilidade, lançamento                                                                                                                          |

@@ -7,20 +7,27 @@ Widget wrap(Widget child) => MaterialApp(home: Scaffold(body: child));
 
 // Helper: open the dialog via a button tap
 Future<void> openDialog(WidgetTester tester, PostGameSummary summary) async {
-  await tester.pumpWidget(wrap(Builder(builder: (ctx) {
-    return ElevatedButton(
-      onPressed: () => MilestoneRankingDialog.show(ctx, summary),
-      child: const Text('Open'),
-    );
-  })));
+  await tester.pumpWidget(
+    wrap(
+      Builder(
+        builder: (ctx) {
+          return ElevatedButton(
+            onPressed: () => MilestoneRankingDialog.show(ctx, summary),
+            child: const Text('Open'),
+          );
+        },
+      ),
+    ),
+  );
   await tester.tap(find.text('Open'));
   await tester.pumpAndSettle();
 }
 
 void main() {
   group('MilestoneRankingDialog', () {
-    testWidgets('milestone 11 with position: shows ranking and time',
-        (tester) async {
+    testWidgets('milestone 11 with position: shows ranking and time', (
+      tester,
+    ) async {
       const summary = PostGameSummary(
         milestone: 11,
         rankingPosition: 3,
@@ -36,8 +43,9 @@ void main() {
       expect(find.text('Continuar'), findsOneWidget);
     });
 
-    testWidgets('milestone 11 without position: omits ranking line',
-        (tester) async {
+    testWidgets('milestone 11 without position: omits ranking line', (
+      tester,
+    ) async {
       const summary = PostGameSummary(
         milestone: 11,
         rankingPosition: null,

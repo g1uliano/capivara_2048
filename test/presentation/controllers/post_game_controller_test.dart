@@ -202,12 +202,14 @@ void main() {
       addTearDown(c.dispose);
       await c.read(personalRecordsProvider.notifier).load();
 
-      await c.read(postGameControllerProvider.notifier).onMilestone(
-        milestone: 11,
-        timeMs: 27000,
-        maxLevel: 11,
-        timesReached8192: 0,
-      );
+      await c
+          .read(postGameControllerProvider.notifier)
+          .onMilestone(
+            milestone: 11,
+            timeMs: 27000,
+            maxLevel: 11,
+            timesReached8192: 0,
+          );
 
       final summary = c.read(postGameControllerProvider);
       expect(summary, isNotNull);

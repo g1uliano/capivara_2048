@@ -14,34 +14,35 @@
 
 ## Mapa de arquivos
 
-| Arquivo | Ação |
-|---------|------|
-| `lib/data/models/personal_records.dart` | Modificar — add `bestTimeMs2048` |
-| `lib/data/models/personal_records_hive_adapter.dart` | Modificar — add campo no adapter |
-| `lib/presentation/controllers/personal_records_notifier.dart` | Modificar — add `updateBestTime2048()` |
-| `lib/domain/ranking/weekly_reward_result.dart` | Modificar — nova tabela `forPosition()` |
-| `lib/data/repositories/firestore_invite_repository.dart` | Modificar — reward do convidador + `pendingLives` |
-| `lib/data/repositories/firebase_sync_engine.dart` | Modificar — creditar `pendingLives` em `syncProfile()` |
-| `lib/data/repositories/firestore_ranking_repository.dart` | Modificar — add `maxTile` como tiebreaker |
-| `lib/presentation/controllers/post_game_controller.dart` | **Criar** — PostGameController + PostGameSummary |
-| `lib/presentation/widgets/milestone_ranking_dialog.dart` | **Criar** — MilestoneRankingDialog |
-| `lib/presentation/screens/ranking_screen.dart` | Modificar — 3 tabs (add Global) |
-| `lib/presentation/screens/game/game_screen.dart` | Modificar — ref.listen PostGameController |
-| `lib/core/providers/ranking_provider.dart` | Modificar — flavor: fake só em `tst` |
-| `lib/domain/invites/invite_service.dart` | Modificar — flavor: fake só em `tst` |
-| `lib/domain/shop/iap_service.dart` | Modificar — flavor: dev usa real (sandbox) |
-| `lib/data/repositories/iap_startup_service.dart` | Modificar — flavor: dev usa real (sandbox) |
-| `README.md` | Modificar — builds table + roadmap |
-| `test/domain/personal_records_test.dart` | **Criar** — testes `bestTimeMs2048` |
-| `test/ranking/weekly_reward_test.dart` | Modificar — novos valores |
-| `test/presentation/controllers/post_game_controller_test.dart` | **Criar** — testes do controller |
-| `test/presentation/widgets/milestone_ranking_dialog_test.dart` | **Criar** — widget tests |
+| Arquivo                                                        | Ação                                                   |
+| -------------------------------------------------------------- | ------------------------------------------------------ |
+| `lib/data/models/personal_records.dart`                        | Modificar — add `bestTimeMs2048`                       |
+| `lib/data/models/personal_records_hive_adapter.dart`           | Modificar — add campo no adapter                       |
+| `lib/presentation/controllers/personal_records_notifier.dart`  | Modificar — add `updateBestTime2048()`                 |
+| `lib/domain/ranking/weekly_reward_result.dart`                 | Modificar — nova tabela `forPosition()`                |
+| `lib/data/repositories/firestore_invite_repository.dart`       | Modificar — reward do convidador + `pendingLives`      |
+| `lib/data/repositories/firebase_sync_engine.dart`              | Modificar — creditar `pendingLives` em `syncProfile()` |
+| `lib/data/repositories/firestore_ranking_repository.dart`      | Modificar — add `maxTile` como tiebreaker              |
+| `lib/presentation/controllers/post_game_controller.dart`       | **Criar** — PostGameController + PostGameSummary       |
+| `lib/presentation/widgets/milestone_ranking_dialog.dart`       | **Criar** — MilestoneRankingDialog                     |
+| `lib/presentation/screens/ranking_screen.dart`                 | Modificar — 3 tabs (add Global)                        |
+| `lib/presentation/screens/game/game_screen.dart`               | Modificar — ref.listen PostGameController              |
+| `lib/core/providers/ranking_provider.dart`                     | Modificar — flavor: fake só em `tst`                   |
+| `lib/domain/invites/invite_service.dart`                       | Modificar — flavor: fake só em `tst`                   |
+| `lib/domain/shop/iap_service.dart`                             | Modificar — flavor: dev usa real (sandbox)             |
+| `lib/data/repositories/iap_startup_service.dart`               | Modificar — flavor: dev usa real (sandbox)             |
+| `README.md`                                                    | Modificar — builds table + roadmap                     |
+| `test/domain/personal_records_test.dart`                       | **Criar** — testes `bestTimeMs2048`                    |
+| `test/ranking/weekly_reward_test.dart`                         | Modificar — novos valores                              |
+| `test/presentation/controllers/post_game_controller_test.dart` | **Criar** — testes do controller                       |
+| `test/presentation/widgets/milestone_ranking_dialog_test.dart` | **Criar** — widget tests                               |
 
 ---
 
 ## Task 1 — `PersonalRecords`: adicionar `bestTimeMs2048`
 
 **Files:**
+
 - Modify: `lib/data/models/personal_records.dart`
 - Modify: `lib/data/models/personal_records_hive_adapter.dart`
 - Modify: `lib/presentation/controllers/personal_records_notifier.dart`
@@ -117,6 +118,7 @@ void main() {
 ```bash
 flutter test test/domain/personal_records_test.dart --no-pub
 ```
+
 Esperado: FAIL (campo não existe ainda)
 
 - [ ] **Step 1.3: Adicionar `bestTimeMs2048` ao model**
@@ -257,6 +259,7 @@ Future<bool> updateBestTime2048(int timeMs) async {
 ```bash
 flutter test test/domain/personal_records_test.dart --no-pub
 ```
+
 Esperado: All tests passed
 
 - [ ] **Step 1.7: Garantir que testes existentes continuam passando**
@@ -264,6 +267,7 @@ Esperado: All tests passed
 ```bash
 flutter test test/domain/personal_records_notifier_test.dart --no-pub
 ```
+
 Esperado: All tests passed
 
 - [ ] **Step 1.8: Commit**
@@ -281,6 +285,7 @@ git commit -m "feat: add bestTimeMs2048 to PersonalRecords for personal record d
 ## Task 2 — `WeeklyRewardResult`: nova tabela de prêmios
 
 **Files:**
+
 - Modify: `lib/domain/ranking/weekly_reward_result.dart`
 - Modify: `test/ranking/weekly_reward_test.dart`
 
@@ -389,6 +394,7 @@ void main() {
 ```bash
 flutter test test/ranking/weekly_reward_test.dart --no-pub
 ```
+
 Esperado: FAIL (valores diferentes dos atuais)
 
 - [ ] **Step 2.3: Atualizar `forPosition()` em `weekly_reward_result.dart`**
@@ -438,6 +444,7 @@ factory WeeklyRewardResult.forPosition(int position, {String weekId = 'unknown'}
 ```bash
 flutter test test/ranking/weekly_reward_test.dart --no-pub
 ```
+
 Esperado: All tests passed
 
 - [ ] **Step 2.5: Commit**
@@ -450,9 +457,10 @@ git commit -m "feat: update weekly ranking reward table (positions 1-10)"
 
 ---
 
-## Task 3 — Auditoria de flavors: Fake* exclusivo para `tst`
+## Task 3 — Auditoria de flavors: Fake\* exclusivo para `tst`
 
 **Files:**
+
 - Modify: `lib/core/providers/ranking_provider.dart`
 - Modify: `lib/domain/invites/invite_service.dart`
 - Modify: `lib/domain/shop/iap_service.dart`
@@ -461,6 +469,7 @@ git commit -m "feat: update weekly ranking reward table (positions 1-10)"
 - [ ] **Step 3.1: Corrigir `rankingRepositoryProvider`**
 
 Em `lib/core/providers/ranking_provider.dart`, a condição atual é:
+
 ```dart
 if (kDebugMode || flavor != 'prd') return FakeRankingService();
 ```
@@ -482,6 +491,7 @@ final rankingRepositoryProvider = Provider<RankingRepository>((ref) {
 - [ ] **Step 3.2: Corrigir `inviteServiceProvider`**
 
 Em `lib/domain/invites/invite_service.dart`, a condição atual é:
+
 ```dart
 if (flavor == 'prd') { ... return FirestoreInviteRepository(...); }
 return FakeInviteService();
@@ -511,6 +521,7 @@ final inviteServiceProvider = Provider<InviteService>((ref) {
 - [ ] **Step 3.3: Corrigir `iapServiceProvider` e `iapStartupServiceProvider`**
 
 Em `lib/domain/shop/iap_service.dart`, a condição atual é:
+
 ```dart
 if (flavor == 'prd' || (flavor == 'tst' && useRealIap)) {
 ```
@@ -522,6 +533,7 @@ if (flavor == 'prd' || flavor == 'dev' || (flavor == 'tst' && useRealIap)) {
 ```
 
 Em `lib/data/repositories/iap_startup_service.dart`, aplicar o mesmo padrão:
+
 ```dart
 if (flavor == 'prd' || flavor == 'dev' || (flavor == 'tst' && useRealIap)) {
 ```
@@ -534,6 +546,7 @@ flutter test test/domain/auth/auth_controller_test.dart \
              test/presentation/profile_screen_test.dart \
              --no-pub
 ```
+
 Esperado: All tests passed (os testes já usam overrides explícitos de providers, não dependem do flavor)
 
 - [ ] **Step 3.5: Commit**
@@ -553,6 +566,7 @@ git commit -m "fix: Fake* providers exclusivos para flavor tst (dev usa serviço
 O convidador está em outro dispositivo — inventory (bomb3, undo1) pode ser entregue via Firestore (synced por `_mergeRemoteInventory`). Vidas precisam de um mecanismo `pendingLives` creditado em `syncProfile()`.
 
 **Files:**
+
 - Modify: `lib/data/repositories/firestore_invite_repository.dart`
 - Modify: `lib/data/repositories/firebase_sync_engine.dart`
 
@@ -644,6 +658,7 @@ Future<void> _creditPendingLives(int amount) async {
 ```bash
 flutter test test/domain/invite_service_test.dart --no-pub
 ```
+
 Esperado: All tests passed (FakeInviteService não é afetado)
 
 - [ ] **Step 4.4: Commit**
@@ -659,10 +674,12 @@ git commit -m "feat: inviter receives 1 combo (vida+bomb3+undo1) when invitee pl
 ## Task 5 — Ranking Global: adicionar `maxTile` como tiebreaker
 
 **Files:**
+
 - Modify: `lib/data/repositories/firestore_ranking_repository.dart`
 - Modify: `lib/presentation/controllers/game_notifier.dart`
 
 Firestore não suporta tiebreaker sem índice composto. Precisamos:
+
 1. Salvar `maxTile` no documento de ranking
 2. Criar índice composto: `bestTimeMs ASC, maxTile DESC`
 
@@ -807,6 +824,7 @@ Se `maxTile` não existir, usar: `maxTile: state.maxLevel > 0 ? (1 << state.maxL
 ```bash
 flutter test test/domain/ --no-pub
 ```
+
 Esperado: All tests passed
 
 - [ ] **Step 5.8: Commit**
@@ -824,6 +842,7 @@ git commit -m "feat: add maxTile tiebreaker to global time ranking submission"
 ## Task 6 — `PostGameController` + `PostGameSummary`
 
 **Files:**
+
 - Create: `lib/presentation/controllers/post_game_controller.dart`
 - Create: `test/presentation/controllers/post_game_controller_test.dart`
 
@@ -1035,6 +1054,7 @@ void main() {
 ```bash
 flutter test test/presentation/controllers/post_game_controller_test.dart --no-pub
 ```
+
 Esperado: FAIL (arquivo não existe)
 
 - [ ] **Step 6.3: Criar `PostGameSummary` e `PostGameController`**
@@ -1174,6 +1194,7 @@ Ajustar os nomes no `post_game_controller.dart` conforme o output.
 ```bash
 flutter test test/presentation/controllers/post_game_controller_test.dart --no-pub
 ```
+
 Esperado: All tests passed
 
 - [ ] **Step 6.6: Commit**
@@ -1189,6 +1210,7 @@ git commit -m "feat: PostGameController — detecta recordes, concede combo, con
 ## Task 7 — `MilestoneRankingDialog`
 
 **Files:**
+
 - Create: `lib/presentation/widgets/milestone_ranking_dialog.dart`
 - Create: `test/presentation/widgets/milestone_ranking_dialog_test.dart`
 
@@ -1335,6 +1357,7 @@ void main() {
 ```bash
 flutter test test/presentation/widgets/milestone_ranking_dialog_test.dart --no-pub
 ```
+
 Esperado: FAIL
 
 - [ ] **Step 7.3: Criar `MilestoneRankingDialog`**
@@ -1525,6 +1548,7 @@ class MilestoneRankingDialog extends StatelessWidget {
 ```bash
 flutter test test/presentation/widgets/milestone_ranking_dialog_test.dart --no-pub
 ```
+
 Esperado: All tests passed
 
 - [ ] **Step 7.5: Commit**
@@ -1540,16 +1564,20 @@ git commit -m "feat: MilestoneRankingDialog para 2048/4096/8192 com variações 
 ## Task 8 — `RankingScreen`: adicionar aba Global
 
 **Files:**
+
 - Modify: `lib/presentation/screens/ranking_screen.dart`
 
 - [ ] **Step 8.1: Alterar `DefaultTabController` de `length: 2` para `length: 3`**
 
 Localizar:
+
 ```dart
 DefaultTabController(
   length: 2,
 ```
+
 Alterar para:
+
 ```dart
 DefaultTabController(
   length: 3,
@@ -1558,13 +1586,16 @@ DefaultTabController(
 - [ ] **Step 8.2: Adicionar tab "Global" entre "Pessoal" e "Lendas"**
 
 Localizar:
+
 ```dart
 tabs: const [
   Tab(text: 'Pessoal'),
   Tab(text: 'Lendas'),
 ],
 ```
+
 Alterar para:
+
 ```dart
 tabs: const [
   Tab(text: 'Pessoal'),
@@ -1576,12 +1607,15 @@ tabs: const [
 - [ ] **Step 8.3: Adicionar `_GlobalRankingTab` no `TabBarView`**
 
 Localizar:
+
 ```dart
 body: const TabBarView(
   children: [_PersonalRankingTab(), _LegendsRankingTab()],
 ),
 ```
+
 Alterar para:
+
 ```dart
 body: const TabBarView(
   children: [_PersonalRankingTab(), _GlobalRankingTab(), _LegendsRankingTab()],
@@ -1726,6 +1760,7 @@ class _GlobalRankingTab extends ConsumerWidget {
 ```bash
 dart analyze lib/presentation/screens/ranking_screen.dart
 ```
+
 Corrigir eventuais erros de import.
 
 - [ ] **Step 8.6: Commit**
@@ -1740,6 +1775,7 @@ git commit -m "feat: add Global tab to RankingScreen (weekly time ranking)"
 ## Task 9 — `GameScreen`: acionar `PostGameController` no milestone
 
 **Files:**
+
 - Modify: `lib/presentation/screens/game/game_screen.dart`
 
 O `GameScreen` já escuta `pendingMilestone` do `gameNotifier` para exibir o overlay de vitória. Precisamos também acionar o `PostGameController` quando o milestone é detectado.
@@ -1832,6 +1868,7 @@ dart analyze lib/presentation/screens/game/game_screen.dart
 ```bash
 flutter test test/presentation/game_screen_211_test.dart --no-pub
 ```
+
 Esperado: All tests passed
 
 - [ ] **Step 9.7: Commit**
@@ -1847,6 +1884,7 @@ git commit -m "feat: wire PostGameController to GameScreen milestone events"
 ## Task 10 — README: atualizar tabela de builds e roadmap
 
 **Files:**
+
 - Modify: `README.md`
 
 - [ ] **Step 10.1: Atualizar tabela de builds**
@@ -1854,12 +1892,12 @@ git commit -m "feat: wire PostGameController to GameScreen milestone events"
 Localizar a tabela de builds e substituir:
 
 ```markdown
-| Comando | Flavor | Serviços | Uso |
-|---------|--------|----------|-----|
-| `flutter run --dart-define=FLAVOR=dev` | dev | Reais (Firebase dev / sandbox) | Desenvolvimento local |
-| `flutter build apk --dart-define=FLAVOR=tst` | tst | Fake (sem Firebase) | QA — testes sem lojas |
-| `flutter build apk --dart-define=FLAVOR=tst --dart-define=USE_REAL_IAP=true` | tst | IAP Real (sandbox) | QA com Play Store sandbox |
-| `flutter build apk --dart-define=FLAVOR=prd` | prd | Reais (produção) | Release |
+| Comando                                                                      | Flavor | Serviços                       | Uso                       |
+| ---------------------------------------------------------------------------- | ------ | ------------------------------ | ------------------------- |
+| `flutter run --dart-define=FLAVOR=dev`                                       | dev    | Reais (Firebase dev / sandbox) | Desenvolvimento local     |
+| `flutter build apk --dart-define=FLAVOR=tst`                                 | tst    | Fake (sem Firebase)            | QA — testes sem lojas     |
+| `flutter build apk --dart-define=FLAVOR=tst --dart-define=USE_REAL_IAP=true` | tst    | IAP Real (sandbox)             | QA com Play Store sandbox |
+| `flutter build apk --dart-define=FLAVOR=prd`                                 | prd    | Reais (produção)               | Release                   |
 ```
 
 - [ ] **Step 10.2: Adicionar Fase 4.3 ao roadmap**
@@ -1873,7 +1911,7 @@ Após a linha de Fase 4.2 (ou 4B/4C/gaps/4.1/4.1.1/4.2), adicionar:
   - Recompensas por recorde pessoal (combo: vida + bomba3 + desfazer)
   - Recompensas por convite (convidador recebe combo quando convidado joga 1ª partida)
   - Tabela de prêmios semanais revisada (top 10)
-  - Fake* providers exclusivos para flavor `tst`
+  - Fake\* providers exclusivos para flavor `tst`
 ```
 
 - [ ] **Step 10.3: Commit**
@@ -1892,6 +1930,7 @@ git commit -m "docs: update README builds table and roadmap for Fase 4.3"
 ```bash
 flutter test --no-pub --exclude-tags golden
 ```
+
 Esperado: sem regressões nas tasks existentes; novos testes passando
 
 - [ ] **Step 11.2: Análise estática global**
@@ -1899,16 +1938,19 @@ Esperado: sem regressões nas tasks existentes; novos testes passando
 ```bash
 dart analyze lib/
 ```
+
 Esperado: No issues found
 
 - [ ] **Step 11.3: Atualizar AGENTS.md**
 
 Atualizar a linha de fase atual:
+
 ```
 Fase atual: **Fase 4.3 em andamento — Ranking Global, Recompensas e Auditoria de Flavors**
 ```
 
 E adicionar a linha `4.3` na tabela de fases:
+
 ```
 | 4.3       | Ranking Global (aba + dialogs pós-milestone), recompensas por recorde pessoal/convite, tabela semanal revisada, flavor audit |
 ```

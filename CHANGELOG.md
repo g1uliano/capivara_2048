@@ -4,9 +4,35 @@ All notable changes to Capivara 2048 will be documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.7.0] — 2026-05-08
+
+### Added
+
+- **Ranking Global:** aba "Global" no `RankingScreen` com ranking semanal de menor tempo até 2048 (`watchWeeklyTop globalTime`)
+- **MilestoneRankingDialog:** diálogo pós-milestone (2048 / 4096 / 8192) exibindo posição do jogador no ranking global semanal
+- **PostGameController:** detecta recordes pessoais pós-partida, concede combo de recompensas e consulta posição no ranking global
+- **`bestTimeMs2048` em `PersonalRecords`:** campo para rastrear recorde de tempo até 2048 e detectar melhoras
+- **maxTile tiebreaker:** desempate por maior tile na submissão do ranking global de tempo
+- **Recompensa ao convidador:** quem convida recebe 1 combo (vida + bomba 3×3 + desfazer) quando o convidado completa a primeira partida
+- **Tabela de recompensas semanais revisada:** prêmios para posições 1–10 no ranking semanal
+- **`InviteFriendsScreen` redesenhada:** layout scrollável, `_HeroCard` glassmorphism, lista de recompensas, estado vazio estilizado
+- **`ProfileScreen` refatorada:** ações agrupadas em card branco semi-transparente; acesso direto a "Convidar Amigos", troca de senha e restaurar compras
+- **`OnboardingAuthScreen` renovada:** painéis frosted-glass (`_ContentPanel`), bloco de benefícios (`_BenefitsBlock`), layout mais responsivo
+
+### Fixed
+
+- **`GlobalRankingTab`:** `StreamProvider` movido para top-level, evitando recriação em rebuilds; estilos de texto corrigidos com `outlinedWhiteTextStyle`
+- **Exibição de rank globalTime:** posição calculada corretamente com tiebreaker de maxTile
+- **`_mergeRemoteInventory`:** usava chave Hive errada `'inventory'`; corrigido para `'data'`
+- **Fake* providers:** `FakeRankingService`, `FakeAuthService` etc. exclusivos do flavor `tst`; `dev` usa serviços reais
+- **Cold start avatar:** tile e displayName do avatar restaurados corretamente no arranque frio
+- **`RankingScreen`:** todos os textos sobre o fundo usam `outlinedWhiteTextStyle(GoogleFonts.fredoka(...))`
+- **`BombSelectionOverlay` / `InventoryBar`:** ajustes menores de estilo e tipografia
+
 ## [1.6.0] — 2026-05-07
 
 ### Added
+
 - **Exclusão de conta (LGPD):** fluxo de 2 etapas na `ProfileScreen` (aviso + digitar "EXCLUIR" + senha para conta e-mail); remove dados do Firestore, Hive local e Firebase Auth com re-autenticação
 - **Campo nome no cadastro:** `EmailAuthScreen` agora exige nome no signup; nome é salvo no Firebase Auth e Firestore
 - **Editar nome de perfil:** botão lápis ao lado do nome na `ProfileScreen` (somente contas e-mail)
@@ -24,6 +50,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - **`GameRecord.toJson/fromJson`:** serialização para persistência no Firestore
 
 ### Fixed
+
 - **`signOut()`:** `GoogleSignIn.instance.signOut()` agora é chamado apenas para contas Google (antes chamava incondicionalmente)
 - **`syncEngineProvider`:** usa `FirebaseSyncEngine` para `dev`, `tst` e `prd` (antes só `prd`)
 - **Avatar Google:** botão de editar avatar ocultado na `ProfileScreen` para contas Google
@@ -32,6 +59,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## [1.5.3] — 2026-05-07
 
 ### Fixed
+
 - **Tipografia consistente (Fase 4.1.1):** todo texto exibido diretamente sobre fundos não-sólidos (fundo do jogo, dark overlay) migrado de `GoogleFonts.nunito()` para `GoogleFonts.fredoka()` em todas as telas e widgets:
   - Telas: `ProfileScreen`, `OnboardingAuthScreen`, `EmailAuthScreen`, `InviteFriendsScreen`, `AvatarPickerScreen`, `RankingScreen`, `HomeScreen`, `ShopScreen`, `RedeemCodeScreen`, `NoLivesScreen`, `DailyRewardsScreen`
   - Widgets: `ScorePanel`, `StatusPanel`, `PauseOverlay`, `AuthBanner`, `DailyRewardOverlay`, `GameOverNoItemsOverlay`
@@ -40,6 +68,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## [1.5.2] — 2026-05-07
 
 ### Added
+
 - **EmailAuthScreen:** tela dedicada de e-mail/senha com toggle Entrar/Criar Conta, validação inline (formato de e-mail, mínimo 8 caracteres + 1 número, confirmação de senha), mostrar/ocultar senha e mensagens de erro em português
 - **AvatarPickerScreen:** tela de seleção de avatar com grid dos 13 animais do jogo (tiles); acessível após cadastro e pela ProfileScreen
 - **AvatarWidget:** widget reutilizável de avatar com suporte a tile animal, URL HTTP (Google/Apple) e inicial do nome sobre fundo verde
@@ -48,6 +77,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Botão de editar avatar (ícone lápis) na ProfileScreen
 
 ### Fixed
+
 - Logo na tela de login (`OnboardingAuthScreen`) agora usa `HomeConstants.titleHeight(scale)` — mesmo tamanho responsivo da Home
 - Textos sobre o fundo em `InviteFriendsScreen` agora usam `outlinedWhiteTextStyle` (legíveis)
 

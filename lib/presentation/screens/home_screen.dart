@@ -486,8 +486,8 @@ class _HowToPlaySheet extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              '• Deslize o dedo para mover todos os tiles.\n'
-              '• Tiles com o mesmo animal se fundem ao se encontrar.\n'
+              '• Deslize o dedo para mover todas as peças.\n'
+              '• Peças com o mesmo animal se fundem ao se encontrar.\n'
               '• Funda animais até chegar na Capivara Lendária (2048)!\n'
               '• Cada partida consome uma vida. Vidas se regeneram com o tempo.\n'
               '• Use bombas e desfazer para sair de situações difíceis.',

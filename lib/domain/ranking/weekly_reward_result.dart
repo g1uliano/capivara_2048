@@ -17,37 +17,50 @@ class WeeklyRewardResult {
 
   bool get hasReward => lives > 0 || bomb3 > 0 || bomb2 > 0 || undo1 > 0;
 
-  factory WeeklyRewardResult.forPosition(int position, {String weekId = 'unknown'}) {
+  factory WeeklyRewardResult.forPosition(
+    int position, {
+    String weekId = 'unknown',
+  }) {
     if (position == 1) {
       return WeeklyRewardResult(
-        position: position, weekId: weekId,
-        lives: 10, undo1: 10, bomb3: 10,
+        position: position,
+        weekId: weekId,
+        lives: 10,
+        undo1: 10,
+        bomb3: 10,
       );
     } else if (position == 2) {
       return WeeklyRewardResult(
-        position: position, weekId: weekId,
-        lives: 5, undo1: 5, bomb3: 5,
+        position: position,
+        weekId: weekId,
+        lives: 5,
+        undo1: 5,
+        bomb3: 5,
       );
     } else if (position == 3) {
       return WeeklyRewardResult(
-        position: position, weekId: weekId,
-        lives: 3, undo1: 3, bomb3: 3,
+        position: position,
+        weekId: weekId,
+        lives: 3,
+        undo1: 3,
+        bomb3: 3,
       );
     } else if (position >= 4 && position <= 6) {
       return WeeklyRewardResult(
-        position: position, weekId: weekId,
-        lives: 3, bomb3: 3,
+        position: position,
+        weekId: weekId,
+        lives: 3,
+        bomb3: 3,
       );
     } else if (position >= 7 && position <= 9) {
       return WeeklyRewardResult(
-        position: position, weekId: weekId,
-        lives: 3, undo1: 3,
+        position: position,
+        weekId: weekId,
+        lives: 3,
+        undo1: 3,
       );
     } else if (position == 10) {
-      return WeeklyRewardResult(
-        position: position, weekId: weekId,
-        lives: 3,
-      );
+      return WeeklyRewardResult(position: position, weekId: weekId, lives: 3);
     } else {
       return WeeklyRewardResult(position: position, weekId: weekId);
     }
@@ -65,8 +78,7 @@ class WeeklyRewardResult {
           other.undo1 == undo1;
 
   @override
-  int get hashCode =>
-      Object.hash(position, weekId, lives, bomb3, bomb2, undo1);
+  int get hashCode => Object.hash(position, weekId, lives, bomb3, bomb2, undo1);
 
   WeeklyRewardResult copyWith({
     int? position,

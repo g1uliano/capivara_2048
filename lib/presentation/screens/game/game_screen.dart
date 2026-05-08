@@ -68,7 +68,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         inventory.undo1 > 0 ||
         inventory.undo3 > 0;
 
-    ref.listen<PostGameSummary?>(postGameControllerProvider, (previous, summary) {
+    ref.listen<PostGameSummary?>(postGameControllerProvider, (
+      previous,
+      summary,
+    ) {
       if (summary == null || !mounted) return;
       MilestoneRankingDialog.show(
         context,
@@ -88,7 +91,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     });
 
     ref.listen<GameState>(gameProvider, (previous, current) {
-      if (previous?.pendingMilestone == null && current.pendingMilestone != null) {
+      if (previous?.pendingMilestone == null &&
+          current.pendingMilestone != null) {
         final milestone = current.pendingMilestone!;
         final records = ref.read(personalRecordsProvider);
         final timeMs = switch (milestone) {
@@ -96,12 +100,14 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           12 => current.bestTimeMs4096 ?? current.elapsedMs,
           _ => current.elapsedMs,
         };
-        ref.read(postGameControllerProvider.notifier).onMilestone(
-          milestone: milestone,
-          timeMs: timeMs,
-          maxLevel: current.maxLevel,
-          timesReached8192: records.timesReached8192,
-        );
+        ref
+            .read(postGameControllerProvider.notifier)
+            .onMilestone(
+              milestone: milestone,
+              timeMs: timeMs,
+              maxLevel: current.maxLevel,
+              timesReached8192: records.timesReached8192,
+            );
       }
     });
 

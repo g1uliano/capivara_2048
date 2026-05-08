@@ -35,7 +35,7 @@ class BombDimOverlay extends ConsumerWidget {
                 padding: const EdgeInsets.only(top: 8),
                 child: Center(
                   child: Text(
-                    'Selecione $maxTiles tiles para destruir',
+                    'Selecione $maxTiles peças para destruir',
                     style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ),

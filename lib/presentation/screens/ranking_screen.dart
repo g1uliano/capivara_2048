@@ -16,9 +16,9 @@ import 'onboarding_auth_screen.dart';
 // Top-level — ensures the Firestore stream is not restarted on every rebuild
 final _globalRankingStreamProvider =
     StreamProvider.autoDispose<List<RankingEntry>>((ref) {
-  final repo = ref.watch(rankingRepositoryProvider);
-  return repo.watchWeeklyTop(RankingType.globalTime);
-});
+      final repo = ref.watch(rankingRepositoryProvider);
+      return repo.watchWeeklyTop(RankingType.globalTime);
+    });
 
 class RankingScreen extends ConsumerWidget {
   const RankingScreen({super.key, this.initialTab = 0});
@@ -405,10 +405,9 @@ class _GlobalRankingTab extends ConsumerWidget {
                 const SizedBox(width: 4),
                 Text(
                   'Reinício em ${_timeUntilReset()}',
-                  style: outlinedWhiteTextStyle(GoogleFonts.fredoka(
-                    fontSize: 13,
-                    color: Colors.white70,
-                  )),
+                  style: outlinedWhiteTextStyle(
+                    GoogleFonts.fredoka(fontSize: 13, color: Colors.white70),
+                  ),
                 ),
               ],
             ),
@@ -421,7 +420,9 @@ class _GlobalRankingTab extends ConsumerWidget {
                 padding: const EdgeInsets.all(24),
                 child: Text(
                   'Entre na sua conta para ver e participar do Ranking Global.',
-                  style: outlinedWhiteTextStyle(GoogleFonts.fredoka(fontSize: 16, color: Colors.white)),
+                  style: outlinedWhiteTextStyle(
+                    GoogleFonts.fredoka(fontSize: 16, color: Colors.white),
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -434,7 +435,9 @@ class _GlobalRankingTab extends ConsumerWidget {
               error: (e, _) => Center(
                 child: Text(
                   'Erro ao carregar ranking.',
-                  style: outlinedWhiteTextStyle(GoogleFonts.fredoka(fontSize: 16, color: Colors.white)),
+                  style: outlinedWhiteTextStyle(
+                    GoogleFonts.fredoka(fontSize: 16, color: Colors.white),
+                  ),
                 ),
               ),
               data: (entries) {
@@ -444,10 +447,12 @@ class _GlobalRankingTab extends ConsumerWidget {
                       padding: const EdgeInsets.all(24),
                       child: Text(
                         'Forme o 2048 para entrar no ranking desta semana!',
-                        style: outlinedWhiteTextStyle(GoogleFonts.fredoka(
-                          fontSize: 16,
-                          color: Colors.white,
-                        )),
+                        style: outlinedWhiteTextStyle(
+                          GoogleFonts.fredoka(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -473,27 +478,33 @@ class _GlobalRankingTab extends ConsumerWidget {
                         dense: true,
                         leading: Text(
                           '${e.rank}º',
-                          style: outlinedWhiteTextStyle(GoogleFonts.fredoka(
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontWeight: e.rank <= 3
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                          )),
+                          style: outlinedWhiteTextStyle(
+                            GoogleFonts.fredoka(
+                              fontSize: 18,
+                              color: Colors.white,
+                              fontWeight: e.rank <= 3
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                            ),
+                          ),
                         ),
                         title: Text(
                           e.playerName,
-                          style: outlinedWhiteTextStyle(GoogleFonts.fredoka(
-                            fontSize: 15,
-                            color: Colors.white,
-                          )),
+                          style: outlinedWhiteTextStyle(
+                            GoogleFonts.fredoka(
+                              fontSize: 15,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                         trailing: Text(
                           _formatMs(e.value),
-                          style: outlinedWhiteTextStyle(GoogleFonts.fredoka(
-                            fontSize: 15,
-                            color: Colors.white70,
-                          )),
+                          style: outlinedWhiteTextStyle(
+                            GoogleFonts.fredoka(
+                              fontSize: 15,
+                              color: Colors.white70,
+                            ),
+                          ),
                         ),
                       ),
                     );

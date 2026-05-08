@@ -368,7 +368,7 @@ Navigator.push(context, MaterialPageRoute(
 | `domain/auth/auth_service.dart`                       | Existente | +`deleteAccount()`, +`updateDisplayName()`, +`sendPasswordReset()`, atualizar assinatura `createAccountWithEmail()` |
 | `data/repositories/firebase_auth_service.dart`        | Existente | Implementar novos métodos acima                                                                                     |
 | `domain/sync/sync_engine.dart`                        | Existente | +`deleteUserData()`, +`updateDisplayName()`, +`remoteAvatarUrl` getter, +`syncGameRecord()`                         |
-| `data/repositories/firebase_sync_engine.dart`         | Existente | Implementar novos métodos + ler `avatarUrl` e `gameRecords` em `syncProfile()`                                       |
+| `data/repositories/firebase_sync_engine.dart`         | Existente | Implementar novos métodos + ler `avatarUrl` e `gameRecords` em `syncProfile()`                                      |
 | `presentation/controllers/auth_controller.dart`       | Existente | +`deleteAccount()`, +`updateDisplayName()`, aplicar `remoteAvatarUrl` no login por e-mail                           |
 | `presentation/screens/profile_screen.dart`            | Existente | +exclusão, +editar nome (só email), +trocar senha (só email), ocultar botão avatar para Google                      |
 | `presentation/screens/email_auth_screen.dart`         | Existente | +campo nome no signup, +link esqueci senha                                                                          |
@@ -376,7 +376,7 @@ Navigator.push(context, MaterialPageRoute(
 | `presentation/screens/splash_screen.dart`             | Existente | Redirecionar para `OnboardingAuthScreen` se não logado                                                              |
 | `presentation/screens/ranking_screen.dart`            | Existente | +banner informativo não-bloqueante na aba Lendas quando não logado                                                  |
 | `data/repositories/firestore_ranking_repository.dart` | Existente | Verificar auth antes de submeter ao Lendas; se não logado, skipa gravação remota                                    |
-| `data/repositories/game_record_repository.dart`       | Existente | Após `add()`: se logado, dispara `SyncEngine.syncGameRecord()` para Firestore                                        |
+| `data/repositories/game_record_repository.dart`       | Existente | Após `add()`: se logado, dispara `SyncEngine.syncGameRecord()` para Firestore                                       |
 | `presentation/screens/home_screen.dart`               | Existente | Auth check antes de navegar para DailyRewards e ShopScreen                                                          |
 | `presentation/widgets/auth_gate_overlay.dart`         | **Novo**  | Widget `AuthGateOverlay` para overlays sobre o jogo                                                                 |
 | `presentation/widgets/shop_overlay.dart`              | Existente | Envolver conteúdo em `AuthGateOverlay`                                                                              |

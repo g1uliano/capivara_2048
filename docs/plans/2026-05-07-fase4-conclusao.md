@@ -12,26 +12,26 @@
 
 ## File Map
 
-| Arquivo | Ação |
-|---|---|
-| `lib/domain/auth/auth_service.dart` | Modificar — novos contratos + FakeAuthService |
-| `lib/data/repositories/firebase_auth_service.dart` | Modificar — implementar novos métodos |
-| `lib/domain/sync/sync_engine.dart` | Modificar — novos contratos + FakeSyncEngine + fix provider |
-| `lib/data/repositories/firebase_sync_engine.dart` | Modificar — implementar novos métodos |
-| `lib/data/models/game_record.dart` | Modificar — adicionar `toJson` / `fromJson` |
-| `lib/presentation/controllers/auth_controller.dart` | Modificar — `deleteAccount`, `updateDisplayName`, fix avatar |
-| `lib/presentation/controllers/game_notifier.dart` | Modificar — sync game record + auth check |
-| `lib/presentation/widgets/auth_gate_overlay.dart` | **Criar** |
-| `lib/presentation/screens/splash_screen.dart` | Modificar — auth gate na navegação |
-| `lib/presentation/screens/onboarding_auth_screen.dart` | Modificar — `showSkip` param + benefits |
-| `lib/presentation/screens/profile_screen.dart` | Modificar — exclusão, editar nome, trocar senha, ocultar avatar Google |
-| `lib/presentation/screens/email_auth_screen.dart` | Modificar — campo nome, esqueci senha |
-| `lib/presentation/widgets/shop_overlay.dart` | Modificar — wrap com `AuthGateOverlay` |
-| `lib/presentation/screens/ranking_screen.dart` | Modificar — banner Lendas, sync pessoal |
-| `lib/presentation/screens/home_screen.dart` | Modificar — auth guards |
-| `test/domain/auth/auth_service_extensions_test.dart` | **Criar** |
-| `test/domain/sync/sync_engine_extensions_test.dart` | **Criar** |
-| `test/presentation/widgets/auth_gate_overlay_test.dart` | **Criar** |
+| Arquivo                                                 | Ação                                                                   |
+| ------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `lib/domain/auth/auth_service.dart`                     | Modificar — novos contratos + FakeAuthService                          |
+| `lib/data/repositories/firebase_auth_service.dart`      | Modificar — implementar novos métodos                                  |
+| `lib/domain/sync/sync_engine.dart`                      | Modificar — novos contratos + FakeSyncEngine + fix provider            |
+| `lib/data/repositories/firebase_sync_engine.dart`       | Modificar — implementar novos métodos                                  |
+| `lib/data/models/game_record.dart`                      | Modificar — adicionar `toJson` / `fromJson`                            |
+| `lib/presentation/controllers/auth_controller.dart`     | Modificar — `deleteAccount`, `updateDisplayName`, fix avatar           |
+| `lib/presentation/controllers/game_notifier.dart`       | Modificar — sync game record + auth check                              |
+| `lib/presentation/widgets/auth_gate_overlay.dart`       | **Criar**                                                              |
+| `lib/presentation/screens/splash_screen.dart`           | Modificar — auth gate na navegação                                     |
+| `lib/presentation/screens/onboarding_auth_screen.dart`  | Modificar — `showSkip` param + benefits                                |
+| `lib/presentation/screens/profile_screen.dart`          | Modificar — exclusão, editar nome, trocar senha, ocultar avatar Google |
+| `lib/presentation/screens/email_auth_screen.dart`       | Modificar — campo nome, esqueci senha                                  |
+| `lib/presentation/widgets/shop_overlay.dart`            | Modificar — wrap com `AuthGateOverlay`                                 |
+| `lib/presentation/screens/ranking_screen.dart`          | Modificar — banner Lendas, sync pessoal                                |
+| `lib/presentation/screens/home_screen.dart`             | Modificar — auth guards                                                |
+| `test/domain/auth/auth_service_extensions_test.dart`    | **Criar**                                                              |
+| `test/domain/sync/sync_engine_extensions_test.dart`     | **Criar**                                                              |
+| `test/presentation/widgets/auth_gate_overlay_test.dart` | **Criar**                                                              |
 
 ---
 
@@ -40,6 +40,7 @@
 **Spec:** C6b (sync de gameRecords no Firestore exige serialização)
 
 **Files:**
+
 - Modify: `lib/data/models/game_record.dart`
 
 - [ ] **Step 1: Adicionar métodos de serialização**
@@ -83,6 +84,7 @@
   ```bash
   flutter test --name "GameRecord" 2>/dev/null || flutter test test/
   ```
+
   Expected: sem regressões em testes relacionados a GameRecord.
 
 - [ ] **Step 3: Commit**
@@ -99,6 +101,7 @@
 **Spec:** A1, A2, A3+A4
 
 **Files:**
+
 - Modify: `lib/domain/auth/auth_service.dart`
 - Create: `test/domain/auth/auth_service_extensions_test.dart`
 
@@ -150,6 +153,7 @@
   ```bash
   flutter test test/domain/auth/auth_service_extensions_test.dart
   ```
+
   Expected: compilation errors ou test failures.
 
 - [ ] **Step 3: Atualizar `auth_service.dart`**
@@ -279,6 +283,7 @@
   ```bash
   flutter test test/domain/auth/auth_service_extensions_test.dart
   ```
+
   Expected: 4 tests passed.
 
 - [ ] **Step 5: Commit**
@@ -296,6 +301,7 @@
 **Spec:** A1, A2, B, C6b
 
 **Files:**
+
 - Modify: `lib/domain/sync/sync_engine.dart`
 - Create: `test/domain/sync/sync_engine_extensions_test.dart`
 
@@ -437,6 +443,7 @@
   ```bash
   flutter test test/domain/sync/sync_engine_extensions_test.dart
   ```
+
   Expected: 4 tests passed.
 
 - [ ] **Step 5: Commit**
@@ -454,6 +461,7 @@
 **Spec:** A1, A2, A3+A4
 
 **Files:**
+
 - Modify: `lib/data/repositories/firebase_auth_service.dart`
 
 - [ ] **Step 1: Implementar os métodos**
@@ -595,6 +603,7 @@
   ```bash
   flutter analyze lib/data/repositories/firebase_auth_service.dart
   ```
+
   Expected: No issues found.
 
 - [ ] **Step 3: Commit**
@@ -611,6 +620,7 @@
 **Spec:** A1, A2, B, C6b
 
 **Files:**
+
 - Modify: `lib/data/repositories/firebase_sync_engine.dart`
 
 - [ ] **Step 1: Adicionar campos e métodos ao FirebaseSyncEngine**
@@ -748,6 +758,7 @@
   ```bash
   flutter analyze lib/data/repositories/firebase_sync_engine.dart
   ```
+
   Expected: No issues found.
 
 - [ ] **Step 5: Commit**
@@ -764,6 +775,7 @@
 **Spec:** A1, A2, B
 
 **Files:**
+
 - Modify: `lib/presentation/controllers/auth_controller.dart`
 
 - [ ] **Step 1: Adicionar imports e novos métodos**
@@ -956,6 +968,7 @@
   ```bash
   flutter analyze lib/presentation/controllers/auth_controller.dart
   ```
+
   Expected: No issues found.
 
 - [ ] **Step 3: Commit**
@@ -972,6 +985,7 @@
 **Spec:** C6b (sync) + regra geral (ranking submissão)
 
 **Files:**
+
 - Modify: `lib/presentation/controllers/game_notifier.dart`
 
 - [ ] **Step 1: Adicionar import do SyncEngine (se necessário)**
@@ -1007,6 +1021,7 @@
   ```bash
   flutter analyze lib/presentation/controllers/game_notifier.dart
   ```
+
   Expected: No issues found.
 
 - [ ] **Step 4: Commit**
@@ -1023,6 +1038,7 @@
 **Spec:** C3, C4
 
 **Files:**
+
 - Create: `lib/presentation/widgets/auth_gate_overlay.dart`
 - Create: `test/presentation/widgets/auth_gate_overlay_test.dart`
 
@@ -1254,6 +1270,7 @@
   ```bash
   flutter test test/presentation/widgets/auth_gate_overlay_test.dart
   ```
+
   Expected: 3 tests passed.
 
 - [ ] **Step 5: Commit**
@@ -1271,6 +1288,7 @@
 **Spec:** C4
 
 **Files:**
+
 - Modify: `lib/presentation/widgets/shop_overlay.dart`
 
 - [ ] **Step 1: Envolver o conteúdo da ShopOverlay**
@@ -1303,6 +1321,7 @@
   ```bash
   flutter analyze lib/presentation/widgets/shop_overlay.dart
   ```
+
   Expected: No issues found.
 
 - [ ] **Step 3: Commit**
@@ -1319,6 +1338,7 @@
 **Spec:** C2
 
 **Files:**
+
 - Modify: `lib/presentation/screens/onboarding_auth_screen.dart`
 
 - [ ] **Step 1: Adicionar parâmetro `showSkip` e ajustar navegação pós-login**
@@ -1451,6 +1471,7 @@
 **Spec:** C1
 
 **Files:**
+
 - Modify: `lib/presentation/screens/splash_screen.dart`
 
 - [ ] **Step 1: Converter para ConsumerStatefulWidget e adicionar auth check**
@@ -1559,6 +1580,7 @@
 **Spec:** A2, A3+A4
 
 **Files:**
+
 - Modify: `lib/presentation/screens/email_auth_screen.dart`
 
 - [ ] **Step 1: Adicionar controller `_nameCtrl` e campo de nome**
@@ -1726,6 +1748,7 @@
 **Spec:** A1, A2, A3, B
 
 **Files:**
+
 - Modify: `lib/presentation/screens/profile_screen.dart`
 
 - [ ] **Step 1: Converter `_LoggedIn` para `ConsumerStatefulWidget`**
@@ -2124,6 +2147,7 @@
 **Spec:** C5, C7
 
 **Files:**
+
 - Modify: `lib/presentation/screens/home_screen.dart`
 
 - [ ] **Step 1: Adicionar método `_navGuarded` e atualizar navegações**
@@ -2194,6 +2218,7 @@
 **Spec:** C6, C6b
 
 **Files:**
+
 - Modify: `lib/presentation/screens/ranking_screen.dart`
 
 - [ ] **Step 1: Adicionar banner de login na aba Lendas**
@@ -2304,6 +2329,7 @@
   ```bash
   flutter test
   ```
+
   Expected: todos os testes existentes passam + novos testes verdes.
 
 - [ ] **Step 2: Análise estática completa**
@@ -2311,6 +2337,7 @@
   ```bash
   flutter analyze lib/
   ```
+
   Expected: No issues found (ou apenas warnings existentes não relacionados).
 
 - [ ] **Step 3: Build de verificação**
@@ -2319,6 +2346,7 @@
   flutter build apk --debug --flavor dev \
     --dart-define=FLAVOR=dev 2>&1 | tail -20
   ```
+
   Expected: `✓ Built build/app/outputs/...` sem erros de compilação.
 
 - [ ] **Step 4: Commit de fechamento da fase**

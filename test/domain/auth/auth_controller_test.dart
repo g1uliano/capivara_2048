@@ -54,9 +54,7 @@ void main() {
           createdAt: DateTime(2025, 1, 1),
           lastSeenAt: DateTime.now(),
         );
-        final authComSessao = FakeAuthService(
-          initialProfile: profileSemAvatar,
-        );
+        final authComSessao = FakeAuthService(initialProfile: profileSemAvatar);
         final syncComAvatar = FakeSyncEngine()
           ..remoteAvatarUrl = 'tile:Capivara';
 
@@ -64,7 +62,9 @@ void main() {
           overrides: [
             authServiceProvider.overrideWithValue(authComSessao),
             syncEngineProvider.overrideWithValue(syncComAvatar),
-            iapStartupServiceProvider.overrideWithValue(FakeIAPStartupService()),
+            iapStartupServiceProvider.overrideWithValue(
+              FakeIAPStartupService(),
+            ),
           ],
         );
         addTearDown(() {
@@ -96,9 +96,7 @@ void main() {
           createdAt: DateTime(2025, 1, 1),
           lastSeenAt: DateTime.now(),
         );
-        final authComSessao = FakeAuthService(
-          initialProfile: profileNomVazio,
-        );
+        final authComSessao = FakeAuthService(initialProfile: profileNomVazio);
         final syncComNome = FakeSyncEngine()
           ..remoteDisplayName = 'Giuliano'
           ..remoteAvatarUrl = 'tile:Onca';
@@ -107,7 +105,9 @@ void main() {
           overrides: [
             authServiceProvider.overrideWithValue(authComSessao),
             syncEngineProvider.overrideWithValue(syncComNome),
-            iapStartupServiceProvider.overrideWithValue(FakeIAPStartupService()),
+            iapStartupServiceProvider.overrideWithValue(
+              FakeIAPStartupService(),
+            ),
           ],
         );
         addTearDown(() {
@@ -125,42 +125,37 @@ void main() {
       },
     );
 
-    test(
-      'não sobrescreve displayName correto com valor remoto',
-      () async {
-        // Firebase Auth já tem nome correto — remoto não deve sobrescrever
-        final profileCorreto = PlayerProfile(
-          userId: 'fake-user-id',
-          displayName: 'Giuliano',
-          email: 'giuliano@example.com',
-          provider: AuthProvider.email,
-          createdAt: DateTime(2025, 1, 1),
-          lastSeenAt: DateTime.now(),
-        );
-        final authComSessao = FakeAuthService(
-          initialProfile: profileCorreto,
-        );
-        final syncComOutroNome = FakeSyncEngine()
-          ..remoteDisplayName = 'Outro Nome';
+    test('não sobrescreve displayName correto com valor remoto', () async {
+      // Firebase Auth já tem nome correto — remoto não deve sobrescrever
+      final profileCorreto = PlayerProfile(
+        userId: 'fake-user-id',
+        displayName: 'Giuliano',
+        email: 'giuliano@example.com',
+        provider: AuthProvider.email,
+        createdAt: DateTime(2025, 1, 1),
+        lastSeenAt: DateTime.now(),
+      );
+      final authComSessao = FakeAuthService(initialProfile: profileCorreto);
+      final syncComOutroNome = FakeSyncEngine()
+        ..remoteDisplayName = 'Outro Nome';
 
-        final c = ProviderContainer(
-          overrides: [
-            authServiceProvider.overrideWithValue(authComSessao),
-            syncEngineProvider.overrideWithValue(syncComOutroNome),
-            iapStartupServiceProvider.overrideWithValue(FakeIAPStartupService()),
-          ],
-        );
-        addTearDown(() {
-          authComSessao.dispose();
-          c.dispose();
-        });
+      final c = ProviderContainer(
+        overrides: [
+          authServiceProvider.overrideWithValue(authComSessao),
+          syncEngineProvider.overrideWithValue(syncComOutroNome),
+          iapStartupServiceProvider.overrideWithValue(FakeIAPStartupService()),
+        ],
+      );
+      addTearDown(() {
+        authComSessao.dispose();
+        c.dispose();
+      });
 
-        await Future<void>.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
 
-        // Nome local não-vazio não deve ser sobrescrito
-        expect(c.read(authControllerProvider)?.displayName, 'Giuliano');
-      },
-    );
+      // Nome local não-vazio não deve ser sobrescrito
+      expect(c.read(authControllerProvider)?.displayName, 'Giuliano');
+    });
   });
 
   test('signInWithGoogle atualiza estado com PlayerProfile', () async {

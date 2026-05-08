@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 import 'dart:math';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -80,15 +81,32 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
                   asset: GameTitleImage.pickAsset(),
                   height: HomeConstants.titleHeight(scale),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'Salve seu progresso e dispute o ranking global.',
-                  textAlign: TextAlign.center,
-                  style: outlinedWhiteTextStyle(
-                    GoogleFonts.fredoka(fontSize: 17),
+                const SizedBox(height: 12),
+                _ContentPanel(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        'Salve seu progresso e dispute o ranking global.',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.fredoka(
+                          fontSize: 17,
+                          color: Colors.white,
+                          shadows: const [
+                            Shadow(color: Colors.black38, blurRadius: 6),
+                          ],
+                        ),
+                      ),
+                      if (widget.showSkip) ...[
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: Divider(color: Colors.white24, height: 1),
+                        ),
+                        const _BenefitsBlock(),
+                      ],
+                    ],
                   ),
                 ),
-                if (widget.showSkip) ...[const SizedBox(height: 16), _BenefitsBlock()],
                 const SizedBox(height: 48),
                 if (_loading)
                   const Center(
@@ -119,20 +137,30 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
                       ),
                     ),
                   ),
-                  if (widget.showSkip) ...[const SizedBox(height: 32), TextButton(
-                    onPressed: _navigateHome,
-                    child: Text(
-                      'Jogar sem conta →',
-                      style: outlinedWhiteTextStyle(
-                        GoogleFonts.fredoka(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                          decoration: TextDecoration.underline,
-                          decorationColor: Colors.white,
+                  if (widget.showSkip) ...[
+                    const SizedBox(height: 16),
+                    Center(
+                      child: TextButton(
+                        onPressed: _navigateHome,
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          foregroundColor: Colors.white70,
+                        ),
+                        child: Text(
+                          'Jogar sem conta →',
+                          style: outlinedWhiteTextStyle(
+                            GoogleFonts.fredoka(
+                              fontSize: 14,
+                              color: Colors.white70,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  )],
+                  ],
                 ],
               ],
             ),
@@ -144,6 +172,8 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
 }
 
 class _BenefitsBlock extends StatelessWidget {
+  const _BenefitsBlock();
+
   @override
   Widget build(BuildContext context) {
     const items = [
@@ -157,23 +187,31 @@ class _BenefitsBlock extends StatelessWidget {
       children: [
         Text(
           'Por que fazer login?',
-          style: outlinedWhiteTextStyle(
-            GoogleFonts.fredoka(fontSize: 16, fontWeight: FontWeight.w600),
+          style: GoogleFonts.fredoka(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+            shadows: const [Shadow(color: Colors.black38, blurRadius: 4)],
           ),
         ),
         const SizedBox(height: 8),
         ...items.map(
           (item) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 3),
+            padding: const EdgeInsets.symmetric(vertical: 4),
             child: Row(
               children: [
-                Icon(item.$1, color: Colors.white70, size: 18),
+                Icon(item.$1, color: Colors.white, size: 17),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     item.$2,
-                    style: outlinedWhiteTextStyle(
-                        GoogleFonts.fredoka(fontSize: 14)),
+                    style: GoogleFonts.fredoka(
+                      fontSize: 14,
+                      color: Colors.white,
+                      shadows: const [
+                        Shadow(color: Colors.black26, blurRadius: 3),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -181,6 +219,35 @@ class _BenefitsBlock extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _ContentPanel extends StatelessWidget {
+  const _ContentPanel({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          decoration: BoxDecoration(
+            // Dark emerald translucent - blends with jungle without blocking it
+            color: const Color(0xFF0A1F0D).withValues(alpha: 0.65),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.18),
+              width: 1.0,
+            ),
+          ),
+          child: child,
+        ),
+      ),
     );
   }
 }

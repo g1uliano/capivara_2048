@@ -84,7 +84,8 @@ class PersonalRecordsNotifier extends Notifier<PersonalRecords> {
   /// Retorna true se o recorde foi quebrado.
   Future<bool> updateBestTime2048(int timeMs) async {
     if (timeMs <= 0) return false;
-    final isNewRecord = state.bestTimeMs2048 == 0 || timeMs < state.bestTimeMs2048;
+    final isNewRecord =
+        state.bestTimeMs2048 == 0 || timeMs < state.bestTimeMs2048;
     if (isNewRecord) {
       state = state.copyWith(bestTimeMs2048: timeMs);
       await _save();

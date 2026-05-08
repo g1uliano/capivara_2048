@@ -161,12 +161,12 @@ flutter build apk --flavor tst --debug --dart-define=FLAVOR=dev
 
 ## Builds
 
-| Comando | Flavor | Serviços | Uso |
-|---------|--------|----------|-----|
-| `flutter run --dart-define=FLAVOR=dev` | dev | Reais (Firebase dev / sandbox) | Desenvolvimento local |
-| `flutter build apk --dart-define=FLAVOR=tst` | tst | Fake (sem Firebase) | QA — testes sem lojas |
-| `flutter build apk --dart-define=FLAVOR=tst --dart-define=USE_REAL_IAP=true` | tst | IAP Real (sandbox) | QA com Play Store sandbox |
-| `flutter build apk --dart-define=FLAVOR=prd` | prd | Reais (produção) | Release |
+| Comando                                                                      | Flavor | Serviços                       | Uso                       |
+| ---------------------------------------------------------------------------- | ------ | ------------------------------ | ------------------------- |
+| `flutter run --dart-define=FLAVOR=dev`                                       | dev    | Reais (Firebase dev / sandbox) | Desenvolvimento local     |
+| `flutter build apk --dart-define=FLAVOR=tst`                                 | tst    | Fake (sem Firebase)            | QA — testes sem lojas     |
+| `flutter build apk --dart-define=FLAVOR=tst --dart-define=USE_REAL_IAP=true` | tst    | IAP Real (sandbox)             | QA com Play Store sandbox |
+| `flutter build apk --dart-define=FLAVOR=prd`                                 | prd    | Reais (produção)               | Release                   |
 
 Para configurar produtos nas lojas e contas de teste, consulte [`IAP.md`](IAP.md).
 
@@ -234,7 +234,7 @@ assets/
   - Recompensas por recorde pessoal (combo: vida + bomba3 + desfazer) — novo melhor tempo no 2048 ou novo tile máximo
   - Recompensas por convite — convidador recebe combo quando convidado joga 1ª partida
   - Tabela de prêmios semanais revisada (top 10, posições 1–10)
-  - Fake* providers exclusivos para flavor `tst`; `dev` usa serviços reais
+  - Fake\* providers exclusivos para flavor `tst`; `dev` usa serviços reais
 - **Fase 5** — Arte adicional e polimento visual (logo, ícone, splash final)
 - **Fase 6** — Áudio (sound design dos 13 animais, SFX, música)
 - **Fase 7** — Polimento, l10n, acessibilidade, lançamento

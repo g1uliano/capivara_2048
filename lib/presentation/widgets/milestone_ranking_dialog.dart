@@ -161,7 +161,10 @@ class MilestoneRankingDialog extends StatelessWidget {
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
               ),
-              child: Text('Continuar', style: GoogleFonts.fredoka(fontSize: 16)),
+              child: Text(
+                'Continuar',
+                style: GoogleFonts.fredoka(fontSize: 16),
+              ),
             ),
           ),
         ],

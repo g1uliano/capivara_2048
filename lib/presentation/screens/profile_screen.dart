@@ -164,15 +164,20 @@ class _LoggedInState extends ConsumerState<_LoggedIn> {
                 profile.displayName,
                 style: outlinedWhiteTextStyle(
                   GoogleFonts.fredoka(
-                      fontSize: 24, fontWeight: FontWeight.bold),
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               if (profile.provider == AuthProvider.email) ...[
                 const SizedBox(width: 8),
                 GestureDetector(
                   onTap: () => _editName(context, profile),
-                  child: const Icon(Icons.edit,
-                      color: Colors.white70, size: 18),
+                  child: const Icon(
+                    Icons.edit,
+                    color: Colors.white70,
+                    size: 18,
+                  ),
                 ),
               ],
             ],
@@ -187,70 +192,98 @@ class _LoggedInState extends ConsumerState<_LoggedIn> {
             ),
           ),
         ],
-        const SizedBox(height: 32),
-        const Divider(color: Colors.white24),
-        const SizedBox(height: 16),
-        ListTile(
-          leading: const Icon(Icons.person_add, color: Colors.white),
-          title: Text(
-            'Convidar Amigos',
-            style: outlinedWhiteTextStyle(GoogleFonts.fredoka()),
+        const SizedBox(height: 24),
+        // Ações principais — card branco semi-transparente (mesmo padrão das settings)
+        Card(
+          margin: EdgeInsets.zero,
+          color: Colors.white.withValues(alpha: 0.88),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const InviteFriendsScreen()),
+          elevation: 2,
+          child: Column(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.person_add, color: AppColors.primary),
+                title: Text(
+                  'Convidar Amigos',
+                  style: GoogleFonts.nunito(fontSize: 16),
+                ),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const InviteFriendsScreen(),
+                  ),
+                ),
+              ),
+              if (profile.provider == AuthProvider.email) ...[
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(
+                    Icons.lock_reset,
+                    color: AppColors.primary,
+                  ),
+                  title: Text(
+                    'Trocar senha',
+                    style: GoogleFonts.nunito(fontSize: 16),
+                  ),
+                  onTap: () => _sendPasswordReset(context, profile),
+                ),
+              ],
+              const Divider(height: 1),
+              ListTile(
+                leading: const Icon(Icons.restore, color: AppColors.primary),
+                title: Text(
+                  'Restaurar compras',
+                  style: GoogleFonts.nunito(fontSize: 16),
+                ),
+                onTap: () async {
+                  final iapService = ref.read(iapServiceProvider);
+                  await iapService.restorePurchases();
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Compras restauradas!')),
+                    );
+                  }
+                },
+              ),
+            ],
           ),
         ),
-        if (profile.provider == AuthProvider.email) ...[
-          const SizedBox(height: 8),
-          ListTile(
-            leading: const Icon(Icons.lock_reset, color: Colors.white),
-            title: Text(
-              'Trocar senha',
-              style: outlinedWhiteTextStyle(GoogleFonts.fredoka()),
-            ),
-            onTap: () => _sendPasswordReset(context, profile),
+        const SizedBox(height: 12),
+        // Zona de perigo
+        Card(
+          margin: EdgeInsets.zero,
+          color: Colors.white.withValues(alpha: 0.88),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-        ],
-        const SizedBox(height: 8),
-        ListTile(
-          leading: const Icon(Icons.restore, color: Colors.white),
-          title: Text(
-            'Restaurar compras',
-            style: outlinedWhiteTextStyle(GoogleFonts.fredoka()),
+          elevation: 2,
+          child: Column(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.delete_forever, color: Colors.red),
+                title: Text(
+                  'Excluir conta',
+                  style: GoogleFonts.nunito(fontSize: 16, color: Colors.red),
+                ),
+                onTap: _deletingAccount
+                    ? null
+                    : () => _confirmDeleteAccount(context, profile),
+              ),
+              const Divider(height: 1, color: Colors.red),
+              ListTile(
+                leading: const Icon(Icons.logout, color: Colors.redAccent),
+                title: Text(
+                  'Sair',
+                  style: GoogleFonts.nunito(
+                    fontSize: 16,
+                    color: Colors.redAccent,
+                  ),
+                ),
+                onTap: onSignOut,
+              ),
+            ],
           ),
-          onTap: () async {
-            final iapService = ref.read(iapServiceProvider);
-            await iapService.restorePurchases();
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Compras restauradas!')),
-              );
-            }
-          },
-        ),
-        const SizedBox(height: 8),
-        ListTile(
-          leading: const Icon(Icons.logout, color: Colors.redAccent),
-          title: Text(
-            'Sair',
-            style: outlinedWhiteTextStyle(
-              GoogleFonts.fredoka(),
-            ).copyWith(color: Colors.redAccent),
-          ),
-          onTap: onSignOut,
-        ),
-        const SizedBox(height: 16),
-        const Divider(color: Colors.redAccent),
-        ListTile(
-          leading: const Icon(Icons.delete_forever, color: Colors.red),
-          title: Text(
-            'Excluir conta',
-            style: outlinedWhiteTextStyle(GoogleFonts.fredoka())
-                .copyWith(color: Colors.red),
-          ),
-          onTap: _deletingAccount
-              ? null
-              : () => _confirmDeleteAccount(context, profile),
         ),
       ],
     );
@@ -261,9 +294,13 @@ class _LoggedInState extends ConsumerState<_LoggedIn> {
     final result = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Editar nome',
-            style: GoogleFonts.fredoka(
-                fontSize: 20, color: const Color(0xFF3E2723))),
+        title: Text(
+          'Editar nome',
+          style: GoogleFonts.fredoka(
+            fontSize: 20,
+            color: const Color(0xFF3E2723),
+          ),
+        ),
         content: TextField(
           controller: ctrl,
           autofocus: true,
@@ -286,29 +323,28 @@ class _LoggedInState extends ConsumerState<_LoggedIn> {
       ),
     );
     if (result != null && context.mounted) {
-      await ref
-          .read(authControllerProvider.notifier)
-          .updateDisplayName(result);
+      await ref.read(authControllerProvider.notifier).updateDisplayName(result);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Nome atualizado!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Nome atualizado!')));
       }
     }
   }
 
   Future<void> _sendPasswordReset(
-      BuildContext context, PlayerProfile profile) async {
+    BuildContext context,
+    PlayerProfile profile,
+  ) async {
     if (profile.email == null) return;
     try {
-      await ref
-          .read(authServiceProvider)
-          .sendPasswordReset(profile.email!);
+      await ref.read(authServiceProvider).sendPasswordReset(profile.email!);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                'E-mail de redefinição enviado para ${profile.email}'),
+              'E-mail de redefinição enviado para ${profile.email}',
+            ),
           ),
         );
       }
@@ -316,21 +352,28 @@ class _LoggedInState extends ConsumerState<_LoggedIn> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Erro ao enviar e-mail. Tente novamente.')),
+            content: Text('Erro ao enviar e-mail. Tente novamente.'),
+          ),
         );
       }
     }
   }
 
   Future<void> _confirmDeleteAccount(
-      BuildContext context, PlayerProfile profile) async {
+    BuildContext context,
+    PlayerProfile profile,
+  ) async {
     // Dialog 1: general warning
     final proceed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Excluir conta?',
-            style: GoogleFonts.fredoka(
-                fontSize: 20, color: const Color(0xFF3E2723))),
+        title: Text(
+          'Excluir conta?',
+          style: GoogleFonts.fredoka(
+            fontSize: 20,
+            color: const Color(0xFF3E2723),
+          ),
+        ),
         content: Text(
           'Todos os seus dados serão apagados permanentemente: '
           'progresso, inventário, histórico e ranking.',
@@ -344,8 +387,10 @@ class _LoggedInState extends ConsumerState<_LoggedIn> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Continuar →',
-                style: TextStyle(color: Colors.white)),
+            child: const Text(
+              'Continuar →',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -380,9 +425,9 @@ class _LoggedInState extends ConsumerState<_LoggedIn> {
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao excluir conta: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erro ao excluir conta: $e')));
       }
     } finally {
       if (mounted) setState(() => _deletingAccount = false);
@@ -420,26 +465,33 @@ class _ConfirmDeleteDialogState extends State<_ConfirmDeleteDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Confirmar exclusão',
-          style: GoogleFonts.fredoka(
-              fontSize: 20, color: const Color(0xFF3E2723))),
+      title: Text(
+        'Confirmar exclusão',
+        style: GoogleFonts.fredoka(
+          fontSize: 20,
+          color: const Color(0xFF3E2723),
+        ),
+      ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Digite EXCLUIR para confirmar:',
-              style: GoogleFonts.nunito(fontSize: 14)),
+          Text(
+            'Digite EXCLUIR para confirmar:',
+            style: GoogleFonts.nunito(fontSize: 14),
+          ),
           const SizedBox(height: 8),
           TextField(
             controller: _confirmCtrl,
             decoration: const InputDecoration(labelText: 'EXCLUIR'),
-            onChanged: (v) =>
-                setState(() => _canDelete = v == 'EXCLUIR'),
+            onChanged: (v) => setState(() => _canDelete = v == 'EXCLUIR'),
           ),
           if (widget.isEmail) ...[
             const SizedBox(height: 16),
-            Text('Confirme sua senha:',
-                style: GoogleFonts.nunito(fontSize: 14)),
+            Text(
+              'Confirme sua senha:',
+              style: GoogleFonts.nunito(fontSize: 14),
+            ),
             const SizedBox(height: 8),
             TextField(
               controller: _senhaCtrl,
@@ -448,9 +500,9 @@ class _ConfirmDeleteDialogState extends State<_ConfirmDeleteDialog> {
                 labelText: 'Senha atual',
                 suffixIcon: IconButton(
                   icon: Icon(
-                      _showSenha ? Icons.visibility_off : Icons.visibility),
-                  onPressed: () =>
-                      setState(() => _showSenha = !_showSenha),
+                    _showSenha ? Icons.visibility_off : Icons.visibility,
+                  ),
+                  onPressed: () => setState(() => _showSenha = !_showSenha),
                 ),
               ),
             ),
@@ -458,18 +510,16 @@ class _ConfirmDeleteDialogState extends State<_ConfirmDeleteDialog> {
         ],
       ),
       actions: [
-        TextButton(
-          onPressed: widget.onCancel,
-          child: const Text('Cancelar'),
-        ),
+        TextButton(onPressed: widget.onCancel, child: const Text('Cancelar')),
         ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
           onPressed: _canDelete
-              ? () => widget.onConfirm(
-                  widget.isEmail ? _senhaCtrl.text : null)
+              ? () => widget.onConfirm(widget.isEmail ? _senhaCtrl.text : null)
               : null,
-          child: const Text('Excluir conta',
-              style: TextStyle(color: Colors.white)),
+          child: const Text(
+            'Excluir conta',
+            style: TextStyle(color: Colors.white),
+          ),
         ),
       ],
     );
