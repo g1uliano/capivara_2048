@@ -29,6 +29,7 @@ class TutorialMiniBoard extends StatefulWidget {
 class _TutorialMiniBoardState extends State<TutorialMiniBoard> {
   late List<Tile?> _tiles;
   bool _resolved = false;
+  Timer? _callbackTimer;
 
   @override
   void initState() {
@@ -60,9 +61,15 @@ class _TutorialMiniBoardState extends State<TutorialMiniBoard> {
       _tiles = _applyMove(direction);
     });
 
-    Timer(const Duration(milliseconds: 600), () {
+    _callbackTimer = Timer(const Duration(milliseconds: 600), () {
       if (mounted) widget.onCorrectSwipe();
     });
+  }
+
+  @override
+  void dispose() {
+    _callbackTimer?.cancel();
+    super.dispose();
   }
 
   List<Tile?> _applyMove(Direction direction) {
@@ -112,15 +119,18 @@ class _TutorialMiniBoardState extends State<TutorialMiniBoard> {
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          children: List.generate(_tiles.length, (i) => Padding(
-            key: Key('tutorial_cell_$i'),
-            padding: const EdgeInsets.all(4),
-            child: SizedBox(
-              width: widget.tileSize,
-              height: widget.tileSize,
-              child: TileWidget(tile: _tiles[i], size: widget.tileSize),
+          children: List.generate(
+            _tiles.length,
+            (i) => Padding(
+              key: Key('tutorial_cell_$i'),
+              padding: const EdgeInsets.all(4),
+              child: SizedBox(
+                width: widget.tileSize,
+                height: widget.tileSize,
+                child: TileWidget(tile: _tiles[i], size: widget.tileSize),
+              ),
             ),
-          )),
+          ),
         ),
       ),
     );
