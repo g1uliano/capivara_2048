@@ -207,7 +207,10 @@ class FirebaseSyncEngine implements SyncEngine {
       // 2. Creditar localmente via Hive
       final livesBox = await Hive.openBox<LivesState>('lives');
       final ls = livesBox.get('state') ?? LivesState.initial();
-      await livesBox.put('state', ls.copyWith(lives: (ls.lives + amount).clamp(0, 15)));
+      await livesBox.put(
+        'state',
+        ls.copyWith(lives: (ls.lives + amount).clamp(0, 15)),
+      );
     } catch (_) {
       // Non-fatal — pendingLives remains > 0 in Firestore for next sync
     }
@@ -216,7 +219,7 @@ class FirebaseSyncEngine implements SyncEngine {
   Future<void> _mergeRemoteInventory(Map<String, dynamic>? remoteData) async {
     if (remoteData == null) return;
     final box = await Hive.openBox<Inventory>('inventory');
-    final local = box.get('inventory') ?? Inventory.empty();
+    final local = box.get('data') ?? Inventory.empty();
     final remote = Inventory(
       bomb2: (remoteData['bomb2'] as int?) ?? 0,
       bomb3: (remoteData['bomb3'] as int?) ?? 0,
@@ -224,7 +227,7 @@ class FirebaseSyncEngine implements SyncEngine {
       undo3: (remoteData['undo3'] as int?) ?? 0,
     );
     final merged = SyncConflictResolver.mergeInventory(local, remote);
-    await box.put('inventory', merged);
+    await box.put('data', merged);
   }
 
   Future<void> _writeLocalProfileToFirestore() async {
