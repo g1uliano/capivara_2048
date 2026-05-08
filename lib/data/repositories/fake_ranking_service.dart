@@ -44,7 +44,7 @@ class FakeRankingService implements RankingRepository {
   }
 
   @override
-  Future<void> submitScore(RankingType type, int value, {String? displayName}) async {}
+  Future<void> submitScore(RankingType type, int value, {String? displayName, int? maxTile}) async {}
 
   @override
   Future<WeeklyRewardResult?> checkAndClaimWeeklyReward(String weekId) async => null;

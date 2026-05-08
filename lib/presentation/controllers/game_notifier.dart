@@ -327,11 +327,14 @@ class GameNotifier extends Notifier<GameState> {
 
       // Submit time only when player won (reached level 11 = 2048)
       if (state.hasWon && state.elapsedMs > 0) {
+        // maxTile = 2^maxLevel (e.g., level 11 → 2048) — used as tiebreaker
+        final maxTile = state.maxLevel > 0 ? (1 << state.maxLevel) : null;
         unawaited(
           rankingRepo.submitScore(
             RankingType.globalTime,
             state.elapsedMs,
             displayName: displayName,
+            maxTile: maxTile,
           ),
         );
       }

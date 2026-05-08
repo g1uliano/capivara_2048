@@ -46,10 +46,14 @@ class FirestoreRankingRepository implements RankingRepository {
     final weekId = WeekId.fromUtc(DateTime.now().toUtc());
     switch (type) {
       case RankingType.globalTime:
+        // Secondary sort by maxTile DESC breaks ties (higher tile = better).
+        // Requires a Firestore composite index: bestTimeMs ASC + maxTile DESC.
         return _weeklyCollection(
           weekId,
           type,
-        ).orderBy('bestTimeMs', descending: false).limit(50);
+        ).orderBy('bestTimeMs', descending: false)
+         .orderBy('maxTile', descending: true)
+         .limit(50);
       case RankingType.globalScore:
         return _weeklyCollection(
           weekId,
@@ -196,6 +200,7 @@ class FirestoreRankingRepository implements RankingRepository {
     RankingType type,
     int value, {
     String? displayName,
+    int? maxTile,
   }) async {
     // Legends rankings are managed by the SyncEngine via PendingEvents.
     if (type == RankingType.legends4096Time ||
@@ -217,6 +222,7 @@ class FirestoreRankingRepository implements RankingRepository {
       };
       if (type == RankingType.globalTime) {
         data['bestTimeMs'] = value;
+        if (maxTile != null) data['maxTile'] = maxTile;
       } else {
         data['value'] = value;
       }
@@ -229,6 +235,7 @@ class FirestoreRankingRepository implements RankingRepository {
         if (value < current) {
           await docRef.update({
             'bestTimeMs': value,
+            'maxTile': ?maxTile,
             'submittedAt': FieldValue.serverTimestamp(),
             'displayName': ?displayName,
           });
