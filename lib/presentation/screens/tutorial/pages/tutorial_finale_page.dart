@@ -14,11 +14,13 @@ class TutorialFinalePage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Image.asset(
-            'assets/images/animals/tile/Capivara.png',
-            width: 200,
-            height: 200,
-            fit: BoxFit.contain,
-          ).animate(onPlay: (c) => c.repeat(reverse: true)).scaleXY(
+                'assets/images/animals/tile/Capivara.png',
+                width: 200,
+                height: 200,
+                fit: BoxFit.contain,
+              )
+              .animate(onPlay: (c) => c.repeat(reverse: true))
+              .scaleXY(
                 begin: 1.0,
                 end: 1.03,
                 duration: 2000.ms,
@@ -37,7 +39,8 @@ class TutorialFinalePage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32),
             child: OutlinedText(
-              text: 'Funda animais, evolua a floresta e chegue até ela. Boa sorte, explorador!',
+              text:
+                  'Funda animais, evolua a floresta e chegue até ela. Boa sorte, explorador!',
               style: GoogleFonts.fredoka(fontSize: 16, height: 1.5),
               textAlign: TextAlign.center,
             ),

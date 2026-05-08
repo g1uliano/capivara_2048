@@ -41,21 +41,24 @@ class _TutorialFusionPageState extends State<TutorialFusionPage> {
           ),
           const SizedBox(height: 32),
           TutorialMiniBoard(
-            initialTiles: [
-              Tile(id: 'fusion_1', level: 1, row: 0, col: 0),
-              Tile(id: 'fusion_2', level: 1, row: 0, col: 1),
-            ],
-            acceptedDirections: {game.Direction.left, game.Direction.right},
-            mergedResult: Tile(id: 'fusion_result', level: 2, row: 0, col: 0),
-            onCorrectSwipe: () {
-              setState(() => _done = true);
-              widget.onUserCompleted();
-            },
-          ).animate(onPlay: (c) => c.repeat(reverse: true)).scaleXY(
-                begin: 1.0,
-                end: 1.04,
-                duration: 1500.ms,
-              ),
+                initialTiles: [
+                  Tile(id: 'fusion_1', level: 1, row: 0, col: 0),
+                  Tile(id: 'fusion_2', level: 1, row: 0, col: 1),
+                ],
+                acceptedDirections: {game.Direction.left, game.Direction.right},
+                mergedResult: Tile(
+                  id: 'fusion_result',
+                  level: 2,
+                  row: 0,
+                  col: 0,
+                ),
+                onCorrectSwipe: () {
+                  setState(() => _done = true);
+                  widget.onUserCompleted();
+                },
+              )
+              .animate(onPlay: (c) => c.repeat(reverse: true))
+              .scaleXY(begin: 1.0, end: 1.04, duration: 1500.ms),
           const SizedBox(height: 24),
           AnimatedOpacity(
             opacity: _done ? 0 : 1,

@@ -41,21 +41,19 @@ class _TutorialMovementPageState extends State<TutorialMovementPage> {
           ),
           const SizedBox(height: 32),
           TutorialMiniBoard(
-            initialTiles: [
-              Tile(id: 'mv_1', level: 1, row: 0, col: 0),
-              null,
-            ],
-            acceptedDirections: {game.Direction.right},
-            mergedResult: null,
-            onCorrectSwipe: () {
-              setState(() => _done = true);
-              widget.onUserCompleted();
-            },
-          ).animate(onPlay: (c) => c.repeat(reverse: true)).scaleXY(
-                begin: 1.0,
-                end: 1.04,
-                duration: 1500.ms,
-              ),
+                initialTiles: [
+                  Tile(id: 'mv_1', level: 1, row: 0, col: 0),
+                  null,
+                ],
+                acceptedDirections: {game.Direction.right},
+                mergedResult: null,
+                onCorrectSwipe: () {
+                  setState(() => _done = true);
+                  widget.onUserCompleted();
+                },
+              )
+              .animate(onPlay: (c) => c.repeat(reverse: true))
+              .scaleXY(begin: 1.0, end: 1.04, duration: 1500.ms),
           const SizedBox(height: 24),
           AnimatedOpacity(
             opacity: _done ? 0 : 1,
