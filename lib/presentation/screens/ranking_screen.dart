@@ -13,6 +13,13 @@ import '../controllers/auth_controller.dart';
 import '../../core/theme/text_styles.dart';
 import 'onboarding_auth_screen.dart';
 
+// Top-level — ensures the Firestore stream is not restarted on every rebuild
+final _globalRankingStreamProvider =
+    StreamProvider.autoDispose<List<RankingEntry>>((ref) {
+  final repo = ref.watch(rankingRepositoryProvider);
+  return repo.watchWeeklyTop(RankingType.globalTime);
+});
+
 class RankingScreen extends ConsumerWidget {
   const RankingScreen({super.key, this.initialTab = 0});
   final int initialTab;
@@ -50,7 +57,11 @@ class RankingScreen extends ConsumerWidget {
             ),
           ),
           body: const TabBarView(
-            children: [_PersonalRankingTab(), _GlobalRankingTab(), _LegendsRankingTab()],
+            children: [
+              _PersonalRankingTab(),
+              _GlobalRankingTab(),
+              _LegendsRankingTab(),
+            ],
           ),
         ),
       ),
@@ -167,9 +178,7 @@ class _LegendsRankingTab extends ConsumerWidget {
     return Column(
       children: [
         if (!isLoggedIn)
-          _LoginBanner(
-            message: 'Faça login para aparecer neste ranking.',
-          ),
+          _LoginBanner(message: 'Faça login para aparecer neste ranking.'),
         Expanded(
           child: ListView(
             padding: const EdgeInsets.all(12),
@@ -377,12 +386,7 @@ class _GlobalRankingTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isLoggedIn = ref.watch(authControllerProvider) != null;
-    final rankingRepo = ref.read(rankingRepositoryProvider);
-    final entriesAsync = ref.watch(
-      StreamProvider.autoDispose<List<RankingEntry>>(
-        (ref) => rankingRepo.watchWeeklyTop(RankingType.globalTime),
-      ),
-    );
+    final entriesAsync = ref.watch(_globalRankingStreamProvider);
 
     return Column(
       children: [
@@ -393,11 +397,18 @@ class _GlobalRankingTab extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.timer_outlined, color: Colors.white70, size: 14),
+                const Icon(
+                  Icons.timer_outlined,
+                  color: Colors.white70,
+                  size: 14,
+                ),
                 const SizedBox(width: 4),
                 Text(
                   'Reinício em ${_timeUntilReset()}',
-                  style: GoogleFonts.fredoka(fontSize: 13, color: Colors.white70),
+                  style: outlinedWhiteTextStyle(GoogleFonts.fredoka(
+                    fontSize: 13,
+                    color: Colors.white70,
+                  )),
                 ),
               ],
             ),
@@ -410,7 +421,7 @@ class _GlobalRankingTab extends ConsumerWidget {
                 padding: const EdgeInsets.all(24),
                 child: Text(
                   'Entre na sua conta para ver e participar do Ranking Global.',
-                  style: GoogleFonts.fredoka(fontSize: 16, color: Colors.white),
+                  style: outlinedWhiteTextStyle(GoogleFonts.fredoka(fontSize: 16, color: Colors.white)),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -423,7 +434,7 @@ class _GlobalRankingTab extends ConsumerWidget {
               error: (e, _) => Center(
                 child: Text(
                   'Erro ao carregar ranking.',
-                  style: GoogleFonts.fredoka(fontSize: 16, color: Colors.white),
+                  style: outlinedWhiteTextStyle(GoogleFonts.fredoka(fontSize: 16, color: Colors.white)),
                 ),
               ),
               data: (entries) {
@@ -433,7 +444,10 @@ class _GlobalRankingTab extends ConsumerWidget {
                       padding: const EdgeInsets.all(24),
                       child: Text(
                         'Forme o 2048 para entrar no ranking desta semana!',
-                        style: GoogleFonts.fredoka(fontSize: 16, color: Colors.white),
+                        style: outlinedWhiteTextStyle(GoogleFonts.fredoka(
+                          fontSize: 16,
+                          color: Colors.white,
+                        )),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -459,27 +473,27 @@ class _GlobalRankingTab extends ConsumerWidget {
                         dense: true,
                         leading: Text(
                           '${e.rank}º',
-                          style: GoogleFonts.fredoka(
+                          style: outlinedWhiteTextStyle(GoogleFonts.fredoka(
                             fontSize: 18,
                             color: Colors.white,
                             fontWeight: e.rank <= 3
                                 ? FontWeight.bold
                                 : FontWeight.normal,
-                          ),
+                          )),
                         ),
                         title: Text(
                           e.playerName,
-                          style: GoogleFonts.fredoka(
+                          style: outlinedWhiteTextStyle(GoogleFonts.fredoka(
                             fontSize: 15,
                             color: Colors.white,
-                          ),
+                          )),
                         ),
                         trailing: Text(
                           _formatMs(e.value),
-                          style: GoogleFonts.fredoka(
+                          style: outlinedWhiteTextStyle(GoogleFonts.fredoka(
                             fontSize: 15,
                             color: Colors.white70,
-                          ),
+                          )),
                         ),
                       ),
                     );
