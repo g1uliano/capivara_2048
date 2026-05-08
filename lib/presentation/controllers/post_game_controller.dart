@@ -10,7 +10,8 @@ import '../controllers/personal_records_notifier.dart';
 
 class PostGameSummary {
   final int milestone; // 11 = 2048, 12 = 4096, 13 = 8192
-  final int? rankingPosition; // only for milestone 11; null if not logged in or error
+  final int?
+  rankingPosition; // only for milestone 11; null if not logged in or error
   final int timeMs; // time to reach the milestone
   final int timesReached8192; // only for milestone 13
   final bool earnedCombo; // true if a personal record combo was granted
@@ -81,8 +82,14 @@ class PostGameController extends Notifier<PostGameSummary?> {
       await ref.read(livesProvider.notifier).addEarned(1);
       await ref.read(inventoryProvider.notifier).add(ItemType.bomb3, 1);
       await ref.read(inventoryProvider.notifier).add(ItemType.undo1, 1);
-    } catch (_) {
-      // Non-fatal — game must not be blocked by reward delivery failure
+    } catch (e, s) {
+      // Non-fatal — reward delivery must not block the game.
+      // Log in debug mode to surface failures during development.
+      assert(() {
+        // ignore: avoid_print
+        print('[PostGameController] _grantCombo failed: $e\n$s');
+        return true;
+      }());
     }
   }
 

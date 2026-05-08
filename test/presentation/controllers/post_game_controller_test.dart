@@ -15,6 +15,7 @@ import 'package:capivara_2048/domain/inventory/inventory_notifier.dart';
 import 'package:capivara_2048/data/models/lives_state.dart';
 import 'package:capivara_2048/data/models/inventory.dart';
 import 'package:capivara_2048/data/models/item_type.dart';
+import 'package:capivara_2048/data/models/player_profile.dart';
 
 void main() {
   setUpAll(() async {
@@ -31,7 +32,18 @@ void main() {
   });
 
   ProviderContainer makeContainer({bool loggedIn = false}) {
-    final fakeAuth = FakeAuthService(initialProfile: null);
+    final fakeAuth = FakeAuthService(
+      initialProfile: loggedIn
+          ? PlayerProfile(
+              userId: 'test-user',
+              displayName: 'Tester',
+              email: 'test@example.com',
+              provider: AuthProvider.email,
+              createdAt: DateTime(2025, 1, 1),
+              lastSeenAt: DateTime.now(),
+            )
+          : null,
+    );
 
     return ProviderContainer(
       overrides: [
@@ -59,12 +71,14 @@ void main() {
       addTearDown(c.dispose);
       await c.read(personalRecordsProvider.notifier).load();
 
-      await c.read(postGameControllerProvider.notifier).onMilestone(
-        milestone: 11,
-        timeMs: 27000,
-        maxLevel: 11,
-        timesReached8192: 0,
-      );
+      await c
+          .read(postGameControllerProvider.notifier)
+          .onMilestone(
+            milestone: 11,
+            timeMs: 27000,
+            maxLevel: 11,
+            timesReached8192: 0,
+          );
 
       final summary = c.read(postGameControllerProvider);
       expect(summary, isNotNull);
@@ -80,12 +94,14 @@ void main() {
       // Set a previous record
       await c.read(personalRecordsProvider.notifier).updateBestTime2048(30000);
 
-      await c.read(postGameControllerProvider.notifier).onMilestone(
-        milestone: 11,
-        timeMs: 25000, // better than 30000
-        maxLevel: 11,
-        timesReached8192: 0,
-      );
+      await c
+          .read(postGameControllerProvider.notifier)
+          .onMilestone(
+            milestone: 11,
+            timeMs: 25000, // better than 30000
+            maxLevel: 11,
+            timesReached8192: 0,
+          );
 
       final summary = c.read(postGameControllerProvider);
       expect(summary!.earnedCombo, true);
@@ -98,12 +114,14 @@ void main() {
       await c.read(personalRecordsProvider.notifier).updateBestTime2048(20000);
       await c.read(personalRecordsProvider.notifier).updateHighestLevel(11);
 
-      await c.read(postGameControllerProvider.notifier).onMilestone(
-        milestone: 11,
-        timeMs: 25000, // worse than 20000
-        maxLevel: 11, // same as highestLevelEver → no tile record
-        timesReached8192: 0,
-      );
+      await c
+          .read(postGameControllerProvider.notifier)
+          .onMilestone(
+            milestone: 11,
+            timeMs: 25000, // worse than 20000
+            maxLevel: 11, // same as highestLevelEver → no tile record
+            timesReached8192: 0,
+          );
 
       final summary = c.read(postGameControllerProvider);
       expect(summary!.earnedCombo, false);
@@ -119,12 +137,14 @@ void main() {
           .read(personalRecordsProvider.notifier)
           .updateHighestLevel(11); // previously 2048
 
-      await c.read(postGameControllerProvider.notifier).onMilestone(
-        milestone: 12,
-        timeMs: 50000,
-        maxLevel: 12, // higher than highestLevelEver (11) → tile record
-        timesReached8192: 0,
-      );
+      await c
+          .read(postGameControllerProvider.notifier)
+          .onMilestone(
+            milestone: 12,
+            timeMs: 50000,
+            maxLevel: 12, // higher than highestLevelEver (11) → tile record
+            timesReached8192: 0,
+          );
 
       final summary = c.read(postGameControllerProvider);
       expect(summary!.milestone, 12);
@@ -139,12 +159,14 @@ void main() {
           .read(personalRecordsProvider.notifier)
           .updateHighestLevel(12); // already at 4096
 
-      await c.read(postGameControllerProvider.notifier).onMilestone(
-        milestone: 12,
-        timeMs: 50000,
-        maxLevel: 12, // same as highestLevelEver → no tile record
-        timesReached8192: 0,
-      );
+      await c
+          .read(postGameControllerProvider.notifier)
+          .onMilestone(
+            milestone: 12,
+            timeMs: 50000,
+            maxLevel: 12, // same as highestLevelEver → no tile record
+            timesReached8192: 0,
+          );
 
       final summary = c.read(postGameControllerProvider);
       expect(summary!.earnedCombo, false);
@@ -158,12 +180,14 @@ void main() {
       await c.read(personalRecordsProvider.notifier).load();
       await c.read(personalRecordsProvider.notifier).updateHighestLevel(12);
 
-      await c.read(postGameControllerProvider.notifier).onMilestone(
-        milestone: 13,
-        timeMs: 90000,
-        maxLevel: 13, // new tile record
-        timesReached8192: 3,
-      );
+      await c
+          .read(postGameControllerProvider.notifier)
+          .onMilestone(
+            milestone: 13,
+            timeMs: 90000,
+            maxLevel: 13, // new tile record
+            timesReached8192: 3,
+          );
 
       final summary = c.read(postGameControllerProvider);
       expect(summary!.milestone, 13);
@@ -172,9 +196,9 @@ void main() {
     });
   });
 
-  group('PostGameController — dismiss', () {
-    test('dismiss() sets state to null', () async {
-      final c = makeContainer();
+  group('PostGameController — logged-in ranking', () {
+    test('logged in → rankingPosition from FakeRankingService', () async {
+      final c = makeContainer(loggedIn: true);
       addTearDown(c.dispose);
       await c.read(personalRecordsProvider.notifier).load();
 
@@ -184,6 +208,29 @@ void main() {
         maxLevel: 11,
         timesReached8192: 0,
       );
+
+      final summary = c.read(postGameControllerProvider);
+      expect(summary, isNotNull);
+      expect(summary!.milestone, 11);
+      // FakeRankingService.getPlayerEntry returns rank 7 for globalTime
+      expect(summary.rankingPosition, 7);
+    });
+  });
+
+  group('PostGameController — dismiss', () {
+    test('dismiss() sets state to null', () async {
+      final c = makeContainer();
+      addTearDown(c.dispose);
+      await c.read(personalRecordsProvider.notifier).load();
+
+      await c
+          .read(postGameControllerProvider.notifier)
+          .onMilestone(
+            milestone: 11,
+            timeMs: 27000,
+            maxLevel: 11,
+            timesReached8192: 0,
+          );
       expect(c.read(postGameControllerProvider), isNotNull);
 
       c.read(postGameControllerProvider.notifier).dismiss();
