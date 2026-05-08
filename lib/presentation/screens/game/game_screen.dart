@@ -6,6 +6,8 @@ import '../../../domain/game_engine/direction.dart';
 
 import '../../../data/models/item_type.dart';
 import '../../controllers/game_notifier.dart';
+import '../../controllers/personal_records_notifier.dart';
+import '../../controllers/post_game_controller.dart';
 import '../../widgets/board_widget.dart';
 import '../../widgets/bomb_selection_overlay.dart';
 import '../../widgets/bomb_grid_overlay.dart';
@@ -14,8 +16,11 @@ import '../../widgets/game_header.dart';
 import '../../widgets/game_over_modal.dart';
 import '../../widgets/inventory_bar.dart';
 import '../../widgets/shop_overlay.dart';
+import '../../widgets/milestone_ranking_dialog.dart';
 import '../../widgets/victory_choice_dialog.dart';
 import '../../../core/constants/game_constants.dart';
+import '../../../data/models/game_state.dart';
+import '../ranking_screen.dart';
 import '../../../domain/inventory/inventory_notifier.dart';
 import '../../widgets/pause_overlay.dart';
 import 'game_over_item_overlay.dart';
@@ -62,6 +67,43 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         inventory.bomb3 > 0 ||
         inventory.undo1 > 0 ||
         inventory.undo3 > 0;
+
+    ref.listen<PostGameSummary?>(postGameControllerProvider, (previous, summary) {
+      if (summary == null || !mounted) return;
+      MilestoneRankingDialog.show(
+        context,
+        summary,
+        onViewRanking: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const RankingScreen(initialTab: 1),
+            ),
+          );
+        },
+      ).then((_) {
+        if (mounted) {
+          ref.read(postGameControllerProvider.notifier).dismiss();
+        }
+      });
+    });
+
+    ref.listen<GameState>(gameProvider, (previous, current) {
+      if (previous?.pendingMilestone == null && current.pendingMilestone != null) {
+        final milestone = current.pendingMilestone!;
+        final records = ref.read(personalRecordsProvider);
+        final timeMs = switch (milestone) {
+          11 => current.bestTimeMs2048 ?? current.elapsedMs,
+          12 => current.bestTimeMs4096 ?? current.elapsedMs,
+          _ => current.elapsedMs,
+        };
+        ref.read(postGameControllerProvider.notifier).onMilestone(
+          milestone: milestone,
+          timeMs: timeMs,
+          maxLevel: current.maxLevel,
+          timesReached8192: records.timesReached8192,
+        );
+      }
+    });
 
     return Scaffold(
       body: GameBackground(
