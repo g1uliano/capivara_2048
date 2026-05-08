@@ -12,6 +12,7 @@ abstract class SyncEngine {
   Future<void> dispose();
   Future<void> syncProfile();
   Future<void> updateAvatar(String? avatarUrl);
+  Future<void> updateTutorialCompleted(bool completed);
   Future<void> updateDisplayName(String name);
   Future<void> deleteUserData();
   Future<void> syncGameRecord(GameRecord record);
@@ -49,6 +50,13 @@ class FakeSyncEngine implements SyncEngine {
   @override
   Future<void> updateAvatar(String? avatarUrl) async {
     lastAvatarUrl = avatarUrl;
+  }
+
+  bool tutorialCompleted = false;
+
+  @override
+  Future<void> updateTutorialCompleted(bool completed) async {
+    tutorialCompleted = completed;
   }
 
   @override
