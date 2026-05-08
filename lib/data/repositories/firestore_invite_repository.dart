@@ -26,7 +26,7 @@ class FirestoreInviteRepository implements InviteService {
       'invites': [],
       'totalRewardsClaimed': 0,
     }, SetOptions(merge: true));
-    return 'olhabichim://invite?ref=$userId';
+    return 'https://bichim-prd.web.app/invite?ref=$userId';
   }
 
   @override
@@ -102,12 +102,17 @@ class FirestoreInviteRepository implements InviteService {
         'completedAt': Timestamp.now(),
       };
 
-      // Deliver reward to inviter (Firestore — remote)
+      // Deliver reward to inviter: 1 combo (1 vida + 1 bomb3 + 1 undo1) via Firestore
+      // - inventory items synced by _mergeRemoteInventory on next login
+      // - lives delivered via pendingLives field claimed in syncProfile()
       final inviterRef = _firestore.collection('users').doc(inviterId);
       tx.set(inviterRef, {
-        'inventory': {'bomb2': FieldValue.increment(1)},
+        'inventory': {
+          'bomb3': FieldValue.increment(1),
+          'undo1': FieldValue.increment(1),
+        },
+        'pendingLives': FieldValue.increment(1),
       }, SetOptions(merge: true));
-      // Note: lives for inviter via separate update (outside transaction is fine for non-critical reward)
 
       tx.update(ref, {
         'invites': invites,

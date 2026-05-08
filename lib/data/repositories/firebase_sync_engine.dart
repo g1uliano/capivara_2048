@@ -8,6 +8,7 @@ import '../../data/models/game_record.dart';
 import '../../data/models/pending_event.dart';
 import '../../data/models/personal_records.dart';
 import '../../data/models/inventory.dart';
+import '../../data/models/lives_state.dart';
 import '../../data/models/game_record_hive_adapter.dart';
 import '../../domain/sync/sync_engine.dart';
 import '../../domain/sync/sync_conflict_resolver.dart';
@@ -66,6 +67,11 @@ class FirebaseSyncEngine implements SyncEngine {
         _remoteAvatarUrl = data['avatarUrl'] as String?;
         // displayName canônico do Firestore (mais confiável que o cache do Firebase Auth)
         _remoteDisplayName = data['displayName'] as String?;
+        // Creditar vidas pendentes (reward de convite para o convidador)
+        final pendingLives = (data['pendingLives'] as num?)?.toInt() ?? 0;
+        if (pendingLives > 0) {
+          await _creditPendingLives(pendingLives);
+        }
         await _mergeRemotePersonalRecords(
           data['personalRecords'] as Map<String, dynamic>?,
         );
@@ -189,6 +195,22 @@ class FirebaseSyncEngine implements SyncEngine {
     final remote = _personalRecordsFromMap(remoteData);
     final merged = SyncConflictResolver.mergePersonalRecords(local, remote);
     await box.put(_personalRecordsKey, merged);
+  }
+
+  Future<void> _creditPendingLives(int amount) async {
+    if (_userId == null || amount <= 0) return;
+    try {
+      // 1. Zerar no Firestore ANTES de creditar localmente — evita duplo crédito em crash
+      await _firestore.collection('users').doc(_userId).update({
+        'pendingLives': 0,
+      });
+      // 2. Creditar localmente via Hive
+      final livesBox = await Hive.openBox<LivesState>('lives');
+      final ls = livesBox.get('state') ?? LivesState.initial();
+      await livesBox.put('state', ls.copyWith(lives: (ls.lives + amount).clamp(0, 15)));
+    } catch (_) {
+      // Non-fatal — pendingLives remains > 0 in Firestore for next sync
+    }
   }
 
   Future<void> _mergeRemoteInventory(Map<String, dynamic>? remoteData) async {
