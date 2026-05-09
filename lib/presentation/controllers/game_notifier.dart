@@ -73,16 +73,16 @@ class GameNotifier extends Notifier<GameState> {
 
     // Haptic feedback graduado (respects settings toggle)
     if (after.maxLevel > before.maxLevel) {
-      maybeHaptic(() => ref.read(settingsProvider).hapticEnabled,
-          intensity: HapticIntensity.light);
-    }
-    if (after.pendingMilestone != null && before.pendingMilestone == null) {
-      maybeHaptic(() => ref.read(settingsProvider).hapticEnabled,
-          intensity: HapticIntensity.medium);
+      maybeHaptic(
+        () => ref.read(settingsProvider).hapticEnabled,
+        intensity: HapticIntensity.light,
+      );
     }
     if (after.isGameOver && !before.isGameOver) {
-      maybeHaptic(() => ref.read(settingsProvider).hapticEnabled,
-          intensity: HapticIntensity.heavy);
+      maybeHaptic(
+        () => ref.read(settingsProvider).hapticEnabled,
+        intensity: HapticIntensity.heavy,
+      );
     }
 
     // Atualizar nível mais alto já alcançado (persistido para coleção)
@@ -117,6 +117,10 @@ class GameNotifier extends Notifier<GameState> {
           updated = updated.copyWith(pendingMilestone: milestone);
         }
         state = updated;
+        maybeHaptic(
+          () => ref.read(settingsProvider).hapticEnabled,
+          intensity: HapticIntensity.medium,
+        );
         unawaited(
           ref
               .read(personalRecordsProvider.notifier)
