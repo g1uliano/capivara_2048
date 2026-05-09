@@ -1,14 +1,15 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/utils/iap_delivery.dart';
 import '../../data/models/item_type.dart';
 import '../../data/models/shop_package.dart';
 import '../../data/shop_data.dart';
-import '../../domain/inventory/inventory_notifier.dart';
-import '../../domain/lives/lives_notifier.dart';
+import '../../domain/shop/iap_service.dart';
 import '../widgets/outlined_text.dart';
-import 'shop_package_card.dart';
 import 'auth_gate_overlay.dart';
+import 'iap_confirmation_sheet.dart';
+import 'purchase_success_sheet.dart';
+import 'shop_package_card.dart';
 import 'shop_unit_item_card.dart';
 
 class ShopOverlay extends ConsumerStatefulWidget {
@@ -37,36 +38,27 @@ class _ShopOverlayState extends ConsumerState<ShopOverlay> {
   }
 
   Future<void> _onBuy(ShopPackage package) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Confirmar compra'),
-        content: Text(
-          'Comprar ${package.name} por R\$ ${package.currentPrice.toStringAsFixed(2).replaceAll('.', ',')}?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Confirmar'),
-          ),
-        ],
-      ),
-    );
+    // 1. Confirmation sheet (same as main shop)
+    final confirmed = await IAPConfirmationSheet.show(context, package);
+    if (!confirmed || !mounted) return;
 
-    if (confirmed != true || !mounted) return;
+    // 2. Call IAP service (IAPServiceImpl in dev/prd; FakeIAPService in tst)
+    final iapService = ref.read(iapServiceProvider);
+    final result = await iapService.buyPackage(package);
+    if (!mounted) return;
 
-    final c = package.contents;
-    if (c.lives > 0) unawaited(ref.read(livesProvider.notifier).addPurchased(c.lives));
-    if (c.bomb2 > 0) unawaited(ref.read(inventoryProvider.notifier).add(ItemType.bomb2, c.bomb2));
-    if (c.bomb3 > 0) unawaited(ref.read(inventoryProvider.notifier).add(ItemType.bomb3, c.bomb3));
-    if (c.undo1 > 0) unawaited(ref.read(inventoryProvider.notifier).add(ItemType.undo1, c.undo1));
-    if (c.undo3 > 0) unawaited(ref.read(inventoryProvider.notifier).add(ItemType.undo3, c.undo3));
-
-    widget.onItemPurchased(widget.itemType);
+    if (result.success) {
+      deliverIAPItems(ref, package);
+      if (result.shareCode != null && mounted) {
+        await PurchaseSuccessSheet.show(context, result.shareCode!);
+      }
+      widget.onItemPurchased(widget.itemType);
+    } else if (result.error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro na compra: ${result.error}')),
+      );
+    }
+    // cancelled → do nothing
   }
 
   @override
