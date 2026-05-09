@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/game_constants.dart';
 import '../../data/models/item_type.dart';
+import '../../data/models/tile.dart';
 import '../../domain/game_engine/bomb_mode.dart';
 import '../../domain/inventory/inventory_notifier.dart';
 import '../controllers/game_notifier.dart';
@@ -25,6 +26,11 @@ class InventoryBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final inventory = ref.watch(inventoryProvider);
     final undoStackLen = ref.watch(gameProvider.select((s) => s.undoStack.length));
+    final tileCount = ref.watch(
+      gameProvider.select(
+        (s) => s.board.expand((row) => row).whereType<Tile>().length,
+      ),
+    );
 
     Future<void> useBomb2() async {
       final ok = await showConfirmUseDialog(
@@ -97,7 +103,13 @@ class InventoryBar extends ConsumerWidget {
             pngPath: 'assets/images/inventory/bomb_3.png',
             count: inventory.bomb3,
             size: iconSize,
-            onPressed: inventory.bomb3 > 0 ? useBomb3 : null,
+            onPressed: inventory.bomb3 > 0 && tileCount >= 5 ? useBomb3 : null,
+            forceDisabled: inventory.bomb3 > 0 && tileCount < 5,
+            onTapWhenDisabled: () => showCannotUseItemDialog(
+              context: context,
+              message: 'São necessárias pelo menos 5 peças no tabuleiro para usar a Bomba 3.',
+              pngPath: 'assets/images/inventory/bomb_3.png',
+            ),
             onTapWhenEmpty: inventory.bomb3 == 0 && onTapWhenEmpty != null
                 ? () => onTapWhenEmpty!(ItemType.bomb3)
                 : null,
