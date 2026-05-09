@@ -8,6 +8,27 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Added
 
+- **Haptic feedback graduado**: vibração leve em level-up (troca de anfitrião), média ao atingir 2048/4096/8192, forte em game over — respeitando o toggle de Configurações
+- **Produtos IAP unitários** (`u_bomb3`, `u_undo3`, `u_bomb2`, `u_undo1`): itens avulsos agora têm produtos reais registráveis nas lojas com preços individuais
+- **`docs/IAP.md`**: guia completo de configuração dos produtos IAP no Google Play Console e App Store Connect
+- **`deliverIAPItems` helper** (`lib/core/utils/iap_delivery.dart`): entrega local de itens IAP compartilhada entre ShopScreen, ShopUnitItemCard e ShopOverlay (DRY)
+
+### Changed
+
+- **Bomba 3**: desabilitada quando há menos de 5 peças no tabuleiro; exibe aviso "São necessárias pelo menos 5 peças..." (mesmo padrão visual do Desfazer 3)
+- **Loja principal — itens avulsos**: compra agora usa fluxo IAP real (`IAPConfirmationSheet` + `iapService.buyPackage`) em vez de adicionar direto ao inventário
+- **Shop overlay**: compra de combos e itens avulsos agora usa fluxo IAP real
+- **Recompensa dobrada**: botão de dismiss muda de "Não, obrigado" para "Ok" após assistir o anúncio
+
+### Fixed
+
+- `ShopScreen._deliverItemsLocally` substituído pelo helper compartilhado `deliverIAPItems`
+- Haptic de milestone agora dispara corretamente dentro do loop de detecção de milestone (era dead code antes)
+
+## [Unreleased — 4.4]
+
+### Added
+
 - **Tutorial wizard interativo** (`TutorialScreen`): substitui o `_HowToPlaySheet` por um wizard de 5 telas com navegação passo-a-passo, 2 telas interativas (mini-boards onde o jogador faz swipe), animações com `flutter_animate` e persistência de `tutorialCompleted` no perfil
 - **`TutorialMiniBoard`**: widget independente do `GameEngine` que renderiza tiles reais e detecta swipe
 - **`PlayerProfile.tutorialCompleted`**: novo campo persistido no Firestore (logados) ou `SharedPreferences` (anônimos)

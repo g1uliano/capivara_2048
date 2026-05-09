@@ -108,7 +108,7 @@ TabBar(
 
 ## Fases do roadmap
 
-Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 4.4 completa — próximo: Fase 5 (Arte adicional e polimento visual)**. O áudio foi reposicionado para a **Fase 6** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
+Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 4.5 completa — próximo: Fase 5 (Arte adicional e polimento visual)**. O áudio foi reposicionado para a **Fase 6** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
 
 | Fase      | Foco                                                                                                                                                                 |
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -131,7 +131,8 @@ Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 4
 | 4.1.1 ✅  | Tipografia consistente: Fredoka em todas as telas/widgets sobre fundos não-sólidos                                                                                   |
 | 4.2 ✅    | Exclusão de conta LGPD, nome no cadastro, editar nome, trocar/esqueci senha, persistência avatar tile, auth gates (startup, shop, daily, ranking), sync game records |
 | 4.3 ✅    | Ranking Global (aba + dialogs pós-milestone), recompensas por recorde pessoal/convite, tabela semanal revisada, flavor audit                                         |
-| 4.4 ✅    | Tutorial wizard interativo: TutorialScreen (5 telas, 2 interativas), TutorialMiniBoard, tutorialCompleted no PlayerProfile |
+| 4.4 ✅    | Tutorial wizard interativo: TutorialScreen (5 telas, 2 interativas), TutorialMiniBoard, tutorialCompleted no PlayerProfile                                           |
+| 4.5 ✅    | Polimento: Bomba 3 ≥5 peças, IAP real em dev/overlay/loja, haptic graduado, texto "Ok" pós-ad |
 | 5         | Arte adicional e polimento visual (logo, ícone, splash final)                                                                                                        |
 | 6         | Áudio (sound design dos 13 animais, SFX, música)                                                                                                                     |
 | 7         | Polimento, l10n, acessibilidade, lançamento                                                                                                                          |
