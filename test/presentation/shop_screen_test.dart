@@ -5,6 +5,7 @@ import 'package:capivara_2048/data/models/lives_state_adapter.dart';
 import 'package:capivara_2048/data/repositories/inventory_repository.dart';
 import 'package:capivara_2048/data/repositories/lives_repository.dart';
 import 'package:capivara_2048/data/repositories/share_codes_repository.dart';
+import 'package:capivara_2048/domain/shop/iap_service.dart';
 import 'package:capivara_2048/domain/inventory/inventory_notifier.dart';
 import 'package:capivara_2048/domain/lives/lives_notifier.dart';
 import 'package:capivara_2048/domain/shop/share_codes_notifier.dart';
@@ -36,6 +37,7 @@ Widget _buildShop() {
       inventoryRepositoryProvider.overrideWithValue(InventoryRepository()),
       livesRepositoryProvider.overrideWithValue(LivesRepository()),
       shareCodesRepositoryProvider.overrideWithValue(ShareCodesRepository()),
+      iapServiceProvider.overrideWithValue(FakeIAPService()),
     ],
     child: const MaterialApp(home: ShopScreen()),
   );
@@ -175,7 +177,7 @@ void main() {
     expect(find.text('R\$ 0,49'), findsOneWidget);
   });
 
-  testWidgets('tap Comprar item avulso → AlertDialog com preço', (tester) async {
+  testWidgets('tap Comprar item avulso → IAPConfirmationSheet aparece', (tester) async {
     await tester.pumpWidget(_buildShop());
     await tester.pumpAndSettle();
     await tester.dragUntilVisible(
@@ -185,7 +187,8 @@ void main() {
     );
     await tester.tap(find.text('R\$ 1,99').first);
     await tester.pumpAndSettle();
-    expect(find.text('Confirmar compra'), findsOneWidget);
+    // IAPConfirmationSheet has a confirm button with price
+    expect(find.textContaining('Confirmar'), findsOneWidget);
     expect(find.textContaining('Bomba 3'), findsWidgets);
   });
 }

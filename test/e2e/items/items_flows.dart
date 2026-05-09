@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:capivara_2048/data/models/game_state.dart';
 import 'package:capivara_2048/data/models/inventory.dart';
 import 'package:capivara_2048/data/models/item_type.dart';
+import 'package:capivara_2048/data/models/tile.dart';
 import 'package:capivara_2048/domain/game_engine/bomb_mode.dart';
 import 'package:capivara_2048/domain/inventory/inventory_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/game_notifier.dart';
@@ -13,6 +15,16 @@ import '../_harness/test_harness.dart';
 import '../_harness/tester_extensions.dart';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
+
+List<List<Tile?>> _boardWith5Tiles() {
+  final board = List.generate(4, (_) => List<Tile?>.filled(4, null));
+  for (var i = 0; i < 5; i++) {
+    final row = i ~/ 4;
+    final col = i % 4;
+    board[row][col] = Tile(id: 'test_$i', level: 1, row: row, col: col);
+  }
+  return board;
+}
 
 Future<void> _bootToGame(WidgetTester tester, GameTestHarness harness) async {
   final widget = await tester.runAsync(() => harness.boot());
@@ -100,6 +112,16 @@ final itemsBomb3RequiresTargetScenario = E2EScenario(
 
     harness.container.read(inventoryProvider.notifier)
         .debugSetState(const Inventory(bomb2: 0, bomb3: 1, undo1: 0, undo3: 0));
+    harness.container.read(gameProvider.notifier).debugSetState(
+      GameState(
+        board: _boardWith5Tiles(),
+        score: 0,
+        highScore: 0,
+        isGameOver: false,
+        hasWon: false,
+        maxLevel: 1,
+      ),
+    );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 

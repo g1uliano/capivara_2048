@@ -77,12 +77,14 @@ final shopPurchaseItemScenario = E2EScenario(
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    // AlertDialog de confirmação.
-    expect(find.text('Confirmar compra'), findsOneWidget);
-    await tester.tap(find.text('Confirmar'));
-    await tester.pump();
+    // IAPConfirmationSheet aparece com botão 'Confirmar — R$ X,XX'.
+    await tester.tap(find.textContaining('Confirmar'));
+    await tester.pump(const Duration(milliseconds: 200));
 
-    // State is updated synchronously by add() — verify before any pumping.
+    // FakeIAPService tem 100ms de delay; aguardar atualização do estado.
+    await tester.pump(const Duration(milliseconds: 200));
+
+    // State is updated after deliverIAPItems — verify after settling.
     final inventoryAfter = harness.container.read(inventoryProvider);
     final totalBefore = inventoryBefore.bomb2 +
         inventoryBefore.bomb3 +

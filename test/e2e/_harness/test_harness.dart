@@ -23,6 +23,7 @@ import 'package:capivara_2048/presentation/controllers/personal_records_notifier
 import 'package:capivara_2048/presentation/controllers/settings_notifier.dart';
 import 'package:capivara_2048/data/models/player_profile.dart';
 import 'package:capivara_2048/domain/auth/auth_service.dart';
+import 'package:capivara_2048/domain/shop/iap_service.dart';
 import 'package:capivara_2048/domain/sync/sync_engine.dart';
 
 /// PlayerProfile de teste: simula usuário logado no harness e2e.
@@ -66,6 +67,7 @@ class GameTestHarness {
         gameRecordRepositoryProvider.overrideWithValue(repo),
         authServiceProvider.overrideWithValue(FakeAuthService(initialProfile: _kTestProfile)),
         syncEngineProvider.overrideWithValue(FakeSyncEngine()),
+        iapServiceProvider.overrideWithValue(FakeIAPService()),
       ],
     );
 
@@ -114,6 +116,7 @@ class GameTestHarness {
         gameRecordRepositoryProvider.overrideWithValue(repo),
         authServiceProvider.overrideWithValue(FakeAuthService(initialProfile: _kTestProfile)),
         syncEngineProvider.overrideWithValue(FakeSyncEngine()),
+        iapServiceProvider.overrideWithValue(FakeIAPService()),
       ],
     );
 
