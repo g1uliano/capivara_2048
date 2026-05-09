@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/utils/iap_delivery.dart';
 import '../../data/models/item_type.dart';
 import '../../data/shop_data.dart';
-import '../../domain/inventory/inventory_notifier.dart';
+import '../../domain/shop/iap_service.dart';
+import 'iap_confirmation_sheet.dart';
+import 'purchase_success_sheet.dart';
 
 class ShopUnitItemCard extends ConsumerWidget {
   final ItemType item;
@@ -30,29 +33,28 @@ class ShopUnitItemCard extends ConsumerWidget {
   }
 
   Future<void> _buy(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Confirmar compra'),
-        content: Text('Você receberá 1× $_name por $_price'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Confirmar'),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true) return;
-    await ref.read(inventoryProvider.notifier).add(item, 1);
+    final package = kUnitPackageByType[item]!;
+
+    // 1. Confirmation sheet (same as main shop)
+    final confirmed = await IAPConfirmationSheet.show(context, package);
+    if (!confirmed || !context.mounted) return;
+
+    // 2. Call IAP service (IAPServiceImpl in dev/prd; FakeIAPService in tst)
+    final iapService = ref.read(iapServiceProvider);
+    final result = await iapService.buyPackage(package);
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$_name adicionado! 🎉')),
-    );
+
+    if (result.success) {
+      deliverIAPItems(ref, package);
+      if (result.shareCode != null && context.mounted) {
+        await PurchaseSuccessSheet.show(context, result.shareCode!);
+      }
+    } else if (result.error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro na compra: ${result.error}')),
+      );
+    }
+    // cancelled (error == null && !success) → do nothing
   }
 
   @override
