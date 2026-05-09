@@ -8,6 +8,7 @@ import 'package:capivara_2048/data/repositories/lives_repository.dart';
 import 'package:capivara_2048/domain/inventory/inventory_notifier.dart';
 import 'package:capivara_2048/domain/lives/lives_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/auth_controller.dart';
+import 'package:capivara_2048/domain/shop/iap_service.dart';
 import 'package:capivara_2048/presentation/widgets/shop_overlay.dart';
 import 'package:capivara_2048/presentation/widgets/shop_package_card.dart';
 import 'package:flutter/material.dart';
@@ -52,6 +53,7 @@ Widget _buildOverlay({
       inventoryRepositoryProvider.overrideWithValue(InventoryRepository()),
       livesRepositoryProvider.overrideWithValue(LivesRepository()),
       authControllerProvider.overrideWith(_FakeAuthController.new),
+      iapServiceProvider.overrideWithValue(FakeIAPService()),
     ],
     child: MaterialApp(
       home: Scaffold(
@@ -102,7 +104,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(ElevatedButton, 'Comprar').first);
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ElevatedButton, 'Confirmar'));
+    await tester.tap(find.textContaining('Confirmar'));
     await tester.pumpAndSettle();
     expect(find.byType(ShopOverlay), findsOneWidget);
   });
@@ -116,7 +118,10 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(ElevatedButton, 'Comprar').first);
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ElevatedButton, 'Confirmar'));
+    await tester.tap(find.textContaining('Confirmar'));
+    await tester.pumpAndSettle(); // settles FakeIAPService delay + PurchaseSuccessSheet open
+    // Dismiss PurchaseSuccessSheet so onItemPurchased is called
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Continuar jogando'));
     await tester.pumpAndSettle();
     expect(purchased, isNotNull);
   });
