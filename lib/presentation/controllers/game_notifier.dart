@@ -14,6 +14,8 @@ import '../../domain/inventory/inventory_notifier.dart';
 import '../../domain/ranking/ranking_repository.dart';
 import '../../domain/invites/invite_service.dart';
 import '../../domain/sync/sync_engine.dart';
+import '../../core/utils/haptic_utils.dart';
+import '../../presentation/controllers/settings_notifier.dart';
 import '../controllers/auth_controller.dart';
 import '../controllers/personal_records_notifier.dart';
 
@@ -68,6 +70,20 @@ class GameNotifier extends Notifier<GameState> {
         : after.isGameOver
         ? after
         : after.copyWith(isContinuingWithItem: false);
+
+    // Haptic feedback graduado (respects settings toggle)
+    if (after.maxLevel > before.maxLevel) {
+      maybeHaptic(() => ref.read(settingsProvider).hapticEnabled,
+          intensity: HapticIntensity.light);
+    }
+    if (after.pendingMilestone != null && before.pendingMilestone == null) {
+      maybeHaptic(() => ref.read(settingsProvider).hapticEnabled,
+          intensity: HapticIntensity.medium);
+    }
+    if (after.isGameOver && !before.isGameOver) {
+      maybeHaptic(() => ref.read(settingsProvider).hapticEnabled,
+          intensity: HapticIntensity.heavy);
+    }
 
     // Atualizar nível mais alto já alcançado (persistido para coleção)
     if (state.maxLevel > before.maxLevel) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/haptic_utils.dart';
+import '../../../presentation/controllers/settings_notifier.dart';
 import '../../../data/models/inventory.dart';
 import '../../../data/models/item_type.dart';
 import '../../../domain/game_engine/bomb_mode.dart';
@@ -55,7 +56,9 @@ class _GameOverItemOverlayState extends ConsumerState<GameOverItemOverlay>
       duration: const Duration(milliseconds: 800),
     )
       ..addStatusListener((status) {
-        if (status == AnimationStatus.completed) maybeHaptic(ref);
+        if (status == AnimationStatus.completed) {
+          maybeHaptic(() => ref.read(settingsProvider).hapticEnabled);
+        }
       })
       ..repeat();
   }

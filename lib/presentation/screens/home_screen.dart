@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/home_constants.dart';
 import '../../core/utils/haptic_utils.dart';
+import '../../presentation/controllers/settings_notifier.dart';
 import '../../domain/daily_rewards/daily_rewards_engine.dart';
 import '../../domain/daily_rewards/daily_rewards_notifier.dart';
 import '../../data/models/game_state.dart';
@@ -43,7 +44,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool _hasSavedGame(GameState s) => s.score > 0 && !s.isGameOver;
 
   void _startNewGame() {
-    maybeHaptic(ref);
+    maybeHaptic(() => ref.read(settingsProvider).hapticEnabled);
     ref.read(gameProvider.notifier).restart();
     Navigator.push(
       context,
@@ -52,7 +53,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _continueGame() {
-    maybeHaptic(ref);
+    maybeHaptic(() => ref.read(settingsProvider).hapticEnabled);
     // Garante que ao voltar pra Home (inclusive via back do Android, que não
     // dispara resume()) e clicar Continuar, o jogo de fato continue — senão
     // o jogador caia novamente no PauseOverlay e teria que clicar Continuar 2x.
@@ -64,12 +65,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _nav(Widget screen) {
-    maybeHaptic(ref);
+    maybeHaptic(() => ref.read(settingsProvider).hapticEnabled);
     Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
   }
 
   void _navGuarded(Widget screen) {
-    maybeHaptic(ref);
+    maybeHaptic(() => ref.read(settingsProvider).hapticEnabled);
     final isLoggedIn = ref.read(authControllerProvider) != null;
     if (!isLoggedIn) {
       Navigator.push(
@@ -438,5 +439,3 @@ class _ActionButtonState extends State<_ActionButton> {
     );
   }
 }
-
-
