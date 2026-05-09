@@ -76,6 +76,58 @@ const Map<ItemType, double> kItemUnitPrices = {
   ItemType.undo1: 0.49,
 };
 
+const List<ShopPackage> kShopUnitPackages = [
+  ShopPackage(
+    id: 'u_bomb3',
+    name: '1× Bomba 3',
+    description: '1 bomba que remove 3 peças à sua escolha',
+    originalPrice: 1.99,
+    currentPrice: 1.99,
+    discountPercent: 0,
+    contents: RewardBundle(lives: 0, bomb2: 0, bomb3: 1, undo1: 0, undo3: 0),
+    giftContents: RewardBundle(lives: 0, bomb2: 0, bomb3: 0, undo1: 0, undo3: 0),
+  ),
+  ShopPackage(
+    id: 'u_undo3',
+    name: '1× Desfazer 3',
+    description: '1 desfazer de 3 jogadas',
+    originalPrice: 0.99,
+    currentPrice: 0.99,
+    discountPercent: 0,
+    contents: RewardBundle(lives: 0, bomb2: 0, bomb3: 0, undo1: 0, undo3: 1),
+    giftContents: RewardBundle(lives: 0, bomb2: 0, bomb3: 0, undo1: 0, undo3: 0),
+  ),
+  ShopPackage(
+    id: 'u_bomb2',
+    name: '1× Bomba 2',
+    description: '1 bomba que remove 2 peças adjacentes',
+    originalPrice: 1.19,
+    currentPrice: 1.19,
+    discountPercent: 0,
+    contents: RewardBundle(lives: 0, bomb2: 1, bomb3: 0, undo1: 0, undo3: 0),
+    giftContents: RewardBundle(lives: 0, bomb2: 0, bomb3: 0, undo1: 0, undo3: 0),
+  ),
+  ShopPackage(
+    id: 'u_undo1',
+    name: '1× Desfazer 1',
+    description: '1 desfazer de 1 jogada',
+    originalPrice: 0.49,
+    currentPrice: 0.49,
+    discountPercent: 0,
+    contents: RewardBundle(lives: 0, bomb2: 0, bomb3: 0, undo1: 1, undo3: 0),
+    giftContents: RewardBundle(lives: 0, bomb2: 0, bomb3: 0, undo1: 0, undo3: 0),
+  ),
+];
+
+/// Convenience map: ItemType → unit ShopPackage.
+/// Use for single-item purchases in ShopUnitItemCard and ShopOverlay.
+final Map<ItemType, ShopPackage> kUnitPackageByType = {
+  ItemType.bomb3: kShopUnitPackages[0],
+  ItemType.undo3: kShopUnitPackages[1],
+  ItemType.bomb2: kShopUnitPackages[2],
+  ItemType.undo1: kShopUnitPackages[3],
+};
+
 /// Retorna os IDs dos pacotes que contêm ao menos 1 unidade de [item].
 List<String> packageIdsContaining(ItemType item) {
   return kShopPackages.where((pkg) {
