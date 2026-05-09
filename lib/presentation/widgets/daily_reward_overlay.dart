@@ -79,7 +79,7 @@ class _DailyRewardOverlayState extends ConsumerState<DailyRewardOverlay> {
               TextButton(
                 onPressed: widget.onDismiss,
                 child: Text(
-                  'Não, obrigado',
+                  _doubled ? 'Ok' : 'Não, obrigado',
                   style: GoogleFonts.fredoka(color: Colors.white70, fontSize: 15),
                 ),
               ),
