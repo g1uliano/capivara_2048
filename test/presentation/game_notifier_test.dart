@@ -1,10 +1,12 @@
 import 'package:capivara_2048/presentation/controllers/personal_records_notifier.dart';
+import 'package:capivara_2048/presentation/controllers/settings_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:capivara_2048/presentation/controllers/game_notifier.dart';
 import 'package:capivara_2048/domain/game_engine/direction.dart';
 import 'package:capivara_2048/data/models/tile.dart';
 import 'package:capivara_2048/data/models/game_state.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class _FakePersonalRecordsNotifier extends PersonalRecordsNotifier {
   @override
@@ -19,14 +21,30 @@ class _FakePersonalRecordsNotifier extends PersonalRecordsNotifier {
 }
 
 ProviderContainer _createContainer() {
+  SharedPreferences.setMockInitialValues({});
+  // sharedPreferencesProvider é necessário pois GameNotifier.move() chama
+  // maybeHaptic() que lê settingsProvider → sharedPreferencesProvider.
+  final fakePrefs = _FakePrefs();
   return ProviderContainer(
     overrides: [
       personalRecordsProvider.overrideWith(() => _FakePersonalRecordsNotifier()),
+      sharedPreferencesProvider.overrideWithValue(fakePrefs),
     ],
   );
 }
 
+/// Stub mínimo de SharedPreferences para testes síncronos.
+class _FakePrefs implements SharedPreferences {
+  @override
+  bool? getBool(String key) => null;
+  @override
+  Future<bool> setBool(String key, bool value) async => true;
+  @override
+  dynamic noSuchMethod(Invocation invocation) => null;
+}
+
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   group('GameNotifier timer', () {
     test('elapsedMs starts at 0', () {
       final container = _createContainer();
