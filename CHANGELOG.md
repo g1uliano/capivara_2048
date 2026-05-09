@@ -4,6 +4,23 @@ All notable changes to Capivara 2048 will be documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [Unreleased]
+
+### Added
+
+- **Tutorial wizard interativo** (`TutorialScreen`): substitui o `_HowToPlaySheet` por um wizard de 5 telas com navegação passo-a-passo, 2 telas interativas (mini-boards onde o jogador faz swipe), animações com `flutter_animate` e persistência de `tutorialCompleted` no perfil
+- **`TutorialMiniBoard`**: widget independente do `GameEngine` que renderiza tiles reais e detecta swipe
+- **`PlayerProfile.tutorialCompleted`**: novo campo persistido no Firestore (logados) ou `SharedPreferences` (anônimos)
+- **`TutorialController`**: Riverpod Notifier com `markCompleted()` — persiste nas duas fontes conforme estado de auth
+
+### Changed
+
+- Botão "Como Jogar" na Home agora abre tela cheia `TutorialScreen` em vez de `BottomSheet`; `semanticLabel` renomeado para `"Tutorial"`
+
+### Removed
+
+- `_HowToPlaySheet` (substituído pelo `TutorialScreen`)
+
 ## [1.7.0] — 2026-05-08
 
 ### Added
