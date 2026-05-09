@@ -7,12 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/utils/iap_delivery.dart';
 import '../../data/models/item_type.dart';
 import '../../data/models/share_code.dart';
 import '../../data/shop_data.dart';
 import '../../data/models/shop_package.dart';
-import '../../domain/inventory/inventory_notifier.dart';
-import '../../domain/lives/lives_notifier.dart';
 import '../../domain/shop/iap_service.dart';
 import '../../domain/shop/share_codes_notifier.dart';
 import '../widgets/game_background.dart';
@@ -94,10 +93,18 @@ class ShopScreen extends ConsumerWidget {
     if (!context.mounted) return;
 
     if (result.success && result.shareCode != null) {
-      // In dev/fake: deliver items to Riverpod state manually
+      // Deliver items locally (needed in dev/tst; in prd server-side webhook does it too)
+      deliverIAPItems(ref, package);
+      // In dev: also generate a local share code for testing the gift flow
       const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
       if (flavor != 'prd') {
-        _deliverItemsLocally(ref, package);
+        unawaited(ref.read(shareCodesProvider.notifier).add(ShareCode(
+          code: 'DEV-${DateTime.now().millisecondsSinceEpoch % 10000}-AB',
+          packageId: package.id,
+          giftContents: package.giftContents,
+          status: ShareCodeStatus.pending,
+          createdAt: DateTime.now(),
+        )));
       }
       if (context.mounted) {
         await PurchaseSuccessSheet.show(context, result.shareCode!);
@@ -107,24 +114,5 @@ class ShopScreen extends ConsumerWidget {
         SnackBar(content: Text('Erro na compra: ${result.error}')));
     }
     // cancelled → do nothing
-  }
-
-  void _deliverItemsLocally(WidgetRef ref, ShopPackage package) {
-    final c = package.contents;
-    if (c.lives > 0) {
-      unawaited(ref.read(livesProvider.notifier).addPurchased(c.lives));
-    }
-    if (c.bomb2 > 0) unawaited(ref.read(inventoryProvider.notifier).add(ItemType.bomb2, c.bomb2));
-    if (c.bomb3 > 0) unawaited(ref.read(inventoryProvider.notifier).add(ItemType.bomb3, c.bomb3));
-    if (c.undo1 > 0) unawaited(ref.read(inventoryProvider.notifier).add(ItemType.undo1, c.undo1));
-    if (c.undo3 > 0) unawaited(ref.read(inventoryProvider.notifier).add(ItemType.undo3, c.undo3));
-    // Generate fake share code for dev
-    unawaited(ref.read(shareCodesProvider.notifier).add(ShareCode(
-      code: 'DEV-${DateTime.now().millisecondsSinceEpoch % 10000}-AB',
-      packageId: package.id,
-      giftContents: package.giftContents,
-      status: ShareCodeStatus.pending,
-      createdAt: DateTime.now(),
-    )));
   }
 }
