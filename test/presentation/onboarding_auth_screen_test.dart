@@ -29,12 +29,19 @@ void main() {
   });
 
   testWidgets('exibe botão Jogar sem conta', (tester) async {
+    tester.view.physicalSize = const Size(800, 700);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
     await tester.pumpWidget(_wrap(showSkip: true));
     expect(find.textContaining('sem conta'), findsOneWidget);
   });
 
   testWidgets('toque em Jogar sem conta não lança exceção', (tester) async {
+    tester.view.physicalSize = const Size(800, 700);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
     await tester.pumpWidget(_wrap(showSkip: true));
+    await tester.pumpAndSettle();
     await tester.tap(find.textContaining('sem conta'));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
