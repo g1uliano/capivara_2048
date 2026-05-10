@@ -37,12 +37,14 @@ Future<void> _bootToGame(WidgetTester tester, GameTestHarness harness) async {
 
 final itemsBomb2RequiresTargetScenario = E2EScenario(
   id: 'items.bomb2_requires_target_selection',
-  title: 'bomb2: tap → confirmar dialog → BombGridOverlay e BombDimOverlay visíveis',
+  title:
+      'bomb2: tap → confirmar dialog → BombGridOverlay e BombDimOverlay visíveis',
   tags: {ScenarioTag.critical},
   run: (tester, harness) async {
     await _bootToGame(tester, harness);
 
-    harness.container.read(inventoryProvider.notifier)
+    harness.container
+        .read(inventoryProvider.notifier)
         .debugSetState(const Inventory(bomb2: 1, bomb3: 0, undo1: 0, undo3: 0));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
@@ -52,18 +54,27 @@ final itemsBomb2RequiresTargetScenario = E2EScenario(
     await tester.pump();
 
     // Confirm the dialog ("Confirmar" button).
-    expect(find.text('Confirmar'), findsOneWidget,
-        reason: 'confirmação deve aparecer antes de ativar bomb');
+    expect(
+      find.text('Confirmar'),
+      findsOneWidget,
+      reason: 'confirmação deve aparecer antes de ativar bomb',
+    );
     await tester.tap(find.text('Confirmar'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
     // After confirmation: bomb mode active → overlays rendered.
     expect(tester.readGame(harness).bombMode, equals(BombMode.bomb2));
-    expect(find.byType(BombDimOverlay), findsOneWidget,
-        reason: 'BombDimOverlay deve cobrir a tela');
-    expect(find.byType(BombGridOverlay), findsOneWidget,
-        reason: 'BombGridOverlay deve aparecer para seleção de tiles');
+    expect(
+      find.byType(BombDimOverlay),
+      findsOneWidget,
+      reason: 'BombDimOverlay deve cobrir a tela',
+    );
+    expect(
+      find.byType(BombGridOverlay),
+      findsOneWidget,
+      reason: 'BombGridOverlay deve aparecer para seleção de tiles',
+    );
   },
 );
 
@@ -76,17 +87,22 @@ final itemsBomb2CancellableScenario = E2EScenario(
   run: (tester, harness) async {
     await _bootToGame(tester, harness);
 
-    harness.container.read(inventoryProvider.notifier)
+    harness.container
+        .read(inventoryProvider.notifier)
         .debugSetState(const Inventory(bomb2: 1, bomb3: 0, undo1: 0, undo3: 0));
 
     // Activate bomb mode directly (bypass confirm dialog for speed).
-    harness.container.read(gameProvider.notifier)
+    harness.container
+        .read(gameProvider.notifier)
         .enterBombMode(BombMode.bomb2, ItemType.bomb2);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    expect(tester.readGame(harness).bombMode, equals(BombMode.bomb2),
-        reason: 'bomb mode deve estar ativo após enterBombMode');
+    expect(
+      tester.readGame(harness).bombMode,
+      equals(BombMode.bomb2),
+      reason: 'bomb mode deve estar ativo após enterBombMode',
+    );
     expect(find.byType(BombDimOverlay), findsOneWidget);
 
     // Cancel via notifier.
@@ -94,10 +110,16 @@ final itemsBomb2CancellableScenario = E2EScenario(
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
-    expect(tester.readGame(harness).bombMode, isNull,
-        reason: 'cancelBomb() deve limpar bombMode');
-    expect(find.byType(BombDimOverlay), findsNothing,
-        reason: 'BombDimOverlay deve sumir após cancelamento');
+    expect(
+      tester.readGame(harness).bombMode,
+      isNull,
+      reason: 'cancelBomb() deve limpar bombMode',
+    );
+    expect(
+      find.byType(BombDimOverlay),
+      findsNothing,
+      reason: 'BombDimOverlay deve sumir após cancelamento',
+    );
   },
 );
 
@@ -110,18 +132,21 @@ final itemsBomb3RequiresTargetScenario = E2EScenario(
   run: (tester, harness) async {
     await _bootToGame(tester, harness);
 
-    harness.container.read(inventoryProvider.notifier)
+    harness.container
+        .read(inventoryProvider.notifier)
         .debugSetState(const Inventory(bomb2: 0, bomb3: 1, undo1: 0, undo3: 0));
-    harness.container.read(gameProvider.notifier).debugSetState(
-      GameState(
-        board: _boardWith5Tiles(),
-        score: 0,
-        highScore: 0,
-        isGameOver: false,
-        hasWon: false,
-        maxLevel: 1,
-      ),
-    );
+    harness.container
+        .read(gameProvider.notifier)
+        .debugSetState(
+          GameState(
+            board: _boardWith5Tiles(),
+            score: 0,
+            highScore: 0,
+            isGameOver: false,
+            hasWon: false,
+            maxLevel: 1,
+          ),
+        );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
@@ -134,8 +159,11 @@ final itemsBomb3RequiresTargetScenario = E2EScenario(
     await tester.pump(const Duration(milliseconds: 500));
 
     expect(tester.readGame(harness).bombMode, equals(BombMode.bomb3));
-    expect(find.byType(BombGridOverlay), findsOneWidget,
-        reason: 'BombGridOverlay para seleção de 3 tiles');
+    expect(
+      find.byType(BombGridOverlay),
+      findsOneWidget,
+      reason: 'BombGridOverlay para seleção de 3 tiles',
+    );
   },
 );
 
@@ -143,13 +171,15 @@ final itemsBomb3RequiresTargetScenario = E2EScenario(
 
 final itemsUndo1DisabledScenario = E2EScenario(
   id: 'items.undo1_disabled_at_game_start',
-  title: 'undo1 com undoStack vazio → tap → dialog "Ops!" → inventário inalterado',
+  title:
+      'undo1 com undoStack vazio → tap → dialog "Ops!" → inventário inalterado',
   tags: {ScenarioTag.critical},
   run: (tester, harness) async {
     await _bootToGame(tester, harness);
 
     // Give undo1=2, undoStack is empty (fresh game, no moves yet).
-    harness.container.read(inventoryProvider.notifier)
+    harness.container
+        .read(inventoryProvider.notifier)
         .debugSetState(const Inventory(bomb2: 0, bomb3: 0, undo1: 2, undo3: 0));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
@@ -169,8 +199,11 @@ final itemsUndo1DisabledScenario = E2EScenario(
     }
 
     final countAfter = harness.container.read(inventoryProvider).undo1;
-    expect(countAfter, equals(countBefore),
-        reason: 'undo1 NÃO deve ser consumido quando undoStack está vazio');
+    expect(
+      countAfter,
+      equals(countBefore),
+      reason: 'undo1 NÃO deve ser consumido quando undoStack está vazio',
+    );
   },
 );
 
@@ -178,12 +211,14 @@ final itemsUndo1DisabledScenario = E2EScenario(
 
 final itemsUndo3DisabledScenario = E2EScenario(
   id: 'items.undo3_disabled_when_no_history',
-  title: 'undo3 com undoStack vazio → tap → dialog "Ops!" → inventário inalterado',
+  title:
+      'undo3 com undoStack vazio → tap → dialog "Ops!" → inventário inalterado',
   tags: {ScenarioTag.critical},
   run: (tester, harness) async {
     await _bootToGame(tester, harness);
 
-    harness.container.read(inventoryProvider.notifier)
+    harness.container
+        .read(inventoryProvider.notifier)
         .debugSetState(const Inventory(bomb2: 0, bomb3: 0, undo1: 0, undo3: 2));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
@@ -201,8 +236,11 @@ final itemsUndo3DisabledScenario = E2EScenario(
     }
 
     final countAfter = harness.container.read(inventoryProvider).undo3;
-    expect(countAfter, equals(countBefore),
-        reason: 'undo3 NÃO deve ser consumido quando undoStack está vazio');
+    expect(
+      countAfter,
+      equals(countBefore),
+      reason: 'undo3 NÃO deve ser consumido quando undoStack está vazio',
+    );
   },
 );
 
@@ -215,17 +253,22 @@ final itemsBombDimOverlayScenario = E2EScenario(
   run: (tester, harness) async {
     await _bootToGame(tester, harness);
 
-    harness.container.read(inventoryProvider.notifier)
+    harness.container
+        .read(inventoryProvider.notifier)
         .debugSetState(const Inventory(bomb2: 1, bomb3: 0, undo1: 0, undo3: 0));
 
     // Activate directly (no dialog).
-    harness.container.read(gameProvider.notifier)
+    harness.container
+        .read(gameProvider.notifier)
         .enterBombMode(BombMode.bomb2, ItemType.bomb2);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
-    expect(find.byType(BombDimOverlay), findsOneWidget,
-        reason: 'BombDimOverlay deve aparecer quando bombMode != null');
+    expect(
+      find.byType(BombDimOverlay),
+      findsOneWidget,
+      reason: 'BombDimOverlay deve aparecer quando bombMode != null',
+    );
 
     // Cleanup: cancel bomb mode so teardown is clean.
     harness.container.read(gameProvider.notifier).cancelBomb();
@@ -258,8 +301,11 @@ final itemsCountPersistsScenario = E2EScenario(
     await tester.pumpAndSettle(const Duration(seconds: 5));
 
     final inventory = harness.container.read(inventoryProvider);
-    expect(inventory.bomb2, equals(3),
-        reason: 'bomb2=3 deve persistir após cold restart');
+    expect(
+      inventory.bomb2,
+      equals(3),
+      reason: 'bomb2=3 deve persistir após cold restart',
+    );
   },
 );
 
@@ -273,7 +319,8 @@ final itemsEmptyItemOpensShopScenario = E2EScenario(
     await _bootToGame(tester, harness);
 
     // All items empty → onTapWhenEmpty wired to _openShop.
-    harness.container.read(inventoryProvider.notifier)
+    harness.container
+        .read(inventoryProvider.notifier)
         .debugSetState(Inventory.empty());
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
@@ -283,7 +330,10 @@ final itemsEmptyItemOpensShopScenario = E2EScenario(
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(find.byType(ShopOverlay), findsOneWidget,
-        reason: 'tap em item vazio deve abrir ShopOverlay');
+    expect(
+      find.byType(ShopOverlay),
+      findsOneWidget,
+      reason: 'tap em item vazio deve abrir ShopOverlay',
+    );
   },
 );

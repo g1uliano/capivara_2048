@@ -19,12 +19,12 @@ List<List<Tile?>> _board(int tileCount) {
 }
 
 GameState _gameState(int tileCount) => GameState(
-      board: _board(tileCount),
-      score: 0,
-      highScore: 0,
-      isGameOver: false,
-      hasWon: false,
-    );
+  board: _board(tileCount),
+  score: 0,
+  highScore: 0,
+  isGameOver: false,
+  hasWon: false,
+);
 
 class _FakeGameNotifier extends GameNotifier {
   final GameState _initial;
@@ -38,9 +38,9 @@ void main() {
   group('InventoryBar — Bomba 3 piece count guard', () {
     testWidgets('renders bomb3 button', (tester) async {
       final gs = _gameState(5);
-      final container = ProviderContainer(overrides: [
-        gameProvider.overrideWith(() => _FakeGameNotifier(gs)),
-      ]);
+      final container = ProviderContainer(
+        overrides: [gameProvider.overrideWith(() => _FakeGameNotifier(gs))],
+      );
       addTearDown(container.dispose);
       await tester.pumpWidget(
         UncontrolledProviderScope(

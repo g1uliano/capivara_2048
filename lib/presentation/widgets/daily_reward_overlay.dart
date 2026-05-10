@@ -80,7 +80,10 @@ class _DailyRewardOverlayState extends ConsumerState<DailyRewardOverlay> {
                 onPressed: widget.onDismiss,
                 child: Text(
                   _doubled ? 'Ok' : 'Não, obrigado',
-                  style: GoogleFonts.fredoka(color: Colors.white70, fontSize: 15),
+                  style: GoogleFonts.fredoka(
+                    color: Colors.white70,
+                    fontSize: 15,
+                  ),
                 ),
               ),
             ],
@@ -117,36 +120,52 @@ class _RewardSummary extends StatelessWidget {
     final multiplier = doubled ? 2 : 1;
     final items = <Widget>[];
     if (reward.undo1 > 0) {
-      items.add(_row('assets/images/inventory/undo_1.png', '${reward.undo1 * multiplier}× Desfazer 1'));
+      items.add(
+        _row(
+          'assets/images/inventory/undo_1.png',
+          '${reward.undo1 * multiplier}× Desfazer 1',
+        ),
+      );
     }
     if (reward.bomb2 > 0) {
-      items.add(_row('assets/images/inventory/bomb_2.png', '${reward.bomb2 * multiplier}× Bomba 2'));
+      items.add(
+        _row(
+          'assets/images/inventory/bomb_2.png',
+          '${reward.bomb2 * multiplier}× Bomba 2',
+        ),
+      );
     }
     if (reward.lives > 0) {
-      items.add(_rowIcon(Icons.favorite, Colors.redAccent, '${reward.lives * multiplier}× Vida'));
+      items.add(
+        _rowIcon(
+          Icons.favorite,
+          Colors.redAccent,
+          '${reward.lives * multiplier}× Vida',
+        ),
+      );
     }
     return Column(children: items);
   }
 
   Widget _row(String asset, String label) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(
-          children: [
-            Image.asset(asset, width: 24, height: 24),
-            const SizedBox(width: 8),
-            Text(label, style: const TextStyle(color: Colors.white, fontSize: 15)),
-          ],
-        ),
-      );
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(
+      children: [
+        Image.asset(asset, width: 24, height: 24),
+        const SizedBox(width: 8),
+        Text(label, style: const TextStyle(color: Colors.white, fontSize: 15)),
+      ],
+    ),
+  );
 
   Widget _rowIcon(IconData icon, Color color, String label) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(
-          children: [
-            Icon(icon, color: color, size: 24),
-            const SizedBox(width: 8),
-            Text(label, style: const TextStyle(color: Colors.white, fontSize: 15)),
-          ],
-        ),
-      );
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(
+      children: [
+        Icon(icon, color: color, size: 24),
+        const SizedBox(width: 8),
+        Text(label, style: const TextStyle(color: Colors.white, fontSize: 15)),
+      ],
+    ),
+  );
 }

@@ -18,15 +18,23 @@ void deliverIAPItems(WidgetRef ref, ShopPackage package) {
     unawaited(ref.read(livesProvider.notifier).addPurchased(c.lives));
   }
   if (c.bomb2 > 0) {
-    unawaited(ref.read(inventoryProvider.notifier).add(ItemType.bomb2, c.bomb2));
+    unawaited(
+      ref.read(inventoryProvider.notifier).add(ItemType.bomb2, c.bomb2),
+    );
   }
   if (c.bomb3 > 0) {
-    unawaited(ref.read(inventoryProvider.notifier).add(ItemType.bomb3, c.bomb3));
+    unawaited(
+      ref.read(inventoryProvider.notifier).add(ItemType.bomb3, c.bomb3),
+    );
   }
   if (c.undo1 > 0) {
-    unawaited(ref.read(inventoryProvider.notifier).add(ItemType.undo1, c.undo1));
+    unawaited(
+      ref.read(inventoryProvider.notifier).add(ItemType.undo1, c.undo1),
+    );
   }
   if (c.undo3 > 0) {
-    unawaited(ref.read(inventoryProvider.notifier).add(ItemType.undo3, c.undo3));
+    unawaited(
+      ref.read(inventoryProvider.notifier).add(ItemType.undo3, c.undo3),
+    );
   }
 }

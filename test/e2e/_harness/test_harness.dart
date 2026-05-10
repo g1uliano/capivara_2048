@@ -50,7 +50,10 @@ class GameTestHarness {
   bool _booted = false;
 
   Future<Widget> boot({GameState? initialGameState}) async {
-    assert(!_booted, 'GameTestHarness.boot() called twice — call teardown() first');
+    assert(
+      !_booted,
+      'GameTestHarness.boot() called twice — call teardown() first',
+    );
     GoogleFonts.config.allowRuntimeFetching = false;
     SharedPreferences.setMockInitialValues(<String, Object>{});
     tempDir = await Directory.systemTemp.createTemp('e2e_hive_');
@@ -65,7 +68,9 @@ class GameTestHarness {
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
         gameRecordRepositoryProvider.overrideWithValue(repo),
-        authServiceProvider.overrideWithValue(FakeAuthService(initialProfile: _kTestProfile)),
+        authServiceProvider.overrideWithValue(
+          FakeAuthService(initialProfile: _kTestProfile),
+        ),
         syncEngineProvider.overrideWithValue(FakeSyncEngine()),
         iapServiceProvider.overrideWithValue(FakeIAPService()),
       ],
@@ -114,7 +119,9 @@ class GameTestHarness {
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
         gameRecordRepositoryProvider.overrideWithValue(repo),
-        authServiceProvider.overrideWithValue(FakeAuthService(initialProfile: _kTestProfile)),
+        authServiceProvider.overrideWithValue(
+          FakeAuthService(initialProfile: _kTestProfile),
+        ),
         syncEngineProvider.overrideWithValue(FakeSyncEngine()),
         iapServiceProvider.overrideWithValue(FakeIAPService()),
       ],
@@ -138,10 +145,7 @@ class GameTestHarness {
     // Use a timeout in case there are unawaited Hive writes pending (e.g. from
     // `unawaited(notifier.add(...))` inside widget code). We're deleting the
     // temp directory anyway, so skipping the flush is safe for test isolation.
-    await Hive.close().timeout(
-      const Duration(seconds: 2),
-      onTimeout: () => [],
-    );
+    await Hive.close().timeout(const Duration(seconds: 2), onTimeout: () => []);
     if (tempDir.existsSync()) {
       await tempDir.delete(recursive: true);
     }

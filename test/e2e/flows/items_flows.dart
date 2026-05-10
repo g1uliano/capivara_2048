@@ -50,24 +50,27 @@ void _setupStateWithUndoEntry(GameTestHarness harness) {
   board[0][0] = Tile(id: 'a', level: 1, row: 0, col: 0);
   board[0][1] = Tile(id: 'b', level: 2, row: 0, col: 1);
 
-  harness.container.read(gameProvider.notifier).debugSetState(
-    GameState(
-      board: board,
-      score: 0,
-      highScore: 0,
-      isGameOver: false,
-      hasWon: false,
-      maxLevel: 2,
-      undoStack: [prevState],
-    ),
-  );
+  harness.container
+      .read(gameProvider.notifier)
+      .debugSetState(
+        GameState(
+          board: board,
+          score: 0,
+          highScore: 0,
+          isGameOver: false,
+          hasWon: false,
+          maxLevel: 2,
+          undoStack: [prevState],
+        ),
+      );
 }
 
 // ─── flow.use_undo_during_game ───────────────────────────────────────────────
 
 final useUndoDuringGameScenario = E2EScenario(
   id: 'flow.use_undo_during_game',
-  title: 'undo1: estado com undoStack → undo(1) + consume → inventário decrementa',
+  title:
+      'undo1: estado com undoStack → undo(1) + consume → inventário decrementa',
   tags: {ScenarioTag.critical},
   run: (tester, harness) async {
     await _bootToGame(tester, harness);
@@ -87,7 +90,11 @@ final useUndoDuringGameScenario = E2EScenario(
     // consume() completes before teardown (avoids orphaned Future teardown crash).
     await tester.runAsync(() async {
       final undone = harness.container.read(gameProvider.notifier).undo(1);
-      expect(undone, isTrue, reason: 'undo(1) deve retornar true com undoStack não vazio');
+      expect(
+        undone,
+        isTrue,
+        reason: 'undo(1) deve retornar true com undoStack não vazio',
+      );
       if (undone) {
         await harness.container
             .read(inventoryProvider.notifier)
@@ -97,8 +104,11 @@ final useUndoDuringGameScenario = E2EScenario(
     await tester.pump();
 
     final inventoryAfter = harness.container.read(inventoryProvider).undo1;
-    expect(inventoryAfter, lessThan(inventoryBefore),
-        reason: 'undo1 deve ser consumido ao usar');
+    expect(
+      inventoryAfter,
+      lessThan(inventoryBefore),
+      reason: 'undo1 deve ser consumido ao usar',
+    );
   },
 );
 
@@ -127,8 +137,11 @@ final useBomb2DuringGameScenario = E2EScenario(
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(tester.readGame(harness).bombMode, equals(BombMode.bomb2),
-        reason: 'após confirmar, deve ativar BombMode.bomb2');
+    expect(
+      tester.readGame(harness).bombMode,
+      equals(BombMode.bomb2),
+      reason: 'após confirmar, deve ativar BombMode.bomb2',
+    );
     expect(find.byKey(const Key('game_board')), findsOneWidget);
   },
 );
@@ -145,16 +158,18 @@ final useBomb3DuringGameScenario = E2EScenario(
     harness.container
         .read(inventoryProvider.notifier)
         .debugSetState(const Inventory(bomb2: 0, bomb3: 1, undo1: 0, undo3: 0));
-    harness.container.read(gameProvider.notifier).debugSetState(
-      GameState(
-        board: _boardWith5Tiles(),
-        score: 0,
-        highScore: 0,
-        isGameOver: false,
-        hasWon: false,
-        maxLevel: 1,
-      ),
-    );
+    harness.container
+        .read(gameProvider.notifier)
+        .debugSetState(
+          GameState(
+            board: _boardWith5Tiles(),
+            score: 0,
+            highScore: 0,
+            isGameOver: false,
+            hasWon: false,
+            maxLevel: 1,
+          ),
+        );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
@@ -168,8 +183,11 @@ final useBomb3DuringGameScenario = E2EScenario(
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(tester.readGame(harness).bombMode, equals(BombMode.bomb3),
-        reason: 'após confirmar, deve ativar BombMode.bomb3');
+    expect(
+      tester.readGame(harness).bombMode,
+      equals(BombMode.bomb3),
+      reason: 'após confirmar, deve ativar BombMode.bomb3',
+    );
     expect(find.byKey(const Key('game_board')), findsOneWidget);
   },
 );

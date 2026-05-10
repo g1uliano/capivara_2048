@@ -66,11 +66,17 @@ class ShopScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 12),
-            ...const [ItemType.bomb3, ItemType.undo3, ItemType.bomb2, ItemType.undo1]
-                .map((item) => Padding(
-                      padding: EdgeInsets.only(bottom: 6),
-                      child: ShopUnitItemCard(item: item),
-                    )),
+            ...const [
+              ItemType.bomb3,
+              ItemType.undo3,
+              ItemType.bomb2,
+              ItemType.undo1,
+            ].map(
+              (item) => Padding(
+                padding: EdgeInsets.only(bottom: 6),
+                child: ShopUnitItemCard(item: item),
+              ),
+            ),
           ],
         ),
       ),
@@ -98,20 +104,28 @@ class ShopScreen extends ConsumerWidget {
       // In dev: also generate a local share code for testing the gift flow
       const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
       if (flavor != 'prd') {
-        unawaited(ref.read(shareCodesProvider.notifier).add(ShareCode(
-          code: 'DEV-${DateTime.now().millisecondsSinceEpoch % 10000}-AB',
-          packageId: package.id,
-          giftContents: package.giftContents,
-          status: ShareCodeStatus.pending,
-          createdAt: DateTime.now(),
-        )));
+        unawaited(
+          ref
+              .read(shareCodesProvider.notifier)
+              .add(
+                ShareCode(
+                  code:
+                      'DEV-${DateTime.now().millisecondsSinceEpoch % 10000}-AB',
+                  packageId: package.id,
+                  giftContents: package.giftContents,
+                  status: ShareCodeStatus.pending,
+                  createdAt: DateTime.now(),
+                ),
+              ),
+        );
       }
       if (context.mounted) {
         await PurchaseSuccessSheet.show(context, result.shareCode!);
       }
     } else if (result.error != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro na compra: ${result.error}')));
+        SnackBar(content: Text('Erro na compra: ${result.error}')),
+      );
     }
     // cancelled → do nothing
   }

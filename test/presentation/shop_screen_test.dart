@@ -23,7 +23,9 @@ Future<void> _initHive() async {
   _tempDir = await Directory.systemTemp.createTemp('shop_test');
   Hive.init(_tempDir.path);
   if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(LivesStateAdapter());
-  if (!Hive.isAdapterRegistered(2)) Hive.registerAdapter(InventoryHiveAdapter());
+  if (!Hive.isAdapterRegistered(2)) {
+    Hive.registerAdapter(InventoryHiveAdapter());
+  }
 }
 
 Future<void> _teardownHive() async {
@@ -86,7 +88,9 @@ void main() {
     expect(find.textContaining('Confirmar —'), findsOneWidget);
   });
 
-  testWidgets('cancelar IAPConfirmationSheet → sem PurchaseSuccessSheet', (tester) async {
+  testWidgets('cancelar IAPConfirmationSheet → sem PurchaseSuccessSheet', (
+    tester,
+  ) async {
     await tester.pumpWidget(_buildShop());
     await tester.pumpAndSettle();
 
@@ -98,19 +102,24 @@ void main() {
     expect(find.text('Compra realizada!'), findsNothing);
   });
 
-  testWidgets('confirmar compra p1 → PurchaseSuccessSheet aparece após confirmação', (tester) async {
-    await tester.pumpWidget(_buildShop());
-    await tester.pumpAndSettle();
+  testWidgets(
+    'confirmar compra p1 → PurchaseSuccessSheet aparece após confirmação',
+    (tester) async {
+      await tester.pumpWidget(_buildShop());
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.widgetWithText(ElevatedButton, 'Comprar').first);
-    await tester.pumpAndSettle();
-    await tester.tap(find.textContaining('Confirmar —'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Comprar').first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.textContaining('Confirmar —'));
+      await tester.pumpAndSettle();
 
-    expect(find.text('Compra realizada!'), findsOneWidget);
-  });
+      expect(find.text('Compra realizada!'), findsOneWidget);
+    },
+  );
 
-  testWidgets('PurchaseSuccessSheet → shareCode da FakeIAPService visível', (tester) async {
+  testWidgets('PurchaseSuccessSheet → shareCode da FakeIAPService visível', (
+    tester,
+  ) async {
     await tester.pumpWidget(_buildShop());
     await tester.pumpAndSettle();
 
@@ -122,7 +131,9 @@ void main() {
     expect(find.text('CAPIVARA-1234-AB'), findsOneWidget);
   });
 
-  testWidgets('botão Copiar → snackbar "Código copiado!" aparece', (tester) async {
+  testWidgets('botão Copiar → snackbar "Código copiado!" aparece', (
+    tester,
+  ) async {
     await tester.pumpWidget(_buildShop());
     await tester.pumpAndSettle();
 
@@ -137,7 +148,9 @@ void main() {
     expect(find.text('Código copiado!'), findsOneWidget);
   });
 
-  testWidgets('seção Itens avulsos presente abaixo dos pacotes', (tester) async {
+  testWidgets('seção Itens avulsos presente abaixo dos pacotes', (
+    tester,
+  ) async {
     await tester.pumpWidget(_buildShop());
     await tester.pumpAndSettle();
     await tester.dragUntilVisible(
@@ -177,7 +190,9 @@ void main() {
     expect(find.text('R\$ 0,49'), findsOneWidget);
   });
 
-  testWidgets('tap Comprar item avulso → IAPConfirmationSheet aparece', (tester) async {
+  testWidgets('tap Comprar item avulso → IAPConfirmationSheet aparece', (
+    tester,
+  ) async {
     await tester.pumpWidget(_buildShop());
     await tester.pumpAndSettle();
     await tester.dragUntilVisible(

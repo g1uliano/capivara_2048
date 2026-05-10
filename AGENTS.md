@@ -132,7 +132,7 @@ Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 4
 | 4.2 ✅    | Exclusão de conta LGPD, nome no cadastro, editar nome, trocar/esqueci senha, persistência avatar tile, auth gates (startup, shop, daily, ranking), sync game records |
 | 4.3 ✅    | Ranking Global (aba + dialogs pós-milestone), recompensas por recorde pessoal/convite, tabela semanal revisada, flavor audit                                         |
 | 4.4 ✅    | Tutorial wizard interativo: TutorialScreen (5 telas, 2 interativas), TutorialMiniBoard, tutorialCompleted no PlayerProfile                                           |
-| 4.5 ✅    | Polimento: Bomba 3 ≥5 peças, IAP real em dev/overlay/loja, haptic graduado, texto "Ok" pós-ad |
+| 4.5 ✅    | Polimento: Bomba 3 ≥5 peças, IAP real em dev/overlay/loja, haptic graduado, texto "Ok" pós-ad                                                                        |
 | 5         | Arte adicional e polimento visual (logo, ícone, splash final)                                                                                                        |
 | 6         | Áudio (sound design dos 13 animais, SFX, música)                                                                                                                     |
 | 7         | Polimento, l10n, acessibilidade, lançamento                                                                                                                          |

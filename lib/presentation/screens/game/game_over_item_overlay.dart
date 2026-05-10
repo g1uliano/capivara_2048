@@ -11,28 +11,33 @@ import '../../../domain/lives/lives_notifier.dart';
 import '../../../presentation/controllers/game_notifier.dart';
 
 String _pngFor(ItemType t) => switch (t) {
-      ItemType.bomb2 => 'assets/images/inventory/bomb_2.png',
-      ItemType.bomb3 => 'assets/images/inventory/bomb_3.png',
-      ItemType.undo1 => 'assets/images/inventory/undo_1.png',
-      ItemType.undo3 => 'assets/images/inventory/undo_3.png',
-    };
+  ItemType.bomb2 => 'assets/images/inventory/bomb_2.png',
+  ItemType.bomb3 => 'assets/images/inventory/bomb_3.png',
+  ItemType.undo1 => 'assets/images/inventory/undo_1.png',
+  ItemType.undo3 => 'assets/images/inventory/undo_3.png',
+};
 
 String _nameFor(ItemType t) => switch (t) {
-      ItemType.bomb2 => 'Bomba 2',
-      ItemType.bomb3 => 'Bomba 3',
-      ItemType.undo1 => 'Desfazer 1',
-      ItemType.undo3 => 'Desfazer 3',
-    };
+  ItemType.bomb2 => 'Bomba 2',
+  ItemType.bomb3 => 'Bomba 3',
+  ItemType.undo1 => 'Desfazer 1',
+  ItemType.undo3 => 'Desfazer 3',
+};
 
 String _descFor(ItemType t) => switch (t) {
-      ItemType.bomb2 => 'Remove 2 casas adjacentes',
-      ItemType.bomb3 => 'Remove 3 casas à sua escolha',
-      ItemType.undo1 => 'Desfaz a última jogada',
-      ItemType.undo3 => 'Desfaz as últimas 3 jogadas',
-    };
+  ItemType.bomb2 => 'Remove 2 casas adjacentes',
+  ItemType.bomb3 => 'Remove 3 casas à sua escolha',
+  ItemType.undo1 => 'Desfaz a última jogada',
+  ItemType.undo3 => 'Desfaz as últimas 3 jogadas',
+};
 
 List<ItemType> _availableItems(Inventory inv) {
-  const priority = [ItemType.undo3, ItemType.undo1, ItemType.bomb3, ItemType.bomb2];
+  const priority = [
+    ItemType.undo3,
+    ItemType.undo1,
+    ItemType.bomb3,
+    ItemType.bomb2,
+  ];
   return priority.where((t) => inv.count(t) > 0).toList();
 }
 
@@ -40,7 +45,8 @@ class GameOverItemOverlay extends ConsumerStatefulWidget {
   const GameOverItemOverlay({super.key});
 
   @override
-  ConsumerState<GameOverItemOverlay> createState() => _GameOverItemOverlayState();
+  ConsumerState<GameOverItemOverlay> createState() =>
+      _GameOverItemOverlayState();
 }
 
 class _GameOverItemOverlayState extends ConsumerState<GameOverItemOverlay>
@@ -51,16 +57,17 @@ class _GameOverItemOverlayState extends ConsumerState<GameOverItemOverlay>
   @override
   void initState() {
     super.initState();
-    _hapticController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    )
-      ..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          maybeHaptic(() => ref.read(settingsProvider).hapticEnabled);
-        }
-      })
-      ..repeat();
+    _hapticController =
+        AnimationController(
+            vsync: this,
+            duration: const Duration(milliseconds: 800),
+          )
+          ..addStatusListener((status) {
+            if (status == AnimationStatus.completed) {
+              maybeHaptic(() => ref.read(settingsProvider).hapticEnabled);
+            }
+          })
+          ..repeat();
   }
 
   @override
@@ -129,7 +136,11 @@ class _GameOverItemOverlayState extends ConsumerState<GameOverItemOverlay>
             children: [
               const Text(
                 'Oh não! O tabuleiro travou!',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF3E2723)),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF3E2723),
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
@@ -138,11 +149,20 @@ class _GameOverItemOverlayState extends ConsumerState<GameOverItemOverlay>
                     key: ValueKey(safeIndex),
                     onPlay: (c) => c.repeat(reverse: true),
                   )
-                  .fade(begin: 1.0, end: 0.4, duration: 400.ms, curve: Curves.easeInOut),
+                  .fade(
+                    begin: 1.0,
+                    end: 0.4,
+                    duration: 400.ms,
+                    curve: Curves.easeInOut,
+                  ),
               const SizedBox(height: 12),
               Text(
                 _nameFor(item),
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Color(0xFF3E2723)),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF3E2723),
+                ),
               ),
               const SizedBox(height: 4),
               Text(
@@ -159,9 +179,14 @@ class _GameOverItemOverlayState extends ConsumerState<GameOverItemOverlay>
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF8C42)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF8C42),
+                  ),
                   onPressed: () => _useItem(item),
-                  child: const Text('Usar item', style: TextStyle(color: Colors.white)),
+                  child: const Text(
+                    'Usar item',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
@@ -169,7 +194,9 @@ class _GameOverItemOverlayState extends ConsumerState<GameOverItemOverlay>
                 width: double.infinity,
                 child: isLast
                     ? TextButton(
-                        style: TextButton.styleFrom(foregroundColor: const Color(0xFFEF5350)),
+                        style: TextButton.styleFrom(
+                          foregroundColor: const Color(0xFFEF5350),
+                        ),
                         onPressed: _giveUp,
                         child: const Text('Desistir'),
                       )

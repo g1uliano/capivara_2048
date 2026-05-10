@@ -22,7 +22,9 @@ Future<void> _initHive() async {
   _tempDir = await Directory.systemTemp.createTemp('shop_overlay_test');
   Hive.init(_tempDir.path);
   if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(LivesStateAdapter());
-  if (!Hive.isAdapterRegistered(2)) Hive.registerAdapter(InventoryHiveAdapter());
+  if (!Hive.isAdapterRegistered(2)) {
+    Hive.registerAdapter(InventoryHiveAdapter());
+  }
 }
 
 Future<void> _teardownHive() async {
@@ -68,7 +70,9 @@ Widget _buildOverlay({
 }
 
 void main() {
-  setUp(() async { await _initHive(); });
+  setUp(() async {
+    await _initHive();
+  });
   tearDown(_teardownHive);
 
   testWidgets('exibe 6 ShopPackageCard', (tester) async {
@@ -80,8 +84,13 @@ void main() {
   testWidgets('bomb3: pacotes p1 e p6 têm highlighted:true', (tester) async {
     await tester.pumpWidget(_buildOverlay(itemType: ItemType.bomb3));
     await tester.pumpAndSettle();
-    final cards = tester.widgetList<ShopPackageCard>(find.byType(ShopPackageCard)).toList();
-    final highlightedIds = cards.where((c) => c.highlighted).map((c) => c.package.id).toSet();
+    final cards = tester
+        .widgetList<ShopPackageCard>(find.byType(ShopPackageCard))
+        .toList();
+    final highlightedIds = cards
+        .where((c) => c.highlighted)
+        .map((c) => c.package.id)
+        .toSet();
     expect(highlightedIds, {'p1', 'p6'});
   });
 
@@ -111,15 +120,18 @@ void main() {
 
   testWidgets('compra chama onItemPurchased', (tester) async {
     ItemType? purchased;
-    await tester.pumpWidget(_buildOverlay(
-      itemType: ItemType.bomb3,
-      onItemPurchased: (t) => purchased = t,
-    ));
+    await tester.pumpWidget(
+      _buildOverlay(
+        itemType: ItemType.bomb3,
+        onItemPurchased: (t) => purchased = t,
+      ),
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(ElevatedButton, 'Comprar').first);
     await tester.pumpAndSettle();
     await tester.tap(find.textContaining('Confirmar'));
-    await tester.pumpAndSettle(); // settles FakeIAPService delay + PurchaseSuccessSheet open
+    await tester
+        .pumpAndSettle(); // settles FakeIAPService delay + PurchaseSuccessSheet open
     // Dismiss PurchaseSuccessSheet so onItemPurchased is called
     await tester.tap(find.widgetWithText(ElevatedButton, 'Continuar jogando'));
     await tester.pumpAndSettle();

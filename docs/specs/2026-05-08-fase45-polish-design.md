@@ -8,13 +8,13 @@
 
 ## 1. Escopo
 
-| # | Feature | Área |
-|---|---------|------|
-| 1 | Bomba 3 requer ≥ 5 peças no tabuleiro + aviso visual | Game rules / UI |
-| 2 | Shop overlay com IAP real (mesmo fluxo da loja principal) | IAP / Shop |
-| 3 | Loja principal — itens avulsos com IAP real em `dev` | IAP / Shop |
-| 4 | Texto "Ok" após assistir anúncio e dobrar recompensa | UI (1 linha) |
-| 5 | Haptic feedback graduado em level-up, milestones e game over | Feedback tátil |
+| #   | Feature                                                      | Área            |
+| --- | ------------------------------------------------------------ | --------------- |
+| 1   | Bomba 3 requer ≥ 5 peças no tabuleiro + aviso visual         | Game rules / UI |
+| 2   | Shop overlay com IAP real (mesmo fluxo da loja principal)    | IAP / Shop      |
+| 3   | Loja principal — itens avulsos com IAP real em `dev`         | IAP / Shop      |
+| 4   | Texto "Ok" após assistir anúncio e dobrar recompensa         | UI (1 linha)    |
+| 5   | Haptic feedback graduado em level-up, milestones e game over | Feedback tátil  |
 
 ---
 
@@ -85,6 +85,7 @@ InventoryItemButton(
 ### Visual do aviso
 
 Usa `showCannotUseItemDialog` existente em `lib/presentation/widgets/cannot_use_item_dialog.dart`:
+
 - Ícone de bomba (`bomb_3.png`) em grayscale na esquerda do título
 - Título "Ops! 🙈" (Fredoka bold laranja)
 - Mensagem com o texto acima (Nunito 16)
@@ -127,11 +128,11 @@ void maybeHaptic(Ref ref, {HapticIntensity intensity = HapticIntensity.light}) {
 
 No método `move()`, após calcular `after` e antes de `state = after`:
 
-| Evento | Condição | Intensidade |
-|--------|----------|-------------|
-| Troca de anfitrião (level-up) | `after.maxLevel > state.maxLevel` | `light` |
-| Milestone atingido (2048/4096/8192) | `after.pendingMilestone != null && state.pendingMilestone == null` | `medium` |
-| Game over | `after.isGameOver && !state.isGameOver` | `heavy` |
+| Evento                              | Condição                                                           | Intensidade |
+| ----------------------------------- | ------------------------------------------------------------------ | ----------- |
+| Troca de anfitrião (level-up)       | `after.maxLevel > state.maxLevel`                                  | `light`     |
+| Milestone atingido (2048/4096/8192) | `after.pendingMilestone != null && state.pendingMilestone == null` | `medium`    |
+| Game over                           | `after.isGameOver && !state.isGameOver`                            | `heavy`     |
 
 ```dart
 // Em move(), antes de state = after:
@@ -307,12 +308,12 @@ Future<void> _onBuy(ShopPackage package) async {
 
 ### 5.5 Flavor rules (resultado final)
 
-| Flavor | `IAPService` | Comportamento |
-|--------|-------------|---------------|
-| `prd` | `IAPServiceImpl` | IAP real (Google Play / App Store) |
-| `dev` | `IAPServiceImpl` | IAP real (sandbox Google Play) |
-| `tst` | `FakeIAPService` | Fake — sucesso instantâneo, sem network |
-| `tst` + `USE_REAL_IAP=true` | `IAPServiceImpl` | Real (smoke em CI) |
+| Flavor                      | `IAPService`     | Comportamento                           |
+| --------------------------- | ---------------- | --------------------------------------- |
+| `prd`                       | `IAPServiceImpl` | IAP real (Google Play / App Store)      |
+| `dev`                       | `IAPServiceImpl` | IAP real (sandbox Google Play)          |
+| `tst`                       | `FakeIAPService` | Fake — sucesso instantâneo, sem network |
+| `tst` + `USE_REAL_IAP=true` | `IAPServiceImpl` | Real (smoke em CI)                      |
 
 `iapServiceProvider` já implementa essa lógica — **nenhuma mudança** no provider.
 
@@ -331,18 +332,18 @@ Conteúdo:
 
 ### Produtos registrados
 
-| ID do produto | Tipo | Preço | Conteúdo |
-|--------------|------|-------|---------|
-| `p1` | Consumível | R$ 3,99 | 4× Bomba 3 |
-| `p2` | Consumível | R$ 1,99 | 4× Desfazer 3 |
-| `p3` | Consumível | R$ 2,49 | 6 Vidas |
-| `p4` | Consumível | R$ 4,99 | 10 Vidas |
-| `p5` | Consumível | R$ 4,99 | Combo Mata Atlântica |
-| `p6` | Consumível | R$ 9,99 | Combo Floresta Amazônica |
-| `u_bomb3` | Consumível | R$ 1,99 | 1× Bomba 3 |
-| `u_undo3` | Consumível | R$ 0,99 | 1× Desfazer 3 |
-| `u_bomb2` | Consumível | R$ 1,19 | 1× Bomba 2 |
-| `u_undo1` | Consumível | R$ 0,49 | 1× Desfazer 1 |
+| ID do produto | Tipo       | Preço   | Conteúdo                 |
+| ------------- | ---------- | ------- | ------------------------ |
+| `p1`          | Consumível | R$ 3,99 | 4× Bomba 3               |
+| `p2`          | Consumível | R$ 1,99 | 4× Desfazer 3            |
+| `p3`          | Consumível | R$ 2,49 | 6 Vidas                  |
+| `p4`          | Consumível | R$ 4,99 | 10 Vidas                 |
+| `p5`          | Consumível | R$ 4,99 | Combo Mata Atlântica     |
+| `p6`          | Consumível | R$ 9,99 | Combo Floresta Amazônica |
+| `u_bomb3`     | Consumível | R$ 1,99 | 1× Bomba 3               |
+| `u_undo3`     | Consumível | R$ 0,99 | 1× Desfazer 3            |
+| `u_bomb2`     | Consumível | R$ 1,19 | 1× Bomba 2               |
+| `u_undo1`     | Consumível | R$ 0,49 | 1× Desfazer 1            |
 
 ### Google Play Console
 
@@ -373,18 +374,18 @@ Usa `FakeIAPService` — nenhuma configuração de loja necessária. Para smoke 
 
 ## 7. Mapa de arquivos
 
-| Arquivo | Ação |
-|---------|------|
-| `lib/presentation/widgets/daily_reward_overlay.dart` | Modificar — texto condicional Ok/Não obrigado |
-| `lib/presentation/widgets/inventory_bar.dart` | Modificar — forceDisabled + onTapWhenDisabled na Bomba 3 |
-| `lib/core/utils/haptic_utils.dart` | Modificar — enum HapticIntensity + assinatura Ref |
-| `lib/presentation/controllers/game_notifier.dart` | Modificar — 3 triggers de haptic em move() |
-| `lib/data/shop_data.dart` | Modificar — kShopUnitPackages + kUnitPackageByType |
-| `lib/core/utils/iap_delivery.dart` | **Criar** — deliverIAPItems helper |
-| `lib/presentation/widgets/shop_unit_item_card.dart` | Modificar — fluxo IAP completo |
-| `lib/presentation/widgets/shop_overlay.dart` | Modificar — fluxo IAP completo |
-| `lib/presentation/screens/shop_screen.dart` | Modificar — remover _deliverItemsLocally, usar helper |
-| `docs/IAP.md` | **Criar** — documentação de configuração IAP |
+| Arquivo                                              | Ação                                                     |
+| ---------------------------------------------------- | -------------------------------------------------------- |
+| `lib/presentation/widgets/daily_reward_overlay.dart` | Modificar — texto condicional Ok/Não obrigado            |
+| `lib/presentation/widgets/inventory_bar.dart`        | Modificar — forceDisabled + onTapWhenDisabled na Bomba 3 |
+| `lib/core/utils/haptic_utils.dart`                   | Modificar — enum HapticIntensity + assinatura Ref        |
+| `lib/presentation/controllers/game_notifier.dart`    | Modificar — 3 triggers de haptic em move()               |
+| `lib/data/shop_data.dart`                            | Modificar — kShopUnitPackages + kUnitPackageByType       |
+| `lib/core/utils/iap_delivery.dart`                   | **Criar** — deliverIAPItems helper                       |
+| `lib/presentation/widgets/shop_unit_item_card.dart`  | Modificar — fluxo IAP completo                           |
+| `lib/presentation/widgets/shop_overlay.dart`         | Modificar — fluxo IAP completo                           |
+| `lib/presentation/screens/shop_screen.dart`          | Modificar — remover \_deliverItemsLocally, usar helper   |
+| `docs/IAP.md`                                        | **Criar** — documentação de configuração IAP             |
 
 ---
 

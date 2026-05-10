@@ -21,7 +21,9 @@ Future<void> _initHive() async {
   _tempDir = await Directory.systemTemp.createTemp('no_items_test');
   Hive.init(_tempDir.path);
   if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(LivesStateAdapter());
-  if (!Hive.isAdapterRegistered(2)) Hive.registerAdapter(InventoryHiveAdapter());
+  if (!Hive.isAdapterRegistered(2)) {
+    Hive.registerAdapter(InventoryHiveAdapter());
+  }
 }
 
 Future<void> _teardownHive() async {
@@ -37,9 +39,7 @@ Widget _buildOverlay({AdService? adService}) {
       iapServiceProvider.overrideWithValue(FakeIAPService()),
       if (adService != null) adServiceProvider.overrideWithValue(adService),
     ],
-    child: const MaterialApp(
-      home: Scaffold(body: GameOverNoItemsOverlay()),
-    ),
+    child: const MaterialApp(home: Scaffold(body: GameOverNoItemsOverlay())),
   );
 }
 
@@ -133,7 +133,9 @@ void main() {
     expect(find.textContaining('não possui mais itens'), findsNothing);
   });
 
-  testWidgets('watch ad → item delivered (FakeAdService returns true)', (tester) async {
+  testWidgets('watch ad → item delivered (FakeAdService returns true)', (
+    tester,
+  ) async {
     await tester.pumpWidget(_buildOverlay(adService: FakeAdService()));
     await tester.pumpAndSettle();
     await tester.tap(find.textContaining('Ver anúncio'));

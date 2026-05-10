@@ -27,7 +27,9 @@ ProviderContainer _createContainer() {
   final fakePrefs = _FakePrefs();
   return ProviderContainer(
     overrides: [
-      personalRecordsProvider.overrideWith(() => _FakePersonalRecordsNotifier()),
+      personalRecordsProvider.overrideWith(
+        () => _FakePersonalRecordsNotifier(),
+      ),
       sharedPreferencesProvider.overrideWithValue(fakePrefs),
     ],
   );

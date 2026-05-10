@@ -12,21 +12,34 @@ void main() {
     test('registerInvite links invitee to inviter', () async {
       final svc = FakeInviteService();
       await svc.registerInvite(
-          inviterId: 'alice', inviteeId: 'bob', inviteeDisplayName: 'Bob');
+        inviterId: 'alice',
+        inviteeId: 'bob',
+        inviteeDisplayName: 'Bob',
+      );
       final result = await svc.completeInviteReward(
-          inviteeId: 'bob', inviteeDisplayName: 'Bob');
+        inviteeId: 'bob',
+        inviteeDisplayName: 'Bob',
+      );
       expect(result, isTrue);
     });
 
     test('second registerInvite for same inviteeId is no-op', () async {
       final svc = FakeInviteService();
       await svc.registerInvite(
-          inviterId: 'alice', inviteeId: 'bob', inviteeDisplayName: 'Bob');
+        inviterId: 'alice',
+        inviteeId: 'bob',
+        inviteeDisplayName: 'Bob',
+      );
       await svc.registerInvite(
-          inviterId: 'carol', inviteeId: 'bob', inviteeDisplayName: 'Bob');
+        inviterId: 'carol',
+        inviteeId: 'bob',
+        inviteeDisplayName: 'Bob',
+      );
       // bob still linked to alice — complete returns true
       final result = await svc.completeInviteReward(
-          inviteeId: 'bob', inviteeDisplayName: 'Bob');
+        inviteeId: 'bob',
+        inviteeDisplayName: 'Bob',
+      );
       expect(result, isTrue);
       expect(svc.lastCompleteResult, isTrue);
     });
@@ -34,7 +47,9 @@ void main() {
     test('completeInviteReward returns false with no pending invite', () async {
       final svc = FakeInviteService();
       final result = await svc.completeInviteReward(
-          inviteeId: 'nobody', inviteeDisplayName: 'Nobody');
+        inviteeId: 'nobody',
+        inviteeDisplayName: 'Nobody',
+      );
       expect(result, isFalse);
     });
   });

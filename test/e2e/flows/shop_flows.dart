@@ -71,8 +71,11 @@ final shopPurchaseItemScenario = E2EScenario(
     // ShopPackageCard renders ElevatedButton with text 'Comprar'.
     // SingleChildScrollView renders all cards regardless of viewport.
     final buyButtons = find.text('Comprar');
-    expect(buyButtons, findsWidgets,
-        reason: 'ShopOverlay deve exibir pelo menos um botão "Comprar"');
+    expect(
+      buyButtons,
+      findsWidgets,
+      reason: 'ShopOverlay deve exibir pelo menos um botão "Comprar"',
+    );
     await tester.tap(buyButtons.first);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
@@ -86,16 +89,21 @@ final shopPurchaseItemScenario = E2EScenario(
 
     // State is updated after deliverIAPItems — verify after settling.
     final inventoryAfter = harness.container.read(inventoryProvider);
-    final totalBefore = inventoryBefore.bomb2 +
+    final totalBefore =
+        inventoryBefore.bomb2 +
         inventoryBefore.bomb3 +
         inventoryBefore.undo1 +
         inventoryBefore.undo3;
-    final totalAfter = inventoryAfter.bomb2 +
+    final totalAfter =
+        inventoryAfter.bomb2 +
         inventoryAfter.bomb3 +
         inventoryAfter.undo1 +
         inventoryAfter.undo3;
-    expect(totalAfter, greaterThan(totalBefore),
-        reason: 'compra deve incrementar pelo menos um item no inventário');
+    expect(
+      totalAfter,
+      greaterThan(totalBefore),
+      reason: 'compra deve incrementar pelo menos um item no inventário',
+    );
 
     // Remove PauseOverlay (BackdropFilter) before pumping: _openShop() called
     // pause() so the overlay is still open. BackdropFilter causes pump(Duration)

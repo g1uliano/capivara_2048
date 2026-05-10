@@ -11,21 +11,25 @@ import 'purchase_success_sheet.dart';
 class ShopUnitItemCard extends ConsumerWidget {
   final ItemType item;
   final bool highlighted;
-  const ShopUnitItemCard({super.key, required this.item, this.highlighted = false});
+  const ShopUnitItemCard({
+    super.key,
+    required this.item,
+    this.highlighted = false,
+  });
 
   String get _png => switch (item) {
-        ItemType.bomb2 => 'assets/images/inventory/bomb_2.png',
-        ItemType.bomb3 => 'assets/images/inventory/bomb_3.png',
-        ItemType.undo1 => 'assets/images/inventory/undo_1.png',
-        ItemType.undo3 => 'assets/images/inventory/undo_3.png',
-      };
+    ItemType.bomb2 => 'assets/images/inventory/bomb_2.png',
+    ItemType.bomb3 => 'assets/images/inventory/bomb_3.png',
+    ItemType.undo1 => 'assets/images/inventory/undo_1.png',
+    ItemType.undo3 => 'assets/images/inventory/undo_3.png',
+  };
 
   String get _name => switch (item) {
-        ItemType.bomb2 => 'Bomba 2',
-        ItemType.bomb3 => 'Bomba 3',
-        ItemType.undo1 => 'Desfazer 1',
-        ItemType.undo3 => 'Desfazer 3',
-      };
+    ItemType.bomb2 => 'Bomba 2',
+    ItemType.bomb3 => 'Bomba 3',
+    ItemType.undo1 => 'Desfazer 1',
+    ItemType.undo3 => 'Desfazer 3',
+  };
 
   String get _price {
     final p = kItemUnitPrices[item] ?? 0.0;
@@ -72,9 +76,7 @@ class ShopUnitItemCard extends ConsumerWidget {
           children: [
             Image.asset(_png, width: 40, height: 40),
             const SizedBox(width: 8),
-            Expanded(
-              child: Text(_name, style: const TextStyle(fontSize: 16)),
-            ),
+            Expanded(child: Text(_name, style: const TextStyle(fontSize: 16))),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF8C42),

@@ -25,7 +25,9 @@ class InventoryBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final inventory = ref.watch(inventoryProvider);
-    final undoStackLen = ref.watch(gameProvider.select((s) => s.undoStack.length));
+    final undoStackLen = ref.watch(
+      gameProvider.select((s) => s.undoStack.length),
+    );
     final tileCount = ref.watch(
       gameProvider.select(
         (s) => s.board.expand((row) => row).whereType<Tile>().length,
@@ -40,7 +42,9 @@ class InventoryBar extends ConsumerWidget {
         pngPath: 'assets/images/inventory/bomb_2.png',
       );
       if (!ok) return;
-      ref.read(gameProvider.notifier).enterBombMode(BombMode.bomb2, ItemType.bomb2);
+      ref
+          .read(gameProvider.notifier)
+          .enterBombMode(BombMode.bomb2, ItemType.bomb2);
     }
 
     Future<void> useBomb3() async {
@@ -51,7 +55,9 @@ class InventoryBar extends ConsumerWidget {
         pngPath: 'assets/images/inventory/bomb_3.png',
       );
       if (!ok) return;
-      ref.read(gameProvider.notifier).enterBombMode(BombMode.bomb3, ItemType.bomb3);
+      ref
+          .read(gameProvider.notifier)
+          .enterBombMode(BombMode.bomb3, ItemType.bomb3);
     }
 
     Future<void> useUndo1() async {
@@ -107,7 +113,8 @@ class InventoryBar extends ConsumerWidget {
             forceDisabled: inventory.bomb3 > 0 && tileCount < 5,
             onTapWhenDisabled: () => showCannotUseItemDialog(
               context: context,
-              message: 'São necessárias pelo menos 5 peças no tabuleiro para usar a Bomba 3.',
+              message:
+                  'São necessárias pelo menos 5 peças no tabuleiro para usar a Bomba 3.',
               pngPath: 'assets/images/inventory/bomb_3.png',
             ),
             onTapWhenEmpty: inventory.bomb3 == 0 && onTapWhenEmpty != null
@@ -122,7 +129,9 @@ class InventoryBar extends ConsumerWidget {
             pngPath: 'assets/images/inventory/undo_1.png',
             count: inventory.undo1,
             size: iconSize,
-            onPressed: inventory.undo1 > 0 && undoStackLen >= 1 ? useUndo1 : null,
+            onPressed: inventory.undo1 > 0 && undoStackLen >= 1
+                ? useUndo1
+                : null,
             forceDisabled: inventory.undo1 > 0 && undoStackLen < 1,
             onTapWhenDisabled: () => showCannotUseItemDialog(
               context: context,
@@ -141,11 +150,14 @@ class InventoryBar extends ConsumerWidget {
             pngPath: 'assets/images/inventory/undo_3.png',
             count: inventory.undo3,
             size: iconSize,
-            onPressed: inventory.undo3 > 0 && undoStackLen >= 3 ? useUndo3 : null,
+            onPressed: inventory.undo3 > 0 && undoStackLen >= 3
+                ? useUndo3
+                : null,
             forceDisabled: inventory.undo3 > 0 && undoStackLen < 3,
             onTapWhenDisabled: () => showCannotUseItemDialog(
               context: context,
-              message: 'São necessárias pelo menos 3 jogadas para usar o Desfazer 3.',
+              message:
+                  'São necessárias pelo menos 3 jogadas para usar o Desfazer 3.',
               pngPath: 'assets/images/inventory/undo_3.png',
             ),
             onTapWhenEmpty: inventory.undo3 == 0 && onTapWhenEmpty != null
