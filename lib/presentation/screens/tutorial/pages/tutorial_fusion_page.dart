@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:capivara_2048/data/models/tile.dart';
 import 'package:capivara_2048/domain/game_engine/direction.dart' as game;
 import '../../../widgets/outlined_text.dart';
+import '../../../widgets/glass_panel.dart';
 import '../widgets/tutorial_mini_board.dart';
 
 class TutorialFusionPage extends StatefulWidget {
@@ -25,19 +26,31 @@ class _TutorialFusionPageState extends State<TutorialFusionPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          OutlinedText(
-            text: 'Iguais se fundem!',
-            style: GoogleFonts.fredoka(
-              fontSize: 26,
-              fontWeight: FontWeight.w600,
+          GlassPanel(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Column(
+              children: [
+                Text(
+                  'Iguais se fundem!',
+                  style: GoogleFonts.fredoka(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Quando dois bichos do mesmo tipo se encontram, eles se transformam num bicho mais raro. Tente fundir as duas tanajuras.',
+                  style: GoogleFonts.fredoka(
+                    fontSize: 16,
+                    height: 1.5,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 16),
-          OutlinedText(
-            text:
-                'Quando dois bichos do mesmo tipo se encontram, eles se transformam num bicho mais raro. Tente fundir as duas tanajuras.',
-            style: GoogleFonts.fredoka(fontSize: 16, height: 1.5),
-            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 32),
           TutorialMiniBoard(

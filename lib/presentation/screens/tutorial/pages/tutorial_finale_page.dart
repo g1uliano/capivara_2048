@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../widgets/outlined_text.dart';
+import '../../../widgets/glass_panel.dart';
 
 class TutorialFinalePage extends StatelessWidget {
   const TutorialFinalePage({super.key});
@@ -27,22 +27,30 @@ class TutorialFinalePage extends StatelessWidget {
                 curve: Curves.easeInOut,
               ),
           const SizedBox(height: 24),
-          OutlinedText(
-            text: 'A Capivara Lendária te espera',
-            style: GoogleFonts.fredoka(
-              fontSize: 26,
-              fontWeight: FontWeight.w600,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: OutlinedText(
-              text:
-                  'Funda animais, evolua a floresta e chegue até ela. Boa sorte, explorador!',
-              style: GoogleFonts.fredoka(fontSize: 16, height: 1.5),
-              textAlign: TextAlign.center,
+          GlassPanel(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            child: Column(
+              children: [
+                Text(
+                  'A Capivara Lendária te espera',
+                  style: GoogleFonts.fredoka(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Funda animais, explore os biomas brasileiros e chegue até ela. Boa sorte, explorador!',
+                  style: GoogleFonts.fredoka(
+                    fontSize: 16,
+                    height: 1.5,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
           ),
         ],

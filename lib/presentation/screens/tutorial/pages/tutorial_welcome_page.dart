@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../widgets/outlined_text.dart';
 import '../../../widgets/game_title_image.dart';
+import '../../../widgets/glass_panel.dart';
 
 class TutorialWelcomePage extends StatefulWidget {
   const TutorialWelcomePage({super.key});
@@ -29,21 +29,39 @@ class _TutorialWelcomePageState extends State<TutorialWelcomePage> {
         children: [
           GameTitleImage(asset: _titleAsset, height: 120),
           const SizedBox(height: 24),
-          OutlinedText(
-            text: 'Bem-vindo à floresta amazônica!',
-            style: GoogleFonts.fredoka(
-              fontSize: 26,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: OutlinedText(
-              text:
-                  'Aqui moram bichos de todo tipo — e cabe a você ajudá-los a evoluir até descobrir a lendária Capivara. Bora aprender?',
-              style: GoogleFonts.fredoka(fontSize: 16, height: 1.5),
-              textAlign: TextAlign.center,
+          GlassPanel(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            child: Column(
+              children: [
+                Text(
+                  'Bem-vindo à fauna do Brasil!',
+                  style: GoogleFonts.fredoka(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Do Cerrado à Amazônia, do Pantanal à Mata Atlântica — aqui vivem os bichos mais incríveis do Brasil. Ajude-os a evoluir e encontre a lendária Capivara!',
+                  style: GoogleFonts.fredoka(
+                    fontSize: 16,
+                    height: 1.5,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Bora aprender? 🌿',
+                  style: GoogleFonts.fredoka(
+                    fontSize: 15,
+                    color: Colors.white70,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
           ),
         ],

@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:capivara_2048/data/models/tile.dart';
 import 'package:capivara_2048/domain/game_engine/direction.dart' as game;
 import '../../../widgets/outlined_text.dart';
+import '../../../widgets/glass_panel.dart';
 import '../widgets/tutorial_mini_board.dart';
 
 class TutorialMovementPage extends StatefulWidget {
@@ -25,19 +26,31 @@ class _TutorialMovementPageState extends State<TutorialMovementPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          OutlinedText(
-            text: 'Deslize pra mover',
-            style: GoogleFonts.fredoka(
-              fontSize: 26,
-              fontWeight: FontWeight.w600,
+          GlassPanel(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Column(
+              children: [
+                Text(
+                  'Deslize pra mover',
+                  style: GoogleFonts.fredoka(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Arraste o dedo em qualquer direção pra mover todos os bichos do tabuleiro de uma vez.',
+                  style: GoogleFonts.fredoka(
+                    fontSize: 16,
+                    height: 1.5,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 16),
-          OutlinedText(
-            text:
-                'Arraste o dedo em qualquer direção pra mover todos os bichos do tabuleiro de uma vez.',
-            style: GoogleFonts.fredoka(fontSize: 16, height: 1.5),
-            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 32),
           TutorialMiniBoard(

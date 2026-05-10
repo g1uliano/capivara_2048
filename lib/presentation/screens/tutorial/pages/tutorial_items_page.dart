@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../widgets/outlined_text.dart';
+import '../../../widgets/glass_panel.dart';
 
 class TutorialItemsPage extends StatelessWidget {
   const TutorialItemsPage({super.key});
@@ -13,14 +13,19 @@ class TutorialItemsPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          OutlinedText(
-            text: 'Suas ferramentas',
-            style: GoogleFonts.fredoka(
-              fontSize: 26,
-              fontWeight: FontWeight.w600,
+          GlassPanel(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            child: Text(
+              'Suas ferramentas',
+              style: GoogleFonts.fredoka(
+                fontSize: 26,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           Card(
             color: Colors.white.withValues(alpha: 0.88),
             margin: const EdgeInsets.all(8),

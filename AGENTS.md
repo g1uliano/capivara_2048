@@ -92,6 +92,31 @@ AppBar(
 )
 ```
 
+### GlassPanel — texto sobre o fundo do jogo em blocos
+
+Quando um trecho de texto mais longo (título + parágrafo) aparece sobre o fundo do jogo, use o widget `GlassPanel` de `lib/presentation/widgets/glass_panel.dart` em vez de `OutlinedText` isolado. Ele aplica `BackdropFilter` + container esmeralda escuro translúcido com borda sutil, garantindo legibilidade sem esconder o fundo.
+
+```dart
+import '../../../widgets/glass_panel.dart';
+
+GlassPanel(
+  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+  child: Column(
+    children: [
+      Text('Título', style: GoogleFonts.fredoka(fontSize: 26, fontWeight: FontWeight.w600, color: Colors.white)),
+      const SizedBox(height: 12),
+      Text('Corpo', style: GoogleFonts.fredoka(fontSize: 16, height: 1.5, color: Colors.white)),
+    ],
+  ),
+)
+```
+
+**Regras:**
+- Texto dentro do `GlassPanel` usa `color: Colors.white` diretamente (sem outline — o fundo escuro garante legibilidade)
+- `OutlinedText` continua sendo usado para textos isolados/curtos diretamente sobre o fundo (ex: hints de swipe)
+- Não usar `OutlinedText` dentro de `GlassPanel`
+- Implementação de referência: `OnboardingAuthScreen._ContentPanel`, `InviteFriendsScreen._GlassPanel`, todas as páginas de `TutorialScreen`
+
 ### TabBar
 
 Todos os `TabBar` devem ter `labelStyle` e `unselectedLabelStyle` explícitos:
