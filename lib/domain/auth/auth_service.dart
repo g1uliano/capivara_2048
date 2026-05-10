@@ -111,7 +111,7 @@ class FakeAuthService implements AuthService {
 
 final authServiceProvider = Provider<AuthService>((ref) {
   const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
-  if (flavor == 'prd' || flavor == 'dev' || flavor == 'tst') {
+  if (flavor == 'prd' || flavor == 'dev') {
     return FirebaseAuthService();
   }
   return FakeAuthService();

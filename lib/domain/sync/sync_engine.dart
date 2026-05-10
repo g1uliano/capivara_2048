@@ -86,7 +86,7 @@ class FakeSyncEngine implements SyncEngine {
 
 final syncEngineProvider = Provider<SyncEngine>((ref) {
   const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
-  if (flavor == 'prd' || flavor == 'dev' || flavor == 'tst') {
+  if (flavor == 'prd' || flavor == 'dev') {
     return FirebaseSyncEngine();
   }
   return FakeSyncEngine();
