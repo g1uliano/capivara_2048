@@ -6,6 +6,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.8.1] — 2026-05-10
+
+### Fixed
+
+- **Home — botões Coleção e Configurações**: `Configuracao.png` tem 9.5% de transparência no topo e conteúdo visível de apenas 80.6% da altura do canvas (vs 99.4% do `Colecao.png`), fazendo o círculo de Configurações parecer ~23% menor. Corrigido aumentando `sizeConfiguracao` por fator 1.233× e ajustando `topConfiguracao` para compensar a transparência e alinhar visualmente os dois círculos.
+
 ## [1.8.0] — 2026-05-10
 
 ### Added
