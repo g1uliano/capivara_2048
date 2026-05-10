@@ -112,6 +112,7 @@ GlassPanel(
 ```
 
 **Regras:**
+
 - Texto dentro do `GlassPanel` usa `color: Colors.white` diretamente (sem outline — o fundo escuro garante legibilidade)
 - `OutlinedText` continua sendo usado para textos isolados/curtos diretamente sobre o fundo (ex: hints de swipe)
 - Não usar `OutlinedText` dentro de `GlassPanel`

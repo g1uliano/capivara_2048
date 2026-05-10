@@ -5,42 +5,37 @@
 class HomeConstants {
   HomeConstants._();
 
-  // ─── Fill ratios dos assets PNG da Home ─────────────────────────────────
-  // Fração do quadrado da imagem que contém pixels visíveis (conteúdo real).
-  // Medido via análise de canal alpha. Coleção é a referência visual (1.0×).
-  // Cada botão é redimensionado para que o conteúdo aparente seja igual.
-  static const double _fillColecao = 0.846; // referência
-  static const double _fillConfiguracao = 0.805;
-  static const double _fillRanking = 0.752;
-  static const double _fillRecompensas = 0.929;
-  static const double _fillComoJogar = 0.770;
-  static const double _fillIconeLoja = 0.730;
-
-  // ─── Tamanho base (referência = Coleção) ────────────────────────────────
-  /// Widget size para o botão de Coleção — referência visual da Home.
-  /// Todos os outros botões derivam deste valor × seu fator de normalização.
+  // ─── Tamanho base ────────────────────────────────────────────────────────
+  /// Widget size padrão dos botões da Home. Todos os 6 botões usam o mesmo
+  /// tamanho para garantir alinhamento visual entre as duas colunas.
+  /// (Os PNGs têm proporções internas diferentes — texto vs círculo —
+  /// mas isso é uma característica dos próprios assets, não do layout.)
   static double buttonSize(double scale) => (110.0 * scale).clamp(70.0, 110.0);
 
-  /// Normaliza o tamanho de um botão pelo fill do seu asset em relação à
-  /// Coleção, garantindo que todos os ícones aparentem o mesmo tamanho visual
-  /// na tela, independente das margens internas de cada PNG.
-  static double buttonSizeFor(double scale, double assetFill) =>
-      buttonSize(scale) * (_fillColecao / assetFill);
-
   // ─── Tamanhos individuais por botão ─────────────────────────────────────
-  static double sizeColecao(double scale) => buttonSize(scale); // referência
+  static double sizeColecao(double scale) => buttonSize(scale);
+
+  // Configuracao.png tem ~9.5% de espaço transparente no topo (79/829px) e
+  // conteúdo visível de apenas 80.6% da altura do canvas — vs 99.4% do Colecao.
+  // Factor 1.233 = 0.994 / 0.806 faz o círculo visual ter o mesmo tamanho.
   static double sizeConfiguracao(double scale) =>
-      buttonSizeFor(scale, _fillConfiguracao);
-  static double sizeRanking(double scale) => buttonSizeFor(scale, _fillRanking);
-  static double sizeRecompensas(double scale) =>
-      buttonSizeFor(scale, _fillRecompensas);
-  static double sizeComoJogar(double scale) =>
-      buttonSizeFor(scale, _fillComoJogar);
-  static double sizeIconeLoja(double scale) =>
-      buttonSizeFor(scale, _fillIconeLoja);
+      (buttonSize(scale) * 1.233).clamp(86.3, 135.6);
+
+  static double sizeRanking(double scale) => buttonSize(scale);
+  static double sizeRecompensas(double scale) => buttonSize(scale);
+  static double sizeComoJogar(double scale) => buttonSize(scale);
+  static double sizeIconeLoja(double scale) => buttonSize(scale);
 
   /// Padding das bordas esquerda/direita/topo para os Positioned.
   static double edgePad(double scale) => (12.0 * scale).clamp(6.0, 12.0);
+
+  /// Top offset para Configuracao — compensa a área transparente no topo do PNG
+  /// (79/829 ≈ 9.53%) para alinhar o círculo visível com o de Coleção.
+  static double topConfiguracao(double scale) =>
+      (edgePad(scale) - sizeConfiguracao(scale) * (79.0 / 829.0)).clamp(
+        0.0,
+        edgePad(scale),
+      );
 
   /// bottom dos botões da fileira superior (Recompensas / Ranking).
   static double rowTopBottom(double scale) =>

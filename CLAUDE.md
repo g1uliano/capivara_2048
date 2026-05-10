@@ -58,14 +58,15 @@ Todas as telas usam `GameBackground` com a imagem `fundo.png` (floresta amazôni
 
 **Todo texto que aparece diretamente sobre o fundo do jogo DEVE usar `GoogleFonts.fredoka()` com o tratamento de outline.**
 
-| Contexto | Font | Tratamento | Exemplo |
-|---|---|---|---|
-| Título no AppBar | `fredoka(fontSize: 22, color: Colors.white)` | `Text(...)` simples | "Configurações", "Ranking" |
-| Headers/seções no fundo | `fredoka(fontSize: 14, fontWeight: w600)` | `OutlinedText(...)` | "Gameplay", "Áudio" |
-| Mensagens/corpo no fundo | `fredoka(fontSize: 14–18)` | `outlinedWhiteTextStyle(fredoka(...))` | "Você não está conectado.", "Salve seu progresso..." |
-| Botões de ação no fundo | `fredoka(fontSize: 16–18)` | `outlinedWhiteTextStyle(fredoka(...))` | "Jogar sem conta →", "← Voltar" |
+| Contexto                 | Font                                         | Tratamento                             | Exemplo                                              |
+| ------------------------ | -------------------------------------------- | -------------------------------------- | ---------------------------------------------------- |
+| Título no AppBar         | `fredoka(fontSize: 22, color: Colors.white)` | `Text(...)` simples                    | "Configurações", "Ranking"                           |
+| Headers/seções no fundo  | `fredoka(fontSize: 14, fontWeight: w600)`    | `OutlinedText(...)`                    | "Gameplay", "Áudio"                                  |
+| Mensagens/corpo no fundo | `fredoka(fontSize: 14–18)`                   | `outlinedWhiteTextStyle(fredoka(...))` | "Você não está conectado.", "Salve seu progresso..." |
+| Botões de ação no fundo  | `fredoka(fontSize: 16–18)`                   | `outlinedWhiteTextStyle(fredoka(...))` | "Jogar sem conta →", "← Voltar"                      |
 
 Regras:
+
 - **Usar `GoogleFonts.fredoka()`** para todo texto sobre o fundo — nunca `GoogleFonts.nunito()` em texto sobre o background
 - **Usar `outlinedWhiteTextStyle()`** de `lib/core/theme/text_styles.dart` ou o widget `OutlinedText` de `lib/presentation/widgets/outlined_text.dart`
 - Nunca usar `color: Colors.white` diretamente sem sombra/outline
@@ -73,6 +74,7 @@ Regras:
 ### Texto dentro de cards, dialogs e sheets (fundo branco/sólido)
 
 Dentro de `Card`, `AlertDialog`, `BottomSheet`, `ElevatedButton` (que têm fundo sólido):
+
 - Corpo/labels: `GoogleFonts.nunito(fontSize: 14–16, color: Colors.black87)`
 - Títulos de card: `GoogleFonts.fredoka(fontSize: 16–24, color: Color(0xFF3E2723))`
 - Texto secundário: `GoogleFonts.nunito(fontSize: 12–14, color: Colors.grey)`
@@ -80,6 +82,7 @@ Dentro de `Card`, `AlertDialog`, `BottomSheet`, `ElevatedButton` (que têm fundo
 ### AppBar
 
 Todas as AppBars usam o mesmo padrão — **nunca usar `OutlinedText` no AppBar**:
+
 ```dart
 AppBar(
   title: Text('Título', style: GoogleFonts.fredoka(fontSize: 22, color: Colors.white)),
@@ -109,6 +112,7 @@ GlassPanel(
 ```
 
 **Regras:**
+
 - Texto dentro do `GlassPanel` usa `color: Colors.white` diretamente (sem outline — o fundo escuro garante legibilidade)
 - `OutlinedText` continua sendo usado para textos isolados/curtos diretamente sobre o fundo (ex: hints de swipe)
 - Não usar `OutlinedText` dentro de `GlassPanel`
@@ -117,6 +121,7 @@ GlassPanel(
 ### TabBar
 
 Todos os `TabBar` devem ter `labelStyle` e `unselectedLabelStyle` explícitos:
+
 ```dart
 TabBar(
   labelStyle: GoogleFonts.fredoka(fontSize: 14, fontWeight: FontWeight.w600),
@@ -131,31 +136,31 @@ TabBar(
 
 Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 4.1 completa (v1.5.3) — próximo: Fase 5 (Arte adicional e polimento visual)**. O áudio foi reposicionado para a **Fase 6** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
 
-| Fase      | Foco                                                                                                        |
-| --------- | ----------------------------------------------------------------------------------------------------------- |
-| 1         | Setup, game engine puro, tela básica com placeholders                                                       |
-| 2         | Identidade visual, paleta, tipografia, animações, vidas, inventário, recompensas, coleção, loja mock        |
-| 2.5 ✅    | Rebranding "Olha o Bichim!", GameTitleImage, ícone do app, launcher name                                    |
-| 2.6 ✅    | Tela Home + Coleção + Configurações + stubs                                                                 |
-| 2.11 ✅   | ShopOverlay sobre o jogo acessível pelos ícones desabilitados do inventário                                 |
-| 2.12 ✅   | Peixe-boi (4096), Jacaré (8192), multi-vitória, ranking local, PersonalRecords                              |
-| 3 ✅      | E2E Test Framework: 95+ cenários, golden tests, APK Tier 2, CI GitHub Actions, documentação                 |
-| 3.5 ✅    | `golden.*` com `alchemist` — 15 testes (5 telas × 3 viewports)                                              |
-| 3.6 ✅    | Tier 2: APK flavor `tst` + TestRunnerScreen + Share + Demo (integration_test)                               |
-| 3.7 ✅    | CI GitHub Actions: suite Tier 1 em PR/push, golden diffs como artefato, badge no README                     |
-| 3.8 ✅    | Documentação do framework de testes (`docs/TESTING.md`)                                                     |
-| 4A ✅     | Firebase + Auth + Sync Engine (PlayerProfile, AuthService, SyncEngine, OnboardingAuthScreen, ProfileScreen) |
-| 4B ✅     | Ranking Global Semanal (Firestore) + Ranking Lendas persistido                                              |
-| 4C ✅     | Convites (deep links, Firestore) + Anúncios Reais (Google Mobile Ads) + IAP Real (in_app_purchase)          |
-| 4 gaps ✅ | registerInvite pós-login, ProfileScreen Convidar Amigos + Restaurar Compras real                            |
+| Fase      | Foco                                                                                                                             |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| 1         | Setup, game engine puro, tela básica com placeholders                                                                            |
+| 2         | Identidade visual, paleta, tipografia, animações, vidas, inventário, recompensas, coleção, loja mock                             |
+| 2.5 ✅    | Rebranding "Olha o Bichim!", GameTitleImage, ícone do app, launcher name                                                         |
+| 2.6 ✅    | Tela Home + Coleção + Configurações + stubs                                                                                      |
+| 2.11 ✅   | ShopOverlay sobre o jogo acessível pelos ícones desabilitados do inventário                                                      |
+| 2.12 ✅   | Peixe-boi (4096), Jacaré (8192), multi-vitória, ranking local, PersonalRecords                                                   |
+| 3 ✅      | E2E Test Framework: 95+ cenários, golden tests, APK Tier 2, CI GitHub Actions, documentação                                      |
+| 3.5 ✅    | `golden.*` com `alchemist` — 15 testes (5 telas × 3 viewports)                                                                   |
+| 3.6 ✅    | Tier 2: APK flavor `tst` + TestRunnerScreen + Share + Demo (integration_test)                                                    |
+| 3.7 ✅    | CI GitHub Actions: suite Tier 1 em PR/push, golden diffs como artefato, badge no README                                          |
+| 3.8 ✅    | Documentação do framework de testes (`docs/TESTING.md`)                                                                          |
+| 4A ✅     | Firebase + Auth + Sync Engine (PlayerProfile, AuthService, SyncEngine, OnboardingAuthScreen, ProfileScreen)                      |
+| 4B ✅     | Ranking Global Semanal (Firestore) + Ranking Lendas persistido                                                                   |
+| 4C ✅     | Convites (deep links, Firestore) + Anúncios Reais (Google Mobile Ads) + IAP Real (in_app_purchase)                               |
+| 4 gaps ✅ | registerInvite pós-login, ProfileScreen Convidar Amigos + Restaurar Compras real                                                 |
 | 4.1 ✅    | EmailAuthScreen, AvatarPickerScreen, AvatarWidget, updateAvatar(), destaque avatar na Home, fix legibilidade InviteFriendsScreen |
-| 4.1.1 ✅  | Tipografia consistente: Fredoka em todas as telas/widgets sobre fundos não-sólidos                          |
-| 5         | Arte adicional e polimento visual (logo, ícone, splash final)                                               |
-| 6         | Áudio (sound design dos 13 animais, SFX, música)                                                            |
-| 7         | Polimento, l10n, acessibilidade, lançamento                                                                 |
-| 4       | Arte adicional e polimento visual (logo, ícone, splash final)                                        |
-| 5       | Áudio (sound design dos 13 animais, SFX, música)                                                     |
-| 6       | Polimento, l10n, acessibilidade, lançamento                                                          |
+| 4.1.1 ✅  | Tipografia consistente: Fredoka em todas as telas/widgets sobre fundos não-sólidos                                               |
+| 5         | Arte adicional e polimento visual (logo, ícone, splash final)                                                                    |
+| 6         | Áudio (sound design dos 13 animais, SFX, música)                                                                                 |
+| 7         | Polimento, l10n, acessibilidade, lançamento                                                                                      |
+| 4         | Arte adicional e polimento visual (logo, ícone, splash final)                                                                    |
+| 5         | Áudio (sound design dos 13 animais, SFX, música)                                                                                 |
+| 6         | Polimento, l10n, acessibilidade, lançamento                                                                                      |
 
 ## Release checklist
 

@@ -133,7 +133,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
               // Canto superior direito — Configurações
               Positioned(
-                top: HomeConstants.edgePad(scale),
+                top: HomeConstants.topConfiguracao(scale),
                 right: HomeConstants.edgePad(scale),
                 child: _HomeButton(
                   key: const Key('home_btn_configuracao'),

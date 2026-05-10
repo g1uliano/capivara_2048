@@ -13,14 +13,18 @@ class CollectionScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final highest = ref.watch(personalRecordsProvider.select((s) => s.highestLevelEver));
+    final highest = ref.watch(
+      personalRecordsProvider.select((s) => s.highestLevelEver),
+    );
 
     return GameBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          title: Text('Coleção',
-              style: GoogleFonts.fredoka(fontSize: 22, color: Colors.white)),
+          title: Text(
+            'Coleção',
+            style: GoogleFonts.fredoka(fontSize: 22, color: Colors.white),
+          ),
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
           elevation: 0,
@@ -92,7 +96,10 @@ class _UnlockedCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: const [
             BoxShadow(
-                color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
+              color: Colors.black12,
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
           ],
         ),
         padding: const EdgeInsets.all(12),
@@ -101,9 +108,11 @@ class _UnlockedCard extends StatelessWidget {
           children: [
             Image.asset(animal.tilePngPath, height: 72, fit: BoxFit.contain),
             const SizedBox(height: 8),
-            Text(animal.name,
-                style: GoogleFonts.fredoka(fontSize: 15),
-                textAlign: TextAlign.center),
+            Text(
+              animal.name,
+              style: GoogleFonts.fredoka(fontSize: 15),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),
@@ -133,9 +142,10 @@ class _LockedCard extends StatelessWidget {
             colorBlendMode: BlendMode.srcATop,
           ),
           const SizedBox(height: 8),
-          Text('???',
-              style:
-                  GoogleFonts.fredoka(fontSize: 20, color: Colors.black38)),
+          Text(
+            '???',
+            style: GoogleFonts.fredoka(fontSize: 20, color: Colors.black38),
+          ),
         ],
       ),
     );
@@ -165,39 +175,53 @@ class _AnimalDetailSheet extends StatelessWidget {
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(2)),
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
             ),
-            Image.asset(animal.hostPngPath,
-                height: 160, fit: BoxFit.contain),
+            Image.asset(animal.hostPngPath, height: 160, fit: BoxFit.contain),
             const SizedBox(height: 16),
-            Text(animal.name,
-                style: GoogleFonts.fredoka(
-                    fontSize: 24, fontWeight: FontWeight.w600),
-                textAlign: TextAlign.center),
+            Text(
+              animal.name,
+              style: GoogleFonts.fredoka(
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
             if (animal.scientificName != null) ...[
               const SizedBox(height: 4),
               Text(
                 animal.scientificName!,
                 style: GoogleFonts.nunito(
-                    fontSize: 14,
-                    fontStyle: FontStyle.italic,
-                    color: Colors.grey),
+                  fontSize: 14,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.grey,
+                ),
                 textAlign: TextAlign.center,
               ),
             ],
             const SizedBox(height: 12),
-            Text(animal.funFact ?? '',
-                style: GoogleFonts.nunito(fontSize: 16, fontWeight: FontWeight.w600),
-                textAlign: TextAlign.center),
-            if (animal.bio != null) ...[              
+            Text(
+              animal.funFact ?? '',
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            if (animal.bio != null) ...[
               const SizedBox(height: 16),
               const Divider(),
               const SizedBox(height: 8),
               Text(
                 animal.bio!,
-                style: GoogleFonts.nunito(fontSize: 15, height: 1.6, color: Colors.black87),
+                style: GoogleFonts.nunito(
+                  fontSize: 15,
+                  height: 1.6,
+                  color: Colors.black87,
+                ),
                 textAlign: TextAlign.justify,
               ),
             ],
