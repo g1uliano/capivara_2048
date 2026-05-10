@@ -108,7 +108,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: _HomeButton(
                   key: const Key('home_btn_colecao'),
                   path: 'assets/images/home/Colecao.png',
-                  size: HomeConstants.buttonSize(scale),
+                  size: HomeConstants.sizeColecao(scale),
                   onTap: () => _nav(const CollectionScreen()),
                   semanticLabel: 'Coleção',
                 ),
@@ -138,7 +138,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: _HomeButton(
                   key: const Key('home_btn_configuracao'),
                   path: 'assets/images/home/Configuracao.png',
-                  size: HomeConstants.buttonSize(scale),
+                  size: HomeConstants.sizeConfiguracao(scale),
                   onTap: () => _nav(const SettingsScreen()),
                   semanticLabel: 'Configurações',
                 ),
@@ -181,7 +181,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: _HomeButtonWithBadge(
                   key: const Key('home_btn_recompensas'),
                   path: 'assets/images/home/Recompensas.png',
-                  size: HomeConstants.buttonSize(scale),
+                  size: HomeConstants.sizeRecompensas(scale),
                   showBadge: rewardAvailable,
                   onTap: () => _navGuarded(const DailyRewardsScreen()),
                   semanticLabel: 'Recompensas Diárias',
@@ -195,7 +195,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: _HomeButton(
                   key: const Key('home_btn_ranking'),
                   path: 'assets/images/home/Ranking.png',
-                  size: HomeConstants.buttonSize(scale),
+                  size: HomeConstants.sizeRanking(scale),
                   onTap: () => _nav(const RankingScreen()),
                   semanticLabel: 'Ranking',
                 ),
@@ -208,7 +208,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: _HomeButton(
                   key: const Key('home_btn_loja'),
                   path: 'assets/images/home/IconeLoja.png',
-                  size: HomeConstants.buttonSize(scale),
+                  size: HomeConstants.sizeIconeLoja(scale),
                   onTap: () => _navGuarded(const ShopScreen()),
                   semanticLabel: 'Loja',
                 ),
@@ -221,7 +221,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: _HomeButton(
                   key: const Key('home_btn_comojogar'),
                   path: 'assets/images/home/ComoJogar.png',
-                  size: HomeConstants.buttonSize(scale),
+                  size: HomeConstants.sizeComoJogar(scale),
                   semanticLabel: 'Tutorial',
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const TutorialScreen()),
