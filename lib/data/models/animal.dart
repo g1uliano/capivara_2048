@@ -10,6 +10,7 @@ class Animal {
   final String hostPngPath;
   final String? scientificName;
   final String? funFact;
+  final String? bio;
 
   const Animal({
     required this.level,
@@ -21,5 +22,6 @@ class Animal {
     required this.hostPngPath,
     this.scientificName,
     this.funFact,
+    this.bio,
   });
 }
