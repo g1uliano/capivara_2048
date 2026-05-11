@@ -236,6 +236,12 @@ void _dailyRewardsScreenGoldenTests() {
         'daily_${w}x$h',
         fileName: 'daily_${w}x$h',
         constraints: BoxConstraints.tight(size),
+        // DailyRewardsScreen has infinite repeat animations — pumpAndSettle
+        // never settles. pump(Duration.zero) elapses FakeAsync by zero so
+        // flutter_animate's Future.delayed(Duration.zero, _play) timers fire
+        // (making them inactive before _verifyInvariants), then renders one
+        // frame without advancing animation state.
+        pumpBeforeTest: (tester) => tester.pump(Duration.zero),
         builder: () => _wrap(harness, const DailyRewardsScreen()),
       );
     });

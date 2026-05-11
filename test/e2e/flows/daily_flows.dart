@@ -55,10 +55,10 @@ final dailyRewardClaimScenario = E2EScenario(
     await _navToDailyRewards(tester);
 
     // Coletar button should be visible (status == available).
-    expect(find.text('Coletar'), findsOneWidget);
+    expect(find.text('Coletar recompensa'), findsOneWidget);
 
     // Tap Coletar — triggers _onClaim → async claim() call.
-    await tester.tap(find.text('Coletar'));
+    await tester.tap(find.text('Coletar recompensa'));
     await tester.pump();
 
     // Use runAsync to let the Hive write (and inventory add) complete in real time.
