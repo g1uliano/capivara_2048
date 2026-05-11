@@ -7,16 +7,27 @@ Siga este guia antes de testar com `USE_REAL_IAP=true`.
 
 ## 1. Product IDs
 
-Os 6 pacotes da loja têm IDs exatos que devem ser cadastrados nas lojas:
+O ID na loja é sempre `bichim_pack_<id_interno>` — o `IAPServiceImpl` aplica esse prefixo automaticamente (`'bichim_pack_${package.id}'`).
 
-| Pacote | Nome                     | ID na loja       | Preço BRL |
-| ------ | ------------------------ | ---------------- | --------- |
-| p1     | 4× Bomba 3               | `bichim_pack_p1` | R$ 3,99   |
-| p2     | 4× Desfazer 3            | `bichim_pack_p2` | R$ 1,99   |
-| p3     | 6 Vidas                  | `bichim_pack_p3` | R$ 2,49   |
-| p4     | 10 Vidas                 | `bichim_pack_p4` | R$ 4,99   |
-| p5     | Combo Mata Atlântica     | `bichim_pack_p5` | R$ 4,99   |
-| p6     | Combo Floresta Amazônica | `bichim_pack_p6` | R$ 9,99   |
+### Pacotes
+
+| ID interno | Nome                     | ID na loja            | Preço BRL |
+| ---------- | ------------------------ | --------------------- | --------- |
+| p1         | 4× Bomba 3               | `bichim_pack_p1`      | R$ 3,99   |
+| p2         | 4× Desfazer 3            | `bichim_pack_p2`      | R$ 1,99   |
+| p3         | 6 Vidas                  | `bichim_pack_p3`      | R$ 2,49   |
+| p4         | 10 Vidas                 | `bichim_pack_p4`      | R$ 4,99   |
+| p5         | Combo Mata Atlântica     | `bichim_pack_p5`      | R$ 4,99   |
+| p6         | Combo Floresta Amazônica | `bichim_pack_p6`      | R$ 9,99   |
+
+### Produtos únicos (compra por unidade)
+
+| ID interno | Nome           | ID na loja               | Preço BRL |
+| ---------- | -------------- | ------------------------ | --------- |
+| u_bomb3    | 1× Bomba 3     | `bichim_pack_u_bomb3`    | R$ 1,99   |
+| u_undo3    | 1× Desfazer 3  | `bichim_pack_u_undo3`    | R$ 0,99   |
+| u_bomb2    | 1× Bomba 2     | `bichim_pack_u_bomb2`    | R$ 1,19   |
+| u_undo1    | 1× Desfazer 1  | `bichim_pack_u_undo1`    | R$ 0,49   |
 
 Todos os produtos são do tipo **Consumable** (podem ser comprados múltiplas vezes).
 
@@ -36,13 +47,15 @@ Todos os produtos são do tipo **Consumable** (podem ser comprados múltiplas ve
 2. Selecione o app "Olha o Bichim!"
 3. No menu lateral: **Monetizar → Produtos → Produtos únicos**
 4. Clique em **Criar produto**
-5. Para cada pacote da tabela acima:
-   - **ID do produto:** exatamente como na coluna "ID na loja" (ex: `bichim_pack_p1`)
-   - **Nome:** nome do pacote (ex: `4× Bomba 3`)
-   - **Descrição:** descrição do pacote
+5. Para cada item da seção 1 (pacotes **e** produtos únicos — 10 no total):
+   - **ID do produto:** exatamente como na coluna "ID na loja" (ex: `bichim_pack_p1`, `bichim_pack_u_bomb3`)
+   - **Nome:** nome do item (ex: `4× Bomba 3`, `1× Bomba 3`)
+   - **Descrição:** descrição do item
    - **Status:** Ativo
-   - **Preço padrão:** valor em BRL
-6. Salvar e repetir para todos os 6 pacotes
+   - **Preço padrão:** valor em BRL conforme tabela
+6. Salvar e repetir para todos os 10 produtos
+
+> Os IDs dos produtos únicos seguem o mesmo padrão: `bichim_pack_u_bomb3`, `bichim_pack_u_undo3`, `bichim_pack_u_bomb2`, `bichim_pack_u_undo1`.
 
 ### 2.3 Licença de teste (compras gratuitas)
 
@@ -120,32 +133,63 @@ Para testar sem conectar ao servidor da Apple:
 
 ## 4. Builds com IAP
 
-| Comando                                                                      | Flavor | IAP             | Uso                       |
-| ---------------------------------------------------------------------------- | ------ | --------------- | ------------------------- |
-| `flutter run --dart-define=FLAVOR=dev`                                                          | dev    | Fake            | Desenvolvimento local     |
-| `flutter build apk --flavor tst --dart-define=FLAVOR=tst`                                       | tst    | Fake            | QA — testa UI sem lojas   |
-| `flutter build apk --flavor tst --dart-define=FLAVOR=tst --dart-define=USE_REAL_IAP=true`       | tst    | Real (sandbox)  | QA — testa fluxo completo |
-| `flutter build apk --flavor prod --release --dart-define=FLAVOR=prd`                            | prd    | Real (produção) | Release                   |
+O `iapServiceProvider` decide qual implementação usar com base em **duas** variáveis de ambiente Dart:
 
-### Build e instalação rápida (Android)
+```dart
+const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
+const useRealIap = bool.fromEnvironment('USE_REAL_IAP', defaultValue: false);
+
+// Usa IAPServiceImpl (real) se:
+//   FLAVOR=prd  OU
+//   FLAVOR=dev  OU
+//   FLAVOR=tst && USE_REAL_IAP=true
+// Caso contrário: FakeIAPService
+```
+
+> **Nota:** `--flavor` (argumento do Flutter/Android) e `--dart-define=FLAVOR=` são dois valores independentes. O primeiro controla o flavor do Android build (app ID, signing, etc.); o segundo controla a lógica de IAP em runtime.
+
+| Comando | Android flavor | Dart FLAVOR | IAP | Uso |
+| ------- | -------------- | ----------- | --- | --- |
+| `flutter run --dart-define=FLAVOR=dev` | default | dev | Real (sandbox) | Desenvolvimento local com IAP |
+| `flutter run --dart-define=FLAVOR=dev` (sem dart-define) | default | dev* | Real (sandbox) | Idem — `dev` é o default |
+| `flutter build apk --flavor tst --debug --dart-define=FLAVOR=tst` | tst | tst | Fake | QA — testa UI sem lojas |
+| `flutter build apk --flavor tst --debug --dart-define=FLAVOR=dev` | tst | dev | **Real (sandbox)** | Sandbox com app ID do flavor `tst` |
+| `flutter build apk --flavor tst --dart-define=FLAVOR=tst --dart-define=USE_REAL_IAP=true` | tst | tst | Real (sandbox) | QA — testa fluxo completo |
+| `flutter build apk --flavor prod --release --dart-define=FLAVOR=prd` | prod | prd | Real (produção) | Release |
+
+### Sandbox rápido com flavor `tst` + `FLAVOR=dev`
 
 ```bash
-# Build + install TST com IAP real
+flutter build apk --flavor tst --debug --dart-define=FLAVOR=dev
+flutter install --flavor tst
+```
+
+Esse combo é útil para testar o fluxo IAP completo durante desenvolvimento:
+- `--flavor tst` usa o app ID de teste (evita poluir o histórico do app de produção no Play Console)
+- `--dart-define=FLAVOR=dev` ativa o `IAPServiceImpl` real (sem precisar de `USE_REAL_IAP=true`)
+- `--debug` mantém hot-reload e logs
+
+**Pré-requisito:** o app ID do flavor `tst` deve estar cadastrado no Play Console e os produtos devem estar ativos lá. A conta do testador deve ser licenciada (seção 2.3).
+
+### Build e instalação para QA completo
+
+```bash
+# Build + install TST com IAP real (via USE_REAL_IAP)
 flutter build apk --flavor tst --release \
   --dart-define=FLAVOR=tst \
   --dart-define=USE_REAL_IAP=true
-flutter install
+flutter install --flavor tst
 
 # Build + install PRD
 flutter build apk --flavor prod --release --dart-define=FLAVOR=prd
-flutter install
+flutter install --flavor prod
 ```
 
 ---
 
 ## 5. Checklist antes de testar IAP real
 
-- [ ] Todos os 6 produtos cadastrados no Play Console / App Store Connect com IDs exatos
+- [ ] Todos os 10 produtos cadastrados no Play Console / App Store Connect com IDs exatos (6 pacotes + 4 produtos únicos)
 - [ ] Status dos produtos: **Ativo** (Google) / **Ready to Submit** (Apple)
 - [ ] Conta de testador configurada (Google License Tester / Apple Sandbox)
 - [ ] Dispositivo físico Android (emulador não suporta IAP)

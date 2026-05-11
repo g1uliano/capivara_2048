@@ -13,11 +13,12 @@ import '../controllers/auth_controller.dart';
 import '../../core/theme/text_styles.dart';
 import 'onboarding_auth_screen.dart';
 
-// Top-level — ensures the Firestore stream is not restarted on every rebuild
-final _globalRankingStreamProvider =
-    StreamProvider.autoDispose<List<RankingEntry>>((ref) {
+// One-shot load — avoids Firestore stream restart loop on transient errors.
+// Global ranking doesn't need real-time updates while the user is viewing it.
+final _globalRankingProvider =
+    FutureProvider.autoDispose<List<RankingEntry>>((ref) {
       final repo = ref.watch(rankingRepositoryProvider);
-      return repo.watchWeeklyTop(RankingType.globalTime);
+      return repo.getWeeklyTop(RankingType.globalTime);
     });
 
 class RankingScreen extends ConsumerWidget {
@@ -213,7 +214,7 @@ class _LegendsRankingTab extends ConsumerWidget {
   }
 }
 
-class _LegendsCard extends ConsumerWidget {
+class _LegendsCard extends ConsumerStatefulWidget {
   final RankingType type;
   final dynamic animal;
   final String title;
@@ -229,8 +230,27 @@ class _LegendsCard extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final repo = ref.read(rankingRepositoryProvider);
+  ConsumerState<_LegendsCard> createState() => _LegendsCardState();
+}
+
+class _LegendsCardState extends ConsumerState<_LegendsCard> {
+  late Future<List<RankingEntry>> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = ref.read(legendsRankingRepositoryProvider).getWeeklyTop(widget.type);
+  }
+
+  void _retry() {
+    setState(() {
+      _future = ref.read(legendsRankingRepositoryProvider).getWeeklyTop(widget.type);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final repo = ref.read(legendsRankingRepositoryProvider);
     return Card(
       color: Colors.white.withValues(alpha: 0.92),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -241,10 +261,10 @@ class _LegendsCard extends ConsumerWidget {
           children: [
             Row(
               children: [
-                Image.asset(animal.tilePngPath, height: 40),
+                Image.asset(widget.animal.tilePngPath, height: 40),
                 const SizedBox(width: 8),
                 Text(
-                  title,
+                  widget.title,
                   style: GoogleFonts.fredoka(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -255,21 +275,21 @@ class _LegendsCard extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             FutureBuilder<List<RankingEntry>>(
-              future: repo.getWeeklyTop(type),
+              future: _future,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (snapshot.hasError) {
                   return TextButton(
-                    onPressed: () => (context as Element).markNeedsBuild(),
+                    onPressed: _retry,
                     child: const Text('Tentar novamente'),
                   );
                 }
                 final entries = snapshot.data ?? [];
                 if (entries.isEmpty) {
                   return Text(
-                    emptyMessage,
+                    widget.emptyMessage,
                     style: GoogleFonts.nunito(fontSize: 13),
                   );
                 }
@@ -278,17 +298,17 @@ class _LegendsCard extends ConsumerWidget {
                     ...entries
                         .take(3)
                         .map(
-                          (e) => _EntryRow(entry: e, formatValue: formatValue),
+                          (e) => _EntryRow(entry: e, formatValue: widget.formatValue),
                         ),
                     FutureBuilder<RankingEntry?>(
-                      future: repo.getPlayerEntry(type),
+                      future: repo.getPlayerEntry(widget.type),
                       builder: (context, snap) {
                         final player = snap.data;
                         if (player == null) {
                           return Padding(
                             padding: const EdgeInsets.only(top: 8),
                             child: Text(
-                              emptyMessage,
+                              widget.emptyMessage,
                               style: GoogleFonts.nunito(
                                 fontSize: 12,
                                 color: Colors.grey,
@@ -301,7 +321,7 @@ class _LegendsCard extends ConsumerWidget {
                           padding: const EdgeInsets.only(top: 8),
                           child: _EntryRow(
                             entry: player,
-                            formatValue: formatValue,
+                            formatValue: widget.formatValue,
                           ),
                         );
                       },
@@ -386,7 +406,7 @@ class _GlobalRankingTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isLoggedIn = ref.watch(authControllerProvider) != null;
-    final entriesAsync = ref.watch(_globalRankingStreamProvider);
+    final entriesAsync = ref.watch(_globalRankingProvider);
 
     return Column(
       children: [
@@ -431,13 +451,32 @@ class _GlobalRankingTab extends ConsumerWidget {
         else
           Expanded(
             child: entriesAsync.when(
+              skipLoadingOnRefresh: false,
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(
-                child: Text(
-                  'Erro ao carregar ranking.',
-                  style: outlinedWhiteTextStyle(
-                    GoogleFonts.fredoka(fontSize: 16, color: Colors.white),
-                  ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Erro ao carregar ranking.',
+                      style: outlinedWhiteTextStyle(
+                        GoogleFonts.fredoka(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextButton(
+                      onPressed: () => ref.invalidate(_globalRankingProvider),
+                      child: Text(
+                        'Tentar novamente',
+                        style: outlinedWhiteTextStyle(
+                          GoogleFonts.fredoka(
+                            fontSize: 15,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               data: (entries) {

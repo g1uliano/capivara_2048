@@ -6,6 +6,27 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.0] — 2026-05-11
+
+### Added
+
+- **Recompensas diárias — trilha serpentina**: nova UI estilo jogo de tabuleiro com 6 caixas de presente coloridas (paleta variada por dia) + baú dourado no Dia 7, substituindo o grid 4×2 anterior
+- **CapivaraMascot**: mascote animado que navega até o tile do dia atual na trilha, com `AnimatedPositioned`
+- **`legendsRankingRepositoryProvider`**: provider dedicado para ranking de lendas — funciona sem login (userId vazio para usuários anônimos)
+- **Firebase/Firestore**: `firestore.rules` e `firestore.indexes.json` adicionados e referenciados em `firebase.json`
+- **IAP — produtos unitários**: 4 novos produtos avulsos (`u_bomb3`, `u_undo3`, `u_bomb2`, `u_undo1`) documentados em `IAP.md`
+
+### Changed
+
+- **Ranking Global**: migrado de `StreamProvider` (gerava loop de reinicialização em erros transitórios) para `FutureProvider` com botão "Tentar novamente"
+- **`_LegendsCard`**: convertido para `ConsumerStatefulWidget` com `_retry()` correto — elimina bug onde `animal`/`title`/etc. eram referenciados sem `widget.` em `ConsumerWidget`
+- **`FakeAuthService`**: inicializado com `PlayerProfile` completo (tutorialCompleted=true) para facilitar testes no flavor `tst`
+- **IAP.md**: tabela de builds reescrita separando `--flavor` Android de `--dart-define=FLAVOR=`; guia sandbox atualizado; 10 produtos totais documentados
+
+### Fixed
+
+- **Timer do jogo**: timer reinicia corretamente quando o jogador continua após game over com um item power-up (era `null` após `_stopTimer()`)
+
 ## [1.8.1] — 2026-05-10
 
 ### Fixed
