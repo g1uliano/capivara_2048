@@ -114,5 +114,14 @@ final authServiceProvider = Provider<AuthService>((ref) {
   if (flavor == 'prd' || flavor == 'dev') {
     return FirebaseAuthService();
   }
-  return FakeAuthService();
+  return FakeAuthService(
+    initialProfile: PlayerProfile(
+      userId: 'fake-user-id',
+      displayName: 'Jogador Teste',
+      provider: AuthProvider.google,
+      createdAt: DateTime(2025, 1, 1),
+      lastSeenAt: DateTime(2025, 1, 1),
+      tutorialCompleted: true,
+    ),
+  );
 });

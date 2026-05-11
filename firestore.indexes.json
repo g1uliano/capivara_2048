@@ -1,0 +1,23 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "globalTime",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "bestTimeMs", "order": "ASCENDING" },
+        { "fieldPath": "maxTile", "order": "DESCENDING" },
+        { "fieldPath": "__name__", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "entries",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "timesReached", "order": "DESCENDING" },
+        { "fieldPath": "firstReachedAt", "order": "ASCENDING" },
+        { "fieldPath": "__name__", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

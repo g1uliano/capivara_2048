@@ -134,6 +134,9 @@ class GameNotifier extends Notifier<GameState> {
       if (!_timerStarted) {
         _timerStarted = true;
         _startTimer();
+      } else if (_timer == null && !state.isGameOver && !state.hasWon) {
+        // Timer was stopped at game over; player continued with an item — restart.
+        _startTimer();
       }
       if (state.isGameOver || state.hasWon) {
         _stopTimer();
