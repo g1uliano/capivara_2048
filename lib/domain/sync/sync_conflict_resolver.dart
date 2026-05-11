@@ -33,6 +33,10 @@ class SyncConflictResolver {
       rewardCollected8192:
           local.rewardCollected8192 || remote.rewardCollected8192,
       highestLevelEver: _max(local.highestLevelEver, remote.highestLevelEver),
+      bestTimeMs2048: _minNonZero(
+        local.bestTimeMs2048,
+        remote.bestTimeMs2048,
+      ),
     );
   }
 
@@ -46,6 +50,13 @@ class SyncConflictResolver {
   }
 
   static int _max(int a, int b) => a > b ? a : b;
+
+  /// Para tempos, menor é melhor. 0 significa "sem registro".
+  static int _minNonZero(int a, int b) {
+    if (a == 0) return b;
+    if (b == 0) return a;
+    return a < b ? a : b;
+  }
 
   static DateTime? _oldest(DateTime? a, DateTime? b) {
     if (a == null) return b;

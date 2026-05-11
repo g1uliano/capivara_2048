@@ -5,6 +5,7 @@ import 'package:hive/hive.dart';
 import '../../data/models/inventory.dart';
 import '../../data/models/item_type.dart';
 import '../../data/repositories/inventory_repository.dart';
+import '../sync/sync_engine.dart';
 
 class InventoryNotifier extends Notifier<Inventory> {
   StreamSubscription<BoxEvent>? _boxSub;
@@ -48,12 +49,14 @@ class InventoryNotifier extends Notifier<Inventory> {
   Future<void> consume(ItemType type) async {
     state = state.consume(type);
     await ref.read(inventoryRepositoryProvider).save(state);
+    unawaited(ref.read(syncEngineProvider).syncInventory(state));
   }
 
   Future<void> add(ItemType type, int amount) async {
     assert(amount > 0, 'amount must be positive; use consume() to decrease');
     state = state.add(type, amount);
     await ref.read(inventoryRepositoryProvider).save(state);
+    unawaited(ref.read(syncEngineProvider).syncInventory(state));
   }
 
   int count(ItemType type) => state.count(type);

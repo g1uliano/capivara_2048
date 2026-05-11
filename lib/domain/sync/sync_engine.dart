@@ -1,8 +1,11 @@
 // lib/domain/sync/sync_engine.dart
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/models/daily_rewards_state.dart';
 import '../../data/models/game_record.dart';
+import '../../data/models/inventory.dart';
 import '../../data/models/pending_event.dart';
+import '../../data/models/personal_records.dart';
 import '../../data/repositories/firebase_sync_engine.dart';
 
 enum SyncStatus { idle, syncing, error }
@@ -16,6 +19,9 @@ abstract class SyncEngine {
   Future<void> updateDisplayName(String name);
   Future<void> deleteUserData();
   Future<void> syncGameRecord(GameRecord record);
+  Future<void> syncInventory(Inventory inventory);
+  Future<void> syncPersonalRecords(PersonalRecords records);
+  Future<void> syncDailyRewards(DailyRewardsState state);
   Future<void> drainPendingEvents();
   Future<void> enqueuePendingEvent(PendingEvent event);
   Stream<SyncStatus> get statusStream;
@@ -67,6 +73,15 @@ class FakeSyncEngine implements SyncEngine {
 
   @override
   Future<void> syncGameRecord(GameRecord record) async {}
+
+  @override
+  Future<void> syncInventory(Inventory inventory) async {}
+
+  @override
+  Future<void> syncPersonalRecords(PersonalRecords records) async {}
+
+  @override
+  Future<void> syncDailyRewards(DailyRewardsState state) async {}
 
   @override
   Future<void> drainPendingEvents() async {

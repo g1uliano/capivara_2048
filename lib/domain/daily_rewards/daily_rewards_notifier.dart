@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/daily_rewards_state.dart';
 import '../../data/models/item_type.dart';
 import '../../data/repositories/daily_rewards_repository.dart';
 import '../inventory/inventory_notifier.dart';
 import '../lives/lives_notifier.dart';
+import '../sync/sync_engine.dart';
 import 'daily_rewards_engine.dart';
 
 class DailyRewardsNotifier extends Notifier<DailyRewardsState> {
@@ -50,6 +52,7 @@ class DailyRewardsNotifier extends Notifier<DailyRewardsState> {
     final next = applyClaim(now, current);
     state = next;
     await ref.read(dailyRewardsRepositoryProvider).save(state);
+    unawaited(ref.read(syncEngineProvider).syncDailyRewards(state));
   }
 
   Future<void> claimDouble(DailyReward original) async {

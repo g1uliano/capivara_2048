@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import '../../data/models/daily_rewards_state.dart';
 import '../../data/models/game_record.dart';
 import '../../data/models/pending_event.dart';
 import '../../data/models/personal_records.dart';
@@ -76,6 +77,9 @@ class FirebaseSyncEngine implements SyncEngine {
           data['personalRecords'] as Map<String, dynamic>?,
         );
         await _mergeRemoteInventory(data['inventory'] as Map<String, dynamic>?);
+        await _mergeRemoteDailyRewards(
+          data['dailyRewards'] as Map<String, dynamic>?,
+        );
         await _mergeRemoteGameRecords(
           (data['gameRecords'] as List<dynamic>?)
               ?.map((e) => e as Map<String, dynamic>)
@@ -103,6 +107,56 @@ class FirebaseSyncEngine implements SyncEngine {
     if (_userId == null) return;
     await _firestore.collection('users').doc(_userId).set({
       'avatarUrl': avatarUrl,
+    }, SetOptions(merge: true));
+  }
+
+  @override
+  Future<void> syncInventory(Inventory inventory) async {
+    if (_userId == null) return;
+    await _firestore.collection('users').doc(_userId).set({
+      'inventory': {
+        'bomb2': inventory.bomb2,
+        'bomb3': inventory.bomb3,
+        'undo1': inventory.undo1,
+        'undo3': inventory.undo3,
+      },
+    }, SetOptions(merge: true));
+  }
+
+  @override
+  Future<void> syncPersonalRecords(PersonalRecords records) async {
+    if (_userId == null) return;
+    await _firestore.collection('users').doc(_userId).set({
+      'personalRecords': {
+        'timesReached2048': records.timesReached2048,
+        'timesReached4096': records.timesReached4096,
+        'timesReached8192': records.timesReached8192,
+        'highestLevelEver': records.highestLevelEver,
+        'bestTimeMs2048': records.bestTimeMs2048,
+        'rewardCollected4096': records.rewardCollected4096,
+        'rewardCollected8192': records.rewardCollected8192,
+        if (records.firstReached2048At != null)
+          'firstReached2048At':
+              Timestamp.fromDate(records.firstReached2048At!),
+        if (records.firstReached4096At != null)
+          'firstReached4096At':
+              Timestamp.fromDate(records.firstReached4096At!),
+        if (records.firstReached8192At != null)
+          'firstReached8192At':
+              Timestamp.fromDate(records.firstReached8192At!),
+      },
+    }, SetOptions(merge: true));
+  }
+
+  @override
+  Future<void> syncDailyRewards(DailyRewardsState state) async {
+    if (_userId == null) return;
+    await _firestore.collection('users').doc(_userId).set({
+      'dailyRewards': {
+        'currentDay': state.currentDay,
+        'lastClaimedDate': Timestamp.fromDate(state.lastClaimedDate),
+        'claimedThisCycle': state.claimedThisCycle,
+      },
     }, SetOptions(merge: true));
   }
 
@@ -242,15 +296,24 @@ class FirebaseSyncEngine implements SyncEngine {
     if (_userId == null) return;
     final prBox = await Hive.openBox<PersonalRecords>(_personalRecordsBox);
     final pr = prBox.get(_personalRecordsKey) ?? const PersonalRecords();
+    final invBox = await Hive.openBox<Inventory>('inventory');
+    final inv = invBox.get('data') ?? Inventory.empty();
     await _firestore.collection('users').doc(_userId).set({
       'userId': _userId,
       'createdAt': FieldValue.serverTimestamp(),
       'lastSeenAt': FieldValue.serverTimestamp(),
+      'inventory': {
+        'bomb2': inv.bomb2,
+        'bomb3': inv.bomb3,
+        'undo1': inv.undo1,
+        'undo3': inv.undo3,
+      },
       'personalRecords': {
         'timesReached2048': pr.timesReached2048,
         'timesReached4096': pr.timesReached4096,
         'timesReached8192': pr.timesReached8192,
         'highestLevelEver': pr.highestLevelEver,
+        'bestTimeMs2048': pr.bestTimeMs2048,
         'rewardCollected4096': pr.rewardCollected4096,
         'rewardCollected8192': pr.rewardCollected8192,
         if (pr.firstReached2048At != null)
@@ -274,6 +337,7 @@ class FirebaseSyncEngine implements SyncEngine {
       highestLevelEver: (m['highestLevelEver'] as int?) ?? 0,
       rewardCollected4096: (m['rewardCollected4096'] as bool?) ?? false,
       rewardCollected8192: (m['rewardCollected8192'] as bool?) ?? false,
+      bestTimeMs2048: (m['bestTimeMs2048'] as int?) ?? 0,
       firstReached2048At: ts2048?.toDate(),
       firstReached4096At: ts4096?.toDate(),
       firstReached8192At: ts8192?.toDate(),
@@ -312,6 +376,24 @@ class FirebaseSyncEngine implements SyncEngine {
     existing.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
     final top20 = existing.take(20).toList();
     await docRef.set({'gameRecords': top20}, SetOptions(merge: true));
+  }
+
+  Future<void> _mergeRemoteDailyRewards(
+    Map<String, dynamic>? remoteData,
+  ) async {
+    if (remoteData == null) return;
+    final box = await Hive.openBox<DailyRewardsState>('daily_rewards');
+    final local = box.get('state') ?? DailyRewardsState.initial();
+    final ts = remoteData['lastClaimedDate'] as Timestamp?;
+    final remote = DailyRewardsState(
+      currentDay: (remoteData['currentDay'] as int?) ?? 1,
+      lastClaimedDate: ts?.toDate() ?? DateTime(1970),
+      claimedThisCycle: (remoteData['claimedThisCycle'] as bool?) ?? false,
+    );
+    // Tomar o estado mais recente (maior lastClaimedDate = ganhou mais recentemente)
+    final merged =
+        remote.lastClaimedDate.isAfter(local.lastClaimedDate) ? remote : local;
+    await box.put('state', merged);
   }
 
   Future<void> _mergeRemoteGameRecords(

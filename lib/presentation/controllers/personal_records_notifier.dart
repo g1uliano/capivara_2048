@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../data/models/personal_records.dart';
 import '../../data/models/personal_records_hive_adapter.dart';
+import '../../domain/sync/sync_engine.dart';
 
 class PersonalRecordsNotifier extends Notifier<PersonalRecords> {
   static const _boxName = 'personal_records';
@@ -21,6 +23,7 @@ class PersonalRecordsNotifier extends Notifier<PersonalRecords> {
   Future<void> _save() async {
     final box = await Hive.openBox<PersonalRecords>(_boxName);
     await box.put(_key, state);
+    unawaited(ref.read(syncEngineProvider).syncPersonalRecords(state));
   }
 
   Future<void> recordMilestone(int level, DateTime reachedAt) async {

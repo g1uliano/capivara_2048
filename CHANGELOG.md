@@ -6,6 +6,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.1] — 2026-05-11
+
+### Fixed
+
+- **Sync pós-login: inventário não restaurado** — inventário IAP nunca era escrito no documento Firestore do usuário; após limpar armazenamento e fazer login, `_mergeRemoteInventory` recebia `null` e retornava sem restaurar nada. Corrigido: `syncInventory(Inventory)` adicionado ao `SyncEngine`; chamado em `InventoryNotifier.add()` e `consume()`, garantindo persistência no Firestore a cada mudança
+- **Sync pós-login: coleção/recordes pessoais desatualizados** — `highestLevelEver`, `bestTimeMs2048`, `rewardCollected*` e `firstReached*At` só eram escritos no Firestore na criação do documento (nunca nas atualizações subsequentes). Corrigido: `syncPersonalRecords(PersonalRecords)` chamado em `PersonalRecordsNotifier._save()` a cada atualização
+- **Sync pós-login: `PersonalRecordsNotifier` não recarregado após merge remoto** — `_mergeRemotePersonalRecords` escrevia no Hive mas o notifier Riverpod não tinha watcher; UI mostrava dados antigos. Corrigido: `AuthController._reloadSyncedNotifiers()` chama `.load()` em `personalRecordsProvider` e `dailyRewardsProvider` após `syncProfile()` em todos os 4 caminhos de login
+- **Sync pós-login: progresso de recompensas diárias perdido** — `DailyRewardsState` não tinha nenhuma sincronização com cloud. Corrigido: `syncDailyRewards(DailyRewardsState)` adicionado ao `SyncEngine`; chamado após `claim()`; restaurado em `syncProfile()` com lógica de merge (estado mais recente por `lastClaimedDate` vence)
+- **`SyncConflictResolver.mergePersonalRecords`**: `bestTimeMs2048` agora incluso no merge (min não-zero — menor tempo é melhor); campo também adicionado em `_personalRecordsFromMap`, `_writeLocalProfileToFirestore` e `syncPersonalRecords`
+
 ## [1.9.0] — 2026-05-11
 
 ### Added

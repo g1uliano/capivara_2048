@@ -9,6 +9,8 @@ import '../../domain/auth/auth_service.dart';
 import '../../domain/invites/invite_service.dart';
 import '../../domain/sync/sync_engine.dart';
 import '../../data/repositories/iap_startup_service.dart';
+import 'personal_records_notifier.dart';
+import '../../domain/daily_rewards/daily_rewards_notifier.dart';
 
 class AuthController extends Notifier<PlayerProfile?> {
   @override
@@ -30,6 +32,7 @@ class AuthController extends Notifier<PlayerProfile?> {
       final syncEngine = ref.read(syncEngineProvider);
       await syncEngine.init(profile.userId, displayName: profile.displayName);
       await syncEngine.syncProfile();
+      await _reloadSyncedNotifiers();
 
       // Aplica avatar tile do Firestore (não existe no Firebase Auth photoURL)
       final remoteAvatar = syncEngine.remoteAvatarUrl;
@@ -62,6 +65,7 @@ class AuthController extends Notifier<PlayerProfile?> {
           .read(syncEngineProvider)
           .init(profile.userId, displayName: profile.displayName);
       await ref.read(syncEngineProvider).syncProfile();
+      await _reloadSyncedNotifiers();
       await ref.read(syncEngineProvider).drainPendingEvents();
       _initIAPStartup(profile.userId);
       unawaited(_registerPendingInvite(profile));
@@ -79,6 +83,7 @@ class AuthController extends Notifier<PlayerProfile?> {
           .read(syncEngineProvider)
           .init(profile.userId, displayName: profile.displayName);
       await ref.read(syncEngineProvider).syncProfile();
+      await _reloadSyncedNotifiers();
       await ref.read(syncEngineProvider).drainPendingEvents();
       _initIAPStartup(profile.userId);
       unawaited(_registerPendingInvite(profile));
@@ -103,6 +108,7 @@ class AuthController extends Notifier<PlayerProfile?> {
       if (tileAvatar != null && tileAvatar.startsWith('tile:')) {
         state = state!.copyWith(avatarUrl: tileAvatar);
       }
+      await _reloadSyncedNotifiers();
       await ref.read(syncEngineProvider).drainPendingEvents();
       _initIAPStartup(profile.userId);
       unawaited(_registerPendingInvite(profile));
@@ -127,6 +133,13 @@ class AuthController extends Notifier<PlayerProfile?> {
         .init(profile.userId, displayName: profile.displayName);
     _initIAPStartup(profile.userId);
     unawaited(_registerPendingInvite(profile));
+  }
+
+  /// Recarrega notifiers que não têm watcher do Hive após syncProfile().
+  /// Garante que a UI reflita os dados recém-mesclados do Firestore.
+  Future<void> _reloadSyncedNotifiers() async {
+    await ref.read(personalRecordsProvider.notifier).load();
+    await ref.read(dailyRewardsProvider.notifier).load();
   }
 
   /// Initializes IAPStartupService after successful login.
