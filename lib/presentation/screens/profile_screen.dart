@@ -157,30 +157,14 @@ class _LoggedInState extends ConsumerState<_LoggedIn> {
         ),
         const SizedBox(height: 16),
         Center(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                profile.displayName,
-                style: outlinedWhiteTextStyle(
-                  GoogleFonts.fredoka(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+          child: Text(
+            profile.displayName,
+            style: outlinedWhiteTextStyle(
+              GoogleFonts.fredoka(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
               ),
-              if (profile.provider == AuthProvider.email) ...[
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () => _editName(context, profile),
-                  child: const Icon(
-                    Icons.edit,
-                    color: Colors.white70,
-                    size: 18,
-                  ),
-                ),
-              ],
-            ],
+            ),
           ),
         ),
         if (profile.email != null) ...[
@@ -216,6 +200,18 @@ class _LoggedInState extends ConsumerState<_LoggedIn> {
                 ),
               ),
               if (profile.provider == AuthProvider.email) ...[
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(
+                    Icons.edit,
+                    color: AppColors.primary,
+                  ),
+                  title: Text(
+                    'Editar nome',
+                    style: GoogleFonts.nunito(fontSize: 16),
+                  ),
+                  onTap: () => _editName(context, profile),
+                ),
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(

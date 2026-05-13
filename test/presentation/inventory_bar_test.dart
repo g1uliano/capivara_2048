@@ -50,9 +50,9 @@ void main() {
     final buttons = tester
         .widgetList<InventoryItemButton>(find.byType(InventoryItemButton))
         .toList();
-    expect(buttons[0].pngPath, 'assets/images/inventory/bomb_2.png');
-    expect(buttons[1].pngPath, 'assets/images/inventory/bomb_3.png');
-    expect(buttons[2].pngPath, 'assets/images/inventory/undo_1.png');
-    expect(buttons[3].pngPath, 'assets/images/inventory/undo_3.png');
+    expect(buttons[0].pngPath, 'assets/images/inventory/bomb_2.webp');
+    expect(buttons[1].pngPath, 'assets/images/inventory/bomb_3.webp');
+    expect(buttons[2].pngPath, 'assets/images/inventory/undo_1.webp');
+    expect(buttons[3].pngPath, 'assets/images/inventory/undo_3.webp');
   });
 }

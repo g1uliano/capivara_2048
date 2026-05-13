@@ -136,14 +136,11 @@ class FirebaseSyncEngine implements SyncEngine {
         'rewardCollected4096': records.rewardCollected4096,
         'rewardCollected8192': records.rewardCollected8192,
         if (records.firstReached2048At != null)
-          'firstReached2048At':
-              Timestamp.fromDate(records.firstReached2048At!),
+          'firstReached2048At': Timestamp.fromDate(records.firstReached2048At!),
         if (records.firstReached4096At != null)
-          'firstReached4096At':
-              Timestamp.fromDate(records.firstReached4096At!),
+          'firstReached4096At': Timestamp.fromDate(records.firstReached4096At!),
         if (records.firstReached8192At != null)
-          'firstReached8192At':
-              Timestamp.fromDate(records.firstReached8192At!),
+          'firstReached8192At': Timestamp.fromDate(records.firstReached8192At!),
       },
     }, SetOptions(merge: true));
   }
@@ -391,8 +388,9 @@ class FirebaseSyncEngine implements SyncEngine {
       claimedThisCycle: (remoteData['claimedThisCycle'] as bool?) ?? false,
     );
     // Tomar o estado mais recente (maior lastClaimedDate = ganhou mais recentemente)
-    final merged =
-        remote.lastClaimedDate.isAfter(local.lastClaimedDate) ? remote : local;
+    final merged = remote.lastClaimedDate.isAfter(local.lastClaimedDate)
+        ? remote
+        : local;
     await box.put('state', merged);
   }
 

@@ -32,8 +32,20 @@ class _DailyRewardOverlayState extends ConsumerState<DailyRewardOverlay> {
           margin: const EdgeInsets.symmetric(horizontal: 32),
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: const Color(0xFF1E3A5F),
+            // Esmeralda escuro — alinhado com GlassPanel e demais overlays do app
+            color: const Color(0xFF0A1F0D).withValues(alpha: 0.92),
             borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: const Color(0xFFFFD54F).withValues(alpha: 0.55),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.4),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -122,7 +134,7 @@ class _RewardSummary extends StatelessWidget {
     if (reward.undo1 > 0) {
       items.add(
         _row(
-          'assets/images/inventory/undo_1.png',
+          'assets/images/inventory/undo_1.webp',
           '${reward.undo1 * multiplier}× Desfazer 1',
         ),
       );
@@ -130,7 +142,7 @@ class _RewardSummary extends StatelessWidget {
     if (reward.bomb2 > 0) {
       items.add(
         _row(
-          'assets/images/inventory/bomb_2.png',
+          'assets/images/inventory/bomb_2.webp',
           '${reward.bomb2 * multiplier}× Bomba 2',
         ),
       );

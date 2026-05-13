@@ -228,14 +228,25 @@ assets/
 - **Fase 4.2** — Exclusão de conta LGPD, edição de nome, troca/esqueci senha ✅
   - Persistência de avatar no tile, auth gates (startup, shop, daily, ranking)
   - Sync de game records
-- **Fase 4.3** — Ranking Global, Recompensas e Auditoria de Flavors
+- **Fase 4.3** — Ranking Global, Recompensas e Auditoria de Flavors ✅ _(v1.7.0)_
   - Aba Global no Ranking (tempo até 2048, reinício semanal, tiebreaker por tile máximo)
   - Dialogs pós-milestone: posição no ranking (2048), tempo (4096), contagem (8192)
   - Recompensas por recorde pessoal (combo: vida + bomba3 + desfazer) — novo melhor tempo no 2048 ou novo tile máximo
   - Recompensas por convite — convidador recebe combo quando convidado joga 1ª partida
   - Tabela de prêmios semanais revisada (top 10, posições 1–10)
   - Fake\* providers exclusivos para flavor `tst`; `dev` usa serviços reais
-- **Fase 5** — Arte adicional e polimento visual (logo, ícone, splash final)
+- **Fase 4.4** — Tutorial wizard interativo ✅ _(v1.8.0)_
+  - `TutorialScreen` (5 telas, 2 mini-boards interativos), `TutorialMiniBoard`, `TutorialController`
+  - `PlayerProfile.tutorialCompleted` persistido no Firestore (logados) / SharedPreferences (anônimos)
+- **Fase 4.5** — IAP real, haptic feedback, Bomba3 e ícones da Home ✅ _(v1.8.0/v1.8.1)_
+  - Produtos unitários IAP (`u_bomb3`, `u_undo3`, `u_bomb2`, `u_undo1`); compra de itens avulsos e combos via fluxo IAP real
+  - Haptic feedback graduado (leve em level-up, médio em 2048/4096/8192, forte em game over)
+  - Bomba 3 desabilitada com < 5 peças no tabuleiro; ícones da Home redesenhados (6 PNGs ilustrados)
+- **Fase 4.6** — Recompensas Diárias redesign + Sync pós-login ✅ _(v1.9.1)_
+  - Trilha serpentina com 6 caixas de presente coloridas + baú Dia 7, `CapivaraMascot` animado
+  - Sync completo pós-login: inventário IAP, recordes pessoais, coleção e progresso de recompensas diárias restaurados após `signIn` / `clearStorage`
+- **Fase 5** — Arte adicional e polimento visual _(em progresso, v1.9.3)_
+  - Assets PNG → WebP (~96% redução); novo visual da tela Recompensas Diárias (tiles de sapos, fundo gradiente exclusivo); editar nome visível no Perfil
 - **Fase 6** — Áudio (sound design dos 13 animais, SFX, música)
 - **Fase 7** — Polimento, l10n, acessibilidade, lançamento
 

@@ -14,7 +14,7 @@ class TutorialFinalePage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Image.asset(
-                'assets/images/animals/tile/Capivara.png',
+                'assets/images/animals/tile/Capivara.webp',
                 width: 200,
                 height: 200,
                 fit: BoxFit.contain,

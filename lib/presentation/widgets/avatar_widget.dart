@@ -4,19 +4,19 @@ import '../../data/models/player_profile.dart';
 
 /// Mapa de nome do animal para o asset do tile correspondente.
 const Map<String, String> kAnimalTileAssets = {
-  'Tanajura': 'assets/images/animals/tile/Tanajura.png',
-  'LoboGuara': 'assets/images/animals/tile/LoboGuara.png',
-  'Cururu': 'assets/images/animals/tile/Cururu.png',
-  'Tucano': 'assets/images/animals/tile/Tucano.png',
-  'Sagui': 'assets/images/animals/tile/Sagui.png',
-  'Preguica': 'assets/images/animals/tile/Preguica.png',
-  'MicoLeao': 'assets/images/animals/tile/MicoLeao.png',
-  'Boto': 'assets/images/animals/tile/Boto.png',
-  'Onca': 'assets/images/animals/tile/Onca.png',
-  'Sucuri': 'assets/images/animals/tile/Sucuri.png',
-  'Capivara': 'assets/images/animals/tile/Capivara.png',
-  'PeixeBoi': 'assets/images/animals/tile/PeixeBoi.png',
-  'Jacare': 'assets/images/animals/tile/Jacare.png',
+  'Tanajura': 'assets/images/animals/tile/Tanajura.webp',
+  'LoboGuara': 'assets/images/animals/tile/LoboGuara.webp',
+  'Cururu': 'assets/images/animals/tile/Cururu.webp',
+  'Tucano': 'assets/images/animals/tile/Tucano.webp',
+  'Sagui': 'assets/images/animals/tile/Sagui.webp',
+  'Preguica': 'assets/images/animals/tile/Preguica.webp',
+  'MicoLeao': 'assets/images/animals/tile/MicoLeao.webp',
+  'Boto': 'assets/images/animals/tile/Boto.webp',
+  'Onca': 'assets/images/animals/tile/Onca.webp',
+  'Sucuri': 'assets/images/animals/tile/Sucuri.webp',
+  'Capivara': 'assets/images/animals/tile/Capivara.webp',
+  'PeixeBoi': 'assets/images/animals/tile/PeixeBoi.webp',
+  'Jacare': 'assets/images/animals/tile/Jacare.webp',
 };
 
 /// Lista ordenada dos animais disponíveis como avatar (ordem do jogo).

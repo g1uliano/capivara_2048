@@ -13,7 +13,7 @@ class GameBackground extends StatelessWidget {
         decoration: const BoxDecoration(
           color: AppColors.gameBackground,
           image: DecorationImage(
-            image: AssetImage('assets/images/fundo.png'),
+            image: AssetImage('assets/images/fundo.webp'),
             fit: BoxFit.cover,
           ),
         ),

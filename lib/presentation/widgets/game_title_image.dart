@@ -10,8 +10,8 @@ class GameTitleImage extends StatelessWidget {
   static String pickAsset({Random? random}) {
     final r = random ?? Random();
     return r.nextInt(2) == 0
-        ? 'assets/images/title/title_brown.png'
-        : 'assets/images/title/title_orange.png';
+        ? 'assets/images/title/title_brown.webp'
+        : 'assets/images/title/title_orange.webp';
   }
 
   @override

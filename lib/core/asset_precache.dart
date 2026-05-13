@@ -14,25 +14,25 @@ List<String> criticalAssetPaths() {
     'assets/images/splash/splashscreen.png',
 
     // 2) Logo do jogo (uma das duas é sorteada na Home)
-    'assets/images/title/title_brown.png',
-    'assets/images/title/title_orange.png',
+    'assets/images/title/title_brown.webp',
+    'assets/images/title/title_orange.webp',
 
     // 3) Fundo da tela de jogo
-    'assets/images/fundo.png',
+    'assets/images/fundo.webp',
 
     // 4) Ícones da Home
-    'assets/images/home/Colecao.png',
-    'assets/images/home/ComoJogar.png',
-    'assets/images/home/Configuracao.png',
-    'assets/images/home/IconeLoja.png',
-    'assets/images/home/Ranking.png',
-    'assets/images/home/Recompensas.png',
+    'assets/images/home/Colecao.webp',
+    'assets/images/home/ComoJogar.webp',
+    'assets/images/home/Configuracao.webp',
+    'assets/images/home/IconeLoja.webp',
+    'assets/images/home/Ranking.webp',
+    'assets/images/home/Recompensas.webp',
 
     // 5) Ícones do inventário
-    'assets/images/inventory/bomb_2.png',
-    'assets/images/inventory/bomb_3.png',
-    'assets/images/inventory/undo_1.png',
-    'assets/images/inventory/undo_3.png',
+    'assets/images/inventory/bomb_2.webp',
+    'assets/images/inventory/bomb_3.webp',
+    'assets/images/inventory/undo_1.webp',
+    'assets/images/inventory/undo_3.webp',
 
     // 6) Tiles e hosts dos animais (aparecem no jogo)
     for (final animal in animals) animal.tilePngPath,

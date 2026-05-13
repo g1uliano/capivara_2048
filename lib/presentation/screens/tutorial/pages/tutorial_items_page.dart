@@ -31,7 +31,7 @@ class TutorialItemsPage extends StatelessWidget {
             margin: const EdgeInsets.all(8),
             child: ListTile(
               leading: Image.asset(
-                'assets/images/inventory/bomb_3.png',
+                'assets/images/inventory/bomb_3.webp',
                 width: 48,
                 height: 48,
               ),
@@ -54,7 +54,7 @@ class TutorialItemsPage extends StatelessWidget {
             margin: const EdgeInsets.all(8),
             child: ListTile(
               leading: Image.asset(
-                'assets/images/inventory/undo_1.png',
+                'assets/images/inventory/undo_1.webp',
                 width: 48,
                 height: 48,
               ),

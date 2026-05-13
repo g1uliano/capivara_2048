@@ -17,10 +17,10 @@ import 'iap_confirmation_sheet.dart';
 import 'outlined_text.dart';
 
 String _pngFor(ItemType t) => switch (t) {
-      ItemType.bomb2 => 'assets/images/inventory/bomb_2.png',
-      ItemType.bomb3 => 'assets/images/inventory/bomb_3.png',
-      ItemType.undo1 => 'assets/images/inventory/undo_1.png',
-      ItemType.undo3 => 'assets/images/inventory/undo_3.png',
+      ItemType.bomb2 => 'assets/images/inventory/bomb_2.webp',
+      ItemType.bomb3 => 'assets/images/inventory/bomb_3.webp',
+      ItemType.undo1 => 'assets/images/inventory/undo_1.webp',
+      ItemType.undo3 => 'assets/images/inventory/undo_3.webp',
     };
 
 String _nameFor(ItemType t) => switch (t) {

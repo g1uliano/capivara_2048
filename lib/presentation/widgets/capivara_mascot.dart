@@ -45,7 +45,7 @@ class CapivaraMascot extends StatelessWidget {
             ),
           ),
         Image.asset(
-              'assets/images/animals/tile/Capivara.png',
+              'assets/images/animals/tile/Capivara.webp',
               width: size,
               height: size,
               fit: BoxFit.contain,

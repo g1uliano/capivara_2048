@@ -10,8 +10,8 @@ void main() {
         level: 1, value: 2, name: 'Test',
         borderColor: Color(0xFF000000),
         backgroundBaseColor: Color(0xFFFFFFFF),
-        tilePngPath: 'assets/images/animals/tile/Tanajura.png',
-        hostPngPath: 'assets/images/animals/host/Tanajura.png',
+        tilePngPath: 'assets/images/animals/tile/Tanajura.webp',
+        hostPngPath: 'assets/images/animals/host/Tanajura.webp',
         scientificName: 'Atta sexdens',
         funFact: 'Some fact.',
       );
@@ -24,8 +24,8 @@ void main() {
         level: 1, value: 2, name: 'Test',
         borderColor: Color(0xFF000000),
         backgroundBaseColor: Color(0xFFFFFFFF),
-        tilePngPath: 'assets/images/animals/tile/Tanajura.png',
-        hostPngPath: 'assets/images/animals/host/Tanajura.png',
+        tilePngPath: 'assets/images/animals/tile/Tanajura.webp',
+        hostPngPath: 'assets/images/animals/host/Tanajura.webp',
       );
       expect(a.scientificName, isNull);
       expect(a.funFact, isNull);

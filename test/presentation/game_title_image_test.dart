@@ -5,8 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:capivara_2048/presentation/widgets/game_title_image.dart';
 
 void main() {
-  const orange = 'assets/images/title/title_orange.png';
-  const brown = 'assets/images/title/title_brown.png';
+  const orange = 'assets/images/title/title_orange.webp';
+  const brown = 'assets/images/title/title_brown.webp';
   const validAssets = {orange, brown};
 
   group('GameTitleImage.pickAsset', () {

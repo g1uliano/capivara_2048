@@ -10,31 +10,31 @@ void main() {
     });
 
     test('inclui ambos os títulos do jogo (a logo carrega por último era bug)', () {
-      expect(paths, contains('assets/images/title/title_brown.png'));
-      expect(paths, contains('assets/images/title/title_orange.png'));
+      expect(paths, contains('assets/images/title/title_brown.webp'));
+      expect(paths, contains('assets/images/title/title_orange.webp'));
     });
 
     test('inclui o fundo da game screen', () {
-      expect(paths, contains('assets/images/fundo.png'));
+      expect(paths, contains('assets/images/fundo.webp'));
     });
 
     test('inclui os 6 ícones da Home', () {
       expect(paths, containsAll([
-        'assets/images/home/Colecao.png',
-        'assets/images/home/ComoJogar.png',
-        'assets/images/home/Configuracao.png',
-        'assets/images/home/IconeLoja.png',
-        'assets/images/home/Ranking.png',
-        'assets/images/home/Recompensas.png',
+        'assets/images/home/Colecao.webp',
+        'assets/images/home/ComoJogar.webp',
+        'assets/images/home/Configuracao.webp',
+        'assets/images/home/IconeLoja.webp',
+        'assets/images/home/Ranking.webp',
+        'assets/images/home/Recompensas.webp',
       ]));
     });
 
     test('inclui os ícones do inventário', () {
       expect(paths, containsAll([
-        'assets/images/inventory/bomb_2.png',
-        'assets/images/inventory/bomb_3.png',
-        'assets/images/inventory/undo_1.png',
-        'assets/images/inventory/undo_3.png',
+        'assets/images/inventory/bomb_2.webp',
+        'assets/images/inventory/bomb_3.webp',
+        'assets/images/inventory/undo_1.webp',
+        'assets/images/inventory/undo_3.webp',
       ]));
     });
 

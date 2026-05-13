@@ -134,7 +134,7 @@ class _RecordList extends StatelessWidget {
     if (records.isEmpty) {
       return Center(
         child: OutlinedText(
-          text: 'Jogue sua primeira partida para aparecer aqui!',
+          text: 'Forme o 2048 para aparecer aqui!',
           style: GoogleFonts.fredoka(fontSize: 14),
           textAlign: TextAlign.center,
         ),

@@ -18,10 +18,10 @@ class ShopUnitItemCard extends ConsumerWidget {
   });
 
   String get _png => switch (item) {
-    ItemType.bomb2 => 'assets/images/inventory/bomb_2.png',
-    ItemType.bomb3 => 'assets/images/inventory/bomb_3.png',
-    ItemType.undo1 => 'assets/images/inventory/undo_1.png',
-    ItemType.undo3 => 'assets/images/inventory/undo_3.png',
+    ItemType.bomb2 => 'assets/images/inventory/bomb_2.webp',
+    ItemType.bomb3 => 'assets/images/inventory/bomb_3.webp',
+    ItemType.undo1 => 'assets/images/inventory/undo_1.webp',
+    ItemType.undo3 => 'assets/images/inventory/undo_3.webp',
   };
 
   String get _name => switch (item) {

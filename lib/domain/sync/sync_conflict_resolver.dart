@@ -33,10 +33,7 @@ class SyncConflictResolver {
       rewardCollected8192:
           local.rewardCollected8192 || remote.rewardCollected8192,
       highestLevelEver: _max(local.highestLevelEver, remote.highestLevelEver),
-      bestTimeMs2048: _minNonZero(
-        local.bestTimeMs2048,
-        remote.bestTimeMs2048,
-      ),
+      bestTimeMs2048: _minNonZero(local.bestTimeMs2048, remote.bestTimeMs2048),
     );
   }
 

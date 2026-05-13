@@ -108,7 +108,7 @@ class _HeroCard extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(8),
               child: Image.asset(
-                'assets/images/animals/tile/Capivara.png',
+                'assets/images/animals/tile/Capivara.webp',
                 fit: BoxFit.contain,
               ),
             ),
@@ -146,7 +146,7 @@ class _HeroCard extends StatelessWidget {
               ),
               SizedBox(width: 14),
               _RewardChip(
-                imageAsset: 'assets/images/inventory/bomb_2.png',
+                imageAsset: 'assets/images/inventory/bomb_2.webp',
                 quantity: '1',
                 label: 'Bomba',
               ),

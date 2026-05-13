@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/theme/text_styles.dart';
 import '../../domain/daily_rewards/daily_rewards_engine.dart';
 
 enum DayTileState { future, currentAvailable, claimed }
 
-/// Visual de "presente embrulhado" para a trilha de recompensa diária.
+/// Visual de recompensa diária baseado nas imagens reward_day_0X.webp.
 ///
 /// 3 estados:
-/// - future: caixa fechada com fita, conteúdo escondido (mistério)
-/// - currentAvailable: caixa pulsando dourada, "Toque pra abrir!"
-/// - claimed: caixa aberta vazia com ✓ verde
+/// - future: imagem com opacidade reduzida (mistério)
+/// - currentAvailable: imagem com glow dourado e pulse
+/// - claimed: imagem escurecida + checkmark verde
 ///
-/// Quando isDay7=true, a caixa vira um baú de tesouro maior e dourado.
+/// Quando isDay7=true usa reward_day_07.webp (panorâmica) para o grande prêmio.
 class DailyRewardDayTile extends StatelessWidget {
   final int day;
   final DailyReward reward;
@@ -40,37 +41,45 @@ class DailyRewardDayTile extends StatelessWidget {
 
     Widget box;
     if (isClaimed) {
-      box = _OpenedGiftBox(
+      box = _ClaimedImage(day: day, width: width, height: height, isDay7: isDay7);
+    } else {
+      box = _RewardDayImage(
         day: day,
         width: width,
         height: height,
+        isCurrent: isCurrent,
         isDay7: isDay7,
       );
-    } else if (isDay7) {
-      box = _TreasureChest(
-        day: day,
-        reward: reward,
-        width: width,
-        height: height,
-        isCurrent: isCurrent,
-      );
-    } else {
-      box = _ClosedGiftBox(
-        day: day,
-        width: width,
-        height: height,
-        isCurrent: isCurrent,
-      );
     }
 
-    Widget content = SizedBox(width: width, height: height, child: box);
+    // Label fora dos Stacks internos — garantidamente centrado pelo SizedBox
+    Widget content = SizedBox(
+      width: width,
+      height: height,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          box,
+          if (!isClaimed && !isDay7)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 6,
+              child: Text(
+                'Dia $day',
+                textAlign: TextAlign.center,
+                style: outlinedWhiteTextStyle(
+                  GoogleFonts.fredoka(
+                    fontSize: (width * 0.16).clamp(12, 18),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
 
-    // Dim future tiles slightly to suggest "not yet"
-    if (tileState == DayTileState.future) {
-      content = Opacity(opacity: 0.75, child: content);
-    }
-
-    // Pulse + shimmer animation when current
     if (isCurrent) {
       content = content
           .animate(onPlay: (c) => c.repeat(reverse: true))
@@ -94,29 +103,30 @@ class DailyRewardDayTile extends StatelessWidget {
   }
 }
 
+String _rewardImagePath(int day) =>
+    'assets/images/reward/reward_day_${day.toString().padLeft(2, '0')}.webp';
+
 // ─────────────────────────────────────────────────────────────────────────────
-// CLOSED GIFT BOX (future + current days 1–6)
+// REWARD DAY IMAGE (future + current — dias 1-6 e dia 7)
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _ClosedGiftBox extends StatelessWidget {
+class _RewardDayImage extends StatelessWidget {
   final int day;
   final double width;
   final double height;
   final bool isCurrent;
+  final bool isDay7;
 
-  const _ClosedGiftBox({
+  const _RewardDayImage({
     required this.day,
     required this.width,
     required this.height,
     required this.isCurrent,
+    required this.isDay7,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Cor da caixa varia por dia para dar vida visual
-    final colors = _giftColors(day);
-    final ribbonColor = isCurrent ? const Color(0xFFFFC107) : Colors.white;
-
     return Stack(
       clipBehavior: Clip.none,
       alignment: Alignment.center,
@@ -130,189 +140,126 @@ class _ClosedGiftBox extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFFFD54F).withValues(alpha: 0.7),
-                  blurRadius: 20,
-                  spreadRadius: 4,
+                  color: const Color(0xFFFFD54F).withValues(
+                    alpha: isDay7 ? 0.85 : 0.7,
+                  ),
+                  blurRadius: isDay7 ? 30 : 20,
+                  spreadRadius: isDay7 ? 6 : 4,
                 ),
               ],
             ),
           ),
 
-        // Caixa principal
-        Container(
-          width: width,
-          height: height,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: colors,
-            ),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: isCurrent ? const Color(0xFFFFD54F) : Colors.white24,
-              width: isCurrent ? 2.5 : 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.25),
-                blurRadius: 6,
-                offset: const Offset(0, 3),
-              ),
-            ],
+        // Imagem principal
+        ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: Image.asset(
+            _rewardImagePath(day),
+            width: width,
+            height: height,
+            fit: BoxFit.cover,
           ),
         ),
 
-        // Tampa da caixa (faixa horizontal escura no topo)
-        Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          child: Container(
-            height: height * 0.28,
+        // Borda dourada quando current
+        if (isCurrent)
+          Container(
+            width: width,
+            height: height,
             decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.18),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(14),
-                topRight: Radius.circular(14),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: const Color(0xFFFFD54F),
+                width: 2.5,
               ),
             ),
           ),
-        ),
 
-        // Fita vertical
-        Positioned(
-          top: 0,
-          bottom: 0,
-          child: Container(width: width * 0.13, color: ribbonColor),
-        ),
-
-        // Fita horizontal (na "tampa")
-        Positioned(
-          top: height * 0.21,
-          left: 0,
-          right: 0,
-          child: Container(height: height * 0.10, color: ribbonColor),
-        ),
-
-        // Laço no topo (2 círculos sobrepostos)
-        Positioned(
-          top: -height * 0.08,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: width * 0.22,
-                height: width * 0.22,
-                decoration: BoxDecoration(
-                  color: ribbonColor,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.black12, width: 1),
+        // Label do Dia 7 fica aqui pois está sobre a imagem (dias 1-6 estão no Stack externo)
+        if (isDay7)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: height * 0.08,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'DIA 7',
+                  textAlign: TextAlign.center,
+                  style: outlinedWhiteTextStyle(
+                    GoogleFonts.fredoka(
+                      color: const Color(0xFFFFD700),
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1,
+                    ),
+                  ),
                 ),
-              ),
-              SizedBox(width: width * 0.02),
-              Container(
-                width: width * 0.22,
-                height: width * 0.22,
-                decoration: BoxDecoration(
-                  color: ribbonColor,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.black12, width: 1),
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        // Número do dia (embaixo da fita horizontal)
-        Positioned(
-          bottom: height * 0.12,
-          child: Text(
-            'Dia $day',
-            style: GoogleFonts.fredoka(
-              color: Colors.white,
-              fontSize: (width * 0.20).clamp(15, 22),
-              fontWeight: FontWeight.w900,
-              shadows: const [
-                Shadow(
-                  color: Colors.black,
-                  blurRadius: 4,
-                  offset: Offset(1.5, 1.5),
-                ),
-                Shadow(
-                  color: Colors.black,
-                  blurRadius: 4,
-                  offset: Offset(-1.5, -1.5),
-                ),
-                Shadow(
-                  color: Colors.black,
-                  blurRadius: 4,
-                  offset: Offset(1.5, -1.5),
-                ),
-                Shadow(
-                  color: Colors.black,
-                  blurRadius: 4,
-                  offset: Offset(-1.5, 1.5),
+                Text(
+                  'GRANDE PRÊMIO',
+                  textAlign: TextAlign.center,
+                  style: outlinedWhiteTextStyle(
+                    GoogleFonts.fredoka(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
-        ),
 
         // Sparkle quando current
-        if (isCurrent)
+        if (isCurrent && isDay7) ...[
           Positioned(
-            top: 8,
-            right: 8,
-            child:
-                const Icon(
-                      Icons.auto_awesome,
-                      color: Color(0xFFFFE082),
-                      size: 18,
-                    )
-                    .animate(onPlay: (c) => c.repeat())
-                    .rotate(duration: 2000.ms, begin: 0, end: 1)
-                    .then()
-                    .fade(duration: 400.ms, begin: 1.0, end: 0.5)
-                    .then()
-                    .fade(duration: 400.ms, begin: 0.5, end: 1.0),
+            top: -8,
+            left: 12,
+            child: const Icon(Icons.auto_awesome, color: Color(0xFFFFE082), size: 22)
+                .animate(onPlay: (c) => c.repeat())
+                .fade(duration: 700.ms, begin: 1.0, end: 0.3)
+                .then()
+                .fade(duration: 700.ms, begin: 0.3, end: 1.0),
+          ),
+          Positioned(
+            top: -4,
+            right: 18,
+            child: const Icon(Icons.auto_awesome, color: Color(0xFFFFD700), size: 18)
+                .animate(onPlay: (c) => c.repeat())
+                .fade(duration: 900.ms, begin: 0.4, end: 1.0)
+                .then()
+                .fade(duration: 900.ms, begin: 1.0, end: 0.4),
+          ),
+        ] else if (isCurrent)
+          Positioned(
+            top: 6,
+            right: 6,
+            child: const Icon(Icons.auto_awesome, color: Color(0xFFFFE082), size: 16)
+                .animate(onPlay: (c) => c.repeat())
+                .rotate(duration: 2000.ms, begin: 0, end: 1)
+                .then()
+                .fade(duration: 400.ms, begin: 1.0, end: 0.5)
+                .then()
+                .fade(duration: 400.ms, begin: 0.5, end: 1.0),
           ),
       ],
     );
   }
-
-  /// Paleta variando por dia para deixar a trilha colorida.
-  List<Color> _giftColors(int day) {
-    switch (day) {
-      case 1:
-        return [const Color(0xFFEF5350), const Color(0xFFC62828)]; // vermelho
-      case 2:
-        return [const Color(0xFF42A5F5), const Color(0xFF1565C0)]; // azul
-      case 3:
-        return [const Color(0xFFAB47BC), const Color(0xFF6A1B9A)]; // roxo
-      case 4:
-        return [const Color(0xFF26A69A), const Color(0xFF00695C)]; // teal
-      case 5:
-        return [const Color(0xFFFF7043), const Color(0xFFD84315)]; // laranja
-      case 6:
-        return [const Color(0xFFEC407A), const Color(0xFFAD1457)]; // rosa
-      default:
-        return [const Color(0xFF66BB6A), const Color(0xFF2E7D32)]; // verde
-    }
-  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// OPENED GIFT BOX (claimed)
+// CLAIMED IMAGE (recompensa já coletada)
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _OpenedGiftBox extends StatelessWidget {
+class _ClaimedImage extends StatelessWidget {
   final int day;
   final double width;
   final double height;
   final bool isDay7;
 
-  const _OpenedGiftBox({
+  const _ClaimedImage({
     required this.day,
     required this.width,
     required this.height,
@@ -322,42 +269,29 @@ class _OpenedGiftBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      clipBehavior: Clip.none,
       alignment: Alignment.center,
       children: [
-        // Caixa "vazia" — escurecida e dessaturada
-        Container(
-          width: width,
-          height: height,
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.45),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.white24, width: 1),
-          ),
-        ),
-
-        // "Tampa" levantada acima da caixa (sugere abertura)
-        Positioned(
-          top: -height * 0.16,
-          left: width * 0.08,
-          right: width * 0.08,
-          child: Transform.rotate(
-            angle: -0.12,
-            child: Container(
-              height: height * 0.20,
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.55),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.white24, width: 1),
-              ),
+        // Imagem escurecida (claimed)
+        ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: ColorFiltered(
+            colorFilter: ColorFilter.mode(
+              Colors.black.withValues(alpha: 0.50),
+              BlendMode.darken,
+            ),
+            child: Image.asset(
+              _rewardImagePath(day),
+              width: width,
+              height: height,
+              fit: BoxFit.cover,
             ),
           ),
         ),
 
-        // Check verde grande no centro
+        // Checkmark verde
         Container(
-          width: width * 0.45,
-          height: width * 0.45,
+          width: width * 0.42,
+          height: width * 0.42,
           decoration: BoxDecoration(
             color: const Color(0xFF4CAF50),
             shape: BoxShape.circle,
@@ -369,235 +303,22 @@ class _OpenedGiftBox extends StatelessWidget {
               ),
             ],
           ),
-          child: const Icon(Icons.check, color: Colors.white, size: 32),
+          child: const Icon(Icons.check, color: Colors.white, size: 28),
         ),
 
-        // Label "Dia X" pequeno embaixo
+        // Label
         Positioned(
+          left: 0,
+          right: 0,
           bottom: 6,
           child: Text(
             isDay7 ? 'Dia 7 ✓' : 'Dia $day',
-            style: GoogleFonts.fredoka(
-              color: Colors.white70,
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
+            textAlign: TextAlign.center,
+            style: outlinedWhiteTextStyle(
+              GoogleFonts.fredoka(fontSize: 11, fontWeight: FontWeight.w600),
             ),
           ),
         ),
-      ],
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// TREASURE CHEST (Day 7)
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _TreasureChest extends StatelessWidget {
-  final int day;
-  final DailyReward reward;
-  final double width;
-  final double height;
-  final bool isCurrent;
-
-  const _TreasureChest({
-    required this.day,
-    required this.reward,
-    required this.width,
-    required this.height,
-    required this.isCurrent,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      alignment: Alignment.center,
-      children: [
-        // Glow dourado intenso
-        if (isCurrent)
-          Container(
-            width: width,
-            height: height,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFFFFD54F).withValues(alpha: 0.85),
-                  blurRadius: 30,
-                  spreadRadius: 6,
-                ),
-              ],
-            ),
-          ),
-
-        // Tampa do baú (parte de cima, arredondada)
-        Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          child: Container(
-            height: height * 0.42,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0xFF8D6E63), Color(0xFF5D4037)],
-              ),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(40),
-                topRight: Radius.circular(40),
-              ),
-              border: Border.all(color: const Color(0xFFFFD700), width: 3),
-            ),
-          ),
-        ),
-
-        // Corpo do baú
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: Container(
-            height: height * 0.62,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0xFF6D4C41), Color(0xFF3E2723)],
-              ),
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(12),
-                bottomRight: Radius.circular(12),
-              ),
-              border: Border.all(color: const Color(0xFFFFD700), width: 3),
-            ),
-          ),
-        ),
-
-        // Faixa horizontal dourada (linha de junção da tampa)
-        Positioned(
-          top: height * 0.38,
-          left: 0,
-          right: 0,
-          child: Container(height: 6, color: const Color(0xFFFFD700)),
-        ),
-
-        // Cadêado/jóia menor (não compete com texto)
-        Positioned(
-          top: height * 0.30,
-          child: Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFD700),
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.brown.shade900, width: 2),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.4),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: const Icon(Icons.star, color: Colors.brown, size: 16),
-          ),
-        ),
-
-        // Texto "DIA 7" GRANDE no centro do corpo do baú
-        Positioned(
-          bottom: height * 0.20,
-          child: Text(
-            'DIA 7',
-            style: GoogleFonts.fredoka(
-              color: const Color(0xFFFFD700),
-              fontSize: 38,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 2.5,
-              shadows: const [
-                Shadow(
-                  color: Colors.black,
-                  blurRadius: 4,
-                  offset: Offset(2, 2),
-                ),
-                Shadow(
-                  color: Colors.black,
-                  blurRadius: 4,
-                  offset: Offset(-2, -2),
-                ),
-                Shadow(
-                  color: Colors.black,
-                  blurRadius: 4,
-                  offset: Offset(2, -2),
-                ),
-                Shadow(
-                  color: Colors.black,
-                  blurRadius: 4,
-                  offset: Offset(-2, 2),
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        // Subtítulo "GRANDE PRÊMIO"
-        Positioned(
-          bottom: height * 0.06,
-          child: Text(
-            'GRANDE PRÊMIO',
-            style: GoogleFonts.fredoka(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 2.0,
-              shadows: const [
-                Shadow(
-                  color: Colors.black,
-                  blurRadius: 3,
-                  offset: Offset(1, 1),
-                ),
-                Shadow(
-                  color: Colors.black,
-                  blurRadius: 3,
-                  offset: Offset(-1, -1),
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        // Sparkles nos cantos quando current
-        if (isCurrent) ...[
-          Positioned(
-            top: -8,
-            left: 12,
-            child:
-                const Icon(
-                      Icons.auto_awesome,
-                      color: Color(0xFFFFE082),
-                      size: 22,
-                    )
-                    .animate(onPlay: (c) => c.repeat())
-                    .fade(duration: 700.ms, begin: 1.0, end: 0.3)
-                    .then()
-                    .fade(duration: 700.ms, begin: 0.3, end: 1.0),
-          ),
-          Positioned(
-            top: -4,
-            right: 18,
-            child:
-                const Icon(
-                      Icons.auto_awesome,
-                      color: Color(0xFFFFD700),
-                      size: 18,
-                    )
-                    .animate(onPlay: (c) => c.repeat())
-                    .fade(duration: 900.ms, begin: 0.4, end: 1.0)
-                    .then()
-                    .fade(duration: 900.ms, begin: 1.0, end: 0.4),
-          ),
-        ],
       ],
     );
   }

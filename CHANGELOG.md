@@ -6,6 +6,24 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.3] — 2026-05-13
+
+### Added
+
+- **Perfil — Editar nome visível**: `ListTile` "Editar nome" adicionado no card de ações do `ProfileScreen`, exclusivo para usuários com conta e-mail (ao lado de "Trocar senha"). O ícone inline de 18px que era o único ponto de entrada anterior foi removido por ser praticamente invisível sobre o fundo da floresta
+
+### Changed
+
+- **Assets: PNG → WebP** — todos os assets de imagem migrados para WebP com redimensionamento (tile animals → 512×512, host animals → 1024×1024, home/inventory/title → 512×512); ~96% de redução no tamanho total de imagens (~72 MB → ~2,5 MB)
+- **Recompensas Diárias — novo visual dos tiles**: gift boxes e baú substituídos pelas 7 imagens WebP `reward_day_01–07.webp` (sapos em nenúfares, progressão 1→6 sapos nos dias 1–6; imagem panorâmica no Dia 7)
+- **Recompensas Diárias — fundo exclusivo**: `GameBackground` (floresta) substituído por gradiente verde-floresta escuro (`#071812` → `#0D2B1C`), exclusivo desta tela; `GlassPanel` substituído por `_DailyPanel` sólido otimizado para fundo sólido
+- **Ranking — mensagem estado vazio**: "Jogue sua primeira partida para aparecer aqui!" → "Forme o 2048 para aparecer aqui!" (reflete a condição real de entrada no ranking)
+
+### Fixed
+
+- **reward_day_05.webp**: padding transparente de 32 px nas bordas direita/inferior removido por crop + resize para 512×512, igualando visualmente o tile do Dia 5 aos demais
+- **Recompensas Diárias — labels "Dia X"**: `Positioned(left:0, right:0)` + `textAlign: center` adicionados nos tiles claimed e future, corrigindo desalinhamento do texto
+
 ## [1.9.1] — 2026-05-11
 
 ### Fixed

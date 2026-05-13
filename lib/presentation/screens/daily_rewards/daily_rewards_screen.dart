@@ -11,8 +11,6 @@ import '../../../domain/lives/lives_notifier.dart';
 import '../../widgets/capivara_mascot.dart';
 import '../../widgets/daily_reward_day_tile.dart';
 import '../../widgets/daily_reward_overlay.dart';
-import '../../widgets/game_background.dart';
-import '../../widgets/glass_panel.dart';
 
 class DailyRewardsScreen extends ConsumerStatefulWidget {
   const DailyRewardsScreen({super.key});
@@ -129,7 +127,7 @@ class _DailyRewardsScreenState extends ConsumerState<DailyRewardsScreen> {
         status == DailyRewardStatus.cycleCompleted;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: const Color(0xFF071812),
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
@@ -144,7 +142,19 @@ class _DailyRewardsScreenState extends ConsumerState<DailyRewardsScreen> {
         ),
         centerTitle: true,
       ),
-      body: GameBackground(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF071812),
+              Color(0xFF0D2B1C),
+              Color(0xFF0A2218),
+            ],
+            stops: [0.0, 0.6, 1.0],
+          ),
+        ),
         child: SafeArea(
           child: Stack(
             children: [
@@ -209,7 +219,7 @@ class _StreakHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassPanel(
+    return _DailyPanel(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
       child: Row(
         children: [
@@ -255,7 +265,7 @@ class _StreakHeader extends StatelessWidget {
 class _StreakBrokenBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return GlassPanel(
+    return _DailyPanel(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       child: Row(
         children: [
@@ -585,6 +595,30 @@ class _ClaimButton extends StatelessWidget {
   }
 }
 
+// Painel sólido otimizado para o fundo escuro desta tela (sem BackdropFilter)
+class _DailyPanel extends StatelessWidget {
+  const _DailyPanel({required this.child, this.padding = const EdgeInsets.symmetric(horizontal: 20, vertical: 16)});
+  final Widget child;
+  final EdgeInsets padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: padding,
+      decoration: BoxDecoration(
+        color: const Color(0xFF173D24),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFF3FA968).withValues(alpha: 0.40),
+          width: 1.0,
+        ),
+      ),
+      child: child,
+    );
+  }
+}
+
 class _CountdownCard extends StatelessWidget {
   final Duration countdown;
   final String Function(Duration) formatter;
@@ -593,7 +627,7 @@ class _CountdownCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassPanel(
+    return _DailyPanel(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       child: Column(
         children: [
