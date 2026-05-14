@@ -6,6 +6,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.4] — 2026-05-14
+
+### Changed
+
+- **Loja — cards de pacotes substituídos por imagens WebP**: os seis cards de pacotes (`p1`–`p6`) na `ShopScreen` e no `ShopOverlay` agora exibem as imagens promocionais `shop_pack_01–06.webp` em vez do layout textual anterior; os assets foram adicionados ao `pubspec.yaml`
+- **Loja — efeito de press nos cards de imagem**: ao toque, o card aplica scale 0.97 + sombra reduzida + overlay escuro semitransparente (80 ms), dando feedback visual de seleção
+
 ## [1.9.3] — 2026-05-13
 
 ### Added

@@ -6,6 +6,15 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
 import '../../data/models/shop_package.dart';
 
+const _packImages = {
+  'p1': 'assets/images/shop/shop_pack_01.webp',
+  'p2': 'assets/images/shop/shop_pack_02.webp',
+  'p3': 'assets/images/shop/shop_pack_03.webp',
+  'p4': 'assets/images/shop/shop_pack_04.webp',
+  'p5': 'assets/images/shop/shop_pack_05.webp',
+  'p6': 'assets/images/shop/shop_pack_06.webp',
+};
+
 class ShopPackageCard extends StatelessWidget {
   const ShopPackageCard({
     super.key,
@@ -13,6 +22,80 @@ class ShopPackageCard extends StatelessWidget {
     required this.onBuy,
     this.highlighted = false,
   });
+
+  final ShopPackage package;
+  final VoidCallback onBuy;
+  final bool highlighted;
+
+  @override
+  Widget build(BuildContext context) {
+    final imagePath = _packImages[package.id];
+    if (imagePath != null) return _ImageCard(imagePath: imagePath, onBuy: onBuy, highlighted: highlighted);
+    return _FallbackCard(package: package, onBuy: onBuy, highlighted: highlighted);
+  }
+}
+
+class _ImageCard extends StatefulWidget {
+  const _ImageCard({required this.imagePath, required this.onBuy, required this.highlighted});
+
+  final String imagePath;
+  final VoidCallback onBuy;
+  final bool highlighted;
+
+  @override
+  State<_ImageCard> createState() => _ImageCardState();
+}
+
+class _ImageCardState extends State<_ImageCard> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    const radius = BorderRadius.all(Radius.circular(16));
+    final innerRadius = widget.highlighted
+        ? const BorderRadius.all(Radius.circular(13))
+        : radius;
+
+    return GestureDetector(
+      onTap: widget.onBuy,
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) => setState(() => _pressed = false),
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.97 : 1.0,
+        duration: const Duration(milliseconds: 80),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            border: widget.highlighted ? Border.all(color: const Color(0xFFFF8C42), width: 3) : null,
+            boxShadow: [
+              BoxShadow(
+                color: _pressed ? Colors.black38 : Colors.black26,
+                blurRadius: _pressed ? 2 : 6,
+                offset: _pressed ? const Offset(0, 1) : const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: innerRadius,
+            child: Stack(
+              children: [
+                Image.asset(widget.imagePath, fit: BoxFit.fitWidth, width: double.infinity),
+                if (_pressed)
+                  Positioned.fill(
+                    child: ColoredBox(color: Colors.black.withValues(alpha: 0.15)),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FallbackCard extends StatelessWidget {
+  const _FallbackCard({required this.package, required this.onBuy, required this.highlighted});
 
   final ShopPackage package;
   final VoidCallback onBuy;

@@ -2,9 +2,9 @@
 
 > Documento de especificação para desenvolvimento. Pensado para ser alimentado em ferramentas como Claude Code para implementação iterativa.
 >
-> **Status atual:** Fase 3.1 concluída ✅ — `flow.*` (21 cenários). Fases 3.0 e 2.x todas concluídas.
+> **Status atual:** Fase 4.6 concluída ✅ (v1.9.1) — Sync pós-login + Recompensas Diárias redesign. Fases 2.x, 3.x e 4.x todas concluídas.
 >
-> **Próximo:** **Fase 3.2 — `engine.*` + `items.*` + `nav.*` (29 cenários) — em andamento 🔄**
+> **Próximo:** **Fase 5 — Arte adicional e polimento visual (logo, ícone, splash final)**
 >
 > **Renomeação do jogo:** o nome do jogo passa de **"Capivara 2048"** para **"Olha o Bichim!"**. As referências antigas em seções abaixo serão atualizadas progressivamente; durante a transição, considere "Olha o Bichim!" o nome canônico do produto. O *codename* interno do repositório (`capivara_2048`) permanece — apenas o nome de exibição muda.
 >
@@ -1488,7 +1488,7 @@ testWidgets('precacheImage inclui assets/images/home/ e assets/images/inventory/
 - Helpers semânticos completos validados em fluxos reais
 - Regressões v1.2.9 cobertas: `flow.continue_after_pause`, `flow.continue_after_back_button`
 
-### 🔄 Fase 3.2 — `engine.*` + `items.*` + `nav.*` (29 cenários) — **em andamento**
+### ✅ Fase 3.2 — `engine.*` + `items.*` + `nav.*` (29 cenários)
 > **Spec completa em:** `docs/plans/2026-05-04-e2e-test-framework-design.md`
 
 **Cenários `engine.*` (11):**
@@ -1520,7 +1520,7 @@ testWidgets('precacheImage inclui assets/images/home/ e assets/images/inventory/
 
 ---
 
-### 🔜 Fase 3.3 — `persistence.*` + `pause.*` + `daily.*` + `settings.*` (23 cenários)
+### ✅ Fase 3.3 — `persistence.*` + `pause.*` + `daily.*` + `settings.*` (23 cenários)
 > **Spec completa em:** `docs/plans/2026-05-04-e2e-test-framework-design.md`
 
 **`persistence.*` (9) — cold restart:**
@@ -1551,7 +1551,7 @@ testWidgets('precacheImage inclui assets/images/home/ e assets/images/inventory/
 
 ---
 
-### 🔜 Fase 3.4 — `collection.*` + `accessibility.*` + `regression.*` (14 cenários)
+### ✅ Fase 3.4 — `collection.*` + `accessibility.*` + `regression.*` (14 cenários)
 > **Spec completa em:** `docs/plans/2026-05-04-e2e-test-framework-design.md`
 
 **`collection.*` (6):**
@@ -1576,7 +1576,7 @@ testWidgets('precacheImage inclui assets/images/home/ e assets/images/inventory/
 
 ---
 
-### 🔜 Fase 3.5 — `golden.*` com `alchemist` (15 cenários × 3 viewports)
+### ✅ Fase 3.5 — `golden.*` com `alchemist` (15 cenários × 3 viewports)
 > **Spec completa em:** `docs/plans/2026-05-04-e2e-test-framework-design.md`
 
 15 cenários para `HomeScreen`, `GameScreen`, `PauseOverlay`, `CollectionScreen`, `DailyRewardsScreen` nos viewports **360×640**, **414×894** e **800×1280**.
@@ -1585,7 +1585,7 @@ Biblioteca escolhida: **`alchemist`** (CI mode com fonte fonteless — resolve d
 
 ---
 
-### 🔜 Fase 3.6 — Tier 2: APK com `TestRunnerScreen` + Share + Demo
+### ✅ Fase 3.6 — Tier 2: APK com `TestRunnerScreen` + Share + Demo
 > **Spec completa em:** `docs/plans/2026-05-04-e2e-test-framework-design.md`
 
 - `lib/main_test.dart` — entry point alternativo (flavor `test`)
@@ -1600,14 +1600,14 @@ Demo subset (cenários com tag adicional `demo`):
 
 ---
 
-### 🔜 Fase 3.7 — CI workflow GitHub Actions
+### ✅ Fase 3.7 — CI workflow GitHub Actions
 - Tier 1 roda a cada PR: `flutter test test/e2e/run_all_test.dart --concurrency=4`
 - Falha de golden gera diff como artefato do PR
 - Badge de status no README
 
 ---
 
-### 🔜 Fase 3.8 — Documentação do framework
+### ✅ Fase 3.8 — Documentação do framework
 - README de testes: como rodar Tier 1, como instalar APK Tier 2, como adicionar novo cenário (<5 min de boilerplate)
 - Guia de troubleshooting de goldens flaky
 - Marcação da Fase 3 como concluída ao término da 3.8
@@ -1620,13 +1620,13 @@ Demo subset (cenários com tag adicional `demo`):
 |---|---|---|
 | 3.0 | Harness + smoke tests | ✅ |
 | 3.1 | `flow.*` (21 cenários) | ✅ |
-| 3.2 | `engine.*` + `items.*` + `nav.*` (29 cenários) | 🔄 em andamento |
-| 3.3 | `persistence.*` + `pause.*` + `daily.*` + `settings.*` (23) | 🔜 |
-| 3.4 | `collection.*` + `accessibility.*` + `regression.*` (14) | 🔜 |
-| 3.5 | `golden.*` com `alchemist` (15 × 3 viewports) | 🔜 |
-| 3.6 | Tier 2: APK + TestRunnerScreen + Share + Demo | 🔜 |
-| 3.7 | CI GitHub Actions | 🔜 |
-| 3.8 | Documentação | 🔜 |
+| 3.2 | `engine.*` + `items.*` + `nav.*` (29 cenários) | ✅ |
+| 3.3 | `persistence.*` + `pause.*` + `daily.*` + `settings.*` (23) | ✅ |
+| 3.4 | `collection.*` + `accessibility.*` + `regression.*` (14) | ✅ |
+| 3.5 | `golden.*` com `alchemist` (15 × 3 viewports) | ✅ |
+| 3.6 | Tier 2: APK + TestRunnerScreen + Share + Demo | ✅ |
+| 3.7 | CI GitHub Actions | ✅ |
+| 3.8 | Documentação | ✅ |
 
 **~110 cenários estimados · ~85 Tier 1 · ~5–8 exclusivos Tier 2 · ~12–14 dias total**
 
@@ -1643,17 +1643,17 @@ Demo subset (cenários com tag adicional `demo`):
 
 ---
 
-### 🔜 Fase 4 — Backend, ranking e monetização (3–4 semanas)
-- Setup Firebase (Auth, Firestore)
-- Login (Google, Apple, anônimo)
-- Sincronização de PlayerProfile
-- Ranking global semanal
-- Ranking Lendas (4096 e 8192) — persistência Firestore
-- Sistema de convites com deep links
-- Sistema de códigos de compartilhamento
-- Recompensas de ranking
-- Integração Google Mobile Ads (substitui `FakeAdService`)
-- Integração `in_app_purchase` real (substitui mocks da Fase 2.8 e 2.10)
+### ✅ Fase 4 — Backend, ranking e monetização (v1.4.0 → v1.9.1)
+- Setup Firebase (Auth, Firestore); login Google, Apple, e-mail e anônimo
+- Sincronização de PlayerProfile (inventário, recordes, coleção, recompensas diárias)
+- Ranking global semanal + Ranking Lendas (4096/8192) Firestore
+- Sistema de convites com deep links + recompensas ao convidador
+- Recompensas por recorde pessoal (novo tempo 2048 ou novo tile máximo)
+- Integração Google Mobile Ads + `in_app_purchase` real (pacotes e produtos unitários)
+- Tutorial wizard interativo (`TutorialScreen`, 5 telas, mini-boards)
+- Haptic feedback graduado; Bomba 3 desabilitada com < 5 peças
+- Recompensas Diárias: trilha serpentina + `CapivaraMascot`
+- Sync completo pós-login (inventário IAP, recordes, coleção, recompensas diárias)
 
 ### ✅ Fase 3.5 — `golden.*` com `alchemist` (v1.3.4)
 - 15 golden tests CI-mode (fonteless): `HomeScreen`, `GameScreen`, `PauseOverlay`,
