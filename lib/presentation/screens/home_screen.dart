@@ -24,6 +24,8 @@ import 'profile_screen.dart';
 import 'onboarding_auth_screen.dart';
 import '../controllers/auth_controller.dart';
 import '../widgets/avatar_widget.dart';
+import '../../core/providers/invite_providers.dart';
+import '../widgets/invite_welcome_sheet.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -87,6 +89,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final gameState = ref.watch(gameProvider);
+
+    ref.listen<String?>(pendingInviteRefProvider, (_, next) {
+      if (next == null) return;
+      final isLoggedIn = ref.read(authControllerProvider) != null;
+      ref.read(pendingInviteRefProvider.notifier).state = null;
+      if (isLoggedIn) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) InviteWelcomeSheet.show(context);
+      });
+    });
+
     final dailyState = ref.watch(dailyRewardsProvider);
     final playerProfile = ref.watch(authControllerProvider);
     final rewardAvailable =
