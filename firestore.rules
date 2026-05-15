@@ -43,12 +43,15 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
-    // Share codes for gifting — creator writes, any authenticated user can read/update to redeem
+    // Share codes for gifting — creator writes, authenticated user redeems
     match /shareCodes/{code} {
       allow read: if request.auth != null;
       allow create: if request.auth != null
-        && request.resource.data.createdByUserId == request.auth.uid;
-      allow update: if request.auth != null;
+        && request.resource.data.createdBy == request.auth.uid;
+      allow update: if request.auth != null
+        && resource.data.status == 'pending'
+        && request.resource.data.status == 'redeemed'
+        && request.resource.data.redeemedBy == request.auth.uid;
     }
   }
 }
