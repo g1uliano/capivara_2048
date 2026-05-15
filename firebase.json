@@ -5,7 +5,13 @@
   },
   "hosting": {
     "public": "public",
-    "ignore": ["firebase.json", "**/.*"],
+    "ignore": ["firebase.json"],
+    "headers": [
+      {
+        "source": "/.well-known/assetlinks.json",
+        "headers": [{ "key": "Content-Type", "value": "application/json" }]
+      }
+    ],
     "rewrites": [
       { "source": "/invite", "destination": "/invite.html" }
     ]
