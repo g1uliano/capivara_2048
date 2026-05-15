@@ -113,6 +113,6 @@ void _handleInviteDeepLink(Uri uri, ProviderContainer container) {
     Hive.openBox<String>('invite_refs').then((box) {
       box.put('pending_ref', inviteRef!);
     });
-    container.read(pendingInviteRefProvider.notifier).state = inviteRef;
+    container.read(pendingInviteRefProvider.notifier).setValue(inviteRef);
   }
 }

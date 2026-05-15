@@ -91,7 +91,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final pendingRef = ref.read(pendingInviteRefProvider);
     if (pendingRef == null) return;
     final isLoggedIn = ref.read(authControllerProvider) != null;
-    ref.read(pendingInviteRefProvider.notifier).state = null;
+    ref.read(pendingInviteRefProvider.notifier).setValue(null);
     if (isLoggedIn) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) InviteWelcomeSheet.show(context);
