@@ -72,7 +72,7 @@ class GameNotifier extends Notifier<GameState> {
         : after.copyWith(isContinuingWithItem: false);
 
     // Haptic feedback graduado (respects settings toggle)
-    if (after.maxLevel > before.maxLevel) {
+    if (after.score > before.score) {
       maybeHaptic(
         () => ref.read(settingsProvider).hapticEnabled,
         intensity: HapticIntensity.light,
@@ -87,6 +87,10 @@ class GameNotifier extends Notifier<GameState> {
 
     // Atualizar nível mais alto já alcançado (persistido para coleção)
     if (state.maxLevel > before.maxLevel) {
+      maybeHaptic(
+        () => ref.read(settingsProvider).hapticEnabled,
+        intensity: HapticIntensity.heavy,
+      );
       unawaited(
         ref
             .read(personalRecordsProvider.notifier)
@@ -121,6 +125,7 @@ class GameNotifier extends Notifier<GameState> {
           () => ref.read(settingsProvider).hapticEnabled,
           intensity: HapticIntensity.medium,
         );
+        _submitToRanking();
         unawaited(
           ref
               .read(personalRecordsProvider.notifier)
@@ -331,13 +336,15 @@ class GameNotifier extends Notifier<GameState> {
       // Não bloquear o jogo se o save falhar
     }
 
-    // Submit to ranking (fire-and-forget, never block the game)
+    _submitToRanking();
+  }
+
+  void _submitToRanking() {
     try {
       final rankingRepo = ref.read(rankingRepositoryProvider);
       final authProfile = ref.read(authControllerProvider);
       final displayName = authProfile?.displayName;
 
-      // Submit score always
       if (state.score > 0) {
         unawaited(
           rankingRepo.submitScore(
@@ -348,9 +355,8 @@ class GameNotifier extends Notifier<GameState> {
         );
       }
 
-      // Submit time only when player won (reached level 11 = 2048)
-      if (state.hasWon && state.elapsedMs > 0) {
-        // maxTile = 2^maxLevel (e.g., level 11 → 2048) — used as tiebreaker
+      // Submit time when player reached 2048 — covers both hasWon and milestone paths
+      if ((state.hasWon || state.maxLevel >= 11) && state.elapsedMs > 0) {
         final maxTile = state.maxLevel > 0 ? (1 << state.maxLevel) : null;
         unawaited(
           rankingRepo.submitScore(

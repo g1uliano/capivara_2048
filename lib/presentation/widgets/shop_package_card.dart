@@ -78,14 +78,17 @@ class _ImageCardState extends State<_ImageCard> {
           ),
           child: ClipRRect(
             borderRadius: innerRadius,
-            child: Stack(
-              children: [
-                Image.asset(widget.imagePath, fit: BoxFit.fitWidth, width: double.infinity),
-                if (_pressed)
-                  Positioned.fill(
-                    child: ColoredBox(color: Colors.black.withValues(alpha: 0.15)),
-                  ),
-              ],
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 100),
+              child: Stack(
+                children: [
+                  Image.asset(widget.imagePath, fit: BoxFit.fitWidth, width: double.infinity),
+                  if (_pressed)
+                    Positioned.fill(
+                      child: ColoredBox(color: Colors.black.withValues(alpha: 0.15)),
+                    ),
+                ],
+              ),
             ),
           ),
         ),

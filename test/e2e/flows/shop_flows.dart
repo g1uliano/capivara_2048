@@ -4,6 +4,7 @@ import 'package:capivara_2048/data/models/inventory.dart';
 import 'package:capivara_2048/domain/inventory/inventory_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/game_notifier.dart';
 import 'package:capivara_2048/presentation/widgets/shop_overlay.dart';
+import 'package:capivara_2048/presentation/widgets/shop_package_card.dart';
 import '../_harness/test_harness.dart';
 import '../_harness/tester_extensions.dart';
 import '../_harness/scenario.dart';
@@ -68,15 +69,14 @@ final shopPurchaseItemScenario = E2EScenario(
 
     final inventoryBefore = harness.container.read(inventoryProvider);
 
-    // ShopPackageCard renders ElevatedButton with text 'Comprar'.
-    // SingleChildScrollView renders all cards regardless of viewport.
-    final buyButtons = find.text('Comprar');
+    // ShopPackageCard renders as tappable image (p1–p6) — no "Comprar" text.
+    final packageCards = find.byType(ShopPackageCard);
     expect(
-      buyButtons,
+      packageCards,
       findsWidgets,
-      reason: 'ShopOverlay deve exibir pelo menos um botão "Comprar"',
+      reason: 'ShopOverlay deve exibir pelo menos um ShopPackageCard',
     );
-    await tester.tap(buyButtons.first);
+    await tester.tap(packageCards.first);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
