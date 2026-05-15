@@ -83,7 +83,7 @@ class InviteWelcomeSheet extends StatelessWidget {
               onPressed: () => Navigator.pop(context),
               child: Text(
                 'Agora não',
-                style: GoogleFonts.nunito(fontSize: 14, color: Colors.grey),
+                style: GoogleFonts.nunito(fontSize: 14, color: Colors.grey.shade700),
               ),
             ),
           ],
