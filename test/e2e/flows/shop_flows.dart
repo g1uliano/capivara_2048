@@ -117,3 +117,28 @@ final shopPurchaseItemScenario = E2EScenario(
     await tester.pump(const Duration(milliseconds: 500));
   },
 );
+
+// ─── flow.shop_redeem_code_navigation ─────────────────────────────────────────
+
+final shopRedeemCodeNavigationScenario = E2EScenario(
+  id: 'flow.shop_redeem_code_navigation',
+  title: 'ShopScreen: tap "Resgatar código" → RedeemCodeScreen renderiza',
+  tags: {ScenarioTag.critical},
+  run: (tester, harness) async {
+    final widget = await tester.runAsync(() => harness.boot());
+    await tester.pumpWidget(widget!);
+    await tester.pumpAndSettle(const Duration(seconds: 5));
+
+    // Navigate to ShopScreen from HomeScreen
+    await tester.tap(find.byKey(const Key('home_btn_loja')));
+    await tester.pumpAndSettle();
+
+    // Tap "Resgatar código de presente"
+    await tester.tap(find.text('Resgatar código de presente'));
+    await tester.pumpAndSettle();
+
+    // RedeemCodeScreen should be visible
+    expect(find.text('Resgatar Código'), findsOneWidget);
+    expect(find.text('Resgatar'), findsOneWidget);
+  },
+);

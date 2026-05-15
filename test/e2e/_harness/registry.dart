@@ -46,6 +46,7 @@ final List<E2EScenario> allScenarios = <E2EScenario>[
   // Task 5
   shopOverlayFromEmptyInventoryScenario,
   shopPurchaseItemScenario,
+  shopRedeemCodeNavigationScenario,
   // Task 6
   win2048FirstTimeScenario,
   win4096FirstTimeScenario,
