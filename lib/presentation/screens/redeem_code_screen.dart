@@ -10,6 +10,7 @@ import '../../data/models/shop_package.dart';
 import '../../data/repositories/gift_code_repository.dart';
 import '../controllers/auth_controller.dart';
 import '../widgets/game_background.dart';
+import '../widgets/glass_panel.dart';
 import 'onboarding_auth_screen.dart';
 
 class RedeemCodeScreen extends ConsumerStatefulWidget {
@@ -151,7 +152,48 @@ class _RedeemCodeScreenState extends ConsumerState<RedeemCodeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 24),
+              GlassPanel(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 20,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(
+                      Icons.card_giftcard,
+                      color: Color(0xFFFF8C42),
+                      size: 40,
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Código de Presente',
+                            style: GoogleFonts.fredoka(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Recebeu um código de um amigo que comprou na loja? Digite abaixo para resgatar seus itens.',
+                            style: GoogleFonts.fredoka(
+                              fontSize: 14,
+                              height: 1.4,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
               TextField(
                 controller: _controller,
                 textCapitalization: TextCapitalization.characters,

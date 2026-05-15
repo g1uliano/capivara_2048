@@ -26,6 +26,43 @@ class GameState {
 
   static const _bombSentinel = Object();
 
+  Map<String, dynamic> toJson() {
+    final boardJson = board
+        .map((row) => row.map((tile) => tile?.toJson()).toList())
+        .toList();
+    return {
+      'board': boardJson,
+      'score': score,
+      'highScore': highScore,
+      'maxLevel': maxLevel,
+      'elapsedMs': elapsedMs,
+      'isGameOver': isGameOver,
+      'hasWon': hasWon,
+    };
+  }
+
+  factory GameState.fromJson(Map<String, dynamic> json) {
+    final rawBoard = json['board'] as List<dynamic>;
+    final board = rawBoard.map((rawRow) {
+      final row = rawRow as List<dynamic>;
+      return row.map((cell) {
+        if (cell == null) return null;
+        return Tile.fromJson(cell as Map<String, dynamic>);
+      }).toList();
+    }).toList();
+
+    return GameState(
+      board: board,
+      score: json['score'] as int,
+      highScore: json['highScore'] as int,
+      maxLevel: (json['maxLevel'] as int?) ?? 0,
+      elapsedMs: (json['elapsedMs'] as int?) ?? 0,
+      isGameOver: (json['isGameOver'] as bool?) ?? false,
+      hasWon: (json['hasWon'] as bool?) ?? false,
+      isPaused: true, // always paused on restore
+    );
+  }
+
   GameState({
     required this.board,
     required this.score,

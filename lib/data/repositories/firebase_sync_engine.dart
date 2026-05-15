@@ -1,11 +1,14 @@
 // lib/data/repositories/firebase_sync_engine.dart
 
 import 'dart:async';
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/models/daily_rewards_state.dart';
 import '../../data/models/game_record.dart';
+import '../../data/models/game_state.dart';
 import '../../data/models/pending_event.dart';
 import '../../data/models/personal_records.dart';
 import '../../data/models/inventory.dart';
@@ -85,6 +88,7 @@ class FirebaseSyncEngine implements SyncEngine {
               ?.map((e) => e as Map<String, dynamic>)
               .toList(),
         );
+        await _mergeRemoteCurrentGame(data['currentGame']);
       } else {
         await _writeLocalProfileToFirestore();
       }
@@ -373,6 +377,36 @@ class FirebaseSyncEngine implements SyncEngine {
     existing.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
     final top20 = existing.take(20).toList();
     await docRef.set({'gameRecords': top20}, SetOptions(merge: true));
+  }
+
+  @override
+  Future<void> syncCurrentGame(GameState? state) async {
+    if (_userId == null) return;
+    final docRef = _firestore.collection('users').doc(_userId);
+    if (state == null || state.isGameOver || state.hasWon || state.score == 0) {
+      unawaited(docRef.set({'currentGame': null}, SetOptions(merge: true)));
+    } else {
+      unawaited(
+        docRef.set({'currentGame': state.toJson()}, SetOptions(merge: true)),
+      );
+    }
+  }
+
+  Future<void> _mergeRemoteCurrentGame(dynamic remoteData) async {
+    if (remoteData is! Map) return;
+    try {
+      final gs = GameState.fromJson(
+        Map<String, dynamic>.from(remoteData),
+      );
+      if (gs.isGameOver || gs.hasWon || gs.score <= 0) return;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+        'game.current_state',
+        jsonEncode(gs.toJson()),
+      );
+    } catch (_) {
+      // Non-fatal — remote data may be malformed
+    }
   }
 
   Future<void> _mergeRemoteDailyRewards(

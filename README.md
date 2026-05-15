@@ -245,8 +245,10 @@ assets/
 - **Fase 4.6** — Recompensas Diárias redesign + Sync pós-login ✅ _(v1.9.1)_
   - Trilha serpentina com 6 caixas de presente coloridas + baú Dia 7, `CapivaraMascot` animado
   - Sync completo pós-login: inventário IAP, recordes pessoais, coleção e progresso de recompensas diárias restaurados após `signIn` / `clearStorage`
-- **Fase 5** — Arte adicional e polimento visual _(em progresso, v1.9.3)_
+- **Fase 5** — Arte adicional e polimento visual _(em progresso, v1.9.6)_
   - Assets PNG → WebP (~96% redução); novo visual da tela Recompensas Diárias (tiles de sapos, fundo gradiente exclusivo); editar nome visível no Perfil
+  - Sync do jogo em progresso com Firestore: restaura tabuleiro após apagar dados do app + login
+  - Correções: botão "Resgatar código" legível na loja; painel explicativo na tela de resgate; deep link de convite para usuários não logados
 - **Fase 6** — Áudio (sound design dos 13 animais, SFX, música)
 - **Fase 7** — Polimento, l10n, acessibilidade, lançamento
 

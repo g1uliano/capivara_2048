@@ -32,4 +32,19 @@ class Tile {
       justMerged: justMerged ?? this.justMerged,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'level': level,
+    'row': row,
+    'col': col,
+  };
+
+  factory Tile.fromJson(Map<String, dynamic> json) => Tile(
+    id: json['id'] as String,
+    level: json['level'] as int,
+    row: json['row'] as int,
+    col: json['col'] as int,
+    // isNew and justMerged are animation flags — always false on restore
+  );
 }

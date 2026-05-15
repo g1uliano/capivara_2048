@@ -48,16 +48,16 @@ class ShopScreen extends ConsumerWidget {
           children: [
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
-              child: OutlinedButton.icon(
+              child: ElevatedButton.icon(
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => const RedeemCodeScreen(),
                   ),
                 ),
-                style: OutlinedButton.styleFrom(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFF8C42),
                   foregroundColor: Colors.white,
-                  side: const BorderSide(color: Colors.white60),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -66,7 +66,7 @@ class ShopScreen extends ConsumerWidget {
                 icon: const Icon(Icons.card_giftcard_outlined, size: 20),
                 label: Text(
                   'Resgatar código de presente',
-                  style: GoogleFonts.fredoka(fontSize: 16),
+                  style: GoogleFonts.fredoka(fontSize: 16, color: Colors.white),
                 ),
               ),
             ),

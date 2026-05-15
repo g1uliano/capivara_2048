@@ -6,6 +6,18 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.6] — 2026-05-15
+
+### Added
+
+- **Jogo em progresso — sincronização com Firestore**: estado atual do tabuleiro (board, score, maxLevel, elapsedMs) é persistido em SharedPreferences a cada movimento válido e sincronizado com Firestore com debounce de 10s; ao fazer login após apagar os dados do app, `syncProfile()` restaura o estado remoto e a `HomeScreen` exibe "Continuar Jogo" automaticamente
+- **Tela Resgatar Código — painel explicativo**: `GlassPanel` com ícone de presente e texto explicativo adicionado acima do campo de código
+
+### Fixed
+
+- **Loja — botão "Resgatar código de presente" ilegível**: `OutlinedButton` branco substituído por `ElevatedButton` laranja (`#FF8C42`), mesma cor dos botões de compra de itens avulsos
+- **Deep link de convite — fluxo para usuários não logados**: `SplashScreen._navigate()` agora verifica `pendingInviteRefProvider`; quando há convite pendente e o usuário não está logado, navega para `HomeScreen` (que exibe o `InviteWelcomeSheet`) em vez de ir direto para `OnboardingAuthScreen`
+
 ## [1.9.5] — 2026-05-15
 
 ### Fixed

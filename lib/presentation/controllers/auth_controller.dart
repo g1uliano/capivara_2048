@@ -11,6 +11,8 @@ import '../../domain/sync/sync_engine.dart';
 import '../../data/repositories/iap_startup_service.dart';
 import 'personal_records_notifier.dart';
 import '../../domain/daily_rewards/daily_rewards_notifier.dart';
+import 'game_notifier.dart';
+import 'settings_notifier.dart';
 
 class AuthController extends Notifier<PlayerProfile?> {
   @override
@@ -140,6 +142,7 @@ class AuthController extends Notifier<PlayerProfile?> {
   Future<void> _reloadSyncedNotifiers() async {
     await ref.read(personalRecordsProvider.notifier).load();
     await ref.read(dailyRewardsProvider.notifier).load();
+    await ref.read(gameProvider.notifier).loadSavedGame();
   }
 
   /// Initializes IAPStartupService after successful login.
@@ -203,16 +206,19 @@ class AuthController extends Notifier<PlayerProfile?> {
       } catch (_) {}
     }
 
-    // 3. Deletar conta no Firebase Auth (inclui re-autenticação)
+    // 3. Limpar estado de jogo em progresso do SharedPreferences
+    ref.read(sharedPreferencesProvider).remove('game.current_state');
+
+    // 4. Deletar conta no Firebase Auth (inclui re-autenticação)
     await ref.read(authServiceProvider).deleteAccount(senha: senha);
 
-    // 4. Dispose serviços
+    // 5. Dispose serviços
     unawaited(ref.read(iapStartupServiceProvider).dispose());
     try {
       await ref.read(syncEngineProvider).dispose();
     } catch (_) {}
 
-    // 5. Limpar state
+    // 6. Limpar state
     state = null;
   }
 

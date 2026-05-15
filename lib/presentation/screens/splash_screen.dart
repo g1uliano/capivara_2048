@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/providers/invite_providers.dart';
 import '../controllers/auth_controller.dart';
 import 'home_screen.dart';
 import 'onboarding_auth_screen.dart';
@@ -59,9 +60,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     if (!mounted || _navigated) return;
     _navigated = true;
     final isLoggedIn = ref.read(authControllerProvider) != null;
+    final hasPendingInvite = ref.read(pendingInviteRefProvider) != null;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (_) => isLoggedIn
+        builder: (_) => (isLoggedIn || hasPendingInvite)
             ? const HomeScreen()
             : const OnboardingAuthScreen(showSkip: true),
       ),

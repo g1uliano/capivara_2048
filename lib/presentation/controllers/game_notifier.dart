@@ -1,5 +1,6 @@
 // lib/presentation/controllers/game_notifier.dart
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/ranking_provider.dart';
@@ -20,8 +21,11 @@ import '../controllers/auth_controller.dart';
 import '../controllers/personal_records_notifier.dart';
 
 class GameNotifier extends Notifier<GameState> {
+  static const _savedGameKey = 'game.current_state';
+
   late GameEngine _engine;
   Timer? _timer;
+  Timer? _firestoreSaveTimer;
   bool _timerStarted = false;
   List<(int, int)> _bombSelection = [];
   ItemType? _pendingBombItem;
@@ -35,8 +39,33 @@ class GameNotifier extends Notifier<GameState> {
     _consumeItem = (type) => ref.read(inventoryProvider.notifier).consume(type);
     ref.onDispose(() {
       _timer?.cancel();
+      _firestoreSaveTimer?.cancel();
     });
+
+    // Try to restore an in-progress game from SharedPreferences
+    try {
+      final prefs = ref.read(sharedPreferencesProvider);
+      final saved = prefs.getString(_savedGameKey);
+      if (saved != null) {
+        final gs = GameState.fromJson(
+          jsonDecode(saved) as Map<String, dynamic>,
+        );
+        if (gs.score > 0 && !gs.isGameOver && !gs.hasWon) {
+          _populateMilestonesFromMaxLevel(gs.maxLevel);
+          return gs;
+        }
+      }
+    } catch (_) {
+      // Fall through to fresh game on any parse error
+    }
+
     return _engine.newGame();
+  }
+
+  void _populateMilestonesFromMaxLevel(int maxLevel) {
+    if (maxLevel >= 11) _reachedMilestones.add(11);
+    if (maxLevel >= 12) _reachedMilestones.add(12);
+    if (maxLevel >= 13) _reachedMilestones.add(13);
   }
 
   void _startTimer() {
@@ -131,6 +160,17 @@ class GameNotifier extends Notifier<GameState> {
               .read(personalRecordsProvider.notifier)
               .recordMilestone(milestone, DateTime.now()),
         );
+        // Save record immediately so personal ranking is populated before game ends
+        unawaited(
+          ref.read(gameRecordRepositoryProvider).add(
+            GameRecord(
+              playedAt: DateTime.now(),
+              elapsedMs: captured,
+              score: state.score,
+              maxLevel: state.maxLevel,
+            ),
+          ),
+        );
         break; // Apenas um marco por vez
       }
     }
@@ -145,6 +185,10 @@ class GameNotifier extends Notifier<GameState> {
       }
       if (state.isGameOver || state.hasWon) {
         _stopTimer();
+      }
+      if (!state.isGameOver && !state.hasWon) {
+        _saveLocalGame();
+        _scheduleFirestoreSave();
       }
     }
   }
@@ -182,6 +226,7 @@ class GameNotifier extends Notifier<GameState> {
   }
 
   void restart() {
+    _clearSavedGame();
     _reachedMilestones.clear();
     _stopTimer();
     _timerStarted = false;
@@ -202,6 +247,7 @@ class GameNotifier extends Notifier<GameState> {
 
   /// Confirma game over definitivo (quando jogador desiste/encerra) e salva o record.
   void confirmGameOver() {
+    _clearSavedGame();
     unawaited(_saveGameRecord());
     setAwaitingResolution(false);
   }
@@ -295,6 +341,7 @@ class GameNotifier extends Notifier<GameState> {
   }
 
   Future<void> endGame() async {
+    _clearSavedGame();
     _stopTimer();
     state = state.copyWith(hasWon: true, pendingMilestone: null);
     await _saveGameRecord();
@@ -374,6 +421,57 @@ class GameNotifier extends Notifier<GameState> {
 
   @visibleForTesting
   void setStateForTest(GameState s) => state = s;
+
+  void _saveLocalGame() {
+    if (state.isGameOver || state.hasWon) return;
+    try {
+      final prefs = ref.read(sharedPreferencesProvider);
+      prefs.setString(_savedGameKey, jsonEncode(state.toJson()));
+    } catch (_) {
+      // Non-fatal
+    }
+  }
+
+  void _scheduleFirestoreSave() {
+    _firestoreSaveTimer?.cancel();
+    _firestoreSaveTimer = Timer(const Duration(seconds: 10), () {
+      if (state.isGameOver || state.hasWon) return;
+      final authProfile = ref.read(authControllerProvider);
+      if (authProfile != null) {
+        unawaited(ref.read(syncEngineProvider).syncCurrentGame(state));
+      }
+    });
+  }
+
+  void _clearSavedGame() {
+    _firestoreSaveTimer?.cancel();
+    _firestoreSaveTimer = null;
+    try {
+      ref.read(sharedPreferencesProvider).remove(_savedGameKey);
+    } catch (_) {
+      // Non-fatal
+    }
+    final authProfile = ref.read(authControllerProvider);
+    if (authProfile != null) {
+      unawaited(ref.read(syncEngineProvider).syncCurrentGame(null));
+    }
+  }
+
+  Future<void> loadSavedGame() async {
+    try {
+      final prefs = ref.read(sharedPreferencesProvider);
+      final saved = prefs.getString(_savedGameKey);
+      if (saved == null) return;
+      final gs = GameState.fromJson(jsonDecode(saved) as Map<String, dynamic>);
+      if (gs.isGameOver || gs.hasWon || gs.score <= 0) return;
+      _populateMilestonesFromMaxLevel(gs.maxLevel);
+      _timerStarted = false;
+      _stopTimer();
+      state = gs; // isPaused: true set by fromJson
+    } catch (_) {
+      // Non-fatal — leave current state unchanged
+    }
+  }
 }
 
 final gameEngineProvider = Provider<GameEngine>((ref) => GameEngine());

@@ -3,6 +3,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/daily_rewards_state.dart';
 import '../../data/models/game_record.dart';
+import '../../data/models/game_state.dart';
 import '../../data/models/inventory.dart';
 import '../../data/models/pending_event.dart';
 import '../../data/models/personal_records.dart';
@@ -19,6 +20,7 @@ abstract class SyncEngine {
   Future<void> updateDisplayName(String name);
   Future<void> deleteUserData();
   Future<void> syncGameRecord(GameRecord record);
+  Future<void> syncCurrentGame(GameState? state);
   Future<void> syncInventory(Inventory inventory);
   Future<void> syncPersonalRecords(PersonalRecords records);
   Future<void> syncDailyRewards(DailyRewardsState state);
@@ -73,6 +75,13 @@ class FakeSyncEngine implements SyncEngine {
 
   @override
   Future<void> syncGameRecord(GameRecord record) async {}
+
+  GameState? lastSyncedGame;
+
+  @override
+  Future<void> syncCurrentGame(GameState? state) async {
+    lastSyncedGame = state;
+  }
 
   @override
   Future<void> syncInventory(Inventory inventory) async {}

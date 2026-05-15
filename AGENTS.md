@@ -134,7 +134,7 @@ TabBar(
 
 ## Fases do roadmap
 
-Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 5 em progresso (v1.9.3) — Arte adicional e polimento visual**. O áudio foi reposicionado para a **Fase 6** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
+Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 5 em progresso (v1.9.6) — Arte adicional e polimento visual**. O áudio foi reposicionado para a **Fase 6** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
 
 | Fase      | Foco                                                                                                                                                                 |
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
