@@ -1,6 +1,5 @@
 // lib/presentation/screens/redeem_code_screen.dart
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,6 +8,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/utils/iap_delivery.dart';
 import '../../data/models/shop_package.dart';
 import '../../data/repositories/gift_code_repository.dart';
+import '../controllers/auth_controller.dart';
 import '../widgets/game_background.dart';
 import 'onboarding_auth_screen.dart';
 
@@ -36,7 +36,7 @@ class _RedeemCodeScreenState extends ConsumerState<RedeemCodeScreen> {
       setState(() => _error = 'Digite um código antes de continuar.');
       return;
     }
-    final userId = FirebaseAuth.instance.currentUser?.uid;
+    final userId = ref.read(authControllerProvider)?.userId;
     if (userId == null) {
       if (!mounted) return;
       await Navigator.push(
