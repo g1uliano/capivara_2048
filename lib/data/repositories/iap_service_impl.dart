@@ -125,7 +125,7 @@ class IAPServiceImpl implements IAPService {
         'undo3': package.giftContents.undo3,
       },
       'status': 'pending',
-      'createdByUserId': userId,
+      'createdBy': userId,
       'createdAt': FieldValue.serverTimestamp(),
       'expiresAt': Timestamp.fromDate(
         DateTime.now().add(const Duration(days: 30)),
