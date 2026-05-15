@@ -9,5 +9,16 @@
         "AB:6F:70:8F:9C:47:09:81:F0:5F:1C:EE:6B:1F:C6:E5:02:52:E0:B8:FC:FF:76:BE:12:8B:AB:2A:6E:14:04:0D"
       ]
     }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.catraia.capivara2048.dev",
+      "sha256_cert_fingerprints": [
+        "10:D4:49:74:8C:6C:15:C1:D7:86:7E:61:66:55:89:EE:EE:DA:BE:52:53:57:02:4E:3B:13:2C:23:AE:6B:E9:57",
+        "AB:6F:70:8F:9C:47:09:81:F0:5F:1C:EE:6B:1F:C6:E5:02:52:E0:B8:FC:FF:76:BE:12:8B:AB:2A:6E:14:04:0D"
+      ]
+    }
   }
 ]
