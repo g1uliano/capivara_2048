@@ -1,7 +1,5 @@
 // lib/presentation/screens/redeem_code_screen.dart
 
-import 'dart:async';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,6 +31,11 @@ class _RedeemCodeScreenState extends ConsumerState<RedeemCodeScreen> {
   }
 
   Future<void> _redeem() async {
+    final code = _controller.text.trim();
+    if (code.isEmpty) {
+      setState(() => _error = 'Digite um código antes de continuar.');
+      return;
+    }
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) {
       if (!mounted) return;
@@ -50,7 +53,7 @@ class _RedeemCodeScreenState extends ConsumerState<RedeemCodeScreen> {
     });
     try {
       final repo = ref.read(giftCodeRepositoryProvider);
-      final bundle = await repo.redeemCode(_controller.text, userId);
+      final bundle = await repo.redeemCode(code, userId);
       if (!mounted) return;
       setState(() => _loading = false);
       deliverRewardBundle(ref, bundle);
