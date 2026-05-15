@@ -41,6 +41,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
     _titleAsset = GameTitleImage.pickAsset();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _handlePendingInvite());
   }
 
   bool _hasSavedGame(GameState s) => s.score > 0 && !s.isGameOver;
@@ -86,18 +87,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
   }
 
+  void _handlePendingInvite() {
+    final pendingRef = ref.read(pendingInviteRefProvider);
+    if (pendingRef == null) return;
+    final isLoggedIn = ref.read(authControllerProvider) != null;
+    ref.read(pendingInviteRefProvider.notifier).state = null;
+    if (isLoggedIn) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) InviteWelcomeSheet.show(context);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final gameState = ref.watch(gameProvider);
 
     ref.listen<String?>(pendingInviteRefProvider, (_, next) {
-      if (next == null) return;
-      final isLoggedIn = ref.read(authControllerProvider) != null;
-      ref.read(pendingInviteRefProvider.notifier).state = null;
-      if (isLoggedIn) return;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) InviteWelcomeSheet.show(context);
-      });
+      if (next != null) _handlePendingInvite();
     });
 
     final dailyState = ref.watch(dailyRewardsProvider);
