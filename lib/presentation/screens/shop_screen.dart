@@ -2,12 +2,12 @@
 
 import 'dart:async';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../controllers/auth_controller.dart';
 import '../../data/repositories/gift_code_repository.dart';
 import 'redeem_code_screen.dart';
 import '../../core/utils/iap_delivery.dart';
@@ -128,7 +128,7 @@ class ShopScreen extends ConsumerWidget {
     if (result.success && result.shareCode != null) {
       // Deliver items locally (needed in dev/tst; in prd server-side webhook does it too)
       deliverIAPItems(ref, package);
-      final userId = FirebaseAuth.instance.currentUser?.uid;
+      final userId = ref.read(authControllerProvider)?.userId;
       if (userId != null) {
         unawaited(
           ref
