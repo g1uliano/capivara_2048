@@ -6,6 +6,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.5] — 2026-05-15
+
+### Fixed
+
+- **Haptic — vibração forte ao trocar animal anfitrião**: `HapticIntensity.heavy` adicionado quando `maxLevel` sobe (troca de animal anfitrião), que estava sem haptic desde a implementação
+- **Ranking — recorde registrado ao atingir 2048**: pontuação e tempo agora submetidos ao ranking no momento em que o milestone é detectado (`onSwipe`), sem precisar encerrar o jogo; extraído `_submitToRanking()` reutilizado por `_saveGameRecord()`
+- **Loja — "Você não possui mais itens" comprava item errado**: botão "Comprar Desfazer 1" sempre disparava IAP de "4× Desfazer 3" (package hardcoded); corrigido para usar `kUnitPackageByType[_drawnItem]`, comprando e entregando o item exibido
+- **Loja — Combo Mata Atlântica continha Bomba 2**: `p5` corrigido para `bomb3: 2` em `contents` e `giftContents`; description atualizada para "2 Bomba 3"
+
 ## [1.9.4] — 2026-05-14
 
 ### Changed
