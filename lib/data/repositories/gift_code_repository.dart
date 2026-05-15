@@ -1,7 +1,5 @@
 // lib/data/repositories/gift_code_repository.dart
 
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -48,6 +46,9 @@ class GiftCodeRepository {
       },
       'status': 'pending',
       'createdAt': FieldValue.serverTimestamp(),
+      'expiresAt': Timestamp.fromDate(
+        DateTime.now().add(const Duration(days: 30)),
+      ),
       'createdBy': userId,
       'redeemedBy': null,
       'redeemedAt': null,
@@ -58,9 +59,8 @@ class GiftCodeRepository {
   /// Throws [RedeemException] for all validation failures.
   Future<RewardBundle> redeemCode(String code, String userId) async {
     final docRef = _db.collection('shareCodes').doc(code.trim());
-    RewardBundle? result;
     try {
-      await _db.runTransaction((txn) async {
+      return await _db.runTransaction<RewardBundle>((txn) async {
         final snap = await txn.get(docRef);
         if (!snap.exists) throw const RedeemException(RedeemError.notFound);
         final data = snap.data()!;
@@ -74,7 +74,7 @@ class GiftCodeRepository {
         );
         if (validationError != null) throw RedeemException(validationError);
         final g = data['giftContents'] as Map<String, dynamic>;
-        result = RewardBundle(
+        final bundle = RewardBundle(
           lives: g['lives'] as int,
           bomb2: g['bomb2'] as int,
           bomb3: g['bomb3'] as int,
@@ -86,6 +86,7 @@ class GiftCodeRepository {
           'redeemedBy': userId,
           'redeemedAt': FieldValue.serverTimestamp(),
         });
+        return bundle;
       });
     } on RedeemException {
       rethrow;
@@ -94,7 +95,6 @@ class GiftCodeRepository {
     } catch (_) {
       throw const RedeemException(RedeemError.offline);
     }
-    return result!;
   }
 }
 

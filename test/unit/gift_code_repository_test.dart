@@ -77,6 +77,20 @@ void main() {
       );
     });
 
+    test('returns null for code 29 days old', () {
+      final twentyNineDaysAgo = DateTime(2026, 4, 16); // 29 days before now
+      expect(
+        validateGiftCode(
+          status: 'pending',
+          createdBy: otherUserId,
+          createdAt: twentyNineDaysAgo,
+          userId: userId,
+          now: now,
+        ),
+        isNull,
+      );
+    });
+
     test('alreadyRedeemed takes priority over ownCode', () {
       expect(
         validateGiftCode(
