@@ -2,11 +2,14 @@
 
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../data/repositories/gift_code_repository.dart';
+import 'redeem_code_screen.dart';
 import '../../core/utils/iap_delivery.dart';
 import '../../data/models/item_type.dart';
 import '../../data/models/share_code.dart';
@@ -43,6 +46,30 @@ class ShopScreen extends ConsumerWidget {
         body: ListView(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
           children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: OutlinedButton.icon(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const RedeemCodeScreen(),
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  side: const BorderSide(color: Colors.white60),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                icon: const Icon(Icons.card_giftcard_outlined, size: 20),
+                label: Text(
+                  'Resgatar código de presente',
+                  style: GoogleFonts.fredoka(fontSize: 16),
+                ),
+              ),
+            ),
             ...packages.map(
               (pkg) => Padding(
                 padding: const EdgeInsets.only(bottom: 12),
@@ -101,6 +128,23 @@ class ShopScreen extends ConsumerWidget {
     if (result.success && result.shareCode != null) {
       // Deliver items locally (needed in dev/tst; in prd server-side webhook does it too)
       deliverIAPItems(ref, package);
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId != null) {
+        unawaited(
+          ref
+              .read(giftCodeRepositoryProvider)
+              .writeToFirestore(
+                ShareCode(
+                  code: result.shareCode!,
+                  packageId: package.id,
+                  giftContents: package.giftContents,
+                  status: ShareCodeStatus.pending,
+                  createdAt: DateTime.now(),
+                ),
+                userId,
+              ),
+        );
+      }
       // In dev: also generate a local share code for testing the gift flow
       const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
       if (flavor != 'prd') {
