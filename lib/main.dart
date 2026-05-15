@@ -25,6 +25,7 @@ import 'domain/daily_rewards/daily_rewards_notifier.dart';
 import 'presentation/controllers/settings_notifier.dart';
 import 'presentation/controllers/personal_records_notifier.dart';
 import 'app.dart';
+import 'core/providers/invite_providers.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,14 +56,11 @@ void main() async {
     await FirebaseAuth.instance.useAuthEmulator(emulatorHost, 9099);
   }
 
-  // Deep link listener for invite system
+  // Deep link — capture initial URI before container is ready; handlers registered after container init
   final appLinks = AppLinks();
   final initialUri = await appLinks.getInitialLink().catchError(
     (_) => null as Uri?,
   );
-  if (initialUri != null) _handleInviteDeepLink(initialUri);
-  appLinks.uriLinkStream.listen(_handleInviteDeepLink);
-
   // AdMob — only in prd flavor
   if (flavor == 'prd') {
     await MobileAds.instance.initialize();
@@ -95,18 +93,26 @@ void main() async {
   await container.read(inventoryProvider.notifier).load();
   await container.read(dailyRewardsProvider.notifier).load();
   await container.read(personalRecordsProvider.notifier).load();
+  if (initialUri != null) _handleInviteDeepLink(initialUri, container);
+  appLinks.uriLinkStream.listen((uri) => _handleInviteDeepLink(uri, container));
   runApp(
     UncontrolledProviderScope(container: container, child: const CapivaraApp()),
   );
 }
 
-void _handleInviteDeepLink(Uri uri) {
+void _handleInviteDeepLink(Uri uri, ProviderContainer container) {
+  String? inviteRef;
   if (uri.scheme == 'olhabichim' && uri.host == 'invite') {
-    final ref = uri.queryParameters['ref'];
-    if (ref != null && ref.isNotEmpty) {
-      Hive.openBox<String>('invite_refs').then((box) {
-        box.put('pending_ref', ref);
-      });
-    }
+    inviteRef = uri.queryParameters['ref'];
+  } else if (uri.scheme == 'https' &&
+      uri.host == 'bichim-prd.web.app' &&
+      uri.path == '/invite') {
+    inviteRef = uri.queryParameters['ref'];
+  }
+  if (inviteRef != null && inviteRef.isNotEmpty) {
+    Hive.openBox<String>('invite_refs').then((box) {
+      box.put('pending_ref', inviteRef!);
+    });
+    container.read(pendingInviteRefProvider.notifier).state = inviteRef;
   }
 }
