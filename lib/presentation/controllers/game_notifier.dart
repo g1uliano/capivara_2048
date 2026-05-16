@@ -183,7 +183,7 @@ class GameNotifier extends Notifier<GameState> {
         // Timer was stopped at game over; player continued with an item — restart.
         _startTimer();
       }
-      if (state.isGameOver || state.hasWon) {
+      if (state.isGameOver || state.hasWon || state.pendingMilestone != null) {
         _stopTimer();
       }
       if (!state.isGameOver && !state.hasWon) {
@@ -340,6 +340,7 @@ class GameNotifier extends Notifier<GameState> {
 
   void dismissMilestone() {
     state = state.copyWith(pendingMilestone: null);
+    if (_timerStarted && !state.isGameOver && !state.hasWon) _startTimer();
   }
 
   Future<void> endGame() async {
