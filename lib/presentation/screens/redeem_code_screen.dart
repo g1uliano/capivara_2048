@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/theme/text_styles.dart';
 import '../../core/utils/iap_delivery.dart';
 import '../../data/models/shop_package.dart';
 import '../../data/repositories/gift_code_repository.dart';
@@ -201,7 +202,6 @@ class _RedeemCodeScreenState extends ConsumerState<RedeemCodeScreen> {
                   filled: true,
                   fillColor: Colors.white,
                   hintText: 'Digite o código do presente',
-                  errorText: _error,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -217,6 +217,16 @@ class _RedeemCodeScreenState extends ConsumerState<RedeemCodeScreen> {
                 style: GoogleFonts.nunito(fontSize: 16),
                 onSubmitted: (_) => _redeem(),
               ),
+              if (_error != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    _error!,
+                    style: outlinedWhiteTextStyle(
+                      GoogleFonts.fredoka(fontSize: 14),
+                    ),
+                  ),
+                ),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _loading ? null : _redeem,

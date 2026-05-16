@@ -6,6 +6,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.7] — 2026-05-16
+
+### Fixed
+
+- **Resgatar Código — mensagens de erro ilegíveis**: `errorText` do `InputDecoration` renderizava texto vermelho diretamente sobre o fundo do jogo; substituído por `Text` com `outlinedWhiteTextStyle(fredoka(14))` para legibilidade
+- **GameNotifier — `debugSetState` cancelava apenas timer de jogo**: `_firestoreSaveTimer` agora também é cancelado, evitando salvamentos fantasma no Firestore durante injeção de estado em testes
+
 ## [1.9.6] — 2026-05-15
 
 ### Added

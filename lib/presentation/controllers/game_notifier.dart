@@ -238,6 +238,7 @@ class GameNotifier extends Notifier<GameState> {
   @visibleForTesting
   void debugSetState(GameState s) {
     _stopTimer();
+    _firestoreSaveTimer?.cancel();
     state = s;
   }
 
