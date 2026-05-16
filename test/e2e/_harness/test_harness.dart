@@ -48,6 +48,7 @@ class GameTestHarness {
   late ProviderContainer container;
   late Directory tempDir;
   bool _booted = false;
+  bool _containerDisposed = false;
 
   Future<Widget> boot({GameState? initialGameState}) async {
     assert(
@@ -75,6 +76,7 @@ class GameTestHarness {
         iapServiceProvider.overrideWithValue(FakeIAPService()),
       ],
     );
+    _containerDisposed = false;
 
     await container.read(reduceEffectsProvider.notifier).load();
     await container.read(inventoryProvider.notifier).load();
@@ -97,12 +99,22 @@ class GameTestHarness {
     );
   }
 
+  /// Disposes the current [container] synchronously. Call this inside a
+  /// [testWidgets] body (inside FakeAsync) to cancel any pending timers
+  /// before Flutter's post-test invariant checks run. Safe to call multiple
+  /// times; subsequent calls are no-ops.
+  void disposeContainer() {
+    if (_containerDisposed) return;
+    _containerDisposed = true;
+    container.dispose();
+  }
+
   /// Simulates a cold app restart: disposes the current [container] and
   /// provider state, but keeps Hive on disk (same [tempDir]).
   /// Call after [boot()].
   Future<Widget> restart() async {
     assert(_booted, 'GameTestHarness.restart() called before boot()');
-    container.dispose();
+    disposeContainer();
     await Hive.close().timeout(
       const Duration(seconds: 3),
       onTimeout: () => [],
@@ -126,6 +138,7 @@ class GameTestHarness {
         iapServiceProvider.overrideWithValue(FakeIAPService()),
       ],
     );
+    _containerDisposed = false;
 
     await container.read(reduceEffectsProvider.notifier).load();
     await container.read(inventoryProvider.notifier).load();
@@ -141,7 +154,7 @@ class GameTestHarness {
 
   Future<void> teardown() async {
     if (!_booted) return;
-    container.dispose();
+    disposeContainer();
     // Use a timeout in case there are unawaited Hive writes pending (e.g. from
     // `unawaited(notifier.add(...))` inside widget code). We're deleting the
     // temp directory anyway, so skipping the flush is safe for test isolation.

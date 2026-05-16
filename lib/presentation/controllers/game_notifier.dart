@@ -207,6 +207,7 @@ class GameNotifier extends Notifier<GameState> {
       return;
     }
     _stopTimer();
+    _firestoreSaveTimer?.cancel();
     state = state.copyWith(isPaused: true);
   }
 
