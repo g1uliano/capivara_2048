@@ -12,6 +12,7 @@ class DeviceCapabilityDetector {
     'galaxy a1',
     'galaxy a2',
     'galaxy a3',
+    'galaxy a4',
     'galaxy a5',
     'moto g',
     'moto e',

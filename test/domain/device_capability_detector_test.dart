@@ -45,6 +45,13 @@ void main() {
       );
     });
 
+    test('Galaxy A4x detectado como fraco', () {
+      expect(
+        DeviceCapabilityDetector.isLowEndFromModel('Samsung Galaxy A42', 33),
+        true,
+      );
+    });
+
     test('SDK < 31 detectado como fraco independente do modelo', () {
       expect(
         DeviceCapabilityDetector.isLowEndFromModel('Pixel 9', 30),
