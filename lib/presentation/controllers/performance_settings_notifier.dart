@@ -26,12 +26,23 @@ class PerformanceSettingsNotifier extends Notifier<PerformanceSettings> {
   }
 
   Future<void> enable() async {
-    state = state.copyWith(enabled: true, hasShownSuggestionDialog: true);
+    state = state.copyWith(
+      enabled: true,
+      hasShownSuggestionDialog: true,
+      tileQuality: TileQuality.simple,
+      blurEffectsEnabled: false,
+      animationsEnabled: false,
+    );
     await _save();
   }
 
   Future<void> disable() async {
-    state = state.copyWith(enabled: false);
+    state = state.copyWith(
+      enabled: false,
+      tileQuality: TileQuality.full,
+      blurEffectsEnabled: true,
+      animationsEnabled: true,
+    );
     await _save();
   }
 
@@ -63,5 +74,5 @@ class PerformanceSettingsNotifier extends Notifier<PerformanceSettings> {
 
 final performanceSettingsProvider =
     NotifierProvider<PerformanceSettingsNotifier, PerformanceSettings>(
-  PerformanceSettingsNotifier.new,
-);
+      PerformanceSettingsNotifier.new,
+    );

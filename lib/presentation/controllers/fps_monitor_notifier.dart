@@ -3,8 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class FpsMonitorNotifier extends Notifier<bool> {
   // state = true: drops detectados, exibir dialog
-  static const _windowSize = 30;
-  static const _thresholdMicros = 22000; // 22ms = ~45fps
+  // Janela de 120 frames (~2s a 60fps) para filtrar picos pontuais de GC.
+  // Threshold de 33ms (~30fps) — só dispara se o device realmente sofrer de
+  // forma sustentada, não por quedas momentâneas.
+  static const _windowSize = 120;
+  static const _thresholdMicros = 33333; // 33ms = ~30fps
 
   TimingsCallback? _callback;
   final List<int> _frameMicros = [];
@@ -31,7 +34,8 @@ class FpsMonitorNotifier extends Notifier<bool> {
   void _onTimings(List<FrameTiming> timings) {
     if (!ref.mounted || state) return;
     for (final t in timings) {
-      final us = t.buildDuration.inMicroseconds + t.rasterDuration.inMicroseconds;
+      final us =
+          t.buildDuration.inMicroseconds + t.rasterDuration.inMicroseconds;
       _frameMicros.add(us);
       if (_frameMicros.length > _windowSize) _frameMicros.removeAt(0);
     }
@@ -44,5 +48,6 @@ class FpsMonitorNotifier extends Notifier<bool> {
   }
 }
 
-final fpsMonitorProvider =
-    NotifierProvider<FpsMonitorNotifier, bool>(FpsMonitorNotifier.new);
+final fpsMonitorProvider = NotifierProvider<FpsMonitorNotifier, bool>(
+  FpsMonitorNotifier.new,
+);
