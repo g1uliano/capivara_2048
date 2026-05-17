@@ -35,6 +35,26 @@ lib/
     └── controllers/   # Riverpod notifiers
 ```
 
+## Comandos de build
+
+### flutter build
+
+| Descrição                    | Comando |
+| ---------------------------- | ------- |
+| APK tst dev debug            | `flutter build apk --flavor tst --dart-define=FLAVOR=dev --debug` |
+| APK prd release              | `flutter build apk --flavor prd --release --dart-define=FLAVOR=prd --dart-define=AD_UNIT_ANDROID=ca-app-pub-3940256099942544/5224354917 --dart-define=AD_UNIT_IOS=ca-app-pub-3940256099942544/1712485313` |
+| AAB prd release (Play Store) | `flutter build appbundle --flavor prod --release --dart-define=FLAVOR=prd --dart-define=AD_UNIT_ANDROID=ca-app-pub-3940256099942544/5224354917 --dart-define=AD_UNIT_IOS=ca-app-pub-3940256099942544/1712485313` |
+| iOS prd release              | `flutter build ios --flavor prd --release --dart-define=FLAVOR=prd` |
+
+### flutter run
+
+| Cenário                                    | Comando |
+| ------------------------------------------ | ------- |
+| Dispositivo físico, Firebase dev real      | `flutter run --flavor tst --dart-define=FLAVOR=dev` |
+| Produção (Firebase prd)                    | `flutter run --flavor prod --dart-define=FLAVOR=prd` |
+| Emulador Firebase + USB (adb reverse)      | `flutter run --flavor tst --dart-define=FLAVOR=dev --dart-define=USE_EMULATOR=true` |
+| Emulador Firebase + WiFi (Genymotion etc.) | `flutter run --flavor tst --dart-define=FLAVOR=dev --dart-define=USE_EMULATOR=true --dart-define=EMULATOR_HOST=10.0.0.2` |
+
 ## Regras de desenvolvimento
 
 - **Game engine** (`domain/game_engine/`) deve ser puro Dart, zero dependência de Flutter — facilita testes unitários

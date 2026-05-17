@@ -6,6 +6,24 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.8] — 2026-05-17
+
+### Added
+
+- **Modo de Performance**: sistema completo de detecção de capacidade de dispositivo e controle granular de qualidade gráfica
+  - Detecção heurística automática por modelo/SDK no startup (via `device_info_plus`) — exibe dialog de sugestão uma vez por instalação
+  - Monitor de FPS em runtime (`SchedulerBinding.addTimingsCallback`, janela de 30 frames, threshold 45 fps) — exibe dialog na primeira sessão com queda detectada
+  - Dialog de sugestão com estilo consistente ao restante da UI (borda laranja, Fredoka, dois botões: "Agora não" / "Ativar")
+  - Três variantes de qualidade dos tiles: **Completo** (imagem + opacidade 0.27), **Sem opacidade** (imagem sem Opacity wrapper), **Simples** (cor sólida + nome do animal)
+  - Toggle de efeitos de blur (substitui o `reduceEffectsProvider` removido)
+  - Toggle de animações decorativas (bob da capivara-mascote, pulse/sparkles da trilha de recompensas, animação de claim)
+  - Seção "Performance" completa na tela de Configurações: switch modo, switch detecção automática, `SegmentedButton` de qualidade dos tiles, switches blur e animações (sub-itens desabilitados com opacity 0.4 + `IgnorePointer` quando modo desligado)
+  - Persistência em `SharedPreferences` com JSON + defaults seguros
+
+### Fixed
+
+- **Swipe — movimentos ignorados em dispositivos lentos**: threshold de velocidade reduzido de 100 px/s para 50 px/s — resolve o principal sintoma de lag de input relatado no Redmi Note 9s
+
 ## [1.9.7] — 2026-05-16
 
 ### Fixed

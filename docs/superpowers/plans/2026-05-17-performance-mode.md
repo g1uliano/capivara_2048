@@ -46,7 +46,7 @@
 Abrir `pubspec.yaml` e adicionar logo após `package_info_plus`:
 
 ```yaml
-  device_info_plus: ^10.1.0
+  device_info_plus: ^13.1.0
 ```
 
 - [ ] **Step 2: Instalar**
