@@ -161,13 +161,15 @@ class GameNotifier extends Notifier<GameState> {
         if (milestone == 12 || milestone == 13) {
           final tileValue = 1 << milestone; // 4096 ou 8192
           unawaited(
-            ref.read(syncEngineProvider).enqueuePendingEvent(
-              PendingEvent.legendReached(
-                id: const Uuid().v4(),
-                level: tileValue,
-                occurredAt: DateTime.now(),
-              ),
-            ),
+            ref
+                .read(syncEngineProvider)
+                .enqueuePendingEvent(
+                  PendingEvent.legendReached(
+                    id: const Uuid().v4(),
+                    level: tileValue,
+                    occurredAt: DateTime.now(),
+                  ),
+                ),
           );
         }
         unawaited(
@@ -177,14 +179,16 @@ class GameNotifier extends Notifier<GameState> {
         );
         // Save record immediately so personal ranking is populated before game ends
         unawaited(
-          ref.read(gameRecordRepositoryProvider).add(
-            GameRecord(
-              playedAt: DateTime.now(),
-              elapsedMs: captured,
-              score: state.score,
-              maxLevel: state.maxLevel,
-            ),
-          ),
+          ref
+              .read(gameRecordRepositoryProvider)
+              .add(
+                GameRecord(
+                  playedAt: DateTime.now(),
+                  elapsedMs: captured,
+                  score: state.score,
+                  maxLevel: state.maxLevel,
+                ),
+              ),
         );
         break; // Apenas um marco por vez
       }
