@@ -35,6 +35,11 @@ class PerformanceSettingsNotifier extends Notifier<PerformanceSettings> {
     await _save();
   }
 
+  Future<void> markDialogShown() async {
+    state = state.copyWith(hasShownSuggestionDialog: true);
+    await _save();
+  }
+
   Future<void> setTileQuality(TileQuality quality) async {
     state = state.copyWith(tileQuality: quality);
     await _save();

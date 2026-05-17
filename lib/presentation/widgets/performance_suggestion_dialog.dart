@@ -41,7 +41,10 @@ class _PerformanceSuggestionDialog extends StatelessWidget {
       actionsAlignment: MainAxisAlignment.center,
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            ref.read(performanceSettingsProvider.notifier).markDialogShown();
+            Navigator.of(context).pop();
+          },
           child: Text(
             'Agora não',
             style: GoogleFonts.fredoka(
