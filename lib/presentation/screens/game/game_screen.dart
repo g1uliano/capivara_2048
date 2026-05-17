@@ -25,6 +25,9 @@ import '../../../domain/inventory/inventory_notifier.dart';
 import '../../widgets/pause_overlay.dart';
 import 'game_over_item_overlay.dart';
 import '../../widgets/game_over_no_items_overlay.dart';
+import '../../controllers/fps_monitor_notifier.dart';
+import '../../controllers/performance_settings_notifier.dart';
+import '../../widgets/performance_suggestion_dialog.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({super.key});
@@ -53,6 +56,26 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     Timer(const Duration(milliseconds: 300), () {
       if (mounted) setState(() => _pulsingItems.remove(type));
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _startFpsMonitor());
+  }
+
+  void _startFpsMonitor() {
+    if (!mounted) return;
+    final perf = ref.read(performanceSettingsProvider);
+    if (perf.autoDetectEnabled && !perf.enabled) {
+      ref.read(fpsMonitorProvider.notifier).start();
+    }
+  }
+
+  @override
+  void dispose() {
+    ref.read(fpsMonitorProvider.notifier).stop();
+    super.dispose();
   }
 
   @override
@@ -108,6 +131,15 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               maxLevel: current.maxLevel,
               timesReached8192: records.timesReached8192,
             );
+      }
+    });
+
+    ref.listen<bool>(fpsMonitorProvider, (prev, next) {
+      if (next == true && (prev ?? false) == false) {
+        final perf = ref.read(performanceSettingsProvider);
+        if (!perf.enabled) {
+          showPerformanceSuggestionDialog(context, ref);
+        }
       }
     });
 
