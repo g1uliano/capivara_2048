@@ -40,11 +40,19 @@ void main() {
       expect(s2.hasShownSuggestionDialog, true);
     });
 
-    test('fromJson com chave ausente usa defaults', () {
+    test('fromJson com chave ausente usa defaults em todos os campos', () {
       final s = PerformanceSettings.fromJson({});
       expect(s.enabled, false);
       expect(s.tileQuality, TileQuality.full);
       expect(s.blurEffectsEnabled, true);
+      expect(s.animationsEnabled, true);
+      expect(s.autoDetectEnabled, true);
+      expect(s.hasShownSuggestionDialog, false);
+    });
+
+    test('fromJson com tileQuality fora do range usa full', () {
+      final s = PerformanceSettings.fromJson({'tileQuality': 99});
+      expect(s.tileQuality, TileQuality.full);
     });
 
     test('== e hashCode baseados em campos', () {

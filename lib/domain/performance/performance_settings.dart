@@ -48,7 +48,12 @@ class PerformanceSettings {
   factory PerformanceSettings.fromJson(Map<String, dynamic> json) =>
       PerformanceSettings(
         enabled: json['enabled'] as bool? ?? false,
-        tileQuality: TileQuality.values[json['tileQuality'] as int? ?? 0],
+        tileQuality: () {
+          final idx = json['tileQuality'] as int? ?? 0;
+          return (idx >= 0 && idx < TileQuality.values.length)
+              ? TileQuality.values[idx]
+              : TileQuality.full;
+        }(),
         blurEffectsEnabled: json['blurEffectsEnabled'] as bool? ?? true,
         animationsEnabled: json['animationsEnabled'] as bool? ?? true,
         autoDetectEnabled: json['autoDetectEnabled'] as bool? ?? true,
