@@ -13,8 +13,10 @@ import '../../domain/game_engine/direction.dart';
 import '../../domain/game_engine/game_engine.dart';
 import '../../domain/inventory/inventory_notifier.dart';
 import '../../domain/ranking/ranking_repository.dart';
+import '../../data/models/pending_event.dart';
 import '../../domain/invites/invite_service.dart';
 import '../../domain/sync/sync_engine.dart';
+import 'package:uuid/uuid.dart';
 import '../../core/utils/haptic_utils.dart';
 import '../../presentation/controllers/settings_notifier.dart';
 import '../controllers/auth_controller.dart';
@@ -155,6 +157,19 @@ class GameNotifier extends Notifier<GameState> {
           intensity: HapticIntensity.medium,
         );
         _submitToRanking();
+        // Enfileirar evento para ranking Lendas (4096 / 8192)
+        if (milestone == 12 || milestone == 13) {
+          final tileValue = 1 << milestone; // 4096 ou 8192
+          unawaited(
+            ref.read(syncEngineProvider).enqueuePendingEvent(
+              PendingEvent.legendReached(
+                id: const Uuid().v4(),
+                level: tileValue,
+                occurredAt: DateTime.now(),
+              ),
+            ),
+          );
+        }
         unawaited(
           ref
               .read(personalRecordsProvider.notifier)
