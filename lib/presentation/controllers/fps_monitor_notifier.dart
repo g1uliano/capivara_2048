@@ -10,7 +10,10 @@ class FpsMonitorNotifier extends Notifier<bool> {
   final List<int> _frameMicros = [];
 
   @override
-  bool build() => false;
+  bool build() {
+    ref.onDispose(stop);
+    return false;
+  }
 
   void start() {
     if (_callback != null || state) return;
@@ -26,7 +29,7 @@ class FpsMonitorNotifier extends Notifier<bool> {
   }
 
   void _onTimings(List<FrameTiming> timings) {
-    if (state) return;
+    if (!ref.mounted || state) return;
     for (final t in timings) {
       final us = t.buildDuration.inMicroseconds + t.rasterDuration.inMicroseconds;
       _frameMicros.add(us);

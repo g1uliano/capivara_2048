@@ -39,6 +39,7 @@ class GameScreen extends ConsumerStatefulWidget {
 class _GameScreenState extends ConsumerState<GameScreen> {
   ItemType? _shopItem;
   final Set<ItemType> _pulsingItems = {};
+  late final FpsMonitorNotifier _fpsMonitorNotifier;
 
   void _openShop(ItemType type) {
     if (ref.read(gameProvider).pendingMilestone != null) return;
@@ -61,6 +62,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   @override
   void initState() {
     super.initState();
+    _fpsMonitorNotifier = ref.read(fpsMonitorProvider.notifier);
     WidgetsBinding.instance.addPostFrameCallback((_) => _startFpsMonitor());
   }
 
@@ -74,7 +76,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   @override
   void dispose() {
-    ref.read(fpsMonitorProvider.notifier).stop();
+    _fpsMonitorNotifier.stop();
     super.dispose();
   }
 
