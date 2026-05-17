@@ -8,6 +8,7 @@ import '../../../data/models/daily_rewards_state.dart';
 import '../../../domain/daily_rewards/daily_rewards_engine.dart';
 import '../../../domain/daily_rewards/daily_rewards_notifier.dart';
 import '../../../domain/lives/lives_notifier.dart';
+import '../../controllers/performance_settings_notifier.dart';
 import '../../widgets/capivara_mascot.dart';
 import '../../widgets/daily_reward_day_tile.dart';
 import '../../widgets/daily_reward_overlay.dart';
@@ -459,15 +460,19 @@ class _SerpentinePath extends StatelessWidget {
 }
 
 /// Wraps a tile with the "claim animation" (scale up + fade out) when claimed.
-class _AnimatedClaimTile extends StatelessWidget {
+class _AnimatedClaimTile extends ConsumerWidget {
   final bool isAnimating;
   final Widget child;
 
   const _AnimatedClaimTile({required this.isAnimating, required this.child});
 
   @override
-  Widget build(BuildContext context) {
-    if (!isAnimating) return child;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final animationsEnabled = ref.watch(
+      performanceSettingsProvider.select((s) => s.animationsEnabled),
+    );
+
+    if (!isAnimating || !animationsEnabled) return child;
     return child
         .animate()
         .scale(
@@ -541,50 +546,57 @@ class _TrailPainter extends CustomPainter {
 // CLAIM BUTTON & COUNTDOWN CARD
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _ClaimButton extends StatelessWidget {
+class _ClaimButton extends ConsumerWidget {
   final DailyRewardStatus status;
   final VoidCallback onPressed;
 
   const _ClaimButton({required this.status, required this.onPressed});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final animationsEnabled = ref.watch(
+      performanceSettingsProvider.select((s) => s.animationsEnabled),
+    );
+
     final label = status == DailyRewardStatus.cycleCompleted
         ? 'Iniciar novo ciclo'
         : 'Coletar recompensa';
-    return SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: onPressed,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFFD54F),
-              foregroundColor: const Color(0xFF3E2723),
-              padding: const EdgeInsets.symmetric(vertical: 18),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18),
-              ),
-              elevation: 6,
-              shadowColor: Colors.black54,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.card_giftcard, size: 24),
-                const SizedBox(width: 8),
-                Flexible(
-                  child: Text(
-                    label,
-                    style: GoogleFonts.fredoka(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
+    final button = SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFFFFD54F),
+          foregroundColor: const Color(0xFF3E2723),
+          padding: const EdgeInsets.symmetric(vertical: 18),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
           ),
-        )
+          elevation: 6,
+          shadowColor: Colors.black54,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.card_giftcard, size: 24),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                label,
+                style: GoogleFonts.fredoka(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (!animationsEnabled) return button;
+    return button
         .animate(onPlay: (c) => c.repeat(reverse: true))
         .scale(
           duration: 1200.ms,

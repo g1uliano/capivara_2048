@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../controllers/performance_settings_notifier.dart';
 
 /// Mascote da Capivara que se posiciona ao lado do dia atual na trilha de
 /// recompensa diária. Tem animação sutil de "bobbing" (flutua pra cima e pra
@@ -8,14 +10,25 @@ import 'package:google_fonts/google_fonts.dart';
 ///
 /// O posicionamento é controlado pelo widget pai (via AnimatedPositioned ou
 /// AnimatedAlign) — este widget só renderiza o sprite + balão "Você está aqui!".
-class CapivaraMascot extends StatelessWidget {
+class CapivaraMascot extends ConsumerWidget {
   final double size;
   final bool showHint;
 
   const CapivaraMascot({super.key, this.size = 64, this.showHint = true});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final animationsEnabled = ref.watch(
+      performanceSettingsProvider.select((s) => s.animationsEnabled),
+    );
+
+    final image = Image.asset(
+      'assets/images/animals/tile/Capivara.webp',
+      width: size,
+      height: size,
+      fit: BoxFit.contain,
+    );
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -44,19 +57,16 @@ class CapivaraMascot extends StatelessWidget {
               ),
             ),
           ),
-        Image.asset(
-              'assets/images/animals/tile/Capivara.webp',
-              width: size,
-              height: size,
-              fit: BoxFit.contain,
-            )
-            .animate(onPlay: (c) => c.repeat(reverse: true))
-            .moveY(
-              duration: 1100.ms,
-              begin: 0,
-              end: -6,
-              curve: Curves.easeInOut,
-            ),
+        animationsEnabled
+            ? image
+                .animate(onPlay: (c) => c.repeat(reverse: true))
+                .moveY(
+                  duration: 1100.ms,
+                  begin: 0,
+                  end: -6,
+                  curve: Curves.easeInOut,
+                )
+            : image,
       ],
     );
   }

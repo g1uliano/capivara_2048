@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/text_styles.dart';
 import '../../domain/daily_rewards/daily_rewards_engine.dart';
+import '../controllers/performance_settings_notifier.dart';
 
 enum DayTileState { future, currentAvailable, claimed }
 
@@ -14,7 +16,7 @@ enum DayTileState { future, currentAvailable, claimed }
 /// - claimed: imagem escurecida + checkmark verde
 ///
 /// Quando isDay7=true usa reward_day_07.webp (panorâmica) para o grande prêmio.
-class DailyRewardDayTile extends StatelessWidget {
+class DailyRewardDayTile extends ConsumerWidget {
   final int day;
   final DailyReward reward;
   final DayTileState tileState;
@@ -35,7 +37,11 @@ class DailyRewardDayTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final animationsEnabled = ref.watch(
+      performanceSettingsProvider.select((s) => s.animationsEnabled),
+    );
+
     final isCurrent = tileState == DayTileState.currentAvailable;
     final isClaimed = tileState == DayTileState.claimed;
 
@@ -49,6 +55,7 @@ class DailyRewardDayTile extends StatelessWidget {
         height: height,
         isCurrent: isCurrent,
         isDay7: isDay7,
+        animationsEnabled: animationsEnabled,
       );
     }
 
@@ -80,7 +87,7 @@ class DailyRewardDayTile extends StatelessWidget {
       ),
     );
 
-    if (isCurrent) {
+    if (isCurrent && animationsEnabled) {
       content = content
           .animate(onPlay: (c) => c.repeat(reverse: true))
           .scale(
@@ -116,6 +123,7 @@ class _RewardDayImage extends StatelessWidget {
   final double height;
   final bool isCurrent;
   final bool isDay7;
+  final bool animationsEnabled;
 
   const _RewardDayImage({
     required this.day,
@@ -123,6 +131,7 @@ class _RewardDayImage extends StatelessWidget {
     required this.height,
     required this.isCurrent,
     required this.isDay7,
+    required this.animationsEnabled,
   });
 
   @override
@@ -213,7 +222,7 @@ class _RewardDayImage extends StatelessWidget {
           ),
 
         // Sparkle quando current
-        if (isCurrent && isDay7) ...[
+        if (isCurrent && isDay7 && animationsEnabled) ...[
           Positioned(
             top: -8,
             left: 12,
@@ -232,7 +241,7 @@ class _RewardDayImage extends StatelessWidget {
                 .then()
                 .fade(duration: 900.ms, begin: 1.0, end: 0.4),
           ),
-        ] else if (isCurrent)
+        ] else if (isCurrent && animationsEnabled)
           Positioned(
             top: 6,
             right: 6,
