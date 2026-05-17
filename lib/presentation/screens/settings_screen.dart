@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../../core/constants/app_colors.dart';
+import '../../domain/performance/performance_settings.dart';
+import '../controllers/performance_settings_notifier.dart';
 import '../controllers/settings_notifier.dart';
 import '../widgets/game_background.dart';
 import '../widgets/outlined_text.dart';
@@ -59,6 +61,105 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                 ],
               ),
+            ),
+            _SettingsSection('Performance'),
+            Consumer(
+              builder: (context, ref, _) {
+                final perf = ref.watch(performanceSettingsProvider);
+                final notifier = ref.read(performanceSettingsProvider.notifier);
+                return Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  color: Colors.white.withValues(alpha: 0.88),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 2,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SwitchListTile(
+                        tileColor: Colors.transparent,
+                        title: Text('Modo de Performance', style: GoogleFonts.nunito(fontSize: 16)),
+                        value: perf.enabled,
+                        onChanged: (v) => v ? notifier.enable() : notifier.disable(),
+                        activeThumbColor: AppColors.primary,
+                      ),
+                      SwitchListTile(
+                        tileColor: Colors.transparent,
+                        title: Text('Detecção automática', style: GoogleFonts.nunito(fontSize: 16)),
+                        subtitle: Text(
+                          'Sugere ativar quando o jogo tiver lentidão',
+                          style: GoogleFonts.nunito(fontSize: 12, color: Colors.grey),
+                        ),
+                        value: perf.autoDetectEnabled,
+                        onChanged: (v) => notifier.setAutoDetect(v),
+                        activeThumbColor: AppColors.primary,
+                      ),
+                      Opacity(
+                        opacity: perf.enabled ? 1.0 : 0.4,
+                        child: IgnorePointer(
+                          ignoring: !perf.enabled,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Divider(height: 1, indent: 16, endIndent: 16),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                                child: Text(
+                                  'Qualidade dos tiles',
+                                  style: GoogleFonts.nunito(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                                child: SegmentedButton<TileQuality>(
+                                  segments: const [
+                                    ButtonSegment(
+                                      value: TileQuality.full,
+                                      label: Text('Completo'),
+                                    ),
+                                    ButtonSegment(
+                                      value: TileQuality.fullOpacity,
+                                      label: Text('Sem opacidade'),
+                                    ),
+                                    ButtonSegment(
+                                      value: TileQuality.simple,
+                                      label: Text('Simples'),
+                                    ),
+                                  ],
+                                  selected: {perf.tileQuality},
+                                  onSelectionChanged: (s) => notifier.setTileQuality(s.first),
+                                  style: ButtonStyle(
+                                    textStyle: WidgetStateProperty.all(
+                                      GoogleFonts.nunito(fontSize: 12),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SwitchListTile(
+                                tileColor: Colors.transparent,
+                                title: Text('Efeitos de blur', style: GoogleFonts.nunito(fontSize: 16)),
+                                value: perf.blurEffectsEnabled,
+                                onChanged: (v) => notifier.setBlurEffects(v),
+                                activeThumbColor: AppColors.primary,
+                              ),
+                              SwitchListTile(
+                                tileColor: Colors.transparent,
+                                title: Text('Animações', style: GoogleFonts.nunito(fontSize: 16)),
+                                value: perf.animationsEnabled,
+                                onChanged: (v) => notifier.setAnimations(v),
+                                activeThumbColor: AppColors.primary,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
             _SettingsSection('Áudio'),
             Card(
