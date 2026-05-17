@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:capivara_2048/core/providers/reduce_effects_provider.dart';
+import 'package:capivara_2048/presentation/controllers/performance_settings_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/game_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/settings_notifier.dart';
 import '../_harness/scenario.dart';
@@ -29,17 +29,20 @@ final settingsReduceEffectsScenario = E2EScenario(
   run: (tester, harness) async {
     await _bootToHome(tester, harness);
 
-    final initialValue = harness.container.read(reduceEffectsProvider);
+    final initialValue =
+        harness.container.read(performanceSettingsProvider).blurEffectsEnabled;
 
-    // Toggle via notifier (same codepath as UI tap, avoids PackageInfo mock)
+    // Toggle blur via notifier (same semantics as old reduceEffects toggle)
     await tester.runAsync(
-        () => harness.container.read(reduceEffectsProvider.notifier).toggle());
+        () => harness.container
+            .read(performanceSettingsProvider.notifier)
+            .setBlurEffects(!initialValue));
     await tester.pump();
 
     expect(
-      harness.container.read(reduceEffectsProvider),
+      harness.container.read(performanceSettingsProvider).blurEffectsEnabled,
       equals(!initialValue),
-      reason: 'toggle deve inverter o valor de reduceEffects',
+      reason: 'setBlurEffects deve inverter o valor de blurEffectsEnabled',
     );
 
     // Cold restart — SharedPreferences survives (same mock)
@@ -48,9 +51,9 @@ final settingsReduceEffectsScenario = E2EScenario(
     await tester.pumpAndSettle(const Duration(seconds: 5));
 
     expect(
-      harness.container.read(reduceEffectsProvider),
+      harness.container.read(performanceSettingsProvider).blurEffectsEnabled,
       equals(!initialValue),
-      reason: 'reduceEffects deve persistir após cold restart',
+      reason: 'blurEffectsEnabled deve persistir após cold restart',
     );
   },
 );
@@ -64,13 +67,17 @@ final settingsReduceEffectsBlurScenario = E2EScenario(
   run: (tester, harness) async {
     await _bootToGame(tester, harness);
 
-    // Enable reduce effects directly via notifier
+    // Disable blur effects directly via notifier (= old reduceEffects=true)
     await tester.runAsync(
-        () => harness.container.read(reduceEffectsProvider.notifier).toggle());
+        () => harness.container
+            .read(performanceSettingsProvider.notifier)
+            .setBlurEffects(false));
     await tester.pump();
 
-    // Verify it's now true
-    expect(harness.container.read(reduceEffectsProvider), isTrue);
+    // Verify blur is now disabled
+    expect(
+        harness.container.read(performanceSettingsProvider).blurEffectsEnabled,
+        isFalse);
 
     // Pause the game
     harness.container.read(gameProvider.notifier).pause();

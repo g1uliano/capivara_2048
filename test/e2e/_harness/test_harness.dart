@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:capivara_2048/app.dart';
-import 'package:capivara_2048/core/providers/reduce_effects_provider.dart';
+import 'package:capivara_2048/presentation/controllers/performance_settings_notifier.dart';
 import 'package:capivara_2048/data/models/daily_rewards_state_adapter.dart';
 import 'package:capivara_2048/data/models/game_record.dart';
 import 'package:capivara_2048/data/models/game_record_hive_adapter.dart';
@@ -78,7 +78,7 @@ class GameTestHarness {
     );
     _containerDisposed = false;
 
-    await container.read(reduceEffectsProvider.notifier).load();
+    await container.read(performanceSettingsProvider.notifier).load();
     await container.read(inventoryProvider.notifier).load();
     await container.read(dailyRewardsProvider.notifier).load();
     await container.read(personalRecordsProvider.notifier).load();
@@ -140,7 +140,7 @@ class GameTestHarness {
     );
     _containerDisposed = false;
 
-    await container.read(reduceEffectsProvider.notifier).load();
+    await container.read(performanceSettingsProvider.notifier).load();
     await container.read(inventoryProvider.notifier).load();
     await container.read(dailyRewardsProvider.notifier).load();
     await container.read(personalRecordsProvider.notifier).load();

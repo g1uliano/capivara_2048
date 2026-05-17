@@ -1,4 +1,5 @@
-import 'package:capivara_2048/core/providers/reduce_effects_provider.dart';
+import 'package:capivara_2048/presentation/controllers/performance_settings_notifier.dart';
+import 'package:capivara_2048/domain/performance/performance_settings.dart';
 import 'package:capivara_2048/presentation/widgets/outlined_text.dart';
 import 'package:capivara_2048/presentation/widgets/pause_overlay.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,9 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          reduceEffectsProvider.overrideWithBuild((ref, n) => true),
+          performanceSettingsProvider.overrideWith(
+            () => _BlurDisabledNotifier(),
+          ),
         ],
         child: const MaterialApp(
           home: Scaffold(body: PauseOverlay()),
@@ -119,4 +122,11 @@ void main() {
     });
     expect(tintFinder, findsAtLeastNWidgets(1));
   });
+}
+
+/// Test-only notifier that starts with blurEffectsEnabled=false (= reduceEffects=true).
+class _BlurDisabledNotifier extends PerformanceSettingsNotifier {
+  @override
+  PerformanceSettings build() =>
+      const PerformanceSettings(blurEffectsEnabled: false);
 }

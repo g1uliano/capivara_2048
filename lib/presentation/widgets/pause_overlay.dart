@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/providers/reduce_effects_provider.dart';
+import '../controllers/performance_settings_notifier.dart';
 import '../controllers/game_notifier.dart';
 import 'outlined_text.dart';
 import '../screens/debug/animals_gallery_screen.dart';
@@ -28,7 +28,9 @@ class _PauseOverlayState extends ConsumerState<PauseOverlay> {
 
   @override
   Widget build(BuildContext context) {
-    final reduceEffects = ref.watch(reduceEffectsProvider);
+    final reduceEffects = ref.watch(
+      performanceSettingsProvider.select((s) => !s.blurEffectsEnabled),
+    );
     final notifier = ref.read(gameProvider.notifier);
 
     Widget content = Stack(

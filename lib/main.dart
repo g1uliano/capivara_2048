@@ -19,7 +19,7 @@ import 'data/models/personal_records_hive_adapter.dart';
 import 'data/models/game_record_hive_adapter.dart';
 import 'data/models/pending_event_hive_adapter.dart';
 import 'data/repositories/game_record_repository.dart';
-import 'core/providers/reduce_effects_provider.dart';
+import 'presentation/controllers/performance_settings_notifier.dart';
 import 'domain/inventory/inventory_notifier.dart';
 import 'domain/daily_rewards/daily_rewards_notifier.dart';
 import 'presentation/controllers/settings_notifier.dart';
@@ -89,7 +89,7 @@ void main() async {
       gameRecordRepositoryProvider.overrideWithValue(gameRecordRepo),
     ],
   );
-  await container.read(reduceEffectsProvider.notifier).load();
+  await container.read(performanceSettingsProvider.notifier).load();
   await container.read(inventoryProvider.notifier).load();
   await container.read(dailyRewardsProvider.notifier).load();
   await container.read(personalRecordsProvider.notifier).load();
