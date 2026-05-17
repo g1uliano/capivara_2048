@@ -207,7 +207,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                                             final v = details
                                                 .velocity
                                                 .pixelsPerSecond;
-                                            const threshold = 100.0;
+                                            const threshold = 50.0;
                                             if (v.dx.abs() > v.dy.abs()) {
                                               if (v.dx > threshold) {
                                                 notifier.onSwipe(
