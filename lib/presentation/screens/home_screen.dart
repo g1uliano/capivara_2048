@@ -26,6 +26,9 @@ import '../controllers/auth_controller.dart';
 import '../widgets/avatar_widget.dart';
 import '../../core/providers/invite_providers.dart';
 import '../widgets/invite_welcome_sheet.dart';
+import '../../domain/performance/device_capability_detector.dart';
+import '../controllers/performance_settings_notifier.dart';
+import '../widgets/performance_suggestion_dialog.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -42,6 +45,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.initState();
     _titleAsset = GameTitleImage.pickAsset();
     WidgetsBinding.instance.addPostFrameCallback((_) => _handlePendingInvite());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkDevicePerformance());
+  }
+
+  Future<void> _checkDevicePerformance() async {
+    if (!mounted) return;
+    final perf = ref.read(performanceSettingsProvider);
+    if (perf.hasShownSuggestionDialog || perf.enabled) return;
+    final isLowEnd = await DeviceCapabilityDetector.isLowEndDevice();
+    if (!mounted || !isLowEnd) return;
+    await showPerformanceSuggestionDialog(context, ref);
   }
 
   bool _hasSavedGame(GameState s) => s.score > 0 && !s.isGameOver;
