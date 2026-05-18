@@ -6,6 +6,20 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.9] — 2026-05-18
+
+### Added
+
+- **Cheat Menu** (debug only): novo menu de cheatcodes acessível via botão "Cheats" no `PauseOverlay` em `kDebugMode`
+  - Ajuste de vidas (incremento/decremento) via `debugSetLives`
+  - Ajuste de quantidade de itens por tipo (Bomba 2×2, Bomba 3×3, Desfazer ×1, Desfazer ×3) + atalho "Dar 5 de cada"
+  - Jump direto para qualquer nível (1–13) com tabuleiro realista — tile alvo + tiles decrescentes; milestones e dialogs de vitória disparam normalmente no próximo merge
+  - Substitui a `AnimalsGalleryScreen` (galeria de animais de debug)
+
+### Changed
+
+- `test/e2e/failures/` adicionado ao `.gitignore` (artefatos de falha de golden test não devem ser versionados)
+
 ## [1.9.8] — 2026-05-17
 
 ### Added
