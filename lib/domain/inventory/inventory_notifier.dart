@@ -61,6 +61,7 @@ class InventoryNotifier extends Notifier<Inventory> {
 
   int count(ItemType type) => state.count(type);
 
+  @visibleForTesting
   void addDebugItems() {
     if (!kDebugMode) return;
     state = const Inventory(bomb2: 5, bomb3: 5, undo1: 5, undo3: 5);

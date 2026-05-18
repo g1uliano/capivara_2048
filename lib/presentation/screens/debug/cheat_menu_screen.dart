@@ -73,6 +73,7 @@ class _CheatMenuScreenState extends ConsumerState<CheatMenuScreen> {
           const SizedBox(height: 8),
           ElevatedButton(
             onPressed: () =>
+                // ignore: invalid_use_of_visible_for_testing_member
                 ref.read(inventoryProvider.notifier).addDebugItems(),
             child: const Text('Dar 5 de cada'),
           ),

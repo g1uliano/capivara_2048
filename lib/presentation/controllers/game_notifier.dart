@@ -288,6 +288,9 @@ class GameNotifier extends Notifier<GameState> {
 
     _stopTimer();
     _firestoreSaveTimer?.cancel();
+    _timerStarted = false;
+    _reachedMilestones.clear();
+    _populateMilestonesFromMaxLevel(targetLevel);
     state = GameState(
       board: board,
       score: score,

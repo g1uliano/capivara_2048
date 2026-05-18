@@ -90,6 +90,11 @@ void main() {
       expect(container.read(gameProvider).isGameOver, false);
     });
 
+    test('hasWon is false after jump', () {
+      container.read(gameProvider.notifier).debugJumpToLevel(11);
+      expect(container.read(gameProvider).hasWon, false);
+    });
+
     test('all tile levels >= 1 for targetLevel 1', () {
       container.read(gameProvider.notifier).debugJumpToLevel(1);
       final board = container.read(gameProvider).board;
