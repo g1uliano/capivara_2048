@@ -1,12 +1,14 @@
 // lib/presentation/controllers/game_notifier.dart
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/ranking_provider.dart';
 import '../../data/models/game_record.dart';
 import '../../data/models/game_state.dart';
 import '../../data/models/item_type.dart';
+import '../../data/models/tile.dart';
 import '../../data/repositories/game_record_repository.dart';
 import '../../domain/game_engine/bomb_mode.dart';
 import '../../domain/game_engine/direction.dart';
@@ -260,6 +262,41 @@ class GameNotifier extends Notifier<GameState> {
     _stopTimer();
     _firestoreSaveTimer?.cancel();
     state = s;
+  }
+
+  @visibleForTesting
+  void debugJumpToLevel(int targetLevel) {
+    if (!kDebugMode) return;
+
+    const uuid = Uuid();
+    Tile makeTile(int level, int row, int col) =>
+        Tile(id: uuid.v4(), level: level, row: row, col: col);
+    int lvl(int delta) => max(1, targetLevel - delta);
+
+    final board = List.generate(4, (_) => List<Tile?>.filled(4, null));
+    board[0][3] = makeTile(targetLevel, 0, 3);
+    board[0][2] = makeTile(lvl(1), 0, 2);
+    board[1][3] = makeTile(lvl(2), 1, 3);
+    board[3][0] = makeTile(lvl(3), 3, 0);
+    board[3][2] = makeTile(1, 3, 2);
+    board[3][3] = makeTile(1, 3, 3);
+
+    final score = board
+        .expand((row) => row)
+        .whereType<Tile>()
+        .fold(0, (sum, t) => sum + (1 << t.level));
+
+    _stopTimer();
+    _firestoreSaveTimer?.cancel();
+    state = GameState(
+      board: board,
+      score: score,
+      highScore: max(state.highScore, score),
+      maxLevel: targetLevel,
+      hasWon: false,
+      isGameOver: false,
+      isPaused: false,
+    );
   }
 
   void setAwaitingResolution(bool value) {
