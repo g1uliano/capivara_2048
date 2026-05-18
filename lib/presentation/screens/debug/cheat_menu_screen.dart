@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/constants/app_colors.dart';
 import '../../../data/animals_data.dart';
 import '../../../data/models/item_type.dart';
 import '../../../domain/inventory/inventory_notifier.dart';
@@ -29,7 +30,15 @@ class _CheatMenuScreenState extends ConsumerState<CheatMenuScreen> {
     final inventory = ref.watch(inventoryProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('🧪 Cheat Menu')),
+      appBar: AppBar(
+        title: Text(
+          'Cheat Menu',
+          style: GoogleFonts.fredoka(fontSize: 22, color: Colors.white),
+        ),
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -37,8 +46,10 @@ class _CheatMenuScreenState extends ConsumerState<CheatMenuScreen> {
           _CounterRow(
             label: 'Vidas',
             count: lives,
-            onIncrement: () =>
-                ref.read(livesProvider.notifier).addPurchased(1),
+            onIncrement: () => ref
+                .read(livesProvider.notifier)
+                // ignore: invalid_use_of_visible_for_testing_member
+                .debugSetLives(lives + 1),
             onDecrement: lives > 0
                 ? () => ref
                     .read(livesProvider.notifier)
