@@ -40,6 +40,9 @@ class VictoryChoiceDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.read(gameProvider.notifier);
+    final timesReached8192 = milestone == 13
+        ? ref.watch(personalRecordsProvider.select((r) => r.timesReached8192))
+        : 0;
 
     return PopScope(
       canPop: false,
@@ -62,6 +65,14 @@ class VictoryChoiceDialog extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(_subtitle, style: GoogleFonts.nunito(fontSize: 16)),
+                if (milestone == 13) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    'Você chegou aqui $timesReached8192 '
+                    '${timesReached8192 == 1 ? 'vez' : 'vezes'}!',
+                    style: GoogleFonts.nunito(fontSize: 14, color: Colors.grey[600]),
+                  ),
+                ],
                 const SizedBox(height: 24),
                 if (milestone != 13)
                   SizedBox(

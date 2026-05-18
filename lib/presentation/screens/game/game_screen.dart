@@ -98,6 +98,11 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       summary,
     ) {
       if (summary == null || !mounted) return;
+      // Milestone 13 (Jacaré): info shown in VictoryChoiceDialog; skip ranking dialog.
+      if (summary.milestone == 13) {
+        ref.read(postGameControllerProvider.notifier).dismiss();
+        return;
+      }
       MilestoneRankingDialog.show(
         context,
         summary,
@@ -308,8 +313,14 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       child: GameOverModal(message: 'Game Over!'),
                     ),
                   if (hasWon && !isGameOver)
-                    const Positioned.fill(
-                      child: GameOverModal(message: 'Capivara Lendária! 🎉'),
+                    Positioned.fill(
+                      child: GameOverModal(
+                        message: switch (state.maxLevel) {
+                          >= 13 => 'Jacaré Lendário! 🐊',
+                          >= 12 => 'Peixe-boi Lendário! 🌊',
+                          _ => 'Capivara Lendária! 🎉',
+                        },
+                      ),
                     ),
                   if (state.pendingMilestone != null && !state.hasWon)
                     Positioned.fill(
