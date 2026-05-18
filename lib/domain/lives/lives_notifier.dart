@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
@@ -230,6 +231,12 @@ class LivesNotifier extends Notifier<LivesState> {
 
   bool get canWatchAd => canWatchAdFor(state);
   bool get canPlay => state.lives > 0;
+
+  @visibleForTesting
+  void debugSetLives(int n) {
+    if (!kDebugMode) return;
+    state = state.copyWith(lives: n.clamp(0, state.earnedCap));
+  }
 
   @visibleForTesting
   void debugSetState(LivesState s) => state = s;

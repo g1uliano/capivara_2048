@@ -1,6 +1,11 @@
+import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:capivara_2048/data/models/lives_state.dart';
+import 'package:capivara_2048/data/models/lives_state_adapter.dart';
+import 'package:capivara_2048/data/repositories/lives_repository.dart';
 import 'package:capivara_2048/domain/lives/lives_notifier.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 
 LivesState _state({
   int lives = 3,
@@ -269,4 +274,51 @@ void main() {
       expect(s.earnedCap, 15);
     });
   });
+
+  group('debugSetLives', () {
+    late ProviderContainer container;
+    late Directory tempDir;
+
+    setUp(() async {
+      tempDir = await Directory.systemTemp.createTemp('hive_lives_test_');
+      Hive.init(tempDir.path);
+      if (!Hive.isAdapterRegistered(LivesStateAdapter().typeId)) {
+        Hive.registerAdapter(LivesStateAdapter());
+      }
+      container = ProviderContainer(
+        overrides: [
+          livesRepositoryProvider.overrideWithValue(_FakeLivesRepository()),
+        ],
+      );
+      await container.read(livesProvider.notifier).awaitReady();
+    });
+
+    tearDown(() async {
+      container.dispose();
+      await Hive.close();
+      await tempDir.delete(recursive: true);
+    });
+
+    test('sets lives to given value', () {
+      container.read(livesProvider.notifier).debugSetLives(3);
+      expect(container.read(livesProvider).lives, 3);
+    });
+
+    test('clamps to 0 when negative', () {
+      container.read(livesProvider.notifier).debugSetLives(-1);
+      expect(container.read(livesProvider).lives, 0);
+    });
+
+    test('clamps to earnedCap (15) when over', () {
+      container.read(livesProvider.notifier).debugSetLives(20);
+      expect(container.read(livesProvider).lives, 15);
+    });
+  });
+}
+
+class _FakeLivesRepository implements LivesRepository {
+  @override Future<LivesState> load() async => LivesState.initial();
+  @override Future<void> save(LivesState state) async {}
+  @override Future<bool> getMigrationFlag(String key) async => true;
+  @override Future<void> setMigrationFlag(String key) async {}
 }
