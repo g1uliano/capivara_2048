@@ -6,6 +6,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.11] — 2026-05-18
+
+### Fixed
+
+- **debugJumpToLevel**: VictoryChoiceDialog re-disparava após dismiss — `_reachedMilestones.add(targetLevel)` adicionado junto ao `pendingMilestone` para marcar o milestone como visto e impedir re-trigger no próximo move
+
 ## [1.9.10] — 2026-05-18
 
 ### Fixed

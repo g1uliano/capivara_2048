@@ -290,8 +290,9 @@ class GameNotifier extends Notifier<GameState> {
     _firestoreSaveTimer?.cancel();
     _timerStarted = false;
     _reachedMilestones.clear();
-    // Marca milestones anteriores como já atingidos; o targetLevel fica pendente
     _populateMilestonesFromMaxLevel(targetLevel - 1);
+    // Marca o próprio milestone como visto para não re-disparar após o dismiss
+    if (targetLevel >= 11) _reachedMilestones.add(targetLevel);
     state = GameState(
       board: board,
       score: score,
