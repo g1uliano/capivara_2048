@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:capivara_2048/data/models/inventory.dart';
 import 'package:capivara_2048/data/models/tile.dart';
 import 'package:capivara_2048/data/repositories/inventory_repository.dart';
