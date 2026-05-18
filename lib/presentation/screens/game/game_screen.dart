@@ -16,11 +16,9 @@ import '../../widgets/game_header.dart';
 import '../../widgets/game_over_modal.dart';
 import '../../widgets/inventory_bar.dart';
 import '../../widgets/shop_overlay.dart';
-import '../../widgets/milestone_ranking_dialog.dart';
 import '../../widgets/victory_choice_dialog.dart';
 import '../../../core/constants/game_constants.dart';
 import '../../../data/models/game_state.dart';
-import '../ranking_screen.dart';
 import '../../../domain/inventory/inventory_notifier.dart';
 import '../../widgets/pause_overlay.dart';
 import 'game_over_item_overlay.dart';
@@ -98,26 +96,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       summary,
     ) {
       if (summary == null || !mounted) return;
-      // Milestones 12/13: info shown in VictoryChoiceDialog; skip ranking dialog.
+      // Todos os milestones: info mostrada inline no VictoryChoiceDialog.
+      // Milestones 12/13: dismiss imediato (dados lidos de outros providers).
+      // Milestone 11: estado mantido vivo — VictoryChoiceDialog lê e faz dismiss.
       if (summary.milestone >= 12) {
         ref.read(postGameControllerProvider.notifier).dismiss();
-        return;
       }
-      MilestoneRankingDialog.show(
-        context,
-        summary,
-        onViewRanking: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const RankingScreen(initialTab: 1),
-            ),
-          );
-        },
-      ).then((_) {
-        if (mounted) {
-          ref.read(postGameControllerProvider.notifier).dismiss();
-        }
-      });
     });
 
     ref.listen<GameState>(gameProvider, (previous, current) {

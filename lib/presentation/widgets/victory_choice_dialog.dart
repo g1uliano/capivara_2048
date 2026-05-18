@@ -7,6 +7,8 @@ import '../../domain/inventory/inventory_notifier.dart';
 import '../../domain/lives/lives_notifier.dart';
 import '../controllers/game_notifier.dart';
 import '../controllers/personal_records_notifier.dart';
+import '../controllers/post_game_controller.dart';
+import '../screens/ranking_screen.dart';
 import 'outlined_text.dart';
 
 class VictoryChoiceDialog extends ConsumerWidget {
@@ -46,12 +48,27 @@ class VictoryChoiceDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.read(gameProvider.notifier);
+
     final timesReached8192 = milestone == 13
         ? ref.watch(personalRecordsProvider.select((r) => r.timesReached8192))
         : 0;
     final bestTimeMs4096 = milestone == 12
         ? ref.read(gameProvider.select((s) => s.bestTimeMs4096))
         : null;
+
+    // Milestone 11: dados de ranking chegam de forma reativa (fetch async).
+    final summary = milestone == 11
+        ? ref.watch(postGameControllerProvider)
+        : null;
+    final bestTimeMs2048 = milestone == 11
+        ? ref.read(gameProvider.select((s) => s.bestTimeMs2048))
+        : null;
+
+    void dismissSummary() {
+      if (milestone == 11) {
+        ref.read(postGameControllerProvider.notifier).dismiss();
+      }
+    }
 
     return PopScope(
       canPop: false,
@@ -74,6 +91,55 @@ class VictoryChoiceDialog extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(_subtitle, style: GoogleFonts.nunito(fontSize: 16)),
+
+                // Milestone 11: tempo + posição no ranking + combo
+                if (milestone == 11) ...[
+                  if (bestTimeMs2048 != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      'Tempo: ${_formatMs(bestTimeMs2048)}',
+                      style: GoogleFonts.nunito(fontSize: 14, color: Colors.grey[600]),
+                    ),
+                  ],
+                  if (summary == null)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 8),
+                      child: SizedBox(
+                        height: 2,
+                        child: LinearProgressIndicator(),
+                      ),
+                    )
+                  else ...[
+                    if (summary.rankingPosition != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        'Você está em ${summary.rankingPosition}º lugar!',
+                        style: GoogleFonts.nunito(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ],
+                    if (summary.earnedCombo) ...[
+                      const Divider(height: 20),
+                      Text(
+                        '🎁 Recorde pessoal!',
+                        style: GoogleFonts.fredoka(
+                          fontSize: 15,
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        '+1 vida  •  +1 bomba  •  +1 desfazer',
+                        style: GoogleFonts.nunito(fontSize: 13),
+                      ),
+                    ],
+                  ],
+                ],
+
+                // Milestone 12: tempo
                 if (milestone == 12 && bestTimeMs4096 != null) ...[
                   const SizedBox(height: 4),
                   Text(
@@ -81,6 +147,8 @@ class VictoryChoiceDialog extends ConsumerWidget {
                     style: GoogleFonts.nunito(fontSize: 14, color: Colors.grey[600]),
                   ),
                 ],
+
+                // Milestone 13: vezes que chegou
                 if (milestone == 13) ...[
                   const SizedBox(height: 4),
                   Text(
@@ -89,13 +157,36 @@ class VictoryChoiceDialog extends ConsumerWidget {
                     style: GoogleFonts.nunito(fontSize: 14, color: Colors.grey[600]),
                   ),
                 ],
+
                 const SizedBox(height: 24),
+
+                // Ver Ranking (só milestone 11)
+                if (milestone == 11) ...[
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        dismissSummary();
+                        notifier.dismissMilestone();
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const RankingScreen(initialTab: 1),
+                          ),
+                        );
+                      },
+                      child: Text('Ver Ranking', style: GoogleFonts.fredoka(fontSize: 18)),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+
                 if (milestone != 13)
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton(
                       onPressed: () async {
                         if (milestone == 12) await _deliverReward(ref);
+                        dismissSummary();
                         notifier.dismissMilestone();
                       },
                       child: Text('Continuar', style: GoogleFonts.fredoka(fontSize: 18)),
@@ -106,6 +197,7 @@ class VictoryChoiceDialog extends ConsumerWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () async {
+                      dismissSummary();
                       await notifier.endGame();
                     },
                     style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
