@@ -37,12 +37,21 @@ class VictoryChoiceDialog extends ConsumerWidget {
     }
   }
 
+  static String _formatMs(int ms) {
+    final s = ms ~/ 1000;
+    final m = s ~/ 60;
+    return '${m.toString().padLeft(2, '0')}:${(s % 60).toString().padLeft(2, '0')}';
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.read(gameProvider.notifier);
     final timesReached8192 = milestone == 13
         ? ref.watch(personalRecordsProvider.select((r) => r.timesReached8192))
         : 0;
+    final bestTimeMs4096 = milestone == 12
+        ? ref.read(gameProvider.select((s) => s.bestTimeMs4096))
+        : null;
 
     return PopScope(
       canPop: false,
@@ -65,6 +74,13 @@ class VictoryChoiceDialog extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(_subtitle, style: GoogleFonts.nunito(fontSize: 16)),
+                if (milestone == 12 && bestTimeMs4096 != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    'Seu tempo: ${_formatMs(bestTimeMs4096)}',
+                    style: GoogleFonts.nunito(fontSize: 14, color: Colors.grey[600]),
+                  ),
+                ],
                 if (milestone == 13) ...[
                   const SizedBox(height: 4),
                   Text(

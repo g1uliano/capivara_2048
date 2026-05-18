@@ -98,8 +98,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       summary,
     ) {
       if (summary == null || !mounted) return;
-      // Milestone 13 (Jacaré): info shown in VictoryChoiceDialog; skip ranking dialog.
-      if (summary.milestone == 13) {
+      // Milestones 12/13: info shown in VictoryChoiceDialog; skip ranking dialog.
+      if (summary.milestone >= 12) {
         ref.read(postGameControllerProvider.notifier).dismiss();
         return;
       }
