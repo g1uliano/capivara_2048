@@ -39,76 +39,78 @@ class _CheatMenuScreenState extends ConsumerState<CheatMenuScreen> {
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          _SectionHeader('Vidas'),
-          _CounterRow(
-            label: 'Vidas',
-            count: lives,
-            onIncrement: () => ref
-                .read(livesProvider.notifier)
-                // ignore: invalid_use_of_visible_for_testing_member
-                .debugSetLives(lives + 1),
-            onDecrement: lives > 0
-                ? () => ref
-                    .read(livesProvider.notifier)
-                    // ignore: invalid_use_of_visible_for_testing_member
-                    .debugSetLives(lives - 1)
-                : null,
-          ),
-          const Divider(height: 32),
-          _SectionHeader('Itens'),
-          for (final type in ItemType.values)
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            _SectionHeader('Vidas'),
             _CounterRow(
-              label: _itemLabel(type),
-              count: inventory.count(type),
-              onIncrement: () =>
-                  ref.read(inventoryProvider.notifier).add(type, 1),
-              onDecrement: inventory.count(type) > 0
-                  ? () =>
-                      ref.read(inventoryProvider.notifier).consume(type)
+              label: 'Vidas',
+              count: lives,
+              onIncrement: () => ref
+                  .read(livesProvider.notifier)
+                  // ignore: invalid_use_of_visible_for_testing_member
+                  .debugSetLives(lives + 1),
+              onDecrement: lives > 0
+                  ? () => ref
+                      .read(livesProvider.notifier)
+                      // ignore: invalid_use_of_visible_for_testing_member
+                      .debugSetLives(lives - 1)
                   : null,
             ),
-          const SizedBox(height: 8),
-          ElevatedButton(
-            onPressed: () =>
-                // ignore: invalid_use_of_visible_for_testing_member
-                ref.read(inventoryProvider.notifier).addDebugItems(),
-            child: const Text('Dar 5 de cada'),
-          ),
-          const Divider(height: 32),
-          _SectionHeader('Pular para Nível'),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final animal in animals)
-                ChoiceChip(
-                  label: Text(
-                    '${animal.level} ${animal.name}',
-                    style: GoogleFonts.fredoka(fontSize: 13),
-                  ),
-                  selected: _selectedLevel == animal.level,
-                  onSelected: (_) =>
-                      setState(() => _selectedLevel = animal.level),
-                ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              ref
-                  .read(gameProvider.notifier)
+            const Divider(height: 32),
+            _SectionHeader('Itens'),
+            for (final type in ItemType.values)
+              _CounterRow(
+                label: _itemLabel(type),
+                count: inventory.count(type),
+                onIncrement: () =>
+                    ref.read(inventoryProvider.notifier).add(type, 1),
+                onDecrement: inventory.count(type) > 0
+                    ? () =>
+                        ref.read(inventoryProvider.notifier).consume(type)
+                    : null,
+              ),
+            const SizedBox(height: 8),
+            ElevatedButton(
+              onPressed: () =>
                   // ignore: invalid_use_of_visible_for_testing_member
-                  .debugJumpToLevel(_selectedLevel);
-              Navigator.of(context).pop();
-            },
-            child: Text(
-              '▶ Ir para Nível $_selectedLevel — ${animals[_selectedLevel - 1].name}',
+                  ref.read(inventoryProvider.notifier).addDebugItems(),
+              child: const Text('Dar 5 de cada'),
             ),
-          ),
-        ],
+            const Divider(height: 32),
+            _SectionHeader('Pular para Nível'),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final animal in animals)
+                  ChoiceChip(
+                    label: Text(
+                      '${animal.level} ${animal.name}',
+                      style: GoogleFonts.fredoka(fontSize: 13),
+                    ),
+                    selected: _selectedLevel == animal.level,
+                    onSelected: (_) =>
+                        setState(() => _selectedLevel = animal.level),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                ref
+                    .read(gameProvider.notifier)
+                    // ignore: invalid_use_of_visible_for_testing_member
+                    .debugJumpToLevel(_selectedLevel);
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                '▶ Ir para Nível $_selectedLevel — ${animals[_selectedLevel - 1].name}',
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

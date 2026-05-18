@@ -6,6 +6,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.10] — 2026-05-18
+
+### Fixed
+
+- **Cheat Menu**: último botão "Ir para Nível" cortado pela barra do sistema — adicionado `SafeArea` no body do `CheatMenuScreen`
+- **debugJumpToLevel**: ao pular para nível 11/12/13, o `VictoryChoiceDialog` agora dispara corretamente (`pendingMilestone` setado, milestones anteriores pré-marcados)
+- **debugJumpToLevel**: tile adjacente ao alvo era `lvl-1` (ex: 1024 ao lado do 2048); agora usa `lvl-2` em diante para não sugerir merge imediato
+
 ## [1.9.9] — 2026-05-18
 
 ### Added

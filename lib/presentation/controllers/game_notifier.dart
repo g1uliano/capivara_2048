@@ -275,9 +275,9 @@ class GameNotifier extends Notifier<GameState> {
 
     final board = List.generate(4, (_) => List<Tile?>.filled(4, null));
     board[0][3] = makeTile(targetLevel, 0, 3);
-    board[0][2] = makeTile(lvl(1), 0, 2);
-    board[1][3] = makeTile(lvl(2), 1, 3);
-    board[3][0] = makeTile(lvl(3), 3, 0);
+    board[0][2] = makeTile(lvl(2), 0, 2);
+    board[1][3] = makeTile(lvl(3), 1, 3);
+    board[3][0] = makeTile(lvl(4), 3, 0);
     board[3][2] = makeTile(1, 3, 2);
     board[3][3] = makeTile(1, 3, 3);
 
@@ -290,7 +290,8 @@ class GameNotifier extends Notifier<GameState> {
     _firestoreSaveTimer?.cancel();
     _timerStarted = false;
     _reachedMilestones.clear();
-    _populateMilestonesFromMaxLevel(targetLevel);
+    // Marca milestones anteriores como já atingidos; o targetLevel fica pendente
+    _populateMilestonesFromMaxLevel(targetLevel - 1);
     state = GameState(
       board: board,
       score: score,
@@ -299,6 +300,7 @@ class GameNotifier extends Notifier<GameState> {
       hasWon: false,
       isGameOver: false,
       isPaused: false,
+      pendingMilestone: targetLevel >= 11 ? targetLevel : null,
     );
   }
 
