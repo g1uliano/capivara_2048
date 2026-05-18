@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../controllers/performance_settings_notifier.dart';
 import '../controllers/game_notifier.dart';
 import 'outlined_text.dart';
-import '../screens/debug/animals_gallery_screen.dart';
+import '../screens/debug/cheat_menu_screen.dart';
 
 class PauseOverlay extends ConsumerStatefulWidget {
   const PauseOverlay({super.key});
@@ -108,11 +108,11 @@ class _PauseOverlayState extends ConsumerState<PauseOverlay> {
                 TextButton(
                   onPressed: () => Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (_) => const AnimalsGalleryScreen(),
+                      builder: (_) => const CheatMenuScreen(),
                     ),
                   ),
                   child: OutlinedText(
-                    text: 'Debug',
+                    text: 'Cheats',
                     style: const TextStyle(color: Colors.white70),
                   ),
                 ),

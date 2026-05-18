@@ -122,6 +122,20 @@ void main() {
     });
     expect(tintFinder, findsAtLeastNWidgets(1));
   });
+
+  testWidgets('PauseOverlay mostra botão Cheats em kDebugMode', (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        child: const MaterialApp(
+          home: Scaffold(body: PauseOverlay()),
+        ),
+      ),
+    );
+
+    // kDebugMode é true em testes — o botão deve existir
+    expect(find.text('Cheats'), findsOneWidget);
+    expect(find.text('Debug'), findsNothing);
+  });
 }
 
 /// Test-only notifier that starts with blurEffectsEnabled=false (= reduceEffects=true).
