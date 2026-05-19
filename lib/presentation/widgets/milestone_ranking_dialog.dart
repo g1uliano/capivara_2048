@@ -1,9 +1,13 @@
+import 'dart:math' show pi;
+
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../core/constants/app_colors.dart';
 import '../controllers/post_game_controller.dart';
 
-class MilestoneRankingDialog extends StatelessWidget {
+class MilestoneRankingDialog extends StatefulWidget {
   const MilestoneRankingDialog({
     super.key,
     required this.summary,
@@ -31,6 +35,35 @@ class MilestoneRankingDialog extends StatelessWidget {
     );
   }
 
+  @override
+  State<MilestoneRankingDialog> createState() =>
+      _MilestoneRankingDialogState();
+}
+
+class _MilestoneRankingDialogState extends State<MilestoneRankingDialog> {
+  late ConfettiController _confettiController;
+
+  @override
+  void initState() {
+    super.initState();
+    _confettiController =
+        ConfettiController(duration: const Duration(seconds: 4));
+    _confettiController.play();
+  }
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
+
+  List<Color> _confettiColors() => switch (widget.summary.milestone) {
+        11 => [AppColors.primary, const Color(0xFFFFD700), Colors.white],
+        12 => [Colors.blue, Colors.cyan, Colors.lightBlue],
+        13 => [Colors.orange, Colors.yellow, Colors.amber],
+        _ => [AppColors.primary, Colors.yellow, Colors.white],
+      };
+
   String _formatMs(int ms) {
     final s = ms ~/ 1000;
     final m = s ~/ 60;
@@ -40,30 +73,46 @@ class MilestoneRankingDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildTitle(),
-            const SizedBox(height: 8),
-            _buildBody(),
-            if (summary.earnedCombo) ...[
-              const Divider(height: 24),
-              _buildComboReward(),
-            ],
-            const SizedBox(height: 20),
-            _buildActions(context),
-          ],
+    return Stack(
+      alignment: Alignment.topCenter,
+      children: [
+        Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildTitle(),
+                const SizedBox(height: 8),
+                _buildBody(),
+                if (widget.summary.earnedCombo) ...[
+                  const Divider(height: 24),
+                  _buildComboReward(),
+                ],
+                const SizedBox(height: 20),
+                _buildActions(context),
+              ],
+            ),
+          ),
         ),
-      ),
+        ConfettiWidget(
+          confettiController: _confettiController,
+          blastDirection: pi / 2,
+          maxBlastForce: 20,
+          minBlastForce: 8,
+          emissionFrequency: 0.05,
+          numberOfParticles: 20,
+          gravity: 0.05,
+          colors: _confettiColors(),
+        ),
+      ],
     );
   }
 
   Widget _buildTitle() {
-    final (emoji, text) = switch (summary.milestone) {
+    final (emoji, text) = switch (widget.summary.milestone) {
       11 => ('🏆', 'Ranking Global'),
       12 => ('🌊', 'Peixe-boi atingido!'),
       13 => ('🐊', 'Jacaré atingido!'),
@@ -81,12 +130,12 @@ class MilestoneRankingDialog extends StatelessWidget {
   }
 
   Widget _buildBody() {
-    if (summary.milestone == 11) {
+    if (widget.summary.milestone == 11) {
       return Column(
         children: [
-          if (summary.rankingPosition != null)
+          if (widget.summary.rankingPosition != null)
             Text(
-              'Você está em ${summary.rankingPosition}º lugar!',
+              'Você está em ${widget.summary.rankingPosition}º lugar!',
               style: GoogleFonts.nunito(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -94,22 +143,22 @@ class MilestoneRankingDialog extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           Text(
-            'Tempo: ${_formatMs(summary.timeMs)}',
+            'Tempo: ${_formatMs(widget.summary.timeMs)}',
             style: GoogleFonts.nunito(fontSize: 15),
             textAlign: TextAlign.center,
           ),
         ],
       );
-    } else if (summary.milestone == 12) {
+    } else if (widget.summary.milestone == 12) {
       return Text(
-        'Seu tempo: ${_formatMs(summary.timeMs)}',
+        'Seu tempo: ${_formatMs(widget.summary.timeMs)}',
         style: GoogleFonts.nunito(fontSize: 15),
         textAlign: TextAlign.center,
       );
     } else {
       return Text(
-        'Você chegou aqui ${summary.timesReached8192} '
-        '${summary.timesReached8192 == 1 ? 'vez' : 'vezes'}!',
+        'Você chegou aqui ${widget.summary.timesReached8192} '
+        '${widget.summary.timesReached8192 == 1 ? 'vez' : 'vezes'}!',
         style: GoogleFonts.nunito(fontSize: 15),
         textAlign: TextAlign.center,
       );
@@ -137,15 +186,15 @@ class MilestoneRankingDialog extends StatelessWidget {
   }
 
   Widget _buildActions(BuildContext context) {
-    final dismiss = onDismiss ?? () => Navigator.of(context).pop();
-    if (summary.milestone == 11) {
+    final dismiss = widget.onDismiss ?? () => Navigator.of(context).pop();
+    if (widget.summary.milestone == 11) {
       return Row(
         children: [
           Expanded(
             child: OutlinedButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                onViewRanking?.call();
+                widget.onViewRanking?.call();
               },
               child: Text(
                 'Ver Ranking',

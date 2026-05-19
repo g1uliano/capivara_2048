@@ -1,3 +1,4 @@
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:capivara_2048/presentation/widgets/milestone_ranking_dialog.dart';
@@ -20,7 +21,8 @@ Future<void> openDialog(WidgetTester tester, PostGameSummary summary) async {
     ),
   );
   await tester.tap(find.text('Open'));
-  await tester.pumpAndSettle();
+  await tester.pump();                              // inicia abertura do dialog
+  await tester.pump(const Duration(milliseconds: 300)); // conclui animação de entrada
 }
 
 void main() {
@@ -108,6 +110,38 @@ void main() {
       await openDialog(tester, summary);
 
       expect(find.textContaining('Recorde'), findsNothing);
+    });
+
+    testWidgets('milestone 11: ConfettiWidget presente', (tester) async {
+      const summary = PostGameSummary(
+        milestone: 11,
+        rankingPosition: 1,
+        timeMs: 120000,
+        earnedCombo: false,
+      );
+      await openDialog(tester, summary);
+      expect(find.byType(ConfettiWidget), findsOneWidget);
+    });
+
+    testWidgets('milestone 12: ConfettiWidget presente', (tester) async {
+      const summary = PostGameSummary(
+        milestone: 12,
+        timeMs: 300000,
+        earnedCombo: false,
+      );
+      await openDialog(tester, summary);
+      expect(find.byType(ConfettiWidget), findsOneWidget);
+    });
+
+    testWidgets('milestone 13: ConfettiWidget presente', (tester) async {
+      const summary = PostGameSummary(
+        milestone: 13,
+        timeMs: 0,
+        timesReached8192: 1,
+        earnedCombo: false,
+      );
+      await openDialog(tester, summary);
+      expect(find.byType(ConfettiWidget), findsOneWidget);
     });
   });
 }
