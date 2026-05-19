@@ -21,8 +21,9 @@ Future<void> openDialog(WidgetTester tester, PostGameSummary summary) async {
     ),
   );
   await tester.tap(find.text('Open'));
-  await tester.pump();                              // inicia abertura do dialog
-  await tester.pump(const Duration(milliseconds: 300)); // conclui animação de entrada
+  await tester.pump(); // start dialog open animation
+  // Can't use pumpAndSettle: ConfettiController keeps the ticker running until 4s duration
+  await tester.pump(const Duration(milliseconds: 300)); // finish dialog entrance animation
 }
 
 void main() {
@@ -121,6 +122,8 @@ void main() {
       );
       await openDialog(tester, summary);
       expect(find.byType(ConfettiWidget), findsOneWidget);
+      final confetti = tester.widget<ConfettiWidget>(find.byType(ConfettiWidget));
+      expect(confetti.confettiController.state, ConfettiControllerState.playing);
     });
 
     testWidgets('milestone 12: ConfettiWidget presente', (tester) async {
@@ -131,6 +134,8 @@ void main() {
       );
       await openDialog(tester, summary);
       expect(find.byType(ConfettiWidget), findsOneWidget);
+      final confetti = tester.widget<ConfettiWidget>(find.byType(ConfettiWidget));
+      expect(confetti.confettiController.state, ConfettiControllerState.playing);
     });
 
     testWidgets('milestone 13: ConfettiWidget presente', (tester) async {
@@ -142,6 +147,8 @@ void main() {
       );
       await openDialog(tester, summary);
       expect(find.byType(ConfettiWidget), findsOneWidget);
+      final confetti = tester.widget<ConfettiWidget>(find.byType(ConfettiWidget));
+      expect(confetti.confettiController.state, ConfettiControllerState.playing);
     });
   });
 }

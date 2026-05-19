@@ -75,6 +75,7 @@ class _MilestoneRankingDialogState extends State<MilestoneRankingDialog> {
   Widget build(BuildContext context) {
     return Stack(
       alignment: Alignment.topCenter,
+      clipBehavior: Clip.none,
       children: [
         Dialog(
           shape:
