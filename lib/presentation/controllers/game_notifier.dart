@@ -245,6 +245,7 @@ class GameNotifier extends Notifier<GameState> {
       hasWon: false,
       isGameOver: false,
       isPaused: false,
+      elapsedMs: state.elapsedMs,
     );
     if (targetLevel >= 11) _handleMilestoneReached(targetLevel);
   }

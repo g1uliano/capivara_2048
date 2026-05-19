@@ -6,6 +6,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.13] — 2026-05-19
+
+### Fixed
+
+- **debugJumpToLevel**: `elapsedMs` não era preservado ao criar o novo `GameState` — tempo resetava para 0, corrompendo o recorde salvo, a exibição do timer e impedindo submissão ao ranking global de tempo
+
 ## [1.9.12] — 2026-05-19
 
 ### Fixed
