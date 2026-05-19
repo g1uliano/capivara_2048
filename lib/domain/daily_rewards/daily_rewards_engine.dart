@@ -44,13 +44,13 @@ DailyRewardStatus computeDailyRewardStatus(DateTime now, DailyRewardsState state
 
   if (gap == 0) return DailyRewardStatus.alreadyClaimed;
 
-  // gap >= 1
+  // gap >= 1: missing a day breaks the streak, regardless of claimedThisCycle.
+  // Exception: DateTime(1970) is the initial sentinel (never claimed) — always available.
+  if (gap >= 2 && last.year > 1970) return DailyRewardStatus.streakBroken;
+
   if (!state.claimedThisCycle) return DailyRewardStatus.available;
 
-  // claimedThisCycle == true
-  if (gap >= 2) return DailyRewardStatus.streakBroken;
-
-  // gap == 1 AND claimedThisCycle == true
+  // claimedThisCycle == true (only set after day 7 is claimed)
   if (state.currentDay == 7) return DailyRewardStatus.cycleCompleted;
   return DailyRewardStatus.available;
 }

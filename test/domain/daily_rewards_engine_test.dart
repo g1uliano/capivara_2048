@@ -86,6 +86,17 @@ void main() {
       expect(computeDailyRewardStatus(day(5), s), DailyRewardStatus.available);
     });
 
+    test('8b: claimedThisCycle=false mas gap>=2 → streakBroken (bug regressão)', () {
+      // Coletou dia 3 (currentDay avançou para 4, claimedThisCycle=false).
+      // Ficou fora por 3 dias — deveria quebrar o streak, não mostrar dia 4.
+      final s = _state(
+        currentDay: 4,
+        lastClaimedDate: day(5),
+        claimedThisCycle: false,
+      );
+      expect(computeDailyRewardStatus(day(8), s), DailyRewardStatus.streakBroken);
+    });
+
     test('9: 7 dias consecutivos — Dia 8 cycleCompleted, Dia 9 streakBroken', () {
       var s = DailyRewardsState.initial();
       for (int d = 1; d <= 7; d++) {
