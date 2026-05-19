@@ -6,6 +6,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.16] — 2026-05-19
+
+### Fixed
+
+- **Lendas 4096 — tempo 00:00**: `PendingEvent.legendReached` nunca carregava `timeMs`, então a entrada no Firestore só tinha `timesReached` (inteiro pequeno como 1). A tela de ranking formatava esse valor como milissegundos → sempre exibia `00:00`. Agora o `elapsedMs` capturado no momento do milestone 12 é salvo como `bestTimeMs` na entrada do Firestore; o ranking ordena por `bestTimeMs` ASC e exibe o tempo corretamente
+- **Recompensas diárias — streak não resetava**: o check `gap >= 2` (streak quebrado) só rodava quando `claimedThisCycle == true`. Após coletar dia N (slot avança para N+1, `claimedThisCycle = false`), ficar dias sem entrar ainda mostrava o dia N+1 como disponível em vez de resetar para o dia 1
+
 ## [1.9.15] — 2026-05-19
 
 ### Fixed
