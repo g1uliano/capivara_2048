@@ -375,6 +375,7 @@ class GameNotifier extends Notifier<GameState> {
             id: const Uuid().v4(),
             level: tileValue,
             occurredAt: DateTime.now(),
+            timeMs: milestone == 12 ? captured : null,
           ),
         ),
       );

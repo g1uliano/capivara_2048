@@ -21,10 +21,11 @@ class PendingEvent {
     required String id,
     required int level,
     required DateTime occurredAt,
+    int? timeMs,
   }) => PendingEvent(
     id: id,
     type: PendingEventType.legendReached,
-    payload: {'level': level},
+    payload: {'level': level, 'timeMs': ?timeMs},
     occurredAt: occurredAt,
   );
 

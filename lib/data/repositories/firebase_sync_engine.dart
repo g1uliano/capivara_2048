@@ -220,19 +220,31 @@ class FirebaseSyncEngine implements SyncEngine {
     switch (event.type) {
       case PendingEventType.legendReached:
         final level = event.payload['level'] as int;
+        final timeMs = event.payload['timeMs'] as int?;
         final collectionPath = 'legendsRankings/$level/entries';
         await _firestore.runTransaction((tx) async {
           final ref = _firestore.collection(collectionPath).doc(_userId);
           final snap = await tx.get(ref);
           if (snap.exists) {
-            tx.update(ref, {'timesReached': FieldValue.increment(1)});
+            final updates = <String, dynamic>{
+              'timesReached': FieldValue.increment(1),
+            };
+            if (level == 4096 && timeMs != null) {
+              final existing = (snap.data()?['bestTimeMs'] as num?)?.toInt();
+              if (existing == null || timeMs < existing) {
+                updates['bestTimeMs'] = timeMs;
+              }
+            }
+            tx.update(ref, updates);
           } else {
-            tx.set(ref, {
+            final entry = <String, dynamic>{
               'userId': _userId,
               'displayName': displayName ?? 'Jogador',
               'timesReached': 1,
               'firstReachedAt': Timestamp.fromDate(event.occurredAt),
-            });
+            };
+            if (level == 4096 && timeMs != null) entry['bestTimeMs'] = timeMs;
+            tx.set(ref, entry);
           }
         });
         final field = switch (level) {

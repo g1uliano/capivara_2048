@@ -58,9 +58,9 @@ class FirestoreRankingRepository implements RankingRepository {
           type,
         ).orderBy('value', descending: true).limit(50);
       case RankingType.legends4096Time:
-        return _legendsCollection(
-          type,
-        ).orderBy('timesReached', descending: true).limit(50);
+        return _legendsCollection(type)
+            .orderBy('bestTimeMs', descending: false)
+            .limit(50);
       case RankingType.legends8192Count:
         return _legendsCollection(type)
             .orderBy('timesReached', descending: true)
@@ -90,8 +90,10 @@ class FirestoreRankingRepository implements RankingRepository {
         value = (data['bestTimeMs'] as num?)?.toInt() ?? 0;
       } else if (type == RankingType.globalScore) {
         value = (data['value'] as num?)?.toInt() ?? 0;
+      } else if (type == RankingType.legends4096Time) {
+        value = (data['bestTimeMs'] as num?)?.toInt() ?? 0;
       } else {
-        // legends
+        // legends8192Count
         value = (data['timesReached'] as num?)?.toInt() ?? 0;
       }
 
@@ -108,8 +110,11 @@ class FirestoreRankingRepository implements RankingRepository {
         } else if (type == RankingType.globalScore) {
           prevValue = (prevData['value'] as num?)?.toInt() ?? 0;
           if (value != prevValue) rank = i + 1;
+        } else if (type == RankingType.legends4096Time) {
+          prevValue = (prevData['bestTimeMs'] as num?)?.toInt() ?? 0;
+          if (value != prevValue) rank = i + 1;
         } else {
-          // legends
+          // legends8192Count
           prevValue = (prevData['timesReached'] as num?)?.toInt() ?? 0;
           if (value != prevValue) rank = i + 1;
         }
@@ -185,8 +190,16 @@ class FirestoreRankingRepository implements RankingRepository {
           .count()
           .get();
       rank = (countSnap.count ?? 0) + 1;
+    } else if (type == RankingType.legends4096Time) {
+      playerValue = (data['bestTimeMs'] as num?)?.toInt() ?? 0;
+      // Lower time = better rank; count entries with a faster (lower) bestTimeMs.
+      final countSnap = await col
+          .where('bestTimeMs', isLessThan: playerValue)
+          .count()
+          .get();
+      rank = (countSnap.count ?? 0) + 1;
     } else {
-      // legends
+      // legends8192Count
       playerValue = (data['timesReached'] as num?)?.toInt() ?? 0;
       final countSnap = await col
           .where('timesReached', isGreaterThan: playerValue)
