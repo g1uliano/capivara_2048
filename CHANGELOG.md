@@ -6,6 +6,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.12] — 2026-05-19
+
+### Fixed
+
+- **debugJumpToLevel**: timer resetava e travava após pular para nível 11 — `_timerStarted` não era setado como `true`, impedindo reinício do timer após dismiss
+- **debugJumpToLevel**: recorde global não era registrado ao pular para nível 12 — lógica extraída para `_handleMilestoneReached()`, chamada tanto por `onSwipe` quanto por `debugJumpToLevel`
+- **VictoryChoiceDialog (milestone 12)**: botão "Ver Ranking" ausente — adicionado abrindo aba Lendas (`RankingScreen(initialTab: 2)`)
+- **InventoryNotifier**: race condition em `add()`/`consume()` causava regressão de estado com múltiplas chamadas concorrentes — watcher do Hive ignorado enquanto saves internos estão em voo (`_pendingSaves` counter)
+
 ## [1.9.11] — 2026-05-18
 
 ### Fixed

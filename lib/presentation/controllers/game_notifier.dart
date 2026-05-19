@@ -137,62 +137,8 @@ class GameNotifier extends Notifier<GameState> {
           state.maxLevel >= milestone &&
           !state.hasWon &&
           state.pendingMilestone == null) {
-        _reachedMilestones.add(milestone);
-        final captured = state.elapsedMs;
-        GameState updated = state;
-        if (milestone == 11) {
-          updated = updated.copyWith(
-            pendingMilestone: milestone,
-            bestTimeMs2048: captured,
-          );
-        } else if (milestone == 12) {
-          updated = updated.copyWith(
-            pendingMilestone: milestone,
-            bestTimeMs4096: captured,
-          );
-        } else {
-          updated = updated.copyWith(pendingMilestone: milestone);
-        }
-        state = updated;
-        maybeHaptic(
-          () => ref.read(settingsProvider).hapticEnabled,
-          intensity: HapticIntensity.medium,
-        );
-        _submitToRanking();
-        // Enfileirar evento para ranking Lendas (4096 / 8192)
-        if (milestone == 12 || milestone == 13) {
-          final tileValue = 1 << milestone; // 4096 ou 8192
-          unawaited(
-            ref
-                .read(syncEngineProvider)
-                .enqueuePendingEvent(
-                  PendingEvent.legendReached(
-                    id: const Uuid().v4(),
-                    level: tileValue,
-                    occurredAt: DateTime.now(),
-                  ),
-                ),
-          );
-        }
-        unawaited(
-          ref
-              .read(personalRecordsProvider.notifier)
-              .recordMilestone(milestone, DateTime.now()),
-        );
-        // Save record immediately so personal ranking is populated before game ends
-        unawaited(
-          ref
-              .read(gameRecordRepositoryProvider)
-              .add(
-                GameRecord(
-                  playedAt: DateTime.now(),
-                  elapsedMs: captured,
-                  score: state.score,
-                  maxLevel: state.maxLevel,
-                ),
-              ),
-        );
-        break; // Apenas um marco por vez
+        _handleMilestoneReached(milestone);
+        break;
       }
     }
 
@@ -288,11 +234,9 @@ class GameNotifier extends Notifier<GameState> {
 
     _stopTimer();
     _firestoreSaveTimer?.cancel();
-    _timerStarted = false;
+    _timerStarted = true;
     _reachedMilestones.clear();
     _populateMilestonesFromMaxLevel(targetLevel - 1);
-    // Marca o próprio milestone como visto para não re-disparar após o dismiss
-    if (targetLevel >= 11) _reachedMilestones.add(targetLevel);
     state = GameState(
       board: board,
       score: score,
@@ -301,8 +245,8 @@ class GameNotifier extends Notifier<GameState> {
       hasWon: false,
       isGameOver: false,
       isPaused: false,
-      pendingMilestone: targetLevel >= 11 ? targetLevel : null,
     );
+    if (targetLevel >= 11) _handleMilestoneReached(targetLevel);
   }
 
   void setAwaitingResolution(bool value) {
@@ -398,6 +342,58 @@ class GameNotifier extends Notifier<GameState> {
   /// Wired up by build(); can be overridden in tests via setConsumeCallback.
   void setConsumeCallback(void Function(ItemType) callback) {
     _consumeItem = callback;
+  }
+
+  void _handleMilestoneReached(int milestone) {
+    _reachedMilestones.add(milestone);
+    final captured = state.elapsedMs;
+    GameState updated = state;
+    if (milestone == 11) {
+      updated = updated.copyWith(
+        pendingMilestone: milestone,
+        bestTimeMs2048: captured,
+      );
+    } else if (milestone == 12) {
+      updated = updated.copyWith(
+        pendingMilestone: milestone,
+        bestTimeMs4096: captured,
+      );
+    } else {
+      updated = updated.copyWith(pendingMilestone: milestone);
+    }
+    state = updated;
+    maybeHaptic(
+      () => ref.read(settingsProvider).hapticEnabled,
+      intensity: HapticIntensity.medium,
+    );
+    _submitToRanking();
+    if (milestone == 12 || milestone == 13) {
+      final tileValue = 1 << milestone;
+      unawaited(
+        ref.read(syncEngineProvider).enqueuePendingEvent(
+          PendingEvent.legendReached(
+            id: const Uuid().v4(),
+            level: tileValue,
+            occurredAt: DateTime.now(),
+          ),
+        ),
+      );
+    }
+    unawaited(
+      ref
+          .read(personalRecordsProvider.notifier)
+          .recordMilestone(milestone, DateTime.now()),
+    );
+    unawaited(
+      ref.read(gameRecordRepositoryProvider).add(
+        GameRecord(
+          playedAt: DateTime.now(),
+          elapsedMs: captured,
+          score: state.score,
+          maxLevel: state.maxLevel,
+        ),
+      ),
+    );
   }
 
   void dismissMilestone() {

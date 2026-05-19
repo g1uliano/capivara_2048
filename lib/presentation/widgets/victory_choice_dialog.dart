@@ -180,6 +180,27 @@ class VictoryChoiceDialog extends ConsumerWidget {
                   const SizedBox(height: 12),
                 ],
 
+                // Ver Ranking (milestone 12 → aba Lendas)
+                if (milestone == 12) ...[
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton(
+                      onPressed: () async {
+                        await _deliverReward(ref);
+                        notifier.dismissMilestone();
+                        if (context.mounted) {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const RankingScreen(initialTab: 2),
+                            ),
+                          );
+                        }
+                      },
+                      child: Text('Ver Ranking', style: GoogleFonts.fredoka(fontSize: 18)),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
                 if (milestone != 13)
                   SizedBox(
                     width: double.infinity,

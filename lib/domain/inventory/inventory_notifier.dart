@@ -9,6 +9,7 @@ import '../sync/sync_engine.dart';
 
 class InventoryNotifier extends Notifier<Inventory> {
   StreamSubscription<BoxEvent>? _boxSub;
+  int _pendingSaves = 0;
 
   @override
   Inventory build() {
@@ -37,6 +38,7 @@ class InventoryNotifier extends Notifier<Inventory> {
           .watch(key: 'data')
           .listen(
             (event) {
+              if (_pendingSaves > 0) return;
               final updated = event.value as Inventory?;
               if (updated != null) state = updated;
             },
@@ -48,14 +50,24 @@ class InventoryNotifier extends Notifier<Inventory> {
 
   Future<void> consume(ItemType type) async {
     state = state.consume(type);
-    await ref.read(inventoryRepositoryProvider).save(state);
+    _pendingSaves++;
+    try {
+      await ref.read(inventoryRepositoryProvider).save(state);
+    } finally {
+      _pendingSaves--;
+    }
     unawaited(ref.read(syncEngineProvider).syncInventory(state));
   }
 
   Future<void> add(ItemType type, int amount) async {
     assert(amount > 0, 'amount must be positive; use consume() to decrease');
     state = state.add(type, amount);
-    await ref.read(inventoryRepositoryProvider).save(state);
+    _pendingSaves++;
+    try {
+      await ref.read(inventoryRepositoryProvider).save(state);
+    } finally {
+      _pendingSaves--;
+    }
     unawaited(ref.read(syncEngineProvider).syncInventory(state));
   }
 
