@@ -6,6 +6,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.15] — 2026-05-19
+
+### Fixed
+
+- **getPlayerEntry(globalTime)**: posição calculada ignorava o desempate por `maxTile` — jogadores com o mesmo `bestTimeMs` mas `maxTile` maior aparecem acima na lista mas não eram contados na query, fazendo o dialog exibir "1º lugar" enquanto a aba Global mostrava "4º lugar"
+- **VictoryChoiceDialog "Ver Ranking"**: botão chamava `dismissMilestone()` em vez de `endGame()` — vitória não era salva no `GameRecordRepository` local, causando ausência do recorde em "Por Pontuação" quando o jogador verificava o ranking via esse botão
+
 ## [1.9.14] — 2026-05-19
 
 ### Fixed

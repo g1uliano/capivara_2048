@@ -165,11 +165,19 @@ class FirestoreRankingRepository implements RankingRepository {
 
     if (type == RankingType.globalTime) {
       playerValue = (data['bestTimeMs'] as num?)?.toInt() ?? 0;
-      final countSnap = await col
+      final playerMaxTile = (data['maxTile'] as num?)?.toInt() ?? 0;
+      final fasterSnap = await col
           .where('bestTimeMs', isLessThan: playerValue)
           .count()
           .get();
-      rank = (countSnap.count ?? 0) + 1;
+      // Players with same time but higher maxTile rank above (tiebreaker).
+      // Fetch docs in-memory — tied players are rare, no new composite index needed.
+      final tiedDocs = await col.where('bestTimeMs', isEqualTo: playerValue).get();
+      final tiedFasterCount = tiedDocs.docs.where((d) {
+        final tile = (d.data()['maxTile'] as num?)?.toInt() ?? 0;
+        return tile > playerMaxTile;
+      }).length;
+      rank = (fasterSnap.count ?? 0) + tiedFasterCount + 1;
     } else if (type == RankingType.globalScore) {
       playerValue = (data['value'] as num?)?.toInt() ?? 0;
       final countSnap = await col

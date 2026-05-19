@@ -165,14 +165,16 @@ class VictoryChoiceDialog extends ConsumerWidget {
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         dismissSummary();
-                        notifier.dismissMilestone();
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const RankingScreen(initialTab: 1),
-                          ),
-                        );
+                        await notifier.endGame();
+                        if (context.mounted) {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const RankingScreen(initialTab: 1),
+                            ),
+                          );
+                        }
                       },
                       child: Text('Ver Ranking', style: GoogleFonts.fredoka(fontSize: 18)),
                     ),
@@ -187,7 +189,7 @@ class VictoryChoiceDialog extends ConsumerWidget {
                     child: OutlinedButton(
                       onPressed: () async {
                         await _deliverReward(ref);
-                        notifier.dismissMilestone();
+                        await notifier.endGame();
                         if (context.mounted) {
                           Navigator.of(context).push(
                             MaterialPageRoute(
