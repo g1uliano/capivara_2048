@@ -6,6 +6,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.14] — 2026-05-19
+
+### Fixed
+
+- **_handleMilestoneReached**: `_submitToRanking()` e `repo.add(GameRecord(...))` eram chamados no momento do milestone E novamente em `endGame()` — causava registros duplicados no ranking pessoal e sobrescrita do recorde global com tempo mais longo (se o usuário continuasse jogando após a vitória)
+- **VictoryChoiceDialog**: mensagem de posição não especificava "ranking global" — alterado para "Xº lugar no ranking global!"
+- **IAPServiceImpl**: `_deliverToHive` entregava itens diretamente no Hive antes de retornar, e o watcher do `InventoryNotifier` atualizava o estado; em seguida, `deliverIAPItems` chamava `add()` novamente — itens entregues em dobro. Removida a entrega duplicada; `deliverIAPItems` (chamado pelo caller) é o único ponto de entrega
+
 ## [1.9.13] — 2026-05-19
 
 ### Fixed

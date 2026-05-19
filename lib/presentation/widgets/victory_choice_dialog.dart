@@ -113,7 +113,7 @@ class VictoryChoiceDialog extends ConsumerWidget {
                     if (summary.rankingPosition != null) ...[
                       const SizedBox(height: 4),
                       Text(
-                        'Você está em ${summary.rankingPosition}º lugar!',
+                        'Você está em ${summary.rankingPosition}º lugar no ranking global!',
                         style: GoogleFonts.nunito(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,

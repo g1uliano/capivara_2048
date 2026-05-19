@@ -1,10 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
-import '../../data/models/inventory.dart';
-import '../../data/models/lives_state.dart';
 import '../../data/models/shop_package.dart';
 import '../../domain/shop/iap_service.dart';
 
@@ -111,8 +108,6 @@ class IAPServiceImpl implements IAPService {
       'purchasedAt': FieldValue.serverTimestamp(),
     });
 
-    await _deliverToHive(package.contents);
-
     final code = _generateShareCode();
     await _firestore.collection('shareCodes').doc(code).set({
       'code': code,
@@ -139,28 +134,6 @@ class IAPServiceImpl implements IAPService {
     });
 
     return PurchaseResult.succeeded(shareCode: code);
-  }
-
-  Future<void> _deliverToHive(RewardBundle contents) async {
-    final invBox = await Hive.openBox<Inventory>('inventory');
-    final inv = invBox.get('data') ?? Inventory.empty();
-    await invBox.put(
-      'data',
-      Inventory(
-        bomb2: inv.bomb2 + contents.bomb2,
-        bomb3: inv.bomb3 + contents.bomb3,
-        undo1: inv.undo1 + contents.undo1,
-        undo3: inv.undo3 + contents.undo3,
-      ),
-    );
-    if (contents.lives > 0) {
-      final livesBox = await Hive.openBox<LivesState>('lives');
-      final ls = livesBox.get('state') ?? LivesState.initial();
-      await livesBox.put(
-        'state',
-        ls.copyWith(lives: (ls.lives + contents.lives).clamp(0, 15)),
-      );
-    }
   }
 
   String _generateShareCode() {

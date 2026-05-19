@@ -367,7 +367,6 @@ class GameNotifier extends Notifier<GameState> {
       () => ref.read(settingsProvider).hapticEnabled,
       intensity: HapticIntensity.medium,
     );
-    _submitToRanking();
     if (milestone == 12 || milestone == 13) {
       final tileValue = 1 << milestone;
       unawaited(
@@ -384,16 +383,6 @@ class GameNotifier extends Notifier<GameState> {
       ref
           .read(personalRecordsProvider.notifier)
           .recordMilestone(milestone, DateTime.now()),
-    );
-    unawaited(
-      ref.read(gameRecordRepositoryProvider).add(
-        GameRecord(
-          playedAt: DateTime.now(),
-          elapsedMs: captured,
-          score: state.score,
-          maxLevel: state.maxLevel,
-        ),
-      ),
     );
   }
 
