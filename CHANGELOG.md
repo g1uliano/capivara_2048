@@ -6,6 +6,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.17] — 2026-05-20
+
+### Added
+
+- **Confetti no MilestoneRankingDialog**: animação de confetes ao atingir milestones (confetti package), com `ClipRect` para conter a animação dentro do dialog
+
+### Fixed
+
+- **clipBehavior**: ajuste de `clipBehavior` no container do confetti; asserções de teste mais robustas
+
 ## [1.9.16] — 2026-05-19
 
 ### Fixed
