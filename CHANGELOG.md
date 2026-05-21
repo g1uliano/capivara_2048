@@ -6,6 +6,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.18] — 2026-05-21
+
+### Fixed
+
+- **Confetti ausente nos milestones**: `MilestoneRankingDialog.show()` nunca era chamado — todo fluxo de milestone vai para `VictoryChoiceDialog` (inline no Stack do game_screen). Confetti movido para o widget correto; `MilestoneRankingDialog` removido (código morto)
+
 ## [1.9.17] — 2026-05-20
 
 ### Added
