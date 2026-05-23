@@ -6,6 +6,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.19] — 2026-05-23
+
+### Fixed
+
+- **Cheat menu — Ir para Nível**: ao invés de injetar um tile do nível alvo diretamente, configura o tabuleiro com dois tiles adjacentes de nível N-1, permitindo testar o fluxo de milestone organicamente via merge
+
 ## [1.9.18] — 2026-05-21
 
 ### Fixed
