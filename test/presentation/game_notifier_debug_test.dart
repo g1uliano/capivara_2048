@@ -54,20 +54,35 @@ void main() {
     setUp(() => container = _createContainer());
     tearDown(() => container.dispose());
 
-    test('sets maxLevel to target', () {
+    test('sets maxLevel to targetLevel minus 1', () {
       container.read(gameProvider.notifier).debugJumpToLevel(7);
-      expect(container.read(gameProvider).maxLevel, 7);
+      expect(container.read(gameProvider).maxLevel, 6);
     });
 
-    test('board contains tile at targetLevel', () {
+    test('board contains exactly two tiles at targetLevel - 1', () {
       container.read(gameProvider.notifier).debugJumpToLevel(7);
       final board = container.read(gameProvider).board;
-      final levels = board
+      final tilesAtTarget = board
           .expand((row) => row)
           .whereType<Tile>()
-          .map((t) => t.level)
+          .where((t) => t.level == 6)
           .toList();
-      expect(levels, contains(7));
+      expect(tilesAtTarget.length, 2);
+    });
+
+    test('the two merge tiles are adjacent (same row, consecutive cols)', () {
+      container.read(gameProvider.notifier).debugJumpToLevel(7);
+      final board = container.read(gameProvider).board;
+      final mergeTiles = board
+          .expand((row) => row)
+          .whereType<Tile>()
+          .where((t) => t.level == 6)
+          .toList();
+      expect(mergeTiles.length, 2);
+      final rows = mergeTiles.map((t) => t.row).toSet();
+      final cols = mergeTiles.map((t) => t.col).toList()..sort();
+      expect(rows.length, 1);
+      expect(cols[1] - cols[0], 1);
     });
 
     test('score equals sum of (1 << tile.level) for all tiles', () {

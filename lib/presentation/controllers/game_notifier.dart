@@ -220,12 +220,13 @@ class GameNotifier extends Notifier<GameState> {
     int lvl(int delta) => max(1, targetLevel - delta);
 
     final board = List.generate(4, (_) => List<Tile?>.filled(4, null));
-    board[0][3] = makeTile(targetLevel, 0, 3);
-    board[0][2] = makeTile(lvl(2), 0, 2);
-    board[1][3] = makeTile(lvl(3), 1, 3);
-    board[3][0] = makeTile(lvl(4), 3, 0);
+    board[0][2] = makeTile(lvl(1), 0, 2); // merge tile 1
+    board[0][3] = makeTile(lvl(1), 0, 3); // merge tile 2 — adjacent, swipe right merges them
+    board[1][3] = makeTile(lvl(2), 1, 3);
+    board[2][0] = makeTile(lvl(4), 2, 0);
+    board[2][2] = makeTile(lvl(3), 2, 2);
+    board[3][0] = makeTile(1, 3, 0);
     board[3][2] = makeTile(1, 3, 2);
-    board[3][3] = makeTile(1, 3, 3);
 
     final score = board
         .expand((row) => row)
@@ -241,13 +242,12 @@ class GameNotifier extends Notifier<GameState> {
       board: board,
       score: score,
       highScore: max(state.highScore, score),
-      maxLevel: targetLevel,
+      maxLevel: targetLevel - 1,
       hasWon: false,
       isGameOver: false,
       isPaused: false,
       elapsedMs: state.elapsedMs,
     );
-    if (targetLevel >= 11) _handleMilestoneReached(targetLevel);
   }
 
   void setAwaitingResolution(bool value) {
