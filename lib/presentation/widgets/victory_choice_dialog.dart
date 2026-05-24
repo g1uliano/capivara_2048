@@ -213,16 +213,18 @@ class _VictoryChoiceDialogState extends ConsumerState<VictoryChoiceDialog> {
                         width: double.infinity,
                         child: OutlinedButton(
                           onPressed: () async {
+                            // Capture navigator before await: endGame() triggers
+                            // a rebuild that removes this widget from the Stack,
+                            // making context.mounted false before we can navigate.
+                            final nav = Navigator.of(context);
                             _dismissSummary();
                             await notifier.endGame();
-                            if (context.mounted) {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      const RankingScreen(initialTab: 1),
-                                ),
-                              );
-                            }
+                            nav.push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    const RankingScreen(initialTab: 1),
+                              ),
+                            );
                           },
                           child: Text(
                             'Ver Ranking',
@@ -239,16 +241,15 @@ class _VictoryChoiceDialogState extends ConsumerState<VictoryChoiceDialog> {
                         width: double.infinity,
                         child: OutlinedButton(
                           onPressed: () async {
+                            final nav = Navigator.of(context);
                             await _deliverReward();
                             await notifier.endGame();
-                            if (context.mounted) {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      const RankingScreen(initialTab: 2),
-                                ),
-                              );
-                            }
+                            nav.push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    const RankingScreen(initialTab: 2),
+                              ),
+                            );
                           },
                           child: Text(
                             'Ver Ranking',

@@ -6,6 +6,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.21] — 2026-05-24
+
+### Fixed
+
+- **Ver Ranking após 2048/4096**: botão não navegava para o ranking — finalizava o jogo sem abrir a tela. `endGame()` setava `hasWon=true` causando rebuild que removia `VictoryChoiceDialog` do Stack antes do `Navigator.push`, tornando `context.mounted == false`. Corrigido capturando `Navigator.of(context)` antes do `await`
+
 ## [1.9.20] — 2026-05-24
 
 ### Fixed
