@@ -202,6 +202,19 @@ class GameNotifier extends Notifier<GameState> {
     state = fresh.copyWith(elapsedMs: 0, isPaused: false);
   }
 
+  /// Resets local game state for logout without touching Firestore currentGame.
+  /// Firestore currentGame is preserved so the game can be restored on re-login.
+  /// Unlike restart(), does NOT call _clearSavedGame() (which would set currentGame=null).
+  void resetForLogout() {
+    _firestoreSaveTimer?.cancel();
+    _firestoreSaveTimer = null;
+    _reachedMilestones.clear();
+    _stopTimer();
+    _timerStarted = false;
+    final fresh = _engine.newGame();
+    state = fresh.copyWith(elapsedMs: 0, isPaused: false);
+  }
+
   // ignore: invalid_use_of_protected_member
   @visibleForTesting
   void debugSetState(GameState s) {
@@ -214,19 +227,34 @@ class GameNotifier extends Notifier<GameState> {
   void debugJumpToLevel(int targetLevel) {
     if (!kDebugMode) return;
 
+    final rng = Random();
     const uuid = Uuid();
     Tile makeTile(int level, int row, int col) =>
         Tile(id: uuid.v4(), level: level, row: row, col: col);
-    int lvl(int delta) => max(1, targetLevel - delta);
+    int rowOf(int i) => i ~/ 4;
+    int colOf(int i) => i % 4;
+
+    // Shuffle all 16 positions so tile placement varies each call
+    final positions = List.generate(16, (i) => i)..shuffle(rng);
 
     final board = List.generate(4, (_) => List<Tile?>.filled(4, null));
-    board[0][2] = makeTile(lvl(1), 0, 2); // merge tile 1
-    board[0][3] = makeTile(lvl(1), 0, 3); // merge tile 2 — adjacent, swipe right merges them
-    board[1][3] = makeTile(lvl(2), 1, 3);
-    board[2][0] = makeTile(lvl(4), 2, 0);
-    board[2][2] = makeTile(lvl(3), 2, 2);
-    board[3][0] = makeTile(1, 3, 0);
-    board[3][2] = makeTile(1, 3, 2);
+
+    // Two merge-ready tiles at targetLevel-1 (merging them reaches targetLevel)
+    final mergeLevel = max(1, targetLevel - 1);
+    for (int i = 0; i < 2; i++) {
+      final r = rowOf(positions[i]);
+      final c = colOf(positions[i]);
+      board[r][c] = makeTile(mergeLevel, r, c);
+    }
+
+    // 3–5 filler tiles with randomised low levels for board/score variety
+    final maxFillerLevel = max(1, targetLevel - 3);
+    final fillerCount = 3 + rng.nextInt(3);
+    for (int i = 2; i < 2 + fillerCount; i++) {
+      final r = rowOf(positions[i]);
+      final c = colOf(positions[i]);
+      board[r][c] = makeTile(1 + rng.nextInt(maxFillerLevel), r, c);
+    }
 
     final score = board
         .expand((row) => row)
@@ -435,10 +463,10 @@ class GameNotifier extends Notifier<GameState> {
       // Não bloquear o jogo se o save falhar
     }
 
-    _submitToRanking();
+    await _submitToRanking();
   }
 
-  void _submitToRanking() {
+  Future<void> _submitToRanking() async {
     try {
       final rankingRepo = ref.read(rankingRepositoryProvider);
       final authProfile = ref.read(authControllerProvider);
@@ -454,16 +482,16 @@ class GameNotifier extends Notifier<GameState> {
         );
       }
 
-      // Submit time when player reached 2048 — covers both hasWon and milestone paths
+      // Submit time when player reached 2048 — covers both hasWon and milestone paths.
+      // Awaited so that the local Firestore cache is updated before endGame() returns,
+      // ensuring the ranking screen opens with fresh data (not stale T1 from first win).
       if ((state.hasWon || state.maxLevel >= 11) && state.elapsedMs > 0) {
         final maxTile = state.maxLevel > 0 ? (1 << state.maxLevel) : null;
-        unawaited(
-          rankingRepo.submitScore(
-            RankingType.globalTime,
-            state.elapsedMs,
-            displayName: displayName,
-            maxTile: maxTile,
-          ),
+        await rankingRepo.submitScore(
+          RankingType.globalTime,
+          state.elapsedMs,
+          displayName: displayName,
+          maxTile: maxTile,
         );
       }
     } catch (_) {

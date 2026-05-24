@@ -11,6 +11,7 @@ import '../../domain/sync/sync_engine.dart';
 import '../../data/repositories/iap_startup_service.dart';
 import 'personal_records_notifier.dart';
 import '../../domain/daily_rewards/daily_rewards_notifier.dart';
+import '../../domain/inventory/inventory_notifier.dart';
 import 'game_notifier.dart';
 import 'settings_notifier.dart';
 
@@ -223,6 +224,37 @@ class AuthController extends Notifier<PlayerProfile?> {
   }
 
   Future<void> signOut() async {
+    // Reset in-memory game state so the user can't continue playing after
+    // logout. resetForLogout() cancels the pending Firestore save timer
+    // WITHOUT calling syncCurrentGame(null) — Firestore currentGame is kept
+    // intact so it can be restored when the user logs back in.
+    ref.read(gameProvider.notifier).resetForLogout();
+
+    // Clear all local user data so the next account login starts clean.
+    const boxNames = [
+      'inventory',
+      'lives',
+      'personal_records',
+      'pending_events',
+      'daily_rewards',
+      'invite_refs',
+      'game_records',
+      'ranking_rewards',
+    ];
+    for (final name in boxNames) {
+      try {
+        final box = await Hive.openBox(name);
+        await box.clear();
+        await box.close();
+      } catch (_) {}
+    }
+    ref.read(sharedPreferencesProvider).remove('game.current_state');
+
+    // Reload inventory from the now-cleared Hive box so in-memory item counts
+    // drop to zero immediately — items are tied to the account and must not
+    // be usable after logout.
+    await ref.read(inventoryProvider.notifier).load();
+
     await ref.read(authServiceProvider).signOut();
     unawaited(ref.read(iapStartupServiceProvider).dispose());
     await ref.read(syncEngineProvider).dispose();

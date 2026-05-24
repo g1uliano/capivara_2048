@@ -253,7 +253,9 @@ class FirestoreRankingRepository implements RankingRepository {
       // Update only if better
       final existing = snap.data()!;
       if (type == RankingType.globalTime) {
-        final current = (existing['bestTimeMs'] as num?)?.toInt() ?? 0;
+        // Fallback to max value: if bestTimeMs absent, any real time wins.
+        final current =
+            (existing['bestTimeMs'] as num?)?.toInt() ?? 999999999;
         if (value < current) {
           await docRef.update({
             'bestTimeMs': value,

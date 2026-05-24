@@ -6,6 +6,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.20] — 2026-05-24
+
+### Fixed
+
+- **Ranking global — segundo recorde**: tempo melhor na segunda vitória não atualizava o ranking (submitScore era fire-and-forget; tela de ranking abria antes da escrita completar). Corrigido com `await` no submit antes da navegação
+- **Logout — dados entre contas**: boxes Hive (personal_records, inventory, lives, etc.) não eram limpos no logout, misturando dados de contas diferentes. Logout agora limpa todos os boxes antes de chamar signOut
+- **Logout — jogo/inventário acessível**: jogo continuava jogável e itens do inventário usáveis após logout. Adicionado `resetForLogout()` (reseta tabuleiro sem destruir o jogo salvo no Firestore) e reload do inventário do Hive zerado
+- **Cheat menu — Ir para Nível**: tabuleiro e pontuação sempre idênticos a cada uso do cheat. Posições e níveis dos tiles filler agora são aleatorizados via `Random`, gerando cenários variados a cada chamada
+
 ## [1.9.19] — 2026-05-23
 
 ### Fixed
