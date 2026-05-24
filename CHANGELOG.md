@@ -6,6 +6,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.22] — 2026-05-24
+
+### Fixed
+
+- **Ver Ranking após milestone — volta sem opções**: clicar em "Ver Ranking" chamava `endGame()` antes de navegar, finalizando o jogo e removendo o `VictoryChoiceDialog`. Ao voltar do ranking, o jogador não tinha mais as opções de Continuar/Encerrar. Corrigido com `submitForRanking()` (submete o tempo sem encerrar o jogo); `endGame()` só é chamado quando o jogador escolhe "Encerrar"
+
 ## [1.9.21] — 2026-05-24
 
 ### Fixed

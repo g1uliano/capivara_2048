@@ -499,6 +499,11 @@ class GameNotifier extends Notifier<GameState> {
     }
   }
 
+  /// Submits the current game's score/time to the ranking without ending the
+  /// game. Used by "Ver Ranking" so the ranking screen shows fresh data while
+  /// the milestone dialog stays alive for the player to decide what to do next.
+  Future<void> submitForRanking() => _submitToRanking();
+
   @visibleForTesting
   void setStateForTest(GameState s) => state = s;
 

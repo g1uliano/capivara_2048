@@ -213,12 +213,12 @@ class _VictoryChoiceDialogState extends ConsumerState<VictoryChoiceDialog> {
                         width: double.infinity,
                         child: OutlinedButton(
                           onPressed: () async {
-                            // Capture navigator before await: endGame() triggers
-                            // a rebuild that removes this widget from the Stack,
-                            // making context.mounted false before we can navigate.
+                            // Submit ranking before navigating so the ranking
+                            // screen shows fresh data. Do NOT call endGame() —
+                            // the dialog must remain alive when the player
+                            // returns so they can still choose Continuar/Encerrar.
                             final nav = Navigator.of(context);
-                            _dismissSummary();
-                            await notifier.endGame();
+                            await notifier.submitForRanking();
                             nav.push(
                               MaterialPageRoute(
                                 builder: (_) =>
@@ -243,7 +243,7 @@ class _VictoryChoiceDialogState extends ConsumerState<VictoryChoiceDialog> {
                           onPressed: () async {
                             final nav = Navigator.of(context);
                             await _deliverReward();
-                            await notifier.endGame();
+                            await notifier.submitForRanking();
                             nav.push(
                               MaterialPageRoute(
                                 builder: (_) =>
