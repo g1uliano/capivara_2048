@@ -6,6 +6,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.23] — 2026-05-25
+
+### Fixed
+
+- **Ver Ranking ausente no milestone 8192**: botão "Ver Ranking" não existia no `VictoryChoiceDialog` para milestone 13 (Jacaré/8192). Jogador via a contagem de vezes mas não conseguia navegar para o ranking
+- **Contagem divergente 8192 (local vs Firestore)**: `submitForRanking()` não drenava eventos pendentes (`legendReached`), causando divergência entre contador local (Hive) e `legendsRankings/8192/entries`. Adicionado `drainPendingEvents()` ao `submitForRanking()`
+
 ## [1.9.22] — 2026-05-24
 
 ### Fixed

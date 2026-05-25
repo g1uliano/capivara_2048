@@ -260,6 +260,30 @@ class _VictoryChoiceDialogState extends ConsumerState<VictoryChoiceDialog> {
                       const SizedBox(height: 12),
                     ],
 
+                    // Ver Ranking (milestone 13 → aba Lendas)
+                    if (widget.milestone == 13) ...[
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton(
+                          onPressed: () async {
+                            final nav = Navigator.of(context);
+                            await notifier.submitForRanking();
+                            nav.push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    const RankingScreen(initialTab: 2),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'Ver Ranking',
+                            style: GoogleFonts.fredoka(fontSize: 18),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+
                     if (widget.milestone != 13)
                       SizedBox(
                         width: double.infinity,

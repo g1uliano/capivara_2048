@@ -499,10 +499,15 @@ class GameNotifier extends Notifier<GameState> {
     }
   }
 
-  /// Submits the current game's score/time to the ranking without ending the
-  /// game. Used by "Ver Ranking" so the ranking screen shows fresh data while
-  /// the milestone dialog stays alive for the player to decide what to do next.
-  Future<void> submitForRanking() => _submitToRanking();
+  /// Submits score/time and drains pending events (legend entries) so the
+  /// ranking screen shows fresh Firestore data when opened. Does NOT end the
+  /// game — the milestone dialog stays alive for Continuar/Encerrar.
+  Future<void> submitForRanking() async {
+    await _submitToRanking();
+    try {
+      await ref.read(syncEngineProvider).drainPendingEvents();
+    } catch (_) {}
+  }
 
   @visibleForTesting
   void setStateForTest(GameState s) => state = s;
