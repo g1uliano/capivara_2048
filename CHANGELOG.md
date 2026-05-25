@@ -6,6 +6,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.24] — 2026-05-25
+
+### Fixed
+
+- **Tela de fim exibe nome do animal**: após ganhar (2048) ou escolher "Encerrar" num milestone, a tela final mostrava "Capivara Lendária" / "Jacaré Lendário" com "Jogar novamente". Corrigido para exibir "Fim de jogo!" — a celebração do animal já ocorre no `VictoryChoiceDialog`
+
 ## [1.9.23] — 2026-05-25
 
 ### Fixed

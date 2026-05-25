@@ -297,14 +297,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       child: GameOverModal(message: 'Game Over!'),
                     ),
                   if (hasWon && !isGameOver)
-                    Positioned.fill(
-                      child: GameOverModal(
-                        message: switch (state.maxLevel) {
-                          >= 13 => 'Jacaré Lendário! 🐊',
-                          >= 12 => 'Peixe-boi Lendário! 🌊',
-                          _ => 'Capivara Lendária! 🎉',
-                        },
-                      ),
+                    const Positioned.fill(
+                      child: GameOverModal(message: 'Fim de jogo!'),
                     ),
                   if (state.pendingMilestone != null && !state.hasWon)
                     Positioned.fill(
