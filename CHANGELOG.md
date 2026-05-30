@@ -6,11 +6,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
-## [1.9.24] — 2026-05-25
+## [1.9.24] — 2026-05-30
 
 ### Fixed
 
 - **Tela de fim exibe nome do animal**: após ganhar (2048) ou escolher "Encerrar" num milestone, a tela final mostrava "Capivara Lendária" / "Jacaré Lendário" com "Jogar novamente". Corrigido para exibir "Fim de jogo!" — a celebração do animal já ocorre no `VictoryChoiceDialog`
+- **Recompensa diária — badge ausente ao perder streak**: badge no botão Recompensas da Home não aparecia quando a streak estava quebrada (`streakBroken`) ou quando o ciclo de 7 dias estava completo (`cycleCompleted`). Corrigido para exibir o badge em qualquer estado coletável
+- **Recorde 2048 com timeMs=0 via cheat**: ao usar cheat em jogo novo (timer não havia iniciado), `timeMs == 0` era aceito como recorde, corrompendo `bestTimeMs2048`. Agora guardado pelo check `timeMs > 0` em `PostGameController` e `VictoryChoiceDialog`
 
 ## [1.9.23] — 2026-05-25
 

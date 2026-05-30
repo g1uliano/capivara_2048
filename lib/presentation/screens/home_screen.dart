@@ -108,9 +108,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     final dailyState = ref.watch(dailyRewardsProvider);
     final playerProfile = ref.watch(authControllerProvider);
+    final dailyStatus = computeDailyRewardStatus(DateTime.now(), dailyState);
     final rewardAvailable =
-        computeDailyRewardStatus(DateTime.now(), dailyState) ==
-        DailyRewardStatus.available;
+        dailyStatus == DailyRewardStatus.available ||
+        dailyStatus == DailyRewardStatus.streakBroken ||
+        dailyStatus == DailyRewardStatus.cycleCompleted;
     final size = MediaQuery.of(context).size;
     final scale = min(size.width / 390.0, size.height / 844.0).clamp(0.1, 1.0);
 

@@ -43,8 +43,11 @@ class PostGameController extends Notifier<PostGameSummary?> {
 
     bool earnedCombo = false;
 
-    if (milestone == 11) {
+    if (milestone == 11 && timeMs > 0) {
       // Criterion A: new personal best time to 2048
+      // Guard: timeMs == 0 happens when cheat is used on a fresh game (timer
+      // hasn't ticked before the milestone fires). Skip to avoid corrupting
+      // personal records with an invalid 0ms best.
       final isNewTime = await ref
           .read(personalRecordsProvider.notifier)
           .updateBestTime2048(timeMs);

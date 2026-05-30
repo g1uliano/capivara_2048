@@ -132,7 +132,7 @@ class _VictoryChoiceDialogState extends ConsumerState<VictoryChoiceDialog> {
 
                     // Milestone 11: tempo + posição no ranking + combo
                     if (widget.milestone == 11) ...[
-                      if (bestTimeMs2048 != null) ...[
+                      if (bestTimeMs2048 != null && bestTimeMs2048 > 0) ...[
                         const SizedBox(height: 4),
                         Text(
                           'Tempo: ${_formatMs(bestTimeMs2048)}',
