@@ -158,40 +158,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ],
               ),
             ),
-            _SettingsSection('Áudio'),
-            Card(
-              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              color: Colors.white.withValues(alpha: 0.88),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              elevation: 2,
-              child: Column(
-                children: [
-                  ListTile(
-                    tileColor: Colors.transparent,
-                    title: Text(
-                      'Disponível na Fase 5',
-                      style: GoogleFonts.nunito(fontSize: 13, fontStyle: FontStyle.italic, color: Colors.grey),
-                    ),
-                  ),
-                  Opacity(
-                    opacity: 0.4,
-                    child: ListTile(
-                      tileColor: Colors.transparent,
-                      title: Text('Volume SFX', style: GoogleFonts.nunito(fontSize: 16)),
-                      subtitle: Slider(value: 1.0, onChanged: null),
-                    ),
-                  ),
-                  Opacity(
-                    opacity: 0.4,
-                    child: ListTile(
-                      tileColor: Colors.transparent,
-                      title: Text('Volume Música', style: GoogleFonts.nunito(fontSize: 16)),
-                      subtitle: Slider(value: 1.0, onChanged: null),
-                    ),
-                  ),
-                ],
-              ),
-            ),
             _SettingsSection('Sobre'),
             Card(
               margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),

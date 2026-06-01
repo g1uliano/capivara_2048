@@ -9,7 +9,6 @@
 - Flutter 3.x / Dart
 - Riverpod (estado)
 - Hive + SharedPreferences (persistência)
-- audioplayers (áudio)
 - flutter_animate (animações)
 
 ## Estrutura de pastas
@@ -181,8 +180,7 @@ Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 5
 | 4.5 ✅    | Polimento: Bomba 3 ≥5 peças, IAP real em dev/overlay/loja, haptic graduado, texto "Ok" pós-ad                                                                        |
 | 4.6 ✅    | Recompensas Diárias: trilha serpentina + CapivaraMascot; sync pós-login completo (inventário IAP, recordes, coleção, daily rewards)                                  |
 | 5 🔄      | Arte adicional e polimento visual — assets PNG→WebP (~96% redução), novo visual Recompensas Diárias (sapos), fundo exclusivo, Editar nome visível no Perfil          |
-| 6         | Áudio (sound design dos 13 animais, SFX, música)                                                                                                                     |
-| 7         | Polimento, l10n, acessibilidade, lançamento                                                                                                                          |
+| 6         | Polimento, l10n, acessibilidade, lançamento                                                                                                                          |
 
 ## Release checklist
 
