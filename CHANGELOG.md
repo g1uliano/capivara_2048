@@ -6,6 +6,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.25] — 2026-06-01
+
+### Removed
+
+- **Áudio removido do escopo**: referências a efeitos sonoros e música tema removidas da tela de Configurações e da documentação — o jogo não terá áudio
+
 ## [1.9.24] — 2026-05-30
 
 ### Fixed
