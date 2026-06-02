@@ -26,7 +26,7 @@ Uint8List buildWav(Int16List samples, {int sampleRate = 22050}) {
   buffer.setUint32(40, dataSize, Endian.little);
 
   final bytes = buffer.buffer.asUint8List();
-  final sampleBytes = samples.buffer.asUint8List();
+  final sampleBytes = samples.buffer.asUint8List(samples.offsetInBytes, samples.lengthInBytes);
   bytes.setRange(44, fileSize, sampleBytes);
   return bytes;
 }
