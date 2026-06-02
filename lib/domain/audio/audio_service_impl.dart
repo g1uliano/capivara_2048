@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_soloud/flutter_soloud.dart';
 
 import 'audio_service.dart';
+import 'jungle_sequencer.dart';
 import 'sfxr_synth.dart';
 import 'sound_presets.dart';
 
@@ -25,6 +26,12 @@ class AudioServiceImpl implements AudioService {
   Future<void> init() async {
     await SoLoud.instance.init();
     await _loadSfx();
+    await _loadMusic();
+  }
+
+  Future<void> _loadMusic() async {
+    final bytes = await JungleSequencer.generate();
+    _music = await SoLoud.instance.loadMem('jungle_music', bytes);
   }
 
   Future<void> _loadSfx() async {
