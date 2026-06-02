@@ -49,6 +49,28 @@ class SoundPresets {
     hasNoise: true,
   );
 
+  // Desfazer: varredura de pitch REVERSA (freq sobe no tempo) → "rebobinar".
+  // freqSweep negativo faz freq = baseFreq * exp(+|sweep|*t), subindo.
+  static const undo1 = SoundPreset(
+    waveType: WaveType.triangle,
+    baseFreq: 220,
+    freqSweep: -4.0,
+    attack: 0.005,
+    sustain: 0.04,
+    decay: 0.18,
+    volume: 0.6,
+  );
+
+  static const undo3 = SoundPreset(
+    waveType: WaveType.triangle,
+    baseFreq: 130,
+    freqSweep: -3.0,
+    attack: 0.005,
+    sustain: 0.08,
+    decay: 0.40,
+    volume: 0.7,
+  );
+
   // Merge pitches by level (1–11)
   static const mergePitches = [
     220.00, // 1 - Tanajura
