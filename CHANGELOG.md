@@ -6,6 +6,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.27] — 2026-06-02
+
+### Fixed
+
+- **Áudio em builds dev/tst**: `AudioServiceImpl` agora é ativado para qualquer build com `FLAVOR` definido (`dev`, `tst`, `prd`) — apenas `flutter test` sem dart-define usa o stub silencioso
+
 ## [1.9.26] — 2026-06-02
 
 ### Added
@@ -15,7 +21,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - **Música de fundo** (`JungleSequencer`): 32 compassos (~85s) de Bossa Nova/MPB em chiptune, em Ré maior a 90 BPM — 4 vozes independentes (melodia triângulo, baixo quadrada, batida João Gilberto, contraponto triângulo), gerada em `Isolate` no boot sem bloquear a UI
 - **Controles de áudio nas Configurações**: switches de Música de fundo e Efeitos sonoros, cada um com slider de volume; persistidos em SharedPreferences
 - **Hooks de jogo**: música inicia/pausa com `GameScreen`; Bomba, Merge, Vitória e Game Over disparam os efeitos nos momentos corretos
-- **Flavor guard**: `FLAVOR=dev` usa stub silencioso — testes e builds `tst` não são afetados; `FLAVOR=prd` ativa o áudio real via `flutter_soloud`
+- **Flavor guard**: `flutter test` sem `--dart-define=FLAVOR` usa stub silencioso; `FLAVOR=dev/tst/prd` ativa o áudio real via `flutter_soloud`
 
 ## [1.9.25] — 2026-06-01
 
