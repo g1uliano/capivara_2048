@@ -67,6 +67,45 @@ class SynthCore {
     }
   }
 
+  /// Renders filtered noise (state-variable filter) into [target].
+  /// [filter]: 'lowpass' | 'bandpass'. [pink] mellows the white noise.
+  /// Cutoff is modulated by a slow LFO ([lfoRate]/[lfoDepth]).
+  static void filteredNoise(
+    Int16List target,
+    int offset,
+    int durationSamples, {
+    bool pink = false,
+    String filter = 'lowpass',
+    double cutoff = 800,
+    double resonance = 0.5,
+    double lfoRate = 0.2,
+    double lfoDepth = 0.0,
+    double volume = 0.3,
+    int seed = 0,
+  }) {
+    final rng = Random(seed);
+    final end = (offset + durationSamples).clamp(0, target.length);
+    double low = 0, band = 0, pinkState = 0;
+    final q = 1.0 - resonance.clamp(0.0, 0.99);
+    for (int i = offset; i < end; i++) {
+      double white = rng.nextDouble() * 2 - 1;
+      if (pink) {
+        pinkState = 0.98 * pinkState + 0.02 * white;
+        white = pinkState * 3.5;
+      }
+      final t = (i - offset) / sampleRate;
+      final modCutoff =
+          (cutoff * (1 + lfoDepth * sin(2 * pi * lfoRate * t)))
+              .clamp(20, sampleRate / 2.2);
+      final f = 2 * sin(pi * modCutoff / sampleRate);
+      low += f * band;
+      final high = white - low - q * band;
+      band += f * high;
+      final out = filter == 'bandpass' ? band : low;
+      mix(target, out * volume * 16000, i);
+    }
+  }
+
   /// Karplus-Strong plucked string. Fills a delay line with noise and reads it
   /// in a loop through a 1-pole lowpass feedback — yields a nylon-guitar timbre.
   /// [brightness] = feedback gain (0.90–0.999). [damping] = lowpass blend (0–1).

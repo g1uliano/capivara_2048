@@ -63,6 +63,35 @@ void main() {
     });
   });
 
+  group('filteredNoise', () {
+    int zeroCrossings(Int16List buf) {
+      int c = 0;
+      for (int i = 1; i < buf.length; i++) {
+        if ((buf[i - 1] < 0) != (buf[i] < 0)) c++;
+      }
+      return c;
+    }
+
+    test('preenche buffer no range e respeita tamanho', () {
+      final n = SynthCore.sampleRate ~/ 5;
+      final buf = Int16List(n);
+      SynthCore.filteredNoise(buf, 0, n, cutoff: 600, volume: 0.4);
+      expect(buf.any((s) => s.abs() > 50), isTrue);
+      expect(buf.every((s) => s.abs() <= 32767), isTrue);
+    });
+
+    test('lowpass tem menos zero-crossings que bandpass alto', () {
+      final n = SynthCore.sampleRate ~/ 2;
+      final low = Int16List(n);
+      final band = Int16List(n);
+      SynthCore.filteredNoise(low, 0, n,
+          filter: 'lowpass', cutoff: 400, volume: 0.5, seed: 3);
+      SynthCore.filteredNoise(band, 0, n,
+          filter: 'bandpass', cutoff: 6000, volume: 0.5, seed: 3);
+      expect(zeroCrossings(low), lessThan(zeroCrossings(band)));
+    });
+  });
+
   group('pluck (Karplus-Strong)', () {
     double rms(Int16List buf, int from, int to) {
       double sum = 0;
