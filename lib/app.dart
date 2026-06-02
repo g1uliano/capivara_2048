@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/app_theme.dart';
 import 'core/asset_precache.dart';
+import 'domain/audio/audio_service.dart';
 import 'presentation/screens/splash_screen.dart';
 
-class CapivaraApp extends StatefulWidget {
+class CapivaraApp extends ConsumerStatefulWidget {
   const CapivaraApp({super.key, this.precacheFutureOverride});
 
   /// Override the precache future (tests only).
@@ -13,11 +15,12 @@ class CapivaraApp extends StatefulWidget {
   final Future<void>? precacheFutureOverride;
 
   @override
-  State<CapivaraApp> createState() => _CapivaraAppState();
+  ConsumerState<CapivaraApp> createState() => _CapivaraAppState();
 }
 
-class _CapivaraAppState extends State<CapivaraApp> {
+class _CapivaraAppState extends ConsumerState<CapivaraApp> {
   Future<void>? _precacheFuture;
+  bool _audioInitialized = false;
 
   @override
   void didChangeDependencies() {
@@ -26,6 +29,10 @@ class _CapivaraAppState extends State<CapivaraApp> {
     // (aguardada antes dos demais) para aparecer imediatamente; o resto
     // carrega em paralelo. A SplashScreen aguarda essa future antes de navegar.
     _precacheFuture ??= widget.precacheFutureOverride ?? precacheCriticalAssets(context);
+    if (!_audioInitialized) {
+      _audioInitialized = true;
+      ref.read(audioServiceProvider).init();
+    }
   }
 
   @override

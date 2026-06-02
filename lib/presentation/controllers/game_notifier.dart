@@ -20,6 +20,7 @@ import '../../domain/invites/invite_service.dart';
 import '../../domain/sync/sync_engine.dart';
 import 'package:uuid/uuid.dart';
 import '../../core/utils/haptic_utils.dart';
+import '../../domain/audio/audio_service.dart';
 import '../../presentation/controllers/settings_notifier.dart';
 import '../controllers/auth_controller.dart';
 import '../controllers/personal_records_notifier.dart';
@@ -109,6 +110,9 @@ class GameNotifier extends Notifier<GameState> {
       maybeHaptic(
         () => ref.read(settingsProvider).hapticEnabled,
         intensity: HapticIntensity.light,
+      );
+      ref.read(audioServiceProvider).playEffect(
+        TilesMerged(_inferMergeLevel(after)),
       );
     }
     if (after.isGameOver && !before.isGameOver) {
@@ -341,6 +345,11 @@ class GameNotifier extends Notifier<GameState> {
     final item = _pendingBombItem;
     _pendingBombItem = null;
     if (item != null) _consumeItem?.call(item);
+    if (mode == BombMode.bomb2) {
+      ref.read(audioServiceProvider).playEffect(const Bomb2xUsed());
+    } else {
+      ref.read(audioServiceProvider).playEffect(const Bomb3xUsed());
+    }
     state = newState.copyWith(
       bombMode: null,
       selectedBombTiles: const [],
@@ -561,6 +570,16 @@ class GameNotifier extends Notifier<GameState> {
     } catch (_) {
       // Non-fatal — leave current state unchanged
     }
+  }
+
+  int _inferMergeLevel(GameState s) {
+    int maxLevel = 1;
+    for (final row in s.board) {
+      for (final tile in row) {
+        if (tile != null && tile.level > maxLevel) maxLevel = tile.level;
+      }
+    }
+    return maxLevel.clamp(1, 11);
   }
 }
 

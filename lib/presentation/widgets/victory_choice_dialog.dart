@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
+import '../../domain/audio/audio_service.dart';
 import '../../data/models/item_type.dart';
 import '../../domain/inventory/inventory_notifier.dart';
 import '../../domain/lives/lives_notifier.dart';
@@ -51,6 +52,9 @@ class _VictoryChoiceDialogState extends ConsumerState<VictoryChoiceDialog> {
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 4));
     _confettiController.play();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(audioServiceProvider).playEffect(const VictoryReached());
+    });
   }
 
   @override
