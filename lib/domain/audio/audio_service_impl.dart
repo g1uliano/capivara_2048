@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_soloud/flutter_soloud.dart';
 
+import 'animal_voices.dart';
 import 'audio_service.dart';
 import 'jungle_sequencer.dart';
 import 'sfxr_synth.dart';
@@ -11,6 +12,9 @@ class AudioServiceImpl implements AudioService {
   AudioSource? _bomb2x;
   AudioSource? _bomb3x;
   final _mergeSounds = <int, AudioSource>{};
+  final _animalVoices = <int, AudioSource>{};
+  AudioSource? _undo1;
+  AudioSource? _undo3;
   AudioSource? _victory;
   AudioSource? _gameOver;
   AudioSource? _music;
@@ -44,6 +48,14 @@ class AudioServiceImpl implements AudioService {
         synth.generateMerge(level),
       );
     }
+    for (int level = 1; level <= 11; level++) {
+      _animalVoices[level] = await SoLoud.instance.loadMem(
+        'animal_$level',
+        AnimalVoices.voice(level),
+      );
+    }
+    _undo1 = await SoLoud.instance.loadMem('undo1', synth.generateUndo1());
+    _undo3 = await SoLoud.instance.loadMem('undo3', synth.generateUndo3());
     _victory = await SoLoud.instance.loadMem('victory', synth.generateVictory());
     _gameOver = await SoLoud.instance.loadMem('gameover', synth.generateGameOver());
   }
@@ -55,6 +67,9 @@ class AudioServiceImpl implements AudioService {
       Bomb2xUsed() => _bomb2x,
       Bomb3xUsed() => _bomb3x,
       TilesMerged(:final level) => _mergeSounds[level.clamp(1, 11)],
+      AnimalReached(:final level) => _animalVoices[level.clamp(1, 11)],
+      Undo1Used() => _undo1,
+      Undo3Used() => _undo3,
       VictoryReached() => _victory,
       GameOver() => _gameOver,
     };
