@@ -16,7 +16,7 @@ class SfxrSynth {
       final t = i / _sampleRate;
       final amplitude = _envelope(t, preset) * preset.volume;
       final freq = preset.baseFreq * exp(-preset.freqSweep * t);
-      phase += freq / _sampleRate;
+      phase = (phase + freq / _sampleRate) % 1.0;
 
       double wave;
       if (preset.hasNoise) {
@@ -88,7 +88,7 @@ class SfxrSynth {
         final fadeOut =
             (i > noteSamples - 220) ? (noteSamples - i) / 220.0 : 1.0;
         final amp = fadeIn * fadeOut * volume;
-        phase += freqs[n] / _sampleRate;
+        phase = (phase + freqs[n] / _sampleRate) % 1.0;
         final wave = switch (waveType) {
           WaveType.square => sin(2 * pi * phase) >= 0 ? 1.0 : -1.0,
           WaveType.triangle =>

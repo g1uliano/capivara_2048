@@ -10,7 +10,7 @@ class SoundPreset {
     required this.decay,
     this.volume = 1.0,
     this.hasNoise = false,
-  });
+  }) : assert(attack > 0, 'attack must be > 0 to avoid division by zero in envelope');
 
   final WaveType waveType;
   final double baseFreq;
