@@ -7,8 +7,6 @@ import 'sfxr_synth.dart';
 import 'sound_presets.dart';
 
 class AudioServiceImpl implements AudioService {
-  final _synth = SfxrSynth();
-
   AudioSource? _bomb2x;
   AudioSource? _bomb3x;
   final _mergeSounds = <int, AudioSource>{};
@@ -30,16 +28,17 @@ class AudioServiceImpl implements AudioService {
   }
 
   Future<void> _loadSfx() async {
-    _bomb2x = await SoLoud.instance.loadMem('bomb2x', _synth.generate(SoundPresets.bomb2x));
-    _bomb3x = await SoLoud.instance.loadMem('bomb3x', _synth.generate(SoundPresets.bomb3x));
+    final synth = SfxrSynth();
+    _bomb2x = await SoLoud.instance.loadMem('bomb2x', synth.generate(SoundPresets.bomb2x));
+    _bomb3x = await SoLoud.instance.loadMem('bomb3x', synth.generate(SoundPresets.bomb3x));
     for (int level = 1; level <= 11; level++) {
       _mergeSounds[level] = await SoLoud.instance.loadMem(
         'merge_$level',
-        _synth.generateMerge(level),
+        synth.generateMerge(level),
       );
     }
-    _victory = await SoLoud.instance.loadMem('victory', _synth.generateVictory());
-    _gameOver = await SoLoud.instance.loadMem('gameover', _synth.generateGameOver());
+    _victory = await SoLoud.instance.loadMem('victory', synth.generateVictory());
+    _gameOver = await SoLoud.instance.loadMem('gameover', synth.generateGameOver());
   }
 
   @override
