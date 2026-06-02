@@ -1,0 +1,33 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:capivara_2048/domain/audio/audio_service.dart';
+import 'package:capivara_2048/domain/audio/audio_service_stub.dart';
+
+void main() {
+  group('AudioServiceStub', () {
+    late AudioService stub;
+
+    setUp(() => stub = AudioServiceStub());
+
+    test('init completes without error', () async {
+      await expectLater(stub.init(), completes);
+    });
+
+    test('playEffect does not throw for any event', () {
+      expect(() => stub.playEffect(const Bomb2xUsed()), returnsNormally);
+      expect(() => stub.playEffect(const Bomb3xUsed()), returnsNormally);
+      expect(() => stub.playEffect(const TilesMerged(5)), returnsNormally);
+      expect(() => stub.playEffect(const VictoryReached()), returnsNormally);
+      expect(() => stub.playEffect(const GameOver()), returnsNormally);
+    });
+
+    test('music control methods do not throw', () {
+      expect(() => stub.startMusic(), returnsNormally);
+      expect(() => stub.pauseMusic(), returnsNormally);
+      expect(() => stub.stopMusic(), returnsNormally);
+      expect(() => stub.setSfxVolume(0.5), returnsNormally);
+      expect(() => stub.setMusicVolume(0.5), returnsNormally);
+      expect(() => stub.setSfxEnabled(false), returnsNormally);
+      expect(() => stub.setMusicEnabled(false), returnsNormally);
+    });
+  });
+}

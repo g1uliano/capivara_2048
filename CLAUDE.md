@@ -153,7 +153,7 @@ TabBar(
 
 ## Fases do roadmap
 
-Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 5 em progresso (v1.9.6) — Arte adicional e polimento visual**. O áudio foi reposicionado para a **Fase 6** (antes do lançamento) — o jogo é desenvolvido sem áudio até lá.
+Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 5 em progresso (v1.9.26) — Arte adicional e polimento visual**.
 
 | Fase      | Foco                                                                                                                             |
 | --------- | -------------------------------------------------------------------------------------------------------------------------------- |
@@ -180,6 +180,7 @@ Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 5
 | 4.5 ✅    | IAP real (produtos unitários), haptic feedback graduado, Bomba3 restrita, ícones Home redesenhados                               |
 | 4.6 ✅    | Recompensas Diárias: trilha serpentina + CapivaraMascot; sync pós-login completo (inventário, recordes, coleção, daily)          |
 | 5 🔄      | Arte adicional e polimento visual — assets PNG→WebP (~96% redução), novo visual Recompensas Diárias (sapos), fundo exclusivo     |
+| 5.1 ✅    | Sistema de áudio procedural: SfxrSynth (efeitos 8-bit), JungleSequencer (Bossa Nova MPB ~85s), AudioServiceImpl (flutter_soloud), controles nas Configurações, hooks de jogo |
 | 6         | Polimento, l10n, acessibilidade, lançamento                                                                                      |
 
 ## Release checklist

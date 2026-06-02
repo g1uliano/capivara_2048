@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../domain/audio/audio_service.dart';
 import '../../../domain/game_engine/direction.dart';
 
 import '../../../data/models/item_type.dart';
@@ -62,6 +63,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     super.initState();
     _fpsMonitorNotifier = ref.read(fpsMonitorProvider.notifier);
     WidgetsBinding.instance.addPostFrameCallback((_) => _startFpsMonitor());
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) ref.read(audioServiceProvider).startMusic();
+    });
   }
 
   void _startFpsMonitor() {
@@ -74,6 +78,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   @override
   void dispose() {
+    ref.read(audioServiceProvider).pauseMusic();
     _fpsMonitorNotifier.stop();
     super.dispose();
   }
@@ -105,6 +110,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     });
 
     ref.listen<GameState>(gameProvider, (previous, current) {
+      if (previous != null && !previous.isGameOver && current.isGameOver) {
+        ref.read(audioServiceProvider).playEffect(const GameOver());
+      }
       if (previous?.pendingMilestone == null &&
           current.pendingMilestone != null) {
         final milestone = current.pendingMilestone!;

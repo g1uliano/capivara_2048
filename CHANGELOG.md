@@ -6,6 +6,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.26] — 2026-06-02
+
+### Added
+
+- **Sistema de áudio procedural completo**: efeitos sonoros 8-bit gerados algoritmicamente (sfxr-style) e música de fundo MPB/Bossa Nova em chiptune, sintetizados inteiramente em Dart puro em runtime — sem assets de áudio
+- **Efeitos sonoros** (`SfxrSynth`): Bomba 2x (explosão curta), Bomba 3x (explosão grave e mais longa), merge de tiles (pitch ascende com o nível do tile, onda triangular), vitória (arpejo pentatônico ascendente C4→G4→C5→E5, onda quadrada), game over (sequência descendente C4→A3→F3, onda triangular)
+- **Música de fundo** (`JungleSequencer`): 32 compassos (~85s) de Bossa Nova/MPB em chiptune, em Ré maior a 90 BPM — 4 vozes independentes (melodia triângulo, baixo quadrada, batida João Gilberto, contraponto triângulo), gerada em `Isolate` no boot sem bloquear a UI
+- **Controles de áudio nas Configurações**: switches de Música de fundo e Efeitos sonoros, cada um com slider de volume; persistidos em SharedPreferences
+- **Hooks de jogo**: música inicia/pausa com `GameScreen`; Bomba, Merge, Vitória e Game Over disparam os efeitos nos momentos corretos
+- **Flavor guard**: `FLAVOR=dev` usa stub silencioso — testes e builds `tst` não são afetados; `FLAVOR=prd` ativa o áudio real via `flutter_soloud`
+
 ## [1.9.25] — 2026-06-01
 
 ### Removed

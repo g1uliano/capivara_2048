@@ -158,6 +158,64 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ],
               ),
             ),
+            _SettingsSection('Áudio'),
+            Card(
+              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              color: Colors.white.withValues(alpha: 0.88),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              elevation: 2,
+              child: Column(
+                children: [
+                  SwitchListTile(
+                    tileColor: Colors.transparent,
+                    title: Text('Música de fundo', style: GoogleFonts.nunito(fontSize: 16)),
+                    value: settings.musicEnabled,
+                    onChanged: notifier.setMusicEnabled,
+                    activeThumbColor: AppColors.primary,
+                  ),
+                  if (settings.musicEnabled)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.music_note, size: 18),
+                          Expanded(
+                            child: Slider(
+                              value: settings.musicVolume,
+                              onChanged: notifier.setMusicVolume,
+                              activeColor: AppColors.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16),
+                  SwitchListTile(
+                    tileColor: Colors.transparent,
+                    title: Text('Efeitos sonoros', style: GoogleFonts.nunito(fontSize: 16)),
+                    value: settings.sfxEnabled,
+                    onChanged: notifier.setSfxEnabled,
+                    activeThumbColor: AppColors.primary,
+                  ),
+                  if (settings.sfxEnabled)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.volume_up, size: 18),
+                          Expanded(
+                            child: Slider(
+                              value: settings.sfxVolume,
+                              onChanged: notifier.setSfxVolume,
+                              activeColor: AppColors.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
             _SettingsSection('Sobre'),
             Card(
               margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
