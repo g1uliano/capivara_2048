@@ -19,6 +19,19 @@ class TilesMerged extends GameSoundEvent {
   final int level; // 1–11
 }
 
+class AnimalReached extends GameSoundEvent {
+  const AnimalReached(this.level); // 1–11
+  final int level;
+}
+
+class Undo1Used extends GameSoundEvent {
+  const Undo1Used();
+}
+
+class Undo3Used extends GameSoundEvent {
+  const Undo3Used();
+}
+
 class VictoryReached extends GameSoundEvent {
   const VictoryReached();
 }
