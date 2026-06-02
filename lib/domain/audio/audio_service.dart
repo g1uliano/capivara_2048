@@ -44,8 +44,8 @@ abstract class AudioService {
 }
 
 final audioServiceProvider = Provider<AudioService>((ref) {
-  const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
-  final service = flavor == 'prd' ? AudioServiceImpl() : AudioServiceStub();
+  const flavor = String.fromEnvironment('FLAVOR', defaultValue: '');
+  final service = flavor.isNotEmpty ? AudioServiceImpl() : AudioServiceStub();
   ref.onDispose(service.dispose);
   return service;
 });
