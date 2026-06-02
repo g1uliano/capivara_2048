@@ -23,8 +23,8 @@ class VictoryReached extends GameSoundEvent {
   const VictoryReached();
 }
 
-class GameOverEvent extends GameSoundEvent {
-  const GameOverEvent();
+class GameOver extends GameSoundEvent {
+  const GameOver();
 }
 
 abstract class AudioService {
@@ -45,7 +45,7 @@ abstract class AudioService {
 
 final audioServiceProvider = Provider<AudioService>((ref) {
   const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
-  final service = flavor == 'dev' ? AudioServiceStub() : AudioServiceImpl();
+  final service = flavor == 'prd' ? AudioServiceImpl() : AudioServiceStub();
   ref.onDispose(service.dispose);
   return service;
 });
