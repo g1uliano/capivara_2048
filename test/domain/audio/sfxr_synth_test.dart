@@ -49,10 +49,8 @@ void main() {
     });
 
     test('todos os níveis têm mesma duração', () {
-      final wav1 = synth.generateMerge(1);
-      final wav11 = synth.generateMerge(11);
-      expect(wav1.length, greaterThan(44));
-      expect(wav11.length, greaterThan(44));
+      final lengths = List.generate(11, (i) => synth.generateMerge(i + 1).length);
+      expect(lengths.every((l) => l == lengths[0]), isTrue);
     });
   });
 
