@@ -19,6 +19,10 @@ void main() {
       expect(SynthCore.adsr(1.0, 1.0, 0.1, 0.1, 0.5, 0.2), 0.0);
       expect(SynthCore.adsr(2.0, 1.0, 0.1, 0.1, 0.5, 0.2), 0.0);
     });
+    test('decay desce de 1 a s', () {
+      // t=0.15 is midpoint of decay [0.1, 0.2], should be 0.75
+      expect(SynthCore.adsr(0.15, 1.0, 0.1, 0.1, 0.5, 0.2), closeTo(0.75, 1e-9));
+    });
   });
 
   group('lfo', () {
@@ -35,6 +39,14 @@ void main() {
       final hasSignal = buf.any((s) => s.abs() > 100);
       expect(hasSignal, isTrue);
       expect(buf.every((s) => s.abs() <= 32767), isTrue);
+    });
+    test('square e triangle não produzem NaN nem clipping', () {
+      for (final wt in [1, 2]) {
+        final buf = Int16List(SynthCore.sampleRate ~/ 10);
+        SynthCore.tone(buf, 0, buf.length, startFreq: 440, volume: 0.5, waveType: wt);
+        expect(buf.every((s) => s.abs() <= 32767), isTrue, reason: 'waveType $wt');
+        expect(buf.any((s) => s.abs() > 100), isTrue, reason: 'waveType $wt has signal');
+      }
     });
   });
 

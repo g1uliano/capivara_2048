@@ -14,7 +14,7 @@ class SynthCore {
     if (t < a) return t / a;
     if (t < a + d) return 1.0 - (1.0 - s) * (t - a) / d;
     if (t < dur - r) return s;
-    if (t < dur) return s * (dur - t) / r;
+    if (r > 0 && t < dur) return s * (dur - t) / r;
     return 0.0;
   }
 
@@ -55,7 +55,7 @@ class SynthCore {
       final t = (i - offset) / sampleRate;
       final frac = durationSamples == 0 ? 0.0 : (i - offset) / durationSamples;
       final base = startFreq * pow(freqEnd / startFreq, frac).toDouble();
-      final freq = base * (1 + vibratoDepth * sin(2 * pi * vibratoRate * t));
+      final freq = base * lfo(t, vibratoRate, vibratoDepth);
       phase = (phase + freq / sampleRate) % 1.0;
       final w = switch (waveType) {
         1 => sin(2 * pi * phase) >= 0 ? 1.0 : -1.0,
