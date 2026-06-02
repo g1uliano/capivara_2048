@@ -38,4 +38,41 @@ void main() {
       expect(durationMs, lessThanOrEqualTo(900));
     });
   });
+
+  group('merge sounds', () {
+    test('generateMerge produz WAV válido para todos os níveis', () {
+      for (int level = 1; level <= 11; level++) {
+        final wav = synth.generateMerge(level);
+        expect(wav.length, greaterThan(44), reason: 'level $level');
+        expect(String.fromCharCodes(wav.sublist(0, 4)), 'RIFF', reason: 'level $level');
+      }
+    });
+
+    test('todos os níveis têm mesma duração', () {
+      final wav1 = synth.generateMerge(1);
+      final wav11 = synth.generateMerge(11);
+      expect(wav1.length, greaterThan(44));
+      expect(wav11.length, greaterThan(44));
+    });
+  });
+
+  group('victory e game over', () {
+    test('generateVictory retorna WAV com 4 notas de ~0.13s', () {
+      final wav = synth.generateVictory();
+      final samples = (wav.length - 44) ~/ 2;
+      final expectedSamples = (4 * 0.13 * 22050).round();
+      expect(samples, closeTo(expectedSamples, 50));
+    });
+
+    test('generateGameOver retorna WAV com 3 notas de ~0.28s', () {
+      final wav = synth.generateGameOver();
+      final samples = (wav.length - 44) ~/ 2;
+      final expectedSamples = (3 * 0.28 * 22050).round();
+      expect(samples, closeTo(expectedSamples, 50));
+    });
+
+    test('game over é mais longo que victory', () {
+      expect(synth.generateGameOver().length, greaterThan(synth.generateVictory().length));
+    });
+  });
 }
