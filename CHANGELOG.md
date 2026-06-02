@@ -6,10 +6,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.28] — 2026-06-02
+
 ### Changed
 
 - **Trilha tema reformulada — Bossa Nova amazônica procedural** (`JungleSequencer`): composição reescrita com progressão jazz (maj7/m7/dom7), batida bossa João Gilberto, timbres Karplus-Strong (violão de nylon) em vez de square/triangle — sem "bip-bip"; ambiência de água e vento (`filteredNoise` SVF); vozes de bicho esparsas na trilha (sapo, tucano, cigarra, boto nos timestamps fixos); sample rate 22050 → 32000 Hz
 - **SFX de merge reformulado**: pluck quente de violão (KS) em vez de toque sintético — toca em toda fusão de tiles, sutil e afinado ao nível
+
+### Added
+
 - **Novo SFX — voz do bicho** (`AnimalVoices`): ao alcançar um animal pela 1ª vez (novo nível máximo), toca a voz sintetizada do animal — cigarra (1), sapo (3), tucano (4), sagui (5), boto (8), sucuri (10), capivara especial (11); chime harmônico para os difíceis (lobo-guará, preguiça, mico, onça)
 - **Novo SFX — Desfazer 1 e Desfazer 3**: varredura de pitch reversa (frequência sobe = "rebobinar"); desfazer 3 mais grave e mais longo que desfazer 1
 - **Novo módulo `SynthCore`**: núcleo DSP reutilizável (Karplus-Strong, ruído filtrado SVF, ADSR, LFO, tom/glide) — fonte única de `sampleRate = 32000`

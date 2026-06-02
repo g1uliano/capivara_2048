@@ -181,7 +181,7 @@ Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 5
 | 4.6 ✅    | Recompensas Diárias: trilha serpentina + CapivaraMascot; sync pós-login completo (inventário IAP, recordes, coleção, daily rewards)                                  |
 | 5 🔄      | Arte adicional e polimento visual — assets PNG→WebP (~96% redução), novo visual Recompensas Diárias (sapos), fundo exclusivo, Editar nome visível no Perfil          |
 | 5.1 ✅    | Sistema de áudio procedural: SfxrSynth (efeitos 8-bit), JungleSequencer (Bossa Nova MPB ~85s), AudioServiceImpl (flutter_soloud), controles nas Configurações, hooks de jogo |
-| 5.2 🔄    | Reformulação trilha tema: SynthCore (Karplus-Strong/filteredNoise/ADSR, 32kHz), JungleSequencer bossa jazz+nylon KS+ambiência+bichos, AnimalVoices (vozes bicho + merge pluck), SFX desfazer 1/3, evento AnimalReached |
+| 5.2 ✅    | Reformulação trilha tema: SynthCore (Karplus-Strong/filteredNoise/ADSR, 32kHz), JungleSequencer bossa jazz+nylon KS+ambiência+bichos, AnimalVoices (vozes bicho + merge pluck), SFX desfazer 1/3, evento AnimalReached |
 | 6         | Polimento, l10n, acessibilidade, lançamento                                                                                                                          |
 
 ## Release checklist
