@@ -66,4 +66,39 @@ class SynthCore {
       mix(target, w * amp * 16000, i);
     }
   }
+
+  /// Karplus-Strong plucked string. Fills a delay line with noise and reads it
+  /// in a loop through a 1-pole lowpass feedback — yields a nylon-guitar timbre.
+  /// [brightness] = feedback gain (0.90–0.999). [damping] = lowpass blend (0–1).
+  static void pluck(
+    Int16List target,
+    double freq,
+    int offset,
+    int durationSamples, {
+    double brightness = 0.96,
+    double damping = 0.5,
+    double volume = 1.0,
+    int seed = 0,
+  }) {
+    final n = (sampleRate / freq).round().clamp(2, sampleRate);
+    final buf = Float64List(n);
+    final rng = Random(seed);
+    for (int i = 0; i < n; i++) {
+      buf[i] = rng.nextDouble() * 2 - 1;
+    }
+    int idx = 0;
+    double prev = 0;
+    final end = (offset + durationSamples).clamp(0, target.length);
+    for (int i = offset; i < end; i++) {
+      final cur = buf[idx];
+      final filtered = cur * (1 - damping) + prev * damping;
+      buf[idx] = filtered * brightness;
+      prev = filtered;
+      final t = i - offset;
+      final fadeOut =
+          (t > durationSamples - 240) ? (durationSamples - t) / 240.0 : 1.0;
+      mix(target, filtered * volume * fadeOut.clamp(0.0, 1.0) * 16000, i);
+      idx = (idx + 1) % n;
+    }
+  }
 }

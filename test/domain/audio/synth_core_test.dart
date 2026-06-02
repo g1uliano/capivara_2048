@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:capivara_2048/domain/audio/synth_core.dart';
@@ -59,6 +60,33 @@ void main() {
       SynthCore.mix(buf, 40000, 1);
       expect(buf[1], 32767); // clamp
       expect(() => SynthCore.mix(buf, 1000, 99), returnsNormally);
+    });
+  });
+
+  group('pluck (Karplus-Strong)', () {
+    double rms(Int16List buf, int from, int to) {
+      double sum = 0;
+      for (int i = from; i < to; i++) {
+        sum += buf[i] * buf[i].toDouble();
+      }
+      return sqrt(sum / (to - from));
+    }
+
+    test('produz som que decai ao longo do tempo', () {
+      final n = SynthCore.sampleRate ~/ 2; // 0.5s
+      final buf = Int16List(n);
+      SynthCore.pluck(buf, 220, 0, n, volume: 0.8);
+      final early = rms(buf, 0, n ~/ 4);
+      final late = rms(buf, 3 * n ~/ 4, n);
+      expect(early, greaterThan(0));
+      expect(late, lessThan(early), reason: 'corda deve decair');
+    });
+
+    test('não estoura Int16 e respeita o tamanho', () {
+      final n = SynthCore.sampleRate ~/ 4;
+      final buf = Int16List(n);
+      SynthCore.pluck(buf, 440, 0, n);
+      expect(buf.every((s) => s.abs() <= 32767), isTrue);
     });
   });
 }
