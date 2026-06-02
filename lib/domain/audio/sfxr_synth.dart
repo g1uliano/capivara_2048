@@ -1,10 +1,12 @@
 import 'dart:math';
 import 'dart:typed_data';
+import 'animal_voices.dart';
 import 'sound_presets.dart';
+import 'synth_core.dart';
 import 'wav_utils.dart';
 
 class SfxrSynth {
-  static const _sampleRate = 22050;
+  static const _sampleRate = SynthCore.sampleRate;
   final _random = Random(42);
 
   Uint8List generate(SoundPreset preset) {
@@ -35,22 +37,16 @@ class SfxrSynth {
       samples[i] = (wave * amplitude * 32767).clamp(-32767, 32767).round();
     }
 
-    return buildWav(samples);
+    return buildWav(samples, sampleRate: _sampleRate);
   }
 
   Uint8List generateMerge(int level) {
     assert(level >= 1 && level <= 11);
-    final freq = SoundPresets.mergePitches[level - 1];
-    final preset = SoundPreset(
-      waveType: WaveType.triangle,
-      baseFreq: freq,
-      attack: 0.01,
-      sustain: 0.04,
-      decay: 0.07,
-      volume: 0.65,
-    );
-    return generate(preset);
+    return AnimalVoices.mergePluck(level);
   }
+
+  Uint8List generateUndo1() => generate(SoundPresets.undo1);
+  Uint8List generateUndo3() => generate(SoundPresets.undo3);
 
   Uint8List generateVictory() {
     return _generateSequence(
@@ -99,7 +95,7 @@ class SfxrSynth {
       }
     }
 
-    return buildWav(total);
+    return buildWav(total, sampleRate: _sampleRate);
   }
 
   double _envelope(double t, SoundPreset p) {

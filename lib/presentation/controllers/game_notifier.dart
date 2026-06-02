@@ -128,6 +128,9 @@ class GameNotifier extends Notifier<GameState> {
         () => ref.read(settingsProvider).hapticEnabled,
         intensity: HapticIntensity.heavy,
       );
+      ref.read(audioServiceProvider).playEffect(
+        AnimalReached(state.maxLevel),
+      );
       unawaited(
         ref
             .read(personalRecordsProvider.notifier)
@@ -194,6 +197,9 @@ class GameNotifier extends Notifier<GameState> {
     final idx = steps - 1;
     final remainingStack = stack.skip(idx + 1).toList();
     state = stack[idx].copyWith(undoStack: remainingStack);
+    ref.read(audioServiceProvider).playEffect(
+      steps == 1 ? const Undo1Used() : const Undo3Used(),
+    );
     return true;
   }
 

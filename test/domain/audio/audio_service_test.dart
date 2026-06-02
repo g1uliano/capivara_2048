@@ -16,6 +16,9 @@ void main() {
       expect(() => stub.playEffect(const Bomb2xUsed()), returnsNormally);
       expect(() => stub.playEffect(const Bomb3xUsed()), returnsNormally);
       expect(() => stub.playEffect(const TilesMerged(5)), returnsNormally);
+      expect(() => stub.playEffect(const AnimalReached(8)), returnsNormally);
+      expect(() => stub.playEffect(const Undo1Used()), returnsNormally);
+      expect(() => stub.playEffect(const Undo3Used()), returnsNormally);
       expect(() => stub.playEffect(const VictoryReached()), returnsNormally);
       expect(() => stub.playEffect(const GameOver()), returnsNormally);
     });
