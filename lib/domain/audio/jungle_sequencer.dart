@@ -8,12 +8,9 @@ import 'wav_utils.dart';
 /// Sections: A (bars 0–7) | B (bars 8–15) | C respite (bars 16–23) | A' with counter (bars 24–31)
 class JungleSequencer {
   static const _sampleRate = 22050;
-  static const _bpm = 90.0;
   static const _beatsPerBar = 4;
   static const _totalBars = 32;
-
-  // 22050 * 60 / 90 = 14700 samples per beat
-  static int get _spb => (_sampleRate * 60 / _bpm).round();
+  static const _spb = 14700; // samples per beat: 22050 × 60 / 90 BPM
 
   static double _midi(int n) => 440.0 * pow(2, (n - 69) / 12);
 
@@ -33,12 +30,7 @@ class JungleSequencer {
     return buildWav(out);
   }
 
-  // ---------------------------------------------------------------------------
-  // Melody voice — section A (bars 0–7) and A' (bars 24–31)
-  // Section B (bars 8–15) silent, Section C (bars 16–23) also has melody
-  // ---------------------------------------------------------------------------
   static List<_Note> _melodyVoice() {
-    // Section A: 8 bars = 32 beats
     const melA = [
       (62, 1.0), (69, 0.5), (67, 0.5), (66, 1.0), (64, 1.0),
       (62, 2.0), (0, 1.0), (64, 1.0),
@@ -58,10 +50,8 @@ class JungleSequencer {
       (62, 4.0),
     ];
 
-    // Section B (bars 8–15): melody rests, counter voice plays instead
     const silentB = [(0, 32.0)]; // 8 bars × 4 beats
 
-    // Section C (bars 16–23): variant melody
     const melC = [
       (74, 1.0), (73, 0.5), (71, 0.5), (69, 1.0), (67, 1.0),
       (66, 2.0), (0, 1.0), (64, 1.0),
@@ -94,9 +84,6 @@ class JungleSequencer {
     return notes;
   }
 
-  // ---------------------------------------------------------------------------
-  // Bass voice — root + fifth pattern, one per bar (32 bars)
-  // ---------------------------------------------------------------------------
   static List<_Note> _bassVoice() {
     const allBarRoots = [
       // Section A (bars 0–7)
@@ -119,9 +106,6 @@ class JungleSequencer {
     return notes;
   }
 
-  // ---------------------------------------------------------------------------
-  // Batida (chord strumming) — bossa nova rhythmic pattern
-  // ---------------------------------------------------------------------------
   static List<_Note> _batidaVoice() {
     const batidaPattern = [1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0];
     final sixteenth = _spb ~/ 4;
@@ -156,9 +140,6 @@ class JungleSequencer {
     return notes;
   }
 
-  // ---------------------------------------------------------------------------
-  // Counter melody — active in sections B (bars 8–15) and A' (bars 24–31)
-  // ---------------------------------------------------------------------------
   static List<_Note> _counterVoice() {
     const counterMel = [
       (0, 4.0),
@@ -199,9 +180,6 @@ class JungleSequencer {
     return notes;
   }
 
-  // ---------------------------------------------------------------------------
-  // Render helpers
-  // ---------------------------------------------------------------------------
   static void _renderVoice(Int16List out, List<_Note> notes) {
     for (final note in notes) {
       final end = (note.offset + note.durationSamples).clamp(0, out.length);
