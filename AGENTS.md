@@ -153,7 +153,7 @@ TabBar(
 
 ## Fases do roadmap
 
-Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 5 em progresso (v1.9.26) — Arte adicional e polimento visual**.
+Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 6 (v1.9.29) — Polimento, l10n, acessibilidade, lançamento**.
 
 | Fase      | Foco                                                                                                                                                                 |
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -179,7 +179,7 @@ Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 5
 | 4.4 ✅    | Tutorial wizard interativo: TutorialScreen (5 telas, 2 interativas), TutorialMiniBoard, tutorialCompleted no PlayerProfile                                           |
 | 4.5 ✅    | Polimento: Bomba 3 ≥5 peças, IAP real em dev/overlay/loja, haptic graduado, texto "Ok" pós-ad                                                                        |
 | 4.6 ✅    | Recompensas Diárias: trilha serpentina + CapivaraMascot; sync pós-login completo (inventário IAP, recordes, coleção, daily rewards)                                  |
-| 5 🔄      | Arte adicional e polimento visual — assets PNG→WebP (~96% redução), novo visual Recompensas Diárias (sapos), fundo exclusivo, Editar nome visível no Perfil          |
+| 5 ✅      | Arte adicional e polimento visual — sistema de SFX procedural (fases 5.1 e 5.2); demais itens visuais descartados |
 | 5.1 ✅    | Sistema de áudio procedural: SfxrSynth (efeitos 8-bit), JungleSequencer (Bossa Nova MPB ~85s), AudioServiceImpl (flutter_soloud), controles nas Configurações, hooks de jogo |
 | 5.2 ✅    | Reformulação trilha tema: SynthCore (Karplus-Strong/filteredNoise/ADSR, 32kHz), JungleSequencer bossa jazz+nylon KS+ambiência+bichos, AnimalVoices (vozes bicho + merge pluck), SFX desfazer 1/3, evento AnimalReached |
 | 6         | Polimento, l10n, acessibilidade, lançamento                                                                                                                          |
