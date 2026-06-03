@@ -42,7 +42,9 @@ List<ItemType> _availableItems(Inventory inv) {
 }
 
 class GameOverItemOverlay extends ConsumerStatefulWidget {
-  const GameOverItemOverlay({super.key});
+  const GameOverItemOverlay({super.key, this.onUndoUsed});
+
+  final void Function(bool isUndo3)? onUndoUsed;
 
   @override
   ConsumerState<GameOverItemOverlay> createState() =>
@@ -94,11 +96,17 @@ class _GameOverItemOverlayState extends ConsumerState<GameOverItemOverlay>
         notifier.enterBombMode(BombMode.bomb3, type);
       case ItemType.undo1:
         final undone = notifier.undo(1);
-        if (undone) ref.read(inventoryProvider.notifier).consume(type);
+        if (undone) {
+          ref.read(inventoryProvider.notifier).consume(type);
+          widget.onUndoUsed?.call(false);
+        }
         notifier.startContinueWithItem();
       case ItemType.undo3:
         final undone = notifier.undo(3);
-        if (undone) ref.read(inventoryProvider.notifier).consume(type);
+        if (undone) {
+          ref.read(inventoryProvider.notifier).consume(type);
+          widget.onUndoUsed?.call(true);
+        }
         notifier.startContinueWithItem();
     }
   }
