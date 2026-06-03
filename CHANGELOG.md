@@ -6,6 +6,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.30] — 2026-06-03
+
+### Added
+
+- **Animação de explosão nas bombas**: ao usar Bomba 2 ou Bomba 3, cada tile selecionado exibe um flash circular de explosão antes de ser removido — laranja para Bomb2, vermelho para Bomb3
+- **Efeito VHS ao desfazer**: ao usar Desfazer 1 ou Desfazer 3, um overlay de tela inteira simula uma fita VHS sendo rebobinada (scanlines, glitch, linha de rebobinagem). Undo3 tem duração e intensidade maiores
+- Ambas as animações respeitam a configuração "Animações" em Configurações → Desempenho
+
 ## [1.9.29] — 2026-06-03
 
 ### Removed
