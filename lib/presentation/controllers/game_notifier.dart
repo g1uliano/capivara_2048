@@ -329,12 +329,9 @@ class GameNotifier extends Notifier<GameState> {
       _bombSelection = _bombSelection.where((p) => p != pos).toList();
     } else if (_bombSelection.length < maxTiles) {
       _bombSelection = [..._bombSelection, pos];
-      if (_bombSelection.length == maxTiles) {
-        confirmBomb();
-        return;
-      }
     }
-    // Emit updated selection so overlay rebuilds on intermediate selections
+    // Emit updated selection so overlay rebuilds on every selection change,
+    // including the final selection (GameScreen will detect and confirm).
     state = state.copyWith(
       selectedBombTiles: List.unmodifiable(_bombSelection),
     );
