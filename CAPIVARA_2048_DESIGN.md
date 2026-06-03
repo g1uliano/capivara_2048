@@ -8,7 +8,7 @@
 >
 > **Renomeação do jogo:** o nome do jogo passa de **"Capivara 2048"** para **"Olha o Bichim!"**. As referências antigas em seções abaixo serão atualizadas progressivamente; durante a transição, considere "Olha o Bichim!" o nome canônico do produto. O *codename* interno do repositório (`capivara_2048`) permanece — apenas o nome de exibição muda.
 >
-> **Áudio:** segue em **Fase 6**, junto da arte adicional e antes do lançamento; o jogo é desenvolvido sem áudio até lá.
+> **Áudio:** sistema de SFX procedural implementado na Fase 5 — `flutter_soloud` + `SfxrSynth` + `AnimalVoices`. Sem música de fundo. Ver seção de áudio para detalhes.
 
 ---
 
@@ -49,7 +49,7 @@
 | Estado | `flutter_riverpod` | Gerenciamento de estado |
 | ID | `uuid` | IDs dos tiles para animação |
 | Animações | `flutter_animate` | Transições suaves |
-| Áudio | `audioplayers` ou `just_audio` | Sons e música (Fase 6) |
+| Áudio | `flutter_soloud` | SFX procedural (implementado) |
 | Persistência | `hive` + `shared_preferences` | Local |
 | Tipografia | `google_fonts` | Fredoka, Nunito |
 | Imagens | `Image.asset` (Flutter nativo) | PNGs dos animais e ícones |
@@ -152,9 +152,6 @@ assets/
 │       ├── bomb_3.png   ← Bomba 3 — tema **Mico-leão-dourado**
 │       ├── undo_1.png   ← Desfazer 1 — tema **Capivara**
 │       └── undo_3.png   ← Desfazer 3 — tema **Onça-pintada**
-├── sounds/animals/                   ← Fase 6
-├── sounds/ui/                        ← Fase 6
-├── music/                            ← Fase 6
 └── fonts/
 ```
 
@@ -971,7 +968,7 @@ Card de **Idioma** (Fase 2.12 — removido):
 - O dropdown de idioma foi removido. O app é exclusivamente PT-BR no lançamento. O card de idioma não é exibido. Quando a expansão de idiomas for implementada (Fase 7), o card é readicionado.
 
 Card de **Áudio** (desabilitado até Fase 6):
-- Sliders de volume SFX e música — visíveis mas `enabled: false` com label "Disponível em breve"
+- Slider de volume SFX com switch de ativação — implementado
 
 ### 12.13 Tela: Debug — Galeria de Animais
 Tela acessível apenas em build de debug (via `kDebugMode`). Mostra os 13 animais em 3 modos: tile, host 1x1 e host 2x2 — incluindo Peixe-boi e Jacaré após a Fase 2.12.
@@ -1127,7 +1124,6 @@ class ShareCode {
 | `daily_streak` | int + lastClaimDate |
 | `unlocked_animals` | `highestLevelEver` (int) — maior nível já atingido em qualquer partida, persistido permanentemente; determina quais animais aparecem desbloqueados na Coleção (v1.1.0) |
 | `settings.sound_volume` | double 0–1 |
-| `settings.music_volume` | double 0–1 |
 | `settings.haptic_enabled` | bool |
 | `settings.reduce_motion` | bool — "Reduzir Efeitos Visuais" (movido do PauseOverlay para Settings na Fase 2.12) |
 | `settings.locale` | String "pt_BR" — fixo no lançamento; UI de seleção removida na Fase 2.12; EN em expansão futura |
@@ -1669,19 +1665,36 @@ Demo subset (cenários com tag adicional `demo`):
 - Splash screen final
 - Validação visual completa
 
-### 🔜 Fase 6 — Áudio (1–2 semanas)
-**Sons dos 13 animais e UI + música ambiente.** Esta fase entra **depois** de toda a arte e polimento visual e **antes** do lançamento.
+## Sistema de Áudio
 
-- Sound design dos 13 animais (definir tom/duração/estilo) e produção dos clipes
-- Sons dos 13 animais (~50KB cada, M4A/AAC iOS, OGG Android, MP3 fallback) — ver tabela 11.1
-- Sons de UI completos — ver lista 11.2
-- Música ambiente: loop de floresta com flautas + marimba
-- Integrar com `audioplayers` ou `just_audio` (decidir qual)
-- Pool de AudioPlayers (evita latência no merge)
-- Mixer simples nas Configurações — habilitar controles desabilitados na Fase 2.6
-- Pré-carregar tudo no início do app
+**Status:** Implementado na Fase 5 (v1.9.28+). 100% procedural — zero arquivos de áudio no bundle.
 
-### 🔜 Fase 7 — Polimento + Lançamento
+### Stack
+
+- `flutter_soloud` — playback low-latency
+- `SynthCore` — primitivas DSP (Karplus-Strong, filteredNoise SVF, ADSR, LFO, 32kHz)
+- `SfxrSynth` — sintetizador de SFX (bomba 2x/3x, merge, vitória, game over, desfazer 1/3)
+- `AnimalVoices` — voz sintetizada por animal + pluck de merge
+
+### SFX implementados
+
+| Evento | Som |
+| --- | --- |
+| Merge de tiles | Pluck quente de violão (Karplus-Strong), pitch sobe com o nível |
+| Novo animal alcançado | Voz sintetizada do bicho (cigarra, sapo, tucano, sagui, boto, sucuri, capivara); chime harmônico para os demais |
+| Bomba 2x | Explosão curta |
+| Bomba 3x | Explosão grave e mais longa |
+| Vitória | Arpejo C4→G4→C5→E5 |
+| Game Over | Sequência descendente C4→A3→F3 |
+| Desfazer 1 | Pitch sweep reverso curto ("rebobinar") |
+| Desfazer 3 | Pitch sweep reverso grave e mais longo |
+
+### Configurações (SettingsScreen)
+
+- Switch "Efeitos sonoros" + slider de volume — persistidos em `settings.sfx_enabled` / `settings.sfx_volume`
+- Música de fundo: **não implementada** (removida do escopo)
+
+### 🔜 Fase 6 — Polimento + Lançamento
 - Idioma: **PT-BR exclusivamente** no lançamento — EN e outros idiomas em expansão futura
 - Acessibilidade (contraste, leitor de tela, fonte ajustável)
 - Modo escuro (opcional)

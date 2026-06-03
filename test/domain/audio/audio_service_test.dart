@@ -23,14 +23,9 @@ void main() {
       expect(() => stub.playEffect(const GameOver()), returnsNormally);
     });
 
-    test('music control methods do not throw', () {
-      expect(() => stub.startMusic(), returnsNormally);
-      expect(() => stub.pauseMusic(), returnsNormally);
-      expect(() => stub.stopMusic(), returnsNormally);
+    test('sfx volume and enabled do not throw', () {
       expect(() => stub.setSfxVolume(0.5), returnsNormally);
-      expect(() => stub.setMusicVolume(0.5), returnsNormally);
       expect(() => stub.setSfxEnabled(false), returnsNormally);
-      expect(() => stub.setMusicEnabled(false), returnsNormally);
     });
   });
 }

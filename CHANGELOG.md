@@ -6,6 +6,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.29] — 2026-06-03
+
+### Removed
+
+- **Música de fundo removida**: `JungleSequencer`, campos `musicEnabled`/`musicVolume` do `SettingsState`, controle "Música de fundo" na tela de Configurações, chamadas `startMusic`/`pauseMusic` no `GameScreen`
+- **`AnimalVoices.voiceSamples`**: método dead code após remoção do `JungleSequencer`
+
+### Changed
+
+- Fase 5 encerrada — sistema de áudio completo (SFX procedural) como estado final da fase
+
 ## [1.9.28] — 2026-06-02
 
 ### Changed
