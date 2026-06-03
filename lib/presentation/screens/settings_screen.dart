@@ -168,30 +168,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 children: [
                   SwitchListTile(
                     tileColor: Colors.transparent,
-                    title: Text('Música de fundo', style: GoogleFonts.nunito(fontSize: 16)),
-                    value: settings.musicEnabled,
-                    onChanged: notifier.setMusicEnabled,
-                    activeThumbColor: AppColors.primary,
-                  ),
-                  if (settings.musicEnabled)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.music_note, size: 18),
-                          Expanded(
-                            child: Slider(
-                              value: settings.musicVolume,
-                              onChanged: notifier.setMusicVolume,
-                              activeColor: AppColors.primary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16),
-                  SwitchListTile(
-                    tileColor: Colors.transparent,
                     title: Text('Efeitos sonoros', style: GoogleFonts.nunito(fontSize: 16)),
                     value: settings.sfxEnabled,
                     onChanged: notifier.setSfxEnabled,
