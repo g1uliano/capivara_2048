@@ -63,9 +63,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     super.initState();
     _fpsMonitorNotifier = ref.read(fpsMonitorProvider.notifier);
     WidgetsBinding.instance.addPostFrameCallback((_) => _startFpsMonitor());
-    Future.delayed(const Duration(milliseconds: 300), () {
-      if (mounted) ref.read(audioServiceProvider).startMusic();
-    });
   }
 
   void _startFpsMonitor() {
@@ -78,7 +75,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   @override
   void dispose() {
-    ref.read(audioServiceProvider).pauseMusic();
     _fpsMonitorNotifier.stop();
     super.dispose();
   }
