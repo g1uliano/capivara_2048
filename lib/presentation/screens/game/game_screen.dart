@@ -27,6 +27,9 @@ import '../../widgets/game_over_no_items_overlay.dart';
 import '../../controllers/fps_monitor_notifier.dart';
 import '../../controllers/performance_settings_notifier.dart';
 import '../../widgets/performance_suggestion_dialog.dart';
+import '../../widgets/bomb_explosion_overlay.dart';
+import '../../widgets/vhs_rewind_overlay.dart';
+import '../../../domain/game_engine/bomb_mode.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({super.key});
@@ -39,6 +42,15 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   ItemType? _shopItem;
   final Set<ItemType> _pulsingItems = {};
   late final FpsMonitorNotifier _fpsMonitorNotifier;
+
+  // Bomb explosion animation state
+  bool _showBombExplosion = false;
+  List<(int, int)> _bombExplosionPositions = [];
+  bool _isBomb3Explosion = false;
+
+  // VHS rewind animation state
+  bool _showVhsRewind = false;
+  bool _isUndo3Rewind = false;
 
   void _openShop(ItemType type) {
     if (ref.read(gameProvider).pendingMilestone != null) return;
@@ -79,6 +91,25 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     super.dispose();
   }
 
+  void _handleUndoUsed(bool isUndo3) {
+    final animEnabled = ref.read(
+      performanceSettingsProvider.select((s) => s.animationsEnabled),
+    );
+    if (!animEnabled) return;
+    setState(() {
+      _showVhsRewind = true;
+      _isUndo3Rewind = isUndo3;
+    });
+  }
+
+  void _onBombExplosionComplete() {
+    ref.read(gameProvider.notifier).confirmBomb();
+    setState(() {
+      _showBombExplosion = false;
+      _bombExplosionPositions = [];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(gameProvider);
@@ -108,6 +139,28 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     ref.listen<GameState>(gameProvider, (previous, current) {
       if (previous != null && !previous.isGameOver && current.isGameOver) {
         ref.read(audioServiceProvider).playEffect(const GameOver());
+      }
+      // Detect when all bomb tiles are selected → show explosion animation
+      if (current.bombMode != null &&
+          previous?.bombMode != null &&
+          !_showBombExplosion) {
+        final maxTiles = current.bombMode == BombMode.bomb2 ? 2 : 3;
+        if (current.selectedBombTiles.length == maxTiles &&
+            (previous?.selectedBombTiles.length ?? 0) < maxTiles) {
+          final animEnabled = ref.read(
+            performanceSettingsProvider.select((s) => s.animationsEnabled),
+          );
+          if (animEnabled) {
+            setState(() {
+              _showBombExplosion = true;
+              _bombExplosionPositions =
+                  List<(int, int)>.from(current.selectedBombTiles);
+              _isBomb3Explosion = current.bombMode == BombMode.bomb3;
+            });
+          } else {
+            ref.read(gameProvider.notifier).confirmBomb();
+          }
+        }
       }
       if (previous?.pendingMilestone == null &&
           current.pendingMilestone != null) {
@@ -264,6 +317,14 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                                         const Positioned.fill(
                                           child: BombGridOverlay(),
                                         ),
+                                      if (_showBombExplosion)
+                                        Positioned.fill(
+                                          child: BombExplosionOverlay(
+                                            positions: _bombExplosionPositions,
+                                            isBomb3: _isBomb3Explosion,
+                                            onComplete: _onBombExplosionComplete,
+                                          ),
+                                        ),
                                     ],
                                   );
                                 },
@@ -280,6 +341,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                             iconSize: invIconSz,
                             onTapWhenEmpty: _openShop,
                             pulsingItems: _pulsingItems,
+                            onUndoUsed: _handleUndoUsed,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -291,7 +353,11 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                   if (state.bombMode != null)
                     const Positioned.fill(child: BombDimOverlay()),
                   if (state.isAwaitingGameOverResolution && hasAnyItem)
-                    const Positioned.fill(child: GameOverItemOverlay()),
+                    Positioned.fill(
+                      child: GameOverItemOverlay(
+                        onUndoUsed: _handleUndoUsed,
+                      ),
+                    ),
                   if (state.isAwaitingGameOverResolution && !hasAnyItem)
                     const Positioned.fill(child: GameOverNoItemsOverlay()),
                   if (isGameOver &&
@@ -316,6 +382,14 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                         itemType: _shopItem!,
                         onClose: _closeShop,
                         onItemPurchased: _onItemPurchased,
+                      ),
+                    ),
+                  if (_showVhsRewind)
+                    Positioned.fill(
+                      child: VhsRewindOverlay(
+                        isUndo3: _isUndo3Rewind,
+                        onComplete: () =>
+                            setState(() => _showVhsRewind = false),
                       ),
                     ),
                 ],
