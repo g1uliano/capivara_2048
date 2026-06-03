@@ -46,14 +46,8 @@ abstract class AudioService {
 
   void playEffect(GameSoundEvent event);
 
-  void startMusic();
-  void pauseMusic();
-  void stopMusic();
-
   void setSfxVolume(double v);
-  void setMusicVolume(double v);
   void setSfxEnabled(bool v);
-  void setMusicEnabled(bool v);
 }
 
 final audioServiceProvider = Provider<AudioService>((ref) {
