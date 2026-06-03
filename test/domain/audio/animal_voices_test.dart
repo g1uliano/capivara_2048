@@ -36,10 +36,4 @@ void main() {
     });
   });
 
-  group('voiceSamples', () {
-    test('retorna buffer sem header WAV', () {
-      final samples = AnimalVoices.voiceSamples(3);
-      expect(samples.length, greaterThan(0));
-    });
-  });
 }

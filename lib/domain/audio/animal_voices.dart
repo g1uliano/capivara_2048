@@ -23,21 +23,19 @@ class AnimalVoices {
   }
 
   /// Animal voice WAV — played only when the player reaches that animal anew.
-  static Uint8List voice(int level) =>
-      buildWav(voiceSamples(level), sampleRate: _sr);
-
-  /// Same as [voice] but raw samples (no WAV header), for embedding in the
-  /// music loop ambience.
-  static Int16List voiceSamples(int level) => switch (level) {
-        1 => _cigarra(),
-        3 => _sapo(),
-        4 => _tucano(),
-        5 => _sagui(),
-        8 => _boto(),
-        10 => _sucuri(),
-        11 => _capivara(),
-        _ => _chime(level), // 2, 6, 7, 9 (difíceis)
-      };
+  static Uint8List voice(int level) => buildWav(
+        switch (level) {
+          1 => _cigarra(),
+          3 => _sapo(),
+          4 => _tucano(),
+          5 => _sagui(),
+          8 => _boto(),
+          10 => _sucuri(),
+          11 => _capivara(),
+          _ => _chime(level), // 2, 6, 7, 9 (difíceis)
+        },
+        sampleRate: _sr,
+      );
 
   static Int16List _cigarra() {
     final n = (0.5 * _sr).round();
