@@ -4,7 +4,6 @@ import 'package:flutter_soloud/flutter_soloud.dart';
 
 import 'animal_voices.dart';
 import 'audio_service.dart';
-import 'jungle_sequencer.dart';
 import 'sfxr_synth.dart';
 import 'sound_presets.dart';
 
@@ -17,25 +16,14 @@ class AudioServiceImpl implements AudioService {
   AudioSource? _undo3;
   AudioSource? _victory;
   AudioSource? _gameOver;
-  AudioSource? _music;
-
-  SoundHandle? _musicHandle;
 
   double _sfxVolume = 1.0;
-  double _musicVolume = 0.7;
   bool _sfxEnabled = true;
-  bool _musicEnabled = true;
 
   @override
   Future<void> init() async {
     await SoLoud.instance.init();
     await _loadSfx();
-    await _loadMusic();
-  }
-
-  Future<void> _loadMusic() async {
-    final bytes = await JungleSequencer.generate();
-    _music = await SoLoud.instance.loadMem('jungle_music', bytes);
   }
 
   Future<void> _loadSfx() async {
@@ -79,60 +67,15 @@ class AudioServiceImpl implements AudioService {
   }
 
   @override
-  void startMusic() {
-    if (!_musicEnabled || _music == null) return;
-    if (_musicHandle != null) {
-      SoLoud.instance.setPause(_musicHandle!, false);
-      return;
-    }
-    unawaited(
-      SoLoud.instance
-          .play(_music!, looping: true, volume: _musicVolume)
-          .then((handle) => _musicHandle = handle),
-    );
-  }
-
-  @override
-  void pauseMusic() {
-    if (_musicHandle != null) {
-      SoLoud.instance.setPause(_musicHandle!, true);
-    }
-  }
-
-  @override
-  void stopMusic() {
-    if (_musicHandle != null) {
-      unawaited(SoLoud.instance.stop(_musicHandle!));
-      _musicHandle = null;
-    }
-  }
-
-  @override
   void setSfxVolume(double v) {
     _sfxVolume = v.clamp(0.0, 1.0);
-  }
-
-  @override
-  void setMusicVolume(double v) {
-    _musicVolume = v.clamp(0.0, 1.0);
-    if (_musicHandle != null) {
-      SoLoud.instance.setVolume(_musicHandle!, _musicVolume);
-    }
   }
 
   @override
   void setSfxEnabled(bool v) => _sfxEnabled = v;
 
   @override
-  void setMusicEnabled(bool v) {
-    _musicEnabled = v;
-    if (!v) pauseMusic();
-    if (v) startMusic();
-  }
-
-  @override
   void dispose() {
-    stopMusic();
     SoLoud.instance.deinit();
   }
 }
