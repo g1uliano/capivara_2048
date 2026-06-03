@@ -16,11 +16,13 @@ class InventoryBar extends ConsumerWidget {
     this.onTapWhenEmpty,
     this.pulsingItems = const {},
     this.iconSize = GameConstants.inventoryIconSize,
+    this.onUndoUsed,
   });
 
   final void Function(ItemType)? onTapWhenEmpty;
   final Set<ItemType> pulsingItems;
   final double iconSize;
+  final void Function(bool isUndo3)? onUndoUsed;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -69,7 +71,10 @@ class InventoryBar extends ConsumerWidget {
       );
       if (!ok) return;
       final undone = ref.read(gameProvider.notifier).undo(1);
-      if (undone) ref.read(inventoryProvider.notifier).consume(ItemType.undo1);
+      if (undone) {
+        ref.read(inventoryProvider.notifier).consume(ItemType.undo1);
+        onUndoUsed?.call(false);
+      }
     }
 
     Future<void> useUndo3() async {
@@ -81,7 +86,10 @@ class InventoryBar extends ConsumerWidget {
       );
       if (!ok) return;
       final undone = ref.read(gameProvider.notifier).undo(3);
-      if (undone) ref.read(inventoryProvider.notifier).consume(ItemType.undo3);
+      if (undone) {
+        ref.read(inventoryProvider.notifier).consume(ItemType.undo3);
+        onUndoUsed?.call(true);
+      }
     }
 
     return Padding(
