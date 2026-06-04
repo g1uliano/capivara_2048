@@ -72,10 +72,10 @@ class _VhsPainter extends CustomPainter {
       Paint()..color = const Color(0x88000000),
     );
 
-    // 2. Horizontal scanlines
+    // 2. Vertical scanlines
     final scanPaint = Paint()..color = const Color(0x26000000);
-    for (double y = 0; y < size.height; y += 6) {
-      canvas.drawRect(Rect.fromLTWH(0, y, size.width, 2), scanPaint);
+    for (double x = 0; x < size.width; x += 6) {
+      canvas.drawRect(Rect.fromLTWH(x, 0, 2, size.height), scanPaint);
     }
 
     // 3. White flash at the beginning (first 25% of animation)
@@ -111,6 +111,35 @@ class _VhsPainter extends CustomPainter {
       final opacity = rng.nextDouble() * 0.25 + 0.08;
       glitchPaint.color = Color.fromRGBO(255, 255, 255, opacity);
       canvas.drawRect(Rect.fromLTWH(xOff, y, size.width, h), glitchPaint);
+    }
+
+    // 6. Rewind symbol ◄◄ — blinks 2× during animation
+    final symbolVisible = (progress * 4).floor() % 2 == 0;
+    if (symbolVisible) {
+      const triW = 22.0;
+      const triH = 40.0;
+      const gap = 6.0;
+      const totalW = triW * 2 + gap;
+      final cx = size.width / 2;
+      final cy = size.height / 2;
+      final left = cx - totalW / 2;
+      final top = cy - triH / 2;
+
+      final glowPaint = Paint()
+        ..color = const Color(0xCCFFD700)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+      final solidPaint = Paint()..color = const Color(0xFFFFD700);
+
+      for (int i = 0; i < 2; i++) {
+        final tx = left + i * (triW + gap);
+        final path = Path()
+          ..moveTo(tx + triW, top)
+          ..lineTo(tx, top + triH / 2)
+          ..lineTo(tx + triW, top + triH)
+          ..close();
+        canvas.drawPath(path, glowPaint);
+        canvas.drawPath(path, solidPaint);
+      }
     }
   }
 
