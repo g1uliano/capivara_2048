@@ -95,7 +95,7 @@ final win8192FirstTimeScenario = E2EScenario(
 
 final continueAfterWinScenario = E2EScenario(
   id: 'flow.continue_after_win',
-  title: 'vitória 2048 → tap "Encerrar" → GameOverModal "Capivara Lendária! 🎉"',
+  title: 'vitória 2048 → tap "Encerrar" → GameOverModal "Fim de jogo!"',
   tags: {ScenarioTag.critical},
   run: (tester, harness) async {
     await _bootToGame(tester, harness);
@@ -112,8 +112,8 @@ final continueAfterWinScenario = E2EScenario(
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
-    // hasWon && !isGameOver → GameOverModal(message: 'Capivara Lendária! 🎉')
-    expect(find.text('Capivara Lendária! 🎉'), findsOneWidget,
+    // hasWon && !isGameOver → GameOverModal(message: 'Fim de jogo!') (46edaab)
+    expect(find.text('Fim de jogo!'), findsOneWidget,
         reason: 'endGame() deve setar hasWon:true → GameOverModal deve aparecer');
     expect(find.text('Jogar de novo'), findsOneWidget);
   },
