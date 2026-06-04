@@ -6,6 +6,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.33] — 2026-06-04
+
+### Changed
+
+- **Confete milestone**: substituído emitter único no topo por 5 emitters espalhados na tela (topo-centro, topo-esquerda, topo-direita, lateral-esquerda, lateral-direita) que disparam de forma intercalada a cada 1,2 s em explosão radial contínua até o jogador escolher Continuar ou Encerrar
+
 ## [1.9.32] — 2026-06-04
 
 ### Changed

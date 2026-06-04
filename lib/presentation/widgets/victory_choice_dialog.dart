@@ -1,5 +1,4 @@
-import 'dart:math' show pi;
-
+import 'dart:async';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,7 +24,22 @@ class VictoryChoiceDialog extends ConsumerStatefulWidget {
 }
 
 class _VictoryChoiceDialogState extends ConsumerState<VictoryChoiceDialog> {
-  late ConfettiController _confettiController;
+  static const _kEmitterCount = 5;
+  static const _kBurstDuration = Duration(milliseconds: 1500);
+  static const _kCycleInterval = Duration(milliseconds: 1200);
+
+  // Posições espalhadas pela tela (Alignment x,y em [-1,1])
+  static const _kPositions = [
+    Alignment(0.0, -1.0),   // topo-centro
+    Alignment(-0.75, -1.0), // topo-esquerda
+    Alignment(0.75, -1.0),  // topo-direita
+    Alignment(-1.0, 0.1),   // lado-esquerdo
+    Alignment(1.0, 0.1),    // lado-direito
+  ];
+
+  late final List<ConfettiController> _confettiControllers;
+  Timer? _confettiTimer;
+  int _nextEmitter = 0;
 
   String get _title => switch (widget.milestone) {
     12 => 'Peixe-boi! Incrível! 🌊',
@@ -49,17 +63,33 @@ class _VictoryChoiceDialogState extends ConsumerState<VictoryChoiceDialog> {
   @override
   void initState() {
     super.initState();
-    _confettiController =
-        ConfettiController(duration: const Duration(seconds: 4));
-    _confettiController.play();
+    _confettiControllers = List.generate(
+      _kEmitterCount,
+      (_) => ConfettiController(duration: _kBurstDuration),
+    );
+    _startConfettiCycle();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(audioServiceProvider).playEffect(const VictoryReached());
     });
   }
 
+  void _startConfettiCycle() {
+    _confettiControllers[0].play();
+    _nextEmitter = 1;
+    _confettiTimer = Timer.periodic(_kCycleInterval, (_) {
+      if (mounted) {
+        _confettiControllers[_nextEmitter].play();
+        _nextEmitter = (_nextEmitter + 1) % _kEmitterCount;
+      }
+    });
+  }
+
   @override
   void dispose() {
-    _confettiController.dispose();
+    _confettiTimer?.cancel();
+    for (final c in _confettiControllers) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -328,19 +358,22 @@ class _VictoryChoiceDialogState extends ConsumerState<VictoryChoiceDialog> {
               ),
             ),
           ),
-          Align(
-            alignment: Alignment.topCenter,
-            child: ConfettiWidget(
-              confettiController: _confettiController,
-              blastDirection: pi / 2,
-              maxBlastForce: 20,
-              minBlastForce: 8,
-              emissionFrequency: 0.05,
-              numberOfParticles: 20,
-              gravity: 0.05,
-              colors: _confettiColors(),
+          for (var i = 0; i < _kEmitterCount; i++)
+            Align(
+              alignment: _kPositions[i],
+              child: IgnorePointer(
+                child: ConfettiWidget(
+                  confettiController: _confettiControllers[i],
+                  blastDirectionality: BlastDirectionality.explosive,
+                  maxBlastForce: 22,
+                  minBlastForce: 8,
+                  emissionFrequency: 0.06,
+                  numberOfParticles: 18,
+                  gravity: 0.08,
+                  colors: _confettiColors(),
+                ),
+              ),
             ),
-          ),
         ],
       ),
     );
