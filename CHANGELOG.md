@@ -6,6 +6,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.32] — 2026-06-04
+
+### Changed
+
+- **SFX desfazer VHS**: substituído o efeito de pitch-sweep simples por síntese procedural de fita VHS rebobinando — zunido do motor com contorno de aceleração/platô/desaceleração, warble de 23 Hz do carretel, camada de atrito da fita (ruído passa-banda) e clunk mecânico de parada. Undo3 usa pico mais alto (1950 Hz vs 1500 Hz) e duração maior
+
 ## [1.9.31] — 2026-06-04
 
 ### Fixed
