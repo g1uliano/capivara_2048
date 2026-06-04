@@ -6,6 +6,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.31] — 2026-06-04
+
+### Fixed
+
+- **Efeito VHS desfazer**: scanlines agora são verticais (era horizontal); adicionado símbolo ◄◄ âmbar centralizado piscando 2× durante a animação, estilo display de videocassete
+
 ## [1.9.30] — 2026-06-03
 
 ### Added
