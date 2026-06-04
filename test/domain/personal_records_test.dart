@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:capivara_2048/data/models/personal_records.dart';
 import 'package:capivara_2048/data/models/personal_records_hive_adapter.dart';
+import 'package:capivara_2048/domain/sync/sync_engine.dart';
 import 'package:capivara_2048/presentation/controllers/personal_records_notifier.dart';
 import 'package:hive/hive.dart';
 // ignore: implementation_imports — Hive has no public API for creating concrete BinaryReader/Writer
@@ -84,7 +85,7 @@ void main() {
       Hive.init(
         '/tmp/capivara_pr_notifier_test_${DateTime.now().millisecondsSinceEpoch}',
       );
-      container = ProviderContainer();
+      container = ProviderContainer(overrides: [syncEngineProvider.overrideWith((_) => FakeSyncEngine())]);
       await container.read(personalRecordsProvider.notifier).load();
     });
 

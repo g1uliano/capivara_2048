@@ -3,6 +3,7 @@ import 'package:capivara_2048/data/models/inventory_hive_adapter.dart';
 import 'package:capivara_2048/data/models/item_type.dart';
 import 'package:capivara_2048/data/repositories/inventory_repository.dart';
 import 'package:capivara_2048/domain/inventory/inventory_notifier.dart';
+import 'package:capivara_2048/domain/sync/sync_engine.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
@@ -62,7 +63,7 @@ void main() {
     test('consume decreases count and saves', () async {
       final repo = InventoryRepository();
       final container = ProviderContainer(
-        overrides: [inventoryRepositoryProvider.overrideWithValue(repo)],
+        overrides: [inventoryRepositoryProvider.overrideWithValue(repo), syncEngineProvider.overrideWith((_) => FakeSyncEngine())],
       );
       addTearDown(container.dispose);
       final notifier = container.read(inventoryProvider.notifier);
@@ -74,7 +75,7 @@ void main() {
     test('consume at 0 does not go negative', () async {
       final repo = InventoryRepository();
       final container = ProviderContainer(
-        overrides: [inventoryRepositoryProvider.overrideWithValue(repo)],
+        overrides: [inventoryRepositoryProvider.overrideWithValue(repo), syncEngineProvider.overrideWith((_) => FakeSyncEngine())],
       );
       addTearDown(container.dispose);
       final notifier = container.read(inventoryProvider.notifier);
@@ -85,7 +86,7 @@ void main() {
     test('add increases count and saves', () async {
       final repo = InventoryRepository();
       final container = ProviderContainer(
-        overrides: [inventoryRepositoryProvider.overrideWithValue(repo)],
+        overrides: [inventoryRepositoryProvider.overrideWithValue(repo), syncEngineProvider.overrideWith((_) => FakeSyncEngine())],
       );
       addTearDown(container.dispose);
       final notifier = container.read(inventoryProvider.notifier);
@@ -97,7 +98,7 @@ void main() {
       final repo = InventoryRepository();
       await repo.save(const Inventory(bomb2: 3, bomb3: 1, undo1: 0, undo3: 2));
       final container = ProviderContainer(
-        overrides: [inventoryRepositoryProvider.overrideWithValue(repo)],
+        overrides: [inventoryRepositoryProvider.overrideWithValue(repo), syncEngineProvider.overrideWith((_) => FakeSyncEngine())],
       );
       addTearDown(container.dispose);
       final notifier = container.read(inventoryProvider.notifier);

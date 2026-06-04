@@ -6,6 +6,8 @@ import 'package:capivara_2048/domain/auth/auth_service.dart';
 import 'package:capivara_2048/domain/sync/sync_engine.dart';
 import 'package:capivara_2048/presentation/controllers/auth_controller.dart';
 import 'package:capivara_2048/data/models/player_profile.dart';
+import 'package:capivara_2048/presentation/controllers/settings_notifier.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   late FakeAuthService fakeAuth;
@@ -16,7 +18,9 @@ void main() {
     Hive.init('/tmp/capivara_auth_test');
   });
 
-  setUp(() {
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
     fakeAuth = FakeAuthService();
     fakeSyncEngine = FakeSyncEngine();
     container = ProviderContainer(
@@ -24,6 +28,7 @@ void main() {
         authServiceProvider.overrideWithValue(fakeAuth),
         syncEngineProvider.overrideWithValue(fakeSyncEngine),
         iapStartupServiceProvider.overrideWithValue(FakeIAPStartupService()),
+        sharedPreferencesProvider.overrideWithValue(prefs),
       ],
     );
   });
@@ -57,14 +62,15 @@ void main() {
         final authComSessao = FakeAuthService(initialProfile: profileSemAvatar);
         final syncComAvatar = FakeSyncEngine()
           ..remoteAvatarUrl = 'tile:Capivara';
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
 
         final c = ProviderContainer(
           overrides: [
             authServiceProvider.overrideWithValue(authComSessao),
             syncEngineProvider.overrideWithValue(syncComAvatar),
-            iapStartupServiceProvider.overrideWithValue(
-              FakeIAPStartupService(),
-            ),
+            iapStartupServiceProvider.overrideWithValue(FakeIAPStartupService()),
+            sharedPreferencesProvider.overrideWithValue(prefs),
           ],
         );
         addTearDown(() {
@@ -75,8 +81,8 @@ void main() {
         // Estado inicial (síncrono) vem do cache do Firebase Auth
         expect(c.read(authControllerProvider)?.avatarUrl, isNull);
 
-        // Aguarda microtask do _restoreSessionOnColdStart
-        await Future<void>.delayed(Duration.zero);
+        // Aguarda _restoreSessionOnColdStart completar (inclui I/O do Hive)
+        await Future<void>.delayed(const Duration(milliseconds: 50));
 
         final profile = c.read(authControllerProvider);
         expect(profile?.avatarUrl, 'tile:Capivara');
@@ -100,14 +106,15 @@ void main() {
         final syncComNome = FakeSyncEngine()
           ..remoteDisplayName = 'Giuliano'
           ..remoteAvatarUrl = 'tile:Onca';
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
 
         final c = ProviderContainer(
           overrides: [
             authServiceProvider.overrideWithValue(authComSessao),
             syncEngineProvider.overrideWithValue(syncComNome),
-            iapStartupServiceProvider.overrideWithValue(
-              FakeIAPStartupService(),
-            ),
+            iapStartupServiceProvider.overrideWithValue(FakeIAPStartupService()),
+            sharedPreferencesProvider.overrideWithValue(prefs),
           ],
         );
         addTearDown(() {
@@ -117,7 +124,7 @@ void main() {
 
         expect(c.read(authControllerProvider)?.displayName, '');
 
-        await Future<void>.delayed(Duration.zero);
+        await Future<void>.delayed(const Duration(milliseconds: 50));
 
         final profile = c.read(authControllerProvider);
         expect(profile?.displayName, 'Giuliano');
@@ -138,12 +145,15 @@ void main() {
       final authComSessao = FakeAuthService(initialProfile: profileCorreto);
       final syncComOutroNome = FakeSyncEngine()
         ..remoteDisplayName = 'Outro Nome';
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
 
       final c = ProviderContainer(
         overrides: [
           authServiceProvider.overrideWithValue(authComSessao),
           syncEngineProvider.overrideWithValue(syncComOutroNome),
           iapStartupServiceProvider.overrideWithValue(FakeIAPStartupService()),
+          sharedPreferencesProvider.overrideWithValue(prefs),
         ],
       );
       addTearDown(() {
@@ -151,7 +161,7 @@ void main() {
         c.dispose();
       });
 
-      await Future<void>.delayed(Duration.zero);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
 
       // Nome local não-vazio não deve ser sobrescrito
       expect(c.read(authControllerProvider)?.displayName, 'Giuliano');

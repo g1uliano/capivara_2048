@@ -59,7 +59,8 @@ void main() {
     notifier.enterBombMode(BombMode.bomb3, ItemType.bomb3);
     notifier.selectBombTile(0, 0);
     notifier.selectBombTile(0, 1);
-    notifier.selectBombTile(0, 2); // 3rd tile auto-confirms
+    notifier.selectBombTile(0, 2);
+    notifier.confirmBomb(); // GameScreen confirma pós-animação (auto-confirm removido em 475f9d9)
     final s = notifier.state;
     expect(s.isContinuingWithItem, false);
     expect(s.bombMode, null);
