@@ -9,6 +9,7 @@ import 'package:capivara_2048/domain/daily_rewards/daily_rewards_engine.dart';
 import 'package:capivara_2048/domain/daily_rewards/daily_rewards_notifier.dart';
 import 'package:capivara_2048/domain/inventory/inventory_notifier.dart';
 import 'package:capivara_2048/domain/lives/lives_notifier.dart';
+import 'package:capivara_2048/domain/sync/sync_engine.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
@@ -31,6 +32,7 @@ void main() {
       livesRepositoryProvider.overrideWithValue(LivesRepository()),
       inventoryRepositoryProvider.overrideWithValue(InventoryRepository()),
       dailyRewardsRepositoryProvider.overrideWithValue(DailyRewardsRepository()),
+      syncEngineProvider.overrideWith((_) => FakeSyncEngine()),
     ]);
     await container.read(livesProvider.notifier).addEarned(0);
     await container.read(inventoryProvider.notifier).load();

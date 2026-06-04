@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:capivara_2048/presentation/controllers/personal_records_notifier.dart';
 import 'package:capivara_2048/data/models/personal_records.dart';
 import 'package:capivara_2048/data/models/personal_records_hive_adapter.dart';
+import 'package:capivara_2048/domain/sync/sync_engine.dart';
 
 void main() {
   late Directory tempDir;
@@ -26,7 +27,7 @@ void main() {
 
   group('PersonalRecordsNotifier', () {
     test('inicia com todos os contadores zerados', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(overrides: [syncEngineProvider.overrideWith((_) => FakeSyncEngine())]);
       addTearDown(container.dispose);
       await container.read(personalRecordsProvider.notifier).load();
       final state = container.read(personalRecordsProvider);
@@ -36,7 +37,7 @@ void main() {
     });
 
     test('recordMilestone(11) incrementa timesReached2048', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(overrides: [syncEngineProvider.overrideWith((_) => FakeSyncEngine())]);
       addTearDown(container.dispose);
       await container.read(personalRecordsProvider.notifier).load();
       await container.read(personalRecordsProvider.notifier)
@@ -45,7 +46,7 @@ void main() {
     });
 
     test('recordMilestone(12) incrementa timesReached4096', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(overrides: [syncEngineProvider.overrideWith((_) => FakeSyncEngine())]);
       addTearDown(container.dispose);
       await container.read(personalRecordsProvider.notifier).load();
       await container.read(personalRecordsProvider.notifier)
@@ -54,7 +55,7 @@ void main() {
     });
 
     test('recordMilestone(13) incrementa timesReached8192', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(overrides: [syncEngineProvider.overrideWith((_) => FakeSyncEngine())]);
       addTearDown(container.dispose);
       await container.read(personalRecordsProvider.notifier).load();
       await container.read(personalRecordsProvider.notifier)
@@ -63,7 +64,7 @@ void main() {
     });
 
     test('firstReached4096At só é setado na primeira chamada', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(overrides: [syncEngineProvider.overrideWith((_) => FakeSyncEngine())]);
       addTearDown(container.dispose);
       await container.read(personalRecordsProvider.notifier).load();
       final notifier = container.read(personalRecordsProvider.notifier);
@@ -75,14 +76,14 @@ void main() {
     });
 
     test('isFirstTime(12) retorna true antes de recordMilestone', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(overrides: [syncEngineProvider.overrideWith((_) => FakeSyncEngine())]);
       addTearDown(container.dispose);
       await container.read(personalRecordsProvider.notifier).load();
       expect(container.read(personalRecordsProvider.notifier).isFirstTime(12), true);
     });
 
     test('isFirstTime(12) retorna false após recordMilestone', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(overrides: [syncEngineProvider.overrideWith((_) => FakeSyncEngine())]);
       addTearDown(container.dispose);
       await container.read(personalRecordsProvider.notifier).load();
       final notifier = container.read(personalRecordsProvider.notifier);
@@ -91,7 +92,7 @@ void main() {
     });
 
     test('markRewardCollected(12) seta flag rewardCollected4096', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(overrides: [syncEngineProvider.overrideWith((_) => FakeSyncEngine())]);
       addTearDown(container.dispose);
       await container.read(personalRecordsProvider.notifier).load();
       await container.read(personalRecordsProvider.notifier).markRewardCollected(12);
@@ -99,7 +100,7 @@ void main() {
     });
 
     test('markRewardCollected(13) seta flag rewardCollected8192', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(overrides: [syncEngineProvider.overrideWith((_) => FakeSyncEngine())]);
       addTearDown(container.dispose);
       await container.read(personalRecordsProvider.notifier).load();
       await container.read(personalRecordsProvider.notifier).markRewardCollected(13);
@@ -110,14 +111,14 @@ void main() {
         'highestLevelEver persiste através de uma reinicialização (regressão: coleção resetava ao fechar app)',
         () async {
       // Boot 1: usuário joga e atinge nível 8.
-      final c1 = ProviderContainer();
+      final c1 = ProviderContainer(overrides: [syncEngineProvider.overrideWith((_) => FakeSyncEngine())]);
       await c1.read(personalRecordsProvider.notifier).load();
       await c1.read(personalRecordsProvider.notifier).updateHighestLevel(8);
       expect(c1.read(personalRecordsProvider).highestLevelEver, 8);
       c1.dispose();
 
       // Boot 2: app fecha e abre de novo. Novo notifier deve carregar 8 do Hive.
-      final c2 = ProviderContainer();
+      final c2 = ProviderContainer(overrides: [syncEngineProvider.overrideWith((_) => FakeSyncEngine())]);
       addTearDown(c2.dispose);
       // Sem chamar load(), o estado fica em 0 — era o bug em main.dart.
       expect(c2.read(personalRecordsProvider).highestLevelEver, 0,
