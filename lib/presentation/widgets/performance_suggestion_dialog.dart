@@ -26,7 +26,7 @@ class _PerformanceSuggestionDialog extends StatelessWidget {
         side: const BorderSide(color: Color(0xFFFF9800), width: 3),
       ),
       title: Text(
-        'Modo de Performance 🐢',
+        'Modo de Desempenho 🐢',
         style: GoogleFonts.fredoka(
           fontWeight: FontWeight.bold,
           fontSize: 22,
@@ -34,7 +34,7 @@ class _PerformanceSuggestionDialog extends StatelessWidget {
         ),
       ),
       content: Text(
-        'Detectamos que seu dispositivo pode estar com dificuldades para rodar o jogo suavemente. Quer ativar o Modo de Performance?',
+        'Detectamos que seu dispositivo pode estar com dificuldades para rodar o jogo suavemente. Quer ativar o Modo de Desempenho?',
         style: GoogleFonts.nunito(fontSize: 16),
         textAlign: TextAlign.center,
       ),

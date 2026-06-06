@@ -63,7 +63,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ],
               ),
             ),
-            _SettingsSection('Performance'),
+            _SettingsSection('Desempenho'),
             Card(
               margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               color: Colors.white.withValues(alpha: 0.88),
@@ -74,7 +74,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 children: [
                   SwitchListTile(
                     tileColor: Colors.transparent,
-                    title: Text('Modo de Performance', style: GoogleFonts.nunito(fontSize: 16)),
+                    title: Text('Modo de Desempenho', style: GoogleFonts.nunito(fontSize: 16)),
                     value: perf.enabled,
                     onChanged: (v) => v
                         ? ref.read(performanceSettingsProvider.notifier).enable()
@@ -103,7 +103,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           Padding(
                             padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
                             child: Text(
-                              'Qualidade dos tiles',
+                              'Qualidade das peças',
                               style: GoogleFonts.nunito(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -121,7 +121,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 ),
                                 ButtonSegment(
                                   value: TileQuality.fullOpacity,
-                                  label: Text('Sem opacidade'),
+                                  label: Text('Normal'),
                                 ),
                                 ButtonSegment(
                                   value: TileQuality.simple,
@@ -139,7 +139,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           ),
                           SwitchListTile(
                             tileColor: Colors.transparent,
-                            title: Text('Efeitos de blur', style: GoogleFonts.nunito(fontSize: 16)),
+                            title: Text('Efeitos de desfoque', style: GoogleFonts.nunito(fontSize: 16)),
                             value: perf.blurEffectsEnabled,
                             onChanged: (v) => ref.read(performanceSettingsProvider.notifier).setBlurEffects(v),
                             activeThumbColor: AppColors.primary,

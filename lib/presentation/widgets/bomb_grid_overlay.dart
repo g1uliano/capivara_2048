@@ -31,7 +31,7 @@ class BombGridOverlay extends ConsumerWidget {
                       if (tile == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Selecione um tile com valor'),
+                            content: Text('Selecione uma peça com valor'),
                             duration: Duration(seconds: 1),
                           ),
                         );

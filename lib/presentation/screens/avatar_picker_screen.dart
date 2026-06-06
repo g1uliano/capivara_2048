@@ -36,7 +36,7 @@ class _AvatarPickerScreenState extends ConsumerState<AvatarPickerScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Erro ao salvar avatar: $e')));
+        ).showSnackBar(const SnackBar(content: Text('Não foi possível salvar. Tente novamente.')));
       }
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -52,7 +52,7 @@ class _AvatarPickerScreenState extends ConsumerState<AvatarPickerScreen> {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           title: Text(
-            'Escolha seu avatar',
+            'Escolha seu animal',
             style: GoogleFonts.fredoka(fontSize: 22, color: Colors.white),
           ),
           backgroundColor: AppColors.primary,

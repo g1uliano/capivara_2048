@@ -69,6 +69,14 @@ lib/
 - Models imutáveis com `copyWith`
 - IDs de tiles como UUID para controle de animações
 
+## Linguagem da interface — regras obrigatórias
+
+**Todo texto visível ao usuário deve estar em português, com linguagem simples e acessível.**
+
+- Nunca usar termos em inglês em strings exibidas ao usuário (ex: "streak" → "sequência de dias", "tile" → "peça", "blur" → "desfoque", "performance" → "desempenho")
+- Preferir palavras do dia a dia que qualquer pessoa entende, sem jargões técnicos ou gamer
+- Ao criar ou editar qualquer texto de UI, verificar se há palavras em inglês e substituir antes de submeter
+
 ## Legibilidade e tipografia — regras obrigatórias
 
 Todas as telas usam `GameBackground` com a imagem `fundo.png` (floresta amazônica colorida). **Texto branco puro sem sombra é ilegível sobre esse fundo.**

@@ -3,6 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../domain/lives/lives_notifier.dart';
+import 'info_dialog.dart';
 import 'lives_status_banner.dart';
 
 class LivesIndicator extends ConsumerStatefulWidget {
@@ -56,34 +57,35 @@ class _LivesIndicatorState extends ConsumerState<LivesIndicator>
   }
 
   void _onTap(int lives, int regenCap, DateTime lastRegenAt) {
-    final next = lastRegenAt.add(const Duration(minutes: 30));
-    final remaining = next.difference(DateTime.now());
-    final mm = remaining.inMinutes.remainder(60).toString().padLeft(2, '0');
-    final ss = (remaining.inSeconds % 60).toString().padLeft(2, '0');
-    showDialog<void>(
+    final String title;
+    final String message;
+
+    if (lives > regenCap) {
+      title = 'Vidas extras! 🎁';
+      message =
+          'Você tem mais vidas do que o limite normal — são bônus ganhos em recompensas! '
+          'Novas vidas não são geradas enquanto você tiver vidas extras. '
+          'Elas não expiram, é só jogar!';
+    } else if (lives == regenCap) {
+      title = 'Banco cheio! ❤️';
+      message =
+          'Você tem o máximo de vidas ($regenCap). '
+          'A regeneração recomeça assim que você usar uma delas no jogo.';
+    } else {
+      final next = lastRegenAt.add(const Duration(minutes: 30));
+      final remaining = next.difference(DateTime.now());
+      final mm = remaining.inMinutes.remainder(60).toString().padLeft(2, '0');
+      final ss = (remaining.inSeconds % 60).toString().padLeft(2, '0');
+      title = 'Regenerando... ⏳';
+      message =
+          'Próxima vida em $mm:$ss. '
+          'Uma nova vida aparece a cada 30 minutos, até o limite de $regenCap.';
+    }
+
+    showInfoDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Vidas',
-          style: GoogleFonts.fredoka(fontWeight: FontWeight.bold, fontSize: 20),
-          textAlign: TextAlign.center,
-        ),
-        content: Text(
-          lives >= regenCap
-              ? 'Vidas cheias!'
-              : 'Próxima vida em $mm:$ss',
-          style: GoogleFonts.nunito(fontSize: 15),
-          textAlign: TextAlign.center,
-        ),
-        actionsAlignment: MainAxisAlignment.center,
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('Ok', style: GoogleFonts.nunito(fontSize: 16)),
-          ),
-        ],
-      ),
+      title: title,
+      message: message,
     );
   }
 

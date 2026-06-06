@@ -278,7 +278,7 @@ class _StreakBrokenBanner extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Você perdeu a streak! Recomeçando do Dia 1.',
+              'Você perdeu a sequência de dias! Recomeçando do Dia 1.',
               style: GoogleFonts.fredoka(
                 color: Colors.white,
                 fontSize: 13,

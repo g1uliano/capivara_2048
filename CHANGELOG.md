@@ -6,6 +6,22 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.34] — 2026-06-06
+
+### Fixed
+
+- **Pausa dupla ao voltar ao jogo**: `loadSavedGame()` não sobrescreve mais o estado de pausa em memória — o jogo não cai no PauseOverlay uma segunda vez após o usuário clicar Continuar e o sync do Firestore completar em background
+
+### Changed
+
+- **Tradução completa da UI**: eliminados todos os termos em inglês visíveis ao usuário — `streak` → `sequência de dias`, `tile` → `peça`, `Performance` → `Desempenho`, `blur` → `desfoque`, `Cheats` → `Trapaças`, `Sem opacidade` → `Normal`, `Escolha seu avatar` → `Escolha seu animal`, mensagens de erro mais amigáveis
+- **Regra de linguagem**: adicionada seção "Linguagem da interface" ao CLAUDE.md — português simples obrigatório em toda a UI
+- **Dialog de vidas redesenhado**: ao clicar em Bônus/Completo/ícone de vidas, abre dialog no estilo de "Ops!" com título e explicação contextual — `Banco cheio ❤️`, `Vidas extras 🎁` ou `Regenerando ⏳`
+
+### Added
+
+- **`info_dialog.dart`**: novo widget reutilizável `showInfoDialog` — mesmo estilo visual do `showCannotUseItemDialog` (borda laranja, Fredoka, botão "Entendi!") mas sem PNG, para mensagens informativas gerais
+
 ## [1.9.33] — 2026-06-04
 
 ### Changed

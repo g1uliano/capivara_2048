@@ -569,7 +569,7 @@ class GameNotifier extends Notifier<GameState> {
       _populateMilestonesFromMaxLevel(gs.maxLevel);
       _timerStarted = false;
       _stopTimer();
-      state = gs; // isPaused: true set by fromJson
+      state = gs.copyWith(isPaused: state.isPaused);
     } catch (_) {
       // Non-fatal — leave current state unchanged
     }

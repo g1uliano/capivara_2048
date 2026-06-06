@@ -112,7 +112,7 @@ class _PauseOverlayState extends ConsumerState<PauseOverlay> {
                     ),
                   ),
                   child: OutlinedText(
-                    text: 'Cheats',
+                    text: 'Trapaças',
                     style: const TextStyle(color: Colors.white70),
                   ),
                 ),
