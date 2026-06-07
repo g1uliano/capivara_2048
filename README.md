@@ -83,8 +83,8 @@ flutter run --flavor tst \
   --dart-define=FLAVOR=dev \
   --dart-define=USE_EMULATOR=true \
   --dart-define=EMULATOR_HOST=10.0.0.2 \
-  --dart-define=AD_UNIT_ANDROID=ca-app-pub-3940256099942544/5224354917 \
-  --dart-define=AD_UNIT_IOS=ca-app-pub-3940256099942544/1712485313
+  --dart-define=AD_UNIT_ANDROID=ca-app-pub-7740393771713068/1418419253 \
+  --dart-define=AD_UNIT_IOS=<premiado-ios-real>
 ```
 
 **Cenário 2 — Emulador Firebase + celular físico via USB**
@@ -101,8 +101,8 @@ adb reverse tcp:9099 tcp:9099
 flutter run --flavor tst \
   --dart-define=FLAVOR=dev \
   --dart-define=USE_EMULATOR=true \
-  --dart-define=AD_UNIT_ANDROID=ca-app-pub-3940256099942544/5224354917 \
-  --dart-define=AD_UNIT_IOS=ca-app-pub-3940256099942544/1712485313
+  --dart-define=AD_UNIT_ANDROID=ca-app-pub-7740393771713068/1418419253 \
+  --dart-define=AD_UNIT_IOS=<premiado-ios-real>
 ```
 
 **Cenário 3 — Dispositivo físico sem emulador (Firebase dev real)**
@@ -140,13 +140,13 @@ Firebase configurado. Ver **[docs/TESTING.md](docs/TESTING.md)** para o guia com
 ```bash
 # Android APK — produção
 flutter build apk --flavor prd --release --dart-define=FLAVOR=prd \
-  --dart-define=AD_UNIT_ANDROID=ca-app-pub-3940256099942544/5224354917 \
-  --dart-define=AD_UNIT_IOS=ca-app-pub-3940256099942544/1712485313
+  --dart-define=AD_UNIT_ANDROID=ca-app-pub-7740393771713068/1418419253 \
+  --dart-define=AD_UNIT_IOS=<premiado-ios-real>
 
 # Android AAB — produção (upload para Play Store)
 flutter build appbundle --flavor prod --release --dart-define=FLAVOR=prd \
-  --dart-define=AD_UNIT_ANDROID=ca-app-pub-3940256099942544/5224354917 \
-  --dart-define=AD_UNIT_IOS=ca-app-pub-3940256099942544/1712485313
+  --dart-define=AD_UNIT_ANDROID=ca-app-pub-7740393771713068/1418419253 \
+  --dart-define=AD_UNIT_IOS=<premiado-ios-real>
 # Saída: build/app/outputs/bundle/prdRelease/app-prd-release.aab
 
 # iOS — produção
