@@ -1,0 +1,29 @@
+Bem-vindo à fauna do Brasil!
+
+Do Cerrado à Amazônia, do Pantanal à Mata Atlântica — aqui vivem os bichos mais incríveis do Brasil. Ajude-os a evoluir e encontre a lendária Capivara!
+
+Olha o Bichim! é um puzzle game estilo 2048 com os animais reais dos biomas brasileiros. Combine peças iguais para fundir os bichos e descobrir espécies cada vez mais raras.
+
+🐾 COMO JOGAR
+Deslize o dedo em qualquer direção pra mover todos os bichos do tabuleiro de uma vez. Quando dois do mesmo tipo se encontram, eles se transformam num bicho mais raro. Funda animais, explore os biomas brasileiros e chegue até a Capivara Lendária!
+
+🌿 OS BICHOS DO BRASIL
+Descubra 13 animais reais espalhados pelos biomas do país:
+Tanajura • Lobo-guará • Sapo-cururu • Tucano • Sagui • Preguiça • Mico-leão-dourado • Boto-cor-de-rosa • Onça-pintada • Sucuri • Peixe-boi • Jacaré • Capivara Lendária
+
+⚡ SUAS FERRAMENTAS
+Bomba: apaga uma área do tabuleiro quando você se enrosca.
+Desfazer: volta a última jogada se rolou um arrependimento.
+
+🎁 RECOMPENSAS DIÁRIAS
+Colete recompensas todos os dias e dobre seus prêmios assistindo a um anúncio.
+
+🏆 RANKING GLOBAL
+Dispute com jogadores do Brasil no ranking semanal. Chegue ao 2048, 4096 ou 8192 e entre para o hall das Lendas!
+
+🎵 SOM E ANIMAÇÕES
+Efeitos sonoros únicos pra cada bicho descoberto e animações fluidas a cada fusão.
+
+Cada partida custa uma vida — elas se regeneram com o tempo. Jogue no seu ritmo, sem pressão!
+
+Feito com 🇧🇷 por Catraia Aplicativos

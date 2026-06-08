@@ -1,0 +1,46 @@
+default_platform(:android)
+
+platform :android do
+  desc "Build AAB de produção e envia para o Google Play (track interno)"
+  lane :deploy do
+    Dir.chdir("../..") do
+      sh "flutter build appbundle --flavor prod --release " \
+         "--dart-define=FLAVOR=prd " \
+         "--dart-define=AD_UNIT_ANDROID=ca-app-pub-7740393771713068/1418419253 " \
+         "--dart-define=AD_UNIT_IOS=placeholder"
+    end
+
+    upload_to_play_store(
+      track:                   "internal",
+      aab:                     "../build/app/outputs/bundle/prodRelease/app-prod-release.aab",
+      skip_upload_apk:         true,
+      skip_upload_images:      true,
+      skip_upload_screenshots: true,
+      skip_upload_metadata:    false,
+      metadata_path:           "fastlane/metadata/android",
+    )
+  end
+
+  desc "Faz upload apenas de metadata e screenshots (sem novo build)"
+  lane :upload_metadata do
+    upload_to_play_store(
+      track:                   "internal",
+      skip_upload_aab:         true,
+      skip_upload_apk:         true,
+      skip_upload_images:      false,
+      skip_upload_screenshots: false,
+      skip_upload_changelogs:  true,
+      metadata_path:           "fastlane/metadata/android",
+    )
+  end
+
+  desc "Promove build do track interno para produção"
+  lane :promote_to_production do
+    upload_to_play_store(
+      track:             "internal",
+      track_promote_to:  "production",
+      skip_upload_aab:   true,
+      skip_upload_apk:   true,
+    )
+  end
+end
