@@ -8,6 +8,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/home_constants.dart';
 import '../../core/theme/text_styles.dart';
 import '../controllers/auth_controller.dart';
+import '../widgets/age_gate_dialog.dart';
 import '../widgets/game_background.dart';
 import '../widgets/game_title_image.dart';
 import 'email_auth_screen.dart';
@@ -28,6 +29,8 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
   Future<void> _handleSignIn(Future<void> Function() action) async {
     setState(() => _loading = true);
     try {
+      final ageOk = await showAgeGateIfNeeded(context);
+      if (!ageOk || !mounted) return;
       await action();
       if (mounted) _navigateHome();
     } catch (e) {

@@ -7,6 +7,7 @@ import '../../core/constants/home_constants.dart';
 import '../../core/theme/text_styles.dart';
 import '../../domain/auth/auth_service.dart';
 import '../controllers/auth_controller.dart';
+import '../widgets/age_gate_dialog.dart';
 import '../widgets/game_background.dart';
 import '../widgets/game_title_image.dart';
 import 'avatar_picker_screen.dart';
@@ -126,6 +127,8 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
     try {
       final controller = ref.read(authControllerProvider.notifier);
       if (_isSignUp) {
+        final ageOk = await showAgeGateIfNeeded(context);
+        if (!ageOk || !mounted) return;
         await controller.createAccountWithEmail(
           _emailCtrl.text.trim(),
           _passCtrl.text,
