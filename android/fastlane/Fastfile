@@ -24,13 +24,28 @@ platform :android do
   desc "Faz upload apenas de metadata e screenshots (sem novo build)"
   lane :upload_metadata do
     upload_to_play_store(
-      track:                   "internal",
-      skip_upload_aab:         true,
-      skip_upload_apk:         true,
-      skip_upload_images:      false,
-      skip_upload_screenshots: false,
-      skip_upload_changelogs:  true,
-      metadata_path:           "fastlane/metadata/android",
+      track:                        "internal",
+      skip_upload_aab:              true,
+      skip_upload_apk:              true,
+      skip_upload_images:           false,
+      skip_upload_screenshots:      false,
+      skip_upload_changelogs:       true,
+      changes_not_sent_for_review:  true,
+      metadata_path:                "fastlane/metadata/android",
+    )
+  end
+
+  desc "Valida metadata sem commitar (diagnóstico)"
+  lane :validate_metadata do
+    upload_to_play_store(
+      track:                        "internal",
+      validate_only:                true,
+      skip_upload_aab:              true,
+      skip_upload_apk:              true,
+      skip_upload_images:           false,
+      skip_upload_screenshots:      false,
+      skip_upload_changelogs:       true,
+      metadata_path:                "fastlane/metadata/android",
     )
   end
 

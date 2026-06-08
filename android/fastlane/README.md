@@ -31,6 +31,14 @@ Build AAB de produção e envia para o Google Play (track interno)
 
 Faz upload apenas de metadata e screenshots (sem novo build)
 
+### android validate_metadata
+
+```sh
+[bundle exec] fastlane android validate_metadata
+```
+
+Valida metadata sem commitar (diagnóstico)
+
 ### android promote_to_production
 
 ```sh
