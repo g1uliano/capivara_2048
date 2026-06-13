@@ -49,6 +49,16 @@ Promove build do track interno para produção (opções: version_code:NN status
 
 status:draft é obrigatório na primeira publicação (app ainda em rascunho no Console)
 
+### android set_production_countries
+
+```sh
+[bundle exec] fastlane android set_production_countries
+```
+
+Define os países/regiões da faixa de produção via Android Publisher API
+
+Opção: countries:BR,PT (padrão: BR). Resolve 'Nenhum país selecionado para esta faixa'
+
 ### android create_iap_products
 
 ```sh

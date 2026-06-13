@@ -6,6 +6,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.36] — 2026-06-13
+
+### Fixed
+
+- **Compatibilidade com páginas de memória de 16 KB (Android 15+)**: atualizado `flutter_soloud` 2.1.7 → 3.5.4, que alinha a biblioteca nativa a 16 KB (`-Wl,-z,max-page-size=16384`) e usa o NDK do app em vez do NDK r23 fixo. Resolve o bloqueio do Play Console "Seu app não é compatível com tamanhos de página de 16 KB de memória"
+
 ## [1.9.35] — 2026-06-13
 
 ### Added
