@@ -45,7 +45,9 @@ Valida metadata sem commitar (diagnóstico)
 [bundle exec] fastlane android promote_to_production
 ```
 
-Promove build do track interno para produção
+Promove build do track interno para produção (opções: version_code:NN status:draft|completed)
+
+status:draft é obrigatório na primeira publicação (app ainda em rascunho no Console)
 
 ### android create_iap_products
 
