@@ -6,6 +6,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.35] — 2026-06-13
+
+### Added
+
+- **Produtos in-app configurados e ativos na Google Play**: os 10 produtos da loja (6 pacotes + 4 produtos únicos) foram criados e ativados na Play Store com os preços em BRL do `IAP.md` — as compras reais passam a funcionar no app
+- **Lane Fastlane `create_iap_products`**: automatiza a criação/atualização/ativação dos produtos in-app via Monetization API (one-time products), reutilizando a service account do `supply`. Idempotente; opções `dry_run:` e `only:`. Documentação em `IAP.md` seção 2.2.1
+
 ## [1.9.34] — 2026-06-06
 
 ### Fixed
