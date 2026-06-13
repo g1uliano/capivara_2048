@@ -58,4 +58,149 @@ platform :android do
       skip_upload_apk:   true,
     )
   end
+
+  # Produtos in-app conforme IAP.md (seção 1). ID na loja = "bichim_pack_<id>".
+  # Todos são one-time products (Monetization API); a consumibilidade é decidida
+  # pelo app no consumo. Vendidos apenas no Brasil (BRL), conforme decisão de escopo.
+  # Formato: [id interno, nome, descrição, preço BRL]
+  IAP_PRODUCTS = [
+    # Pacotes
+    ["p1",      "4× Bomba 3",               "4 bombas que explodem 3 casas",            3.99],
+    ["p2",      "4× Desfazer 3",            "4 desfazeres de 3 jogadas",                1.99],
+    ["p3",      "6 Vidas",                  "Direto no inventário",                     2.49],
+    ["p4",      "10 Vidas",                 "Direto no inventário",                     4.99],
+    ["p5",      "Combo Mata Atlântica",     "6 vidas + 2 Bomba 3 + 2 Desfazer 3",       4.99],
+    ["p6",      "Combo Floresta Amazônica", "10 vidas + 4 Bomba 3 + 4 Desfazer 3",      9.99],
+    # Produtos únicos (compra por unidade)
+    ["u_bomb3", "1× Bomba 3",               "1 bomba que remove 3 peças à sua escolha", 1.99],
+    ["u_undo3", "1× Desfazer 3",            "1 desfazer de 3 jogadas",                  0.99],
+    ["u_bomb2", "1× Bomba 2",               "1 bomba que remove 2 peças adjacentes",    1.19],
+    ["u_undo1", "1× Desfazer 1",            "1 desfazer de 1 jogada",                   0.49],
+  ].freeze
+
+  desc "Cria/atualiza os produtos in-app no Google Play via Android Publisher API (conforme IAP.md)"
+  desc "Opções: only:p1,u_bomb3 (subconjunto)  |  dry_run:true (só lista, não envia)"
+  lane :create_iap_products do |options|
+    require "google/apis/androidpublisher_v3"
+    require "googleauth"
+
+    ap      = Google::Apis::AndroidpublisherV3
+    package = "com.catraia.capivara2048" # mesmo do Appfile
+    dry_run = options[:dry_run].to_s == "true"
+    only    = options[:only]&.split(",")&.map(&:strip)
+
+    # Resolve a chave da service account (a cwd da lane é android/fastlane).
+    # Aceita PLAY_STORE_JSON_KEY relativo à cwd ou à raiz android/, com fallback
+    # para fastlane/play-store-key.json (mesma usada pelo Appfile/supply).
+    env_key   = ENV["PLAY_STORE_JSON_KEY"]
+    candidates = [
+      env_key,
+      env_key && File.join(__dir__, "..", env_key),
+      File.join(__dir__, "play-store-key.json"),
+    ].compact
+    key_path = candidates.find { |p| File.exist?(p) }
+    UI.user_error!("Chave da service account não encontrada. Tentado: #{candidates.join(', ')}") unless dry_run || key_path
+
+    products = IAP_PRODUCTS
+    products = products.select { |id, *_| only.include?(id) || only.include?("bichim_pack_#{id}") } if only
+    UI.user_error!("Nenhum produto corresponde a only:#{options[:only]}") if products.empty?
+
+    service = ap::AndroidPublisherService.new
+    unless dry_run
+      authorizer = Google::Auth::ServiceAccountCredentials.make_creds(
+        json_key_io: File.open(key_path),
+        scope:       "https://www.googleapis.com/auth/androidpublisher",
+      )
+      authorizer.fetch_access_token!
+      service.authorization = authorizer
+    end
+
+    products.each do |id, name, desc, price|
+      sku   = "bichim_pack_#{id}"
+      units = price.floor
+      nanos = ((price - units) * 100).round * 10_000_000 # centavos → nanos
+
+      if dry_run
+        UI.message("[dry-run] #{sku}  →  #{name}  (R$ #{format('%.2f', price)})  [BR]")
+        next
+      end
+
+      cfg = ap::OneTimeProductPurchaseOptionRegionalPricingAndAvailabilityConfig
+      br  = cfg.new(
+        region_code:  "BR",
+        availability: "AVAILABLE",
+        price:        ap::Money.new(currency_code: "BRL", units: units, nanos: nanos),
+      )
+
+      # A API proíbe REMOVER uma região já cadastrada. Se o produto já existe com
+      # outras regiões (ex.: criado global antes), preservamos essas regiões como
+      # NO_LONGER_AVAILABLE em vez de removê-las — mantendo o produto vendável só no BR.
+      existing = begin
+        service.get_monetization_onetimeproduct(package, sku)
+      rescue Google::Apis::ClientError => e
+        raise unless e.status_code == 404
+        nil
+      end
+
+      configs     = [br]
+      new_regions = nil
+      if existing && (po = existing.purchase_options&.first)
+        (po.regional_pricing_and_availability_configs || []).each do |c|
+          next if c.region_code == "BR"
+          configs << cfg.new(region_code: c.region_code, availability: "NO_LONGER_AVAILABLE", price: c.price)
+        end
+        if (nrc = po.new_regions_config)
+          new_regions = ap::OneTimeProductPurchaseOptionNewRegionsConfig.new(
+            availability: "NO_LONGER_AVAILABLE", usd_price: nrc.usd_price, eur_price: nrc.eur_price,
+          )
+        end
+      end
+
+      # Modelo novo: Produto → Purchase Option ("buy") → preço regional.
+      # legacy_compatible permite que a billing library atual enxergue o produto.
+      product = ap::OneTimeProduct.new(
+        package_name: package,
+        product_id:   sku,
+        listings:     [ap::OneTimeProductListing.new(language_code: "pt-BR", title: name, description: desc)],
+        purchase_options: [
+          ap::OneTimeProductPurchaseOption.new(
+            purchase_option_id: "default",
+            buy_option: ap::OneTimeProductBuyPurchaseOption.new(
+              legacy_compatible:     true,
+              multi_quantity_enabled: false,
+            ),
+            new_regions_config:                        new_regions,
+            regional_pricing_and_availability_configs: configs,
+          ),
+        ],
+      )
+
+      # 1) cria/atualiza (allow_missing). Usa a versão de regiões mais recente para
+      # cobrir regiões adicionadas em versões novas (ex.: produtos já existentes).
+      service.patch_monetization_onetimeproduct(
+        package, sku, product,
+        allow_missing:           true,
+        update_mask:             "listings,purchaseOptions",
+        regions_version_version: "2025/03",
+      )
+
+      # 2) ativa o purchase option (sai de DRAFT → ACTIVE). Idempotente.
+      begin
+        activate = ap::BatchUpdatePurchaseOptionStatesRequest.new(requests: [
+          ap::UpdatePurchaseOptionStateRequest.new(
+            activate_purchase_option_request: ap::ActivatePurchaseOptionRequest.new(
+              package_name: package, product_id: sku, purchase_option_id: "default",
+            ),
+          ),
+        ])
+        service.batch_monetization_onetimeproduct_purchase_option_update_states(package, sku, activate)
+      rescue Google::Apis::ClientError => e
+        raise unless e.message.to_s =~ /already active/i
+      end
+
+      UI.success("Ativo: #{sku}  (R$ #{format('%.2f', price)})")
+    end
+
+    UI.success("Concluído: #{products.size} produto(s) ativos no Brasil.") unless dry_run
+  end
 end

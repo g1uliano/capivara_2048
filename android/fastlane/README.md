@@ -47,6 +47,16 @@ Valida metadata sem commitar (diagnóstico)
 
 Promove build do track interno para produção
 
+### android create_iap_products
+
+```sh
+[bundle exec] fastlane android create_iap_products
+```
+
+Cria/atualiza os produtos in-app no Google Play via Android Publisher API (conforme IAP.md)
+
+Opções: only:p1,u_bomb3 (subconjunto)  |  dry_run:true (só lista, não envia)
+
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.

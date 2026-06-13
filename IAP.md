@@ -57,6 +57,52 @@ Todos os produtos são do tipo **Consumable** (podem ser comprados múltiplas ve
 
 > Os IDs dos produtos únicos seguem o mesmo padrão: `bichim_pack_u_bomb3`, `bichim_pack_u_undo3`, `bichim_pack_u_bomb2`, `bichim_pack_u_undo1`.
 
+### 2.2.1 Alternativa automatizada (Fastlane)
+
+Em vez de cadastrar os 10 produtos manualmente, use a lane `create_iap_products`. Ela
+cria (ou atualiza, se já existirem) todos os produtos via Android Publisher API e os deixa
+**ativos**, reutilizando a mesma service account do `supply` (`PLAY_STORE_JSON_KEY` ou
+`fastlane/play-store-key.json`).
+
+> **Importante:** isso usa a API do Google por baixo — o `fastlane supply` em si **não**
+> gerencia produtos in-app. A lane é só um wrapper conveniente em cima da API.
+
+```bash
+cd android
+
+# Pré-visualizar sem enviar nada (não autentica, não toca na API)
+fastlane android create_iap_products dry_run:true
+
+# Criar/atualizar/ativar todos os 10 produtos
+fastlane android create_iap_products
+
+# Apenas um subconjunto (aceita ID interno ou ID na loja)
+fastlane android create_iap_products only:u_bomb3,u_undo1
+```
+
+A lista de produtos (IDs, nomes, descrições e preços BRL) vive na constante `IAP_PRODUCTS`
+no `android/fastlane/Fastfile` e deve espelhar a seção 1 deste documento.
+
+**Como funciona (Monetization API / one-time products):**
+
+- O endpoint legado `inappproducts` foi desativado (`403 "Please migrate to the new
+  publishing API"`); a lane usa a nova API de **one-time products**.
+- Cada produto vira um *one-time product* com um *purchase option* do tipo "buy"
+  (`legacy_compatible: true`, para a billing library atual enxergar). A consumibilidade é
+  decidida pelo app no consumo.
+- A lane faz **dois passos** por produto: `patch` (cria/atualiza, `allow_missing`) e
+  `purchaseOptions:batchUpdateStates` para **ativar** (sai de `DRAFT` → `ACTIVE`).
+  Ambos são idempotentes — pode rodar quantas vezes quiser.
+- **Disponibilidade: apenas Brasil (BRL)**, com os preços exatos da seção 1. A nova API
+  não tem `autoConvertMissingPrices`; expandir para outras regiões exigiria âncoras de
+  preço em USD/EUR. Para vender em mais regiões, adicione-as manualmente no Play Console.
+- A lane preserva regiões já cadastradas (a API proíbe remover uma região existente):
+  regiões fora do BR ficam como `NO_LONGER_AVAILABLE`.
+
+**Pré-requisitos:** app já criado no Play Console com pelo menos um build enviado a alguma
+track (libera a seção de produtos in-app) e a service account com permissão de gerenciar
+produtos.
+
 ### 2.3 Licença de teste (compras gratuitas)
 
 Para testar sem cobrar o cartão do testador:
