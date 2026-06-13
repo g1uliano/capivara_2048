@@ -49,13 +49,28 @@ platform :android do
     )
   end
 
-  desc "Promove build do track interno para produção"
-  lane :promote_to_production do
+  desc "Promove build do track interno para produção (opções: version_code:NN status:draft|completed)"
+  desc "status:draft é obrigatório na primeira publicação (app ainda em rascunho no Console)"
+  lane :promote_to_production do |options|
+    # version_code do option/ENV, ou lido do pubspec.yaml (version: x.y.z+NN)
+    version_code = (options[:version_code] || ENV["VERSION_CODE"]).to_i
+    if version_code.zero?
+      pubspec = File.read(File.join(__dir__, "..", "..", "pubspec.yaml"))
+      version_code = pubspec[/^version:\s*[\d.]+\+(\d+)/, 1].to_i
+    end
+    UI.user_error!("Não foi possível determinar o version_code") if version_code.zero?
+
     upload_to_play_store(
-      track:             "internal",
-      track_promote_to:  "production",
-      skip_upload_aab:   true,
-      skip_upload_apk:   true,
+      track:                   "internal",
+      track_promote_to:           "production",
+      track_promote_release_status: options[:status] || "completed",
+      version_code:               version_code,
+      skip_upload_aab:            true,
+      skip_upload_apk:         true,
+      skip_upload_metadata:    true,
+      skip_upload_changelogs:  true,
+      skip_upload_images:      true,
+      skip_upload_screenshots: true,
     )
   end
 
