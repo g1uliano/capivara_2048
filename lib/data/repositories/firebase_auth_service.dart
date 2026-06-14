@@ -66,6 +66,31 @@ class FirebaseAuthService implements AuthService {
   }
 
   @override
+  Future<DateTime?> getBirthDate() async {
+    final user = _auth.currentUser;
+    if (user == null) return null;
+    final snap = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+    final raw = snap.data()?['birthDate'];
+    return raw is String ? DateTime.tryParse(raw) : null;
+  }
+
+  @override
+  Future<void> saveBirthDate(DateTime dob) async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+    final iso = '${dob.year.toString().padLeft(4, '0')}-'
+        '${dob.month.toString().padLeft(2, '0')}-'
+        '${dob.day.toString().padLeft(2, '0')}';
+    await FirebaseFirestore.instance.collection('users').doc(user.uid).set(
+      {'birthDate': iso},
+      SetOptions(merge: true),
+    );
+  }
+
+  @override
   Future<void> sendPasswordReset(String email) async {
     await _auth.setLanguageCode('pt');
     await _auth.sendPasswordResetEmail(email: email);

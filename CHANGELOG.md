@@ -6,6 +6,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.37] — 2026-06-14
+
+### Fixed
+
+- **Compra de item na tela de jogo travado não entregava o item**: ao comprar (em vez de ver anúncio) o item oferecido quando o jogador fica sem itens, a compra era processada e a mensagem de sucesso aparecia, mas o item não entrava no inventário em produção. O `_confirmBuy` do `GameOverNoItemsOverlay` era o único ponto de compra que não chamava `deliverIAPItems` — usava um guard `flavor != 'prd'` que pulava a entrega local em produção. Agora chama `deliverIAPItems(ref, pkg)` incondicionalmente, igual aos demais pontos de compra (`ShopScreen`, `ShopUnitItemCard`, `ShopOverlay`)
+
+### Changed
+
+- **Confirmação de idade por data completa**: a verificação de idade agora pede dia, mês e ano (com busca por digitação no ano) em vez de apenas o ano, garantindo **12 anos completos** de fato — antes o cálculo só pelo ano deixava entrar quem ainda faria 12 no ano corrente. A data de nascimento passa a ser salva **por conta** no Firestore (`users/{uid}.birthDate`); contas que haviam respondido só o ano são perguntadas novamente no próximo login. Cadastro pergunta antes de criar a conta; logins (e-mail/Google) perguntam após autenticar
+
 ## [1.9.36] — 2026-06-13
 
 ### Fixed

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/utils/iap_delivery.dart';
 import '../../data/models/item_type.dart';
 import '../../data/shop_data.dart';
 import '../../domain/daily_rewards/ad_service.dart';
@@ -94,10 +95,7 @@ class _GameOverNoItemsOverlayState extends ConsumerState<GameOverNoItemsOverlay>
     if (!mounted) return;
 
     if (result.success) {
-      const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
-      if (flavor != 'prd') {
-        unawaited(ref.read(inventoryProvider.notifier).add(_drawnItem, 1));
-      }
+      deliverIAPItems(ref, pkg);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('${_nameFor(_drawnItem)} adicionado! Boa sorte! 🎉')));
       _dismiss();

@@ -127,13 +127,14 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
     try {
       final controller = ref.read(authControllerProvider.notifier);
       if (_isSignUp) {
-        final ageOk = await showAgeGateIfNeeded(context);
-        if (!ageOk || !mounted) return;
+        final dob = await showAgeGateDialog(context);
+        if (dob == null || !mounted) return;
         await controller.createAccountWithEmail(
           _emailCtrl.text.trim(),
           _passCtrl.text,
           _nameCtrl.text.trim(),
         );
+        await ref.read(authServiceProvider).saveBirthDate(dob);
         if (mounted) {
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
@@ -152,12 +153,13 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
           _emailCtrl.text.trim(),
           _passCtrl.text,
         );
-        if (mounted) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const HomeScreen()),
-            (_) => false,
-          );
-        }
+        if (!mounted) return;
+        final ok = await ensureBirthDate(context, ref);
+        if (!ok || !mounted) return;
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          (_) => false,
+        );
       }
     } catch (e) {
       if (mounted) {
