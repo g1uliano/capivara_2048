@@ -41,7 +41,7 @@ lib/
 | Descrição                    | Comando |
 | ---------------------------- | ------- |
 | APK tst dev debug            | `flutter build apk --flavor tst --dart-define=FLAVOR=dev --debug` |
-| APK prd release              | `flutter build apk --flavor prd --release --dart-define=FLAVOR=prd --dart-define=AD_UNIT_ANDROID=ca-app-pub-7740393771713068/1418419253 --dart-define=AD_UNIT_IOS=<premiado-ios-real>` |
+| APK prd release              | `flutter build apk --flavor prod --release --dart-define=FLAVOR=prd --dart-define=AD_UNIT_ANDROID=ca-app-pub-7740393771713068/1418419253 --dart-define=AD_UNIT_IOS=<premiado-ios-real>` |
 | AAB prd release (Play Store) | `flutter build appbundle --flavor prod --release --dart-define=FLAVOR=prd --dart-define=AD_UNIT_ANDROID=ca-app-pub-7740393771713068/1418419253 --dart-define=AD_UNIT_IOS=<premiado-ios-real>` |
 | iOS prd release              | `flutter build ios --flavor prd --release --dart-define=FLAVOR=prd` |
 
