@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "olha-o-bichim-dev"
+    "default": "olha-o-bichim-dev",
+    "dev": "olha-o-bichim-dev",
+    "prod": "bichim-prd"
   }
 }
