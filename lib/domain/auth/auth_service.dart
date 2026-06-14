@@ -21,13 +21,18 @@ abstract class AuthService {
   // senha: obrigatório para AuthProvider.email; ignorado para Google
   Future<void> deleteAccount({String? senha});
   Future<void> signOut();
+  Future<DateTime?> getBirthDate();
+  Future<void> saveBirthDate(DateTime dob);
 }
 
 class FakeAuthService implements AuthService {
   PlayerProfile? _profile;
+  DateTime? _birthDate;
   final _controller = StreamController<PlayerProfile?>.broadcast();
 
-  FakeAuthService({PlayerProfile? initialProfile}) : _profile = initialProfile;
+  FakeAuthService({PlayerProfile? initialProfile, DateTime? initialBirthDate})
+      : _profile = initialProfile,
+        _birthDate = initialBirthDate;
 
   @override
   Stream<PlayerProfile?> get authStateChanges => _controller.stream;
@@ -93,6 +98,14 @@ class FakeAuthService implements AuthService {
     _controller.add(null);
   }
 
+  @override
+  Future<DateTime?> getBirthDate() async => _birthDate;
+
+  @override
+  Future<void> saveBirthDate(DateTime dob) async {
+    _birthDate = dob;
+  }
+
   void dispose() => _controller.close();
 
   PlayerProfile _fakeProfile(
@@ -115,6 +128,7 @@ final authServiceProvider = Provider<AuthService>((ref) {
     return FirebaseAuthService();
   }
   return FakeAuthService(
+    initialBirthDate: DateTime(1990, 1, 1),
     initialProfile: PlayerProfile(
       userId: 'fake-user-id',
       displayName: 'Jogador Teste',
