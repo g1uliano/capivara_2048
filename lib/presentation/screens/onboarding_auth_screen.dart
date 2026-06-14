@@ -29,10 +29,11 @@ class _OnboardingAuthScreenState extends ConsumerState<OnboardingAuthScreen> {
   Future<void> _handleSignIn(Future<void> Function() action) async {
     setState(() => _loading = true);
     try {
-      final ageOk = await showAgeGateIfNeeded(context);
-      if (!ageOk || !mounted) return;
       await action();
-      if (mounted) _navigateHome();
+      if (!mounted) return;
+      final ok = await ensureBirthDate(context, ref);
+      if (!ok || !mounted) return;
+      _navigateHome();
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
