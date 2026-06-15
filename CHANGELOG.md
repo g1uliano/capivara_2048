@@ -6,6 +6,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.38] — 2026-06-15
+
+### Fixed
+
+- **Desfazer comprado na tela de jogo travado ficava inutilizável após sair e voltar**: o histórico de jogadas (`undoStack`) não era serializado, então restaurar uma partida (local ou Firestore) trazia o tabuleiro de volta mas com histórico vazio — o jogador comprava/assistia anúncio por um Desfazer que não tinha jogadas para desfazer. Agora `GameState.toJson`/`fromJson` persistem o histórico (em memória continua ilimitado; a parte salva é limitada às **20 jogadas mais recentes** para manter o documento do Firestore pequeno), sobrevivendo à saída e ao retorno do jogo. Retrocompatível: partidas salvas sem o campo restauram com histórico vazio
+- **Tela "Você não possui mais itens" ofertava Desfazer impossível de usar**: a oferta sorteava entre os 4 itens sem verificar usabilidade, podendo oferecer Desfazer 1/Desfazer 3 sem jogadas suficientes no histórico. Agora `GameOverNoItemsOverlay` só inclui Desfazer 1 quando há ≥1 jogada e Desfazer 3 quando há ≥3; as bombas continuam sempre disponíveis (no game over o tabuleiro está cheio)
+
 ## [1.9.37] — 2026-06-14
 
 ### Fixed

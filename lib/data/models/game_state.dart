@@ -26,6 +26,12 @@ class GameState {
 
   static const _bombSentinel = Object();
 
+  // Quantas jogadas do histórico de desfazer são persistidas (local + Firestore).
+  // O histórico em memória continua ilimitado durante a partida; só a parte salva
+  // é limitada para não inflar o documento do Firestore em partidas longas.
+  // 20 cobre o Desfazer 3 com folga e mantém o documento pequeno.
+  static const _maxPersistedUndoDepth = 20;
+
   Map<String, dynamic> toJson() {
     final boardJson = board
         .map((row) => row.map((tile) => tile?.toJson()).toList())
@@ -38,6 +44,11 @@ class GameState {
       'elapsedMs': elapsedMs,
       'isGameOver': isGameOver,
       'hasWon': hasWon,
+      // undoStack guarda o mais recente no índice 0 — take() preserva os últimos.
+      'undoStack': undoStack
+          .take(_maxPersistedUndoDepth)
+          .map((s) => s.toJson())
+          .toList(),
     };
   }
 
@@ -51,6 +62,14 @@ class GameState {
       }).toList();
     }).toList();
 
+    // Entradas do histórico são snapshots: restauram sem pausa (a pausa pertence
+    // ao estado vivo, não ao passado) e sem histórico aninhado próprio.
+    final rawUndo = json['undoStack'] as List<dynamic>?;
+    final undoStack = rawUndo
+        ?.map((e) => GameState.fromJson(e as Map<String, dynamic>)
+            .copyWith(isPaused: false))
+        .toList();
+
     return GameState(
       board: board,
       score: json['score'] as int,
@@ -60,6 +79,7 @@ class GameState {
       isGameOver: (json['isGameOver'] as bool?) ?? false,
       hasWon: (json['hasWon'] as bool?) ?? false,
       isPaused: true, // always paused on restore
+      undoStack: undoStack,
     );
   }
 
