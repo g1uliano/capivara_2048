@@ -37,6 +37,17 @@ String _descFor(ItemType t) => switch (t) {
       ItemType.undo3 => 'Desfaz as últimas 3 jogadas',
     };
 
+/// Itens que fazem sentido oferecer dado o tamanho do histórico de jogadas.
+/// Desfazer só é ofertado se houver jogadas suficientes para usá-lo — senão o
+/// jogador compraria/assistiria anúncio por um item que não conseguiria usar.
+/// No game over o tabuleiro está cheio, então as bombas são sempre usáveis.
+List<ItemType> offerableItems(int undoStackLen) => [
+      ItemType.bomb2,
+      ItemType.bomb3,
+      if (undoStackLen >= 1) ItemType.undo1,
+      if (undoStackLen >= 3) ItemType.undo3,
+    ];
+
 class GameOverNoItemsOverlay extends ConsumerStatefulWidget {
   const GameOverNoItemsOverlay({super.key});
 
@@ -52,7 +63,8 @@ class _GameOverNoItemsOverlayState extends ConsumerState<GameOverNoItemsOverlay>
   @override
   void initState() {
     super.initState();
-    const items = [ItemType.bomb2, ItemType.bomb3, ItemType.undo1, ItemType.undo3];
+    final undoStackLen = ref.read(gameProvider).undoStack.length;
+    final items = offerableItems(undoStackLen);
     _drawnItem = items[Random().nextInt(items.length)];
   }
 
