@@ -6,7 +6,7 @@ void main() {
     test('generateInviteLink returns correct URL', () async {
       final svc = FakeInviteService();
       final link = await svc.generateInviteLink('user123');
-      expect(link, 'https://bichim-prd.web.app/invite?ref=user123');
+      expect(link, 'https://olhaobichim.com.br/invite?ref=user123');
     });
 
     test('registerInvite links invitee to inviter', () async {

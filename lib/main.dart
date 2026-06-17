@@ -105,7 +105,7 @@ void _handleInviteDeepLink(Uri uri, ProviderContainer container) {
   if (uri.scheme == 'olhabichim' && uri.host == 'invite') {
     inviteRef = uri.queryParameters['ref'];
   } else if (uri.scheme == 'https' &&
-      uri.host == 'bichim-prd.web.app' &&
+      (uri.host == 'olhaobichim.com.br' || uri.host == 'bichim-prd.web.app') &&
       uri.path.startsWith('/invite')) {
     inviteRef = uri.queryParameters['ref'];
   }
