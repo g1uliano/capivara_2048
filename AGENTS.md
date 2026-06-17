@@ -153,7 +153,7 @@ TabBar(
 
 ## Fases do roadmap
 
-Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 6 (v1.9.38) — Polimento, l10n, acessibilidade, lançamento**.
+Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 6 (v1.9.39) — Polimento, l10n, acessibilidade, lançamento**.
 
 | Fase      | Foco                                                                                                                                                                 |
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

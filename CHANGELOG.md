@@ -6,6 +6,20 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.39] — 2026-06-17
+
+### Changed
+
+- **Novo ícone do aplicativo**: ícone redesenhado, regenerado para Android (launcher + ícone adaptativo), iOS e para a ficha da Play Store (512×512)
+
+### Fixed
+
+- **Link de convite usava o domínio do Firebase Hosting** (`bichim-prd.web.app`) em vez do domínio oficial. Agora os convites são gerados com `olhaobichim.com.br`, que já está conectado ao mesmo hosting; o app passa a abrir convites de ambos os domínios, mantendo os links já compartilhados funcionando
+
+### Site
+
+- **Link da Play Store no site** (`olhaobichim.com.br`): a chamada principal da página inicial deixa de ser "Em breve" e aponta para a ficha do app na Play Store
+
 ## [1.9.38] — 2026-06-15
 
 ### Fixed
