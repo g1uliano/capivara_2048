@@ -127,9 +127,6 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  web:
-    generate: true
-    image_path: assets/images/icon/app_icon_tight.png
   windows:
     generate: true
     image_path: assets/images/icon/app_icon_tight.png
