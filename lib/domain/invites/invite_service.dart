@@ -4,7 +4,7 @@ import '../../presentation/controllers/auth_controller.dart';
 
 abstract class InviteService {
   /// Generates (or retrieves) an invite link for the given userId.
-  /// Returns the HTTPS URL: "https://bichim-prd.web.app/invite?ref={userId}"
+  /// Returns the HTTPS URL: "https://olhaobichim.com.br/invite?ref={userId}"
   Future<String> generateInviteLink(String userId);
 
   /// Registers that inviteeId was referred by inviterId.
@@ -31,7 +31,7 @@ class FakeInviteService implements InviteService {
 
   @override
   Future<String> generateInviteLink(String userId) async =>
-      'https://bichim-prd.web.app/invite?ref=$userId';
+      'https://olhaobichim.com.br/invite?ref=$userId';
 
   @override
   Future<void> registerInvite({

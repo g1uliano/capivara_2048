@@ -26,7 +26,7 @@ class FirestoreInviteRepository implements InviteService {
       'invites': [],
       'totalRewardsClaimed': 0,
     }, SetOptions(merge: true));
-    return 'https://bichim-prd.web.app/invite?ref=$userId';
+    return 'https://olhaobichim.com.br/invite?ref=$userId';
   }
 
   @override

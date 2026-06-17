@@ -34,6 +34,9 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="https"
+                      android:host="olhaobichim.com.br"
+                      android:pathPrefix="/invite"/>
+                <data android:scheme="https"
                       android:host="bichim-prd.web.app"
                       android:pathPrefix="/invite"/>
             </intent-filter>
