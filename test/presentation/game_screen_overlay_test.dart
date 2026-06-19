@@ -9,6 +9,8 @@ import 'package:capivara_2048/data/repositories/inventory_repository.dart';
 import 'package:capivara_2048/data/repositories/lives_repository.dart';
 import 'package:capivara_2048/domain/inventory/inventory_notifier.dart';
 import 'package:capivara_2048/domain/lives/lives_notifier.dart';
+import 'package:capivara_2048/data/models/player_profile.dart';
+import 'package:capivara_2048/presentation/controllers/auth_controller.dart';
 import 'package:capivara_2048/presentation/controllers/game_notifier.dart';
 import 'package:capivara_2048/presentation/controllers/settings_notifier.dart';
 import 'package:capivara_2048/presentation/screens/game/game_over_item_overlay.dart';
@@ -22,6 +24,11 @@ import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 late Directory _tempDir;
+
+class _FakeAuthController extends AuthController {
+  @override
+  PlayerProfile? build() => null;
+}
 
 Future<void> _initHive() async {
   _tempDir = await Directory.systemTemp.createTemp('game_screen_overlay_test');
@@ -61,6 +68,7 @@ Widget _buildScreen({
       livesRepositoryProvider.overrideWithValue(LivesRepository()),
       livesProvider.overrideWith(LivesNotifier.new),
       sharedPreferencesProvider.overrideWithValue(prefs),
+      authControllerProvider.overrideWith(_FakeAuthController.new),
     ],
     child: const MaterialApp(home: GameScreen()),
   );
@@ -136,6 +144,7 @@ void main() {
         livesRepositoryProvider.overrideWithValue(LivesRepository()),
         livesProvider.overrideWith(LivesNotifier.new),
         sharedPreferencesProvider.overrideWithValue(prefs),
+        authControllerProvider.overrideWith(_FakeAuthController.new),
       ],
     );
     addTearDown(container.dispose);

@@ -42,7 +42,7 @@ class TutorialFinalePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Funda animais, explore os biomas brasileiros e chegue até ela. Boa sorte, explorador!',
+                  'Junte animais iguais, explore os biomas brasileiros e chegue até ela. Boa sorte, explorador!',
                   style: GoogleFonts.fredoka(
                     fontSize: 16,
                     height: 1.5,

@@ -12,6 +12,7 @@ import '../../domain/daily_rewards/ad_service.dart';
 import '../../domain/inventory/inventory_notifier.dart';
 import '../../domain/lives/lives_notifier.dart';
 import '../../domain/shop/iap_service.dart';
+import '../../presentation/controllers/auth_controller.dart';
 import '../../presentation/controllers/game_notifier.dart';
 import 'iap_confirmation_sheet.dart';
 import 'outlined_text.dart';
@@ -145,6 +146,9 @@ class _GameOverNoItemsOverlayState extends ConsumerState<GameOverNoItemsOverlay>
   @override
   Widget build(BuildContext context) {
     final canWatchAd = ref.watch(livesProvider.select((s) => s.adWatchedToday < 40));
+    // Compra só faz sentido com conta — itens são vinculados ao usuário e
+    // precisam ser restauráveis. Sem login, ofertamos apenas o anúncio.
+    final isLoggedIn = ref.watch(authControllerProvider) != null;
 
     if (_dismissed) return const SizedBox.shrink();
 
@@ -240,19 +244,22 @@ class _GameOverNoItemsOverlayState extends ConsumerState<GameOverNoItemsOverlay>
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFF3E2723),
+                if (isLoggedIn) ...[
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: const Color(0xFF3E2723),
+                      ),
+                      onPressed: _confirmBuy,
+                      child:
+                          Text('🛒 Comprar ${_nameFor(_drawnItem)}  •  $_price'),
                     ),
-                    onPressed: _confirmBuy,
-                    child: Text('🛒 Comprar ${_nameFor(_drawnItem)}  •  $_price'),
                   ),
-                ),
+                ],
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: _confirmQuit,

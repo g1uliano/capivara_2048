@@ -31,7 +31,7 @@ class _TutorialFusionPageState extends State<TutorialFusionPage> {
             child: Column(
               children: [
                 Text(
-                  'Iguais se fundem!',
+                  'Iguais se juntam!',
                   style: GoogleFonts.fredoka(
                     fontSize: 26,
                     fontWeight: FontWeight.w600,
@@ -41,7 +41,7 @@ class _TutorialFusionPageState extends State<TutorialFusionPage> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Quando dois bichos do mesmo tipo se encontram, eles se transformam num bicho mais raro. Tente fundir as duas tanajuras.',
+                  'Quando dois bichos do mesmo tipo se encontram, eles se transformam num bicho mais raro. Tente juntar as duas tanajuras.',
                   style: GoogleFonts.fredoka(
                     fontSize: 16,
                     height: 1.5,

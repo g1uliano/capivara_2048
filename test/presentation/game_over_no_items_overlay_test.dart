@@ -8,6 +8,9 @@ import 'package:capivara_2048/data/repositories/lives_repository.dart';
 import 'package:capivara_2048/domain/daily_rewards/ad_service.dart';
 import 'package:capivara_2048/domain/inventory/inventory_notifier.dart';
 import 'package:capivara_2048/domain/lives/lives_notifier.dart';
+import 'package:capivara_2048/data/models/player_profile.dart';
+import 'package:capivara_2048/domain/sync/sync_engine.dart';
+import 'package:capivara_2048/presentation/controllers/auth_controller.dart';
 import 'package:capivara_2048/presentation/widgets/game_over_no_items_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,6 +19,21 @@ import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 late Directory _tempDir;
+
+class _FakeAuthController extends AuthController {
+  _FakeAuthController(this._profile);
+  final PlayerProfile? _profile;
+  @override
+  PlayerProfile? build() => _profile;
+}
+
+final _fakeProfile = PlayerProfile(
+  userId: 'u1',
+  displayName: 'Jogador',
+  provider: AuthProvider.email,
+  createdAt: DateTime(2025),
+  lastSeenAt: DateTime(2025),
+);
 
 Future<void> _initHive() async {
   _tempDir = await Directory.systemTemp.createTemp('no_items_test');
@@ -31,12 +49,16 @@ Future<void> _teardownHive() async {
   await _tempDir.delete(recursive: true);
 }
 
-Widget _buildOverlay({AdService? adService}) {
+Widget _buildOverlay({AdService? adService, bool loggedIn = true}) {
   return ProviderScope(
     overrides: [
       inventoryRepositoryProvider.overrideWithValue(InventoryRepository()),
       livesRepositoryProvider.overrideWithValue(LivesRepository()),
       iapServiceProvider.overrideWithValue(FakeIAPService()),
+      authControllerProvider.overrideWith(
+        () => _FakeAuthController(loggedIn ? _fakeProfile : null),
+      ),
+      syncEngineProvider.overrideWithValue(FakeSyncEngine()),
       if (adService != null) adServiceProvider.overrideWithValue(adService),
     ],
     child: const MaterialApp(home: Scaffold(body: GameOverNoItemsOverlay())),
@@ -56,6 +78,17 @@ void main() {
     expect(find.textContaining('não possui mais itens'), findsOneWidget);
     expect(find.textContaining('Ver anúncio'), findsOneWidget);
     expect(find.textContaining('Comprar'), findsOneWidget);
+    expect(find.text('Encerrar partida'), findsOneWidget);
+  });
+
+  testWidgets('deslogado: mostra "Ver anúncio" mas esconde "Comprar"', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_buildOverlay(loggedIn: false));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('não possui mais itens'), findsOneWidget);
+    expect(find.textContaining('Ver anúncio'), findsOneWidget);
+    expect(find.textContaining('Comprar'), findsNothing);
     expect(find.text('Encerrar partida'), findsOneWidget);
   });
 

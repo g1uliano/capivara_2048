@@ -6,6 +6,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.40] — 2026-06-19
+
+### Fixed
+
+- **Tela "Você não possui mais itens" mostrava o botão "Comprar" para quem não tem conta**: a compra avulsa exige conta (itens ficam vinculados ao usuário e precisam ser restauráveis), mas o botão aparecia mesmo deslogado. Agora visitantes veem apenas a opção "Ver anúncio e receber"; o botão de compra só aparece para quem está logado
+
+### Changed
+
+- **Linguagem mais simples no lugar de "fundir/funda"**: a palavra estava difícil de entender para parte do público (incluindo crianças). O site passa a usar "Combine. Some iguais. Evolua.", e o tutorial e a descrição da Play Store passam a usar "juntar" no lugar de "fundir"
+
 ## [1.9.39] — 2026-06-17
 
 ### Changed

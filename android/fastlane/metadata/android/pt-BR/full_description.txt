@@ -2,10 +2,10 @@ Bem-vindo à fauna do Brasil!
 
 Do Cerrado à Amazônia, do Pantanal à Mata Atlântica — aqui vivem os bichos mais incríveis do Brasil. Ajude-os a evoluir e encontre a lendária Capivara!
 
-Olha o Bichim! é um puzzle game estilo 2048 com os animais reais dos biomas brasileiros. Combine peças iguais para fundir os bichos e descobrir espécies cada vez mais raras.
+Olha o Bichim! é um puzzle game estilo 2048 com os animais reais dos biomas brasileiros. Combine peças iguais para juntar os bichos e descobrir espécies cada vez mais raras.
 
 🐾 COMO JOGAR
-Deslize o dedo em qualquer direção pra mover todos os bichos do tabuleiro de uma vez. Quando dois do mesmo tipo se encontram, eles se transformam num bicho mais raro. Funda animais, explore os biomas brasileiros e chegue até a Capivara Lendária!
+Deslize o dedo em qualquer direção pra mover todos os bichos do tabuleiro de uma vez. Quando dois do mesmo tipo se encontram, eles se transformam num bicho mais raro. Junte animais iguais, explore os biomas brasileiros e chegue até a Capivara Lendária!
 
 🌿 OS BICHOS DO BRASIL
 Descubra 13 animais reais espalhados pelos biomas do país:
