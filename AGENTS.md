@@ -194,6 +194,17 @@ Sempre que lançar uma nova versão (merge + push):
 4. Atualizar `AGENTS.md` se houver informações relevantes (fase atual, convenções, regras novas)
 5. Fazer merge em main e push
 
+### Firestore — índices em produção
+
+Sempre que alterar uma query de ranking (qualquer `orderBy` composto em `firestore_ranking_repository.dart` / `firestore.indexes.json`), fazer deploy dos índices nos **dois** projetos:
+
+```
+firebase deploy --only firestore:indexes --project dev
+firebase deploy --only firestore:indexes --project prod
+```
+
+O projeto `default` é o `dev` — rodar `firebase deploy` sem `--project prod` deixa produção sem o índice, e a query falha com `FAILED_PRECONDITION` (ex.: ranking "Lendas 8192" mostrando "Tentar novamente"). Conferir com `firebase firestore:indexes --project prod`.
+
 > **Nota:** sempre que `CLAUDE.md` for atualizado, verificar se `AGENTS.md` também precisa ser atualizado — e vice-versa. Os dois devem estar em sincronia quanto à fase atual, convenções de desenvolvimento e decisões de arquitetura.
 
 ## Animais (referência rápida)
