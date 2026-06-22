@@ -2,6 +2,7 @@ import 'package:app_links/app_links.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -54,6 +55,17 @@ void main() async {
   if (useEmulator) {
     FirebaseFirestore.instance.useFirestoreEmulator(emulatorHost, 8080);
     await FirebaseAuth.instance.useAuthEmulator(emulatorHost, 9099);
+  }
+
+  // App Check — protege o Firestore contra clientes não-oficiais.
+  // Pulado sob emulador (o emulador não valida tokens de App Check).
+  if (!useEmulator) {
+    await FirebaseAppCheck.instance.activate(
+      providerAndroid: flavor == 'prd'
+          ? const AndroidPlayIntegrityProvider()
+          : const AndroidDebugProvider(),
+      // iOS: adicionar appleProvider quando a conta Apple Developer estiver ativa
+    );
   }
 
   // Deep link — capture initial URI before container is ready; handlers registered after container init
