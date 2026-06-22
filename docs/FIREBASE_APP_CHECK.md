@@ -15,9 +15,10 @@ O App Check exige que cada requisição traga um token de atestação que prova 
 app oficial e íntegro, rodando num aparelho legítimo. No Android isso é feito pelo
 **Play Integrity**.
 
-O código do app **já envia** os tokens de App Check (ativação em `lib/main.dart`):
-`Play Integrity` no flavor `prd`, provider de **debug** nos demais, e pulado sob emulador.
-Falta apenas a parte de console: registrar o provider e, depois, ligar o enforce.
+Para o App Check funcionar são necessárias **duas partes**: a integração no cliente (o app
+precisa enviar os tokens) e a configuração de console (registrar o provider e ligar o
+enforce). Este guia cobre a parte de console — a integração no cliente é um **pré-requisito**
+(ver abaixo).
 
 ## Rollout em duas fases (importante)
 
@@ -30,6 +31,12 @@ Falta apenas a parte de console: registrar o provider e, depois, ligar o enforce
 
 ## Pré-requisitos
 
+- **Integração de App Check no cliente já publicada.** A versão do app que estiver em produção
+  (ou na faixa de testes monitorada) precisa conter a dependência `firebase_app_check` e a
+  ativação em `lib/main.dart` (`AndroidProvider.playIntegrity` em `prd`, `debug` nos demais,
+  pulada sob emulador). Sem isso, o app não envia token nenhum: a Fase 1 mostraria 100% de
+  requisições **"não verificadas"** e ligar o enforce bloquearia **todos** os usuários.
+  Confirme que o build publicado realmente inclui essa integração antes de prosseguir.
 - App Android registrado em `bichim-prd`:
   `1:957303334019:android:dfec2109cc1c2f631d27b6`.
 - **SHA-256** das chaves de assinatura (Play App Signing **e** upload key) cadastrados em
@@ -44,7 +51,9 @@ Falta apenas a parte de console: registrar o provider e, depois, ligar o enforce
 
 Feito **junto com o release** que contém o App Check no código.
 
-1. Console → projeto **`bichim-prd`** → menu **Criação/Compilação → App Check**.
+1. Console → projeto **`bichim-prd`** → seção **Compilação (Build)** no menu lateral →
+   **App Check**. (O Firebase reorganiza esse item periodicamente; se não estiver em
+   "Compilação", procure "App Check" na busca do console.)
 2. Aba **Apps** → selecione o app **Android** → **Registrar**.
 3. Como provedor, escolha **Play Integrity** e salve. Se pedir, habilite a Play Integrity API.
 4. Confirme os **SHA-256** em Configurações do projeto (ver pré-requisitos).
@@ -85,8 +94,9 @@ volta ao modo monitorar, sem necessidade de novo release.
 - Builds não-`prd` usam o **provider de debug** do App Check. Como o projeto dev fica não
   imposto, **não é obrigatório** registrar tokens de debug.
 - Se quiser testar o comportamento de enforce em dev: rode um build debug, copie o **token de
-  debug** impresso no logcat (linha do tipo `Enter this debug secret into the allow list...`)
-  e cadastre em **App Check → Apps → app Android → menu ⋮ → Gerenciar tokens de depuração**.
+  debug** impresso no logcat (procure por uma linha do App Check contendo `debug secret` /
+  `debug token`) e cadastre em
+  **App Check → Apps → app Android → menu ⋮ → Gerenciar tokens de depuração**.
 
 ---
 
