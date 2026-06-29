@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/game_constants.dart';
+import '../../data/models/tile.dart';
 import '../controllers/game_notifier.dart';
 import 'tile_widget.dart';
 
 class BoardWidget extends ConsumerWidget {
   final double? size;
-  const BoardWidget({super.key, this.size});
+  // ponytail: optional override — tutorial passes local state, game uses provider
+  final List<List<Tile?>>? board;
+
+  const BoardWidget({super.key, this.size, this.board});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final board = ref.watch(gameProvider).board;
+    final board = this.board ?? ref.watch(gameProvider).board;
     final screenWidth = MediaQuery.of(context).size.width;
     final boardSize = size ?? (screenWidth - GameConstants.boardPadding * 2);
-    final tileSize = (boardSize - GameConstants.tileSpacing * (GameConstants.boardSize + 1)) /
-        GameConstants.boardSize;
+    final tileSize =
+        (boardSize - GameConstants.tileSpacing * (GameConstants.boardSize + 1)) /
+            GameConstants.boardSize;
 
     return Container(
       width: boardSize,
@@ -25,11 +30,13 @@ class BoardWidget extends ConsumerWidget {
       ),
       padding: const EdgeInsets.all(GameConstants.tileSpacing),
       child: Column(
-        children: List.generate(GameConstants.boardSize, (r) =>
-          Expanded(
+        children: List.generate(
+          GameConstants.boardSize,
+          (r) => Expanded(
             child: Row(
-              children: List.generate(GameConstants.boardSize, (c) =>
-                Expanded(
+              children: List.generate(
+                GameConstants.boardSize,
+                (c) => Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(GameConstants.tileSpacing / 2),
                     child: TileWidget(tile: board[r][c], size: tileSize),
