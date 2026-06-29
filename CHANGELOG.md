@@ -6,6 +6,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.41] — 2026-06-29
+
+### Changed
+
+- **Tutorial reformulado — sandbox 4×4 interativo**: substituídas as páginas "Mover" e "Juntar" (tirinha 1D de 2 células) por um tabuleiro 4×4 real com 3 passos guiados encadeados:
+  - **Passo A** — Deslize pra mover tudo: tabuleiro com 4 bichos de níveis diferentes; qualquer swipe válido avança
+  - **Passo B** — Junte dois iguais num só bicho: duas tanajuras na mesma linha + um bicho diferente; o jogador vê que só os iguais se unem
+  - **Passo C** — Agora é com você: jogo livre até 2 uniões; destrava o botão "Próximo"
+- **Ferramentas agora têm demo interativa** (toca-e-vê): bomba ativa o overlay real de seleção de células + explosão; desfazer dispara o efeito VHS real; vidas permanecem como card estático
+- Tutorial passa de 5 para 4 páginas (Bem-vindo → Sandbox → Ferramentas → Final)
+
 ## [1.9.40] — 2026-06-19
 
 ### Fixed

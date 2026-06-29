@@ -184,7 +184,7 @@ Sempre confirmar em qual fase estamos antes de implementar. Fase atual: **Fase 6
 | 4.1.1 ✅  | Tipografia consistente: Fredoka em todas as telas/widgets sobre fundos não-sólidos                                               |
 | 4.2 ✅    | Exclusão de conta LGPD, edição de nome, troca/esqueci senha, auth gates, sync game records                                       |
 | 4.3 ✅    | Ranking Global (aba tempo), dialogs pós-milestone, recompensas por recorde e convite, Fake* providers tst                        |
-| 4.4 ✅    | Tutorial wizard interativo (TutorialScreen 5 telas, TutorialMiniBoard, TutorialController)                                       |
+| 4.4 ✅    | Tutorial wizard interativo (TutorialScreen 4 telas, TutorialSandboxPage 3 passos, TutorialItemsPage demo interativa bomba/desfazer, TutorialController) |
 | 4.5 ✅    | IAP real (produtos unitários), haptic feedback graduado, Bomba3 restrita, ícones Home redesenhados                               |
 | 4.6 ✅    | Recompensas Diárias: trilha serpentina + CapivaraMascot; sync pós-login completo (inventário, recordes, coleção, daily)          |
 | 5 ✅      | Arte adicional e polimento visual — sistema de SFX procedural (fases 5.1 e 5.2); demais itens visuais descartados |
