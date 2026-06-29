@@ -1,19 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/game_constants.dart';
+import '../../data/models/tile.dart';
 import '../controllers/game_notifier.dart';
 
 /// Selection grid using the exact same layout as BoardWidget (Column of Rows
 /// with Expanded + same padding values), so cells align pixel-perfectly.
+/// When [board], [selected], [maxTiles] and [onTapCell] are provided,
+/// operates in standalone mode (tutorial). Otherwise reads gameProvider.
 class BombGridOverlay extends ConsumerWidget {
-  const BombGridOverlay({super.key});
+  // ponytail: optional params — tutorial passes local state, game uses provider default
+  final List<List<Tile?>>? board;
+  final Set<(int, int)>? selected;
+  final int? maxTiles;
+  final void Function(int r, int c)? onTapCell;
+
+  const BombGridOverlay({
+    super.key,
+    this.board,
+    this.selected,
+    this.maxTiles,
+    this.onTapCell,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notifier = ref.read(gameProvider.notifier);
-    final state = ref.watch(gameProvider);
-    final selected = state.selectedBombTiles;
-    final board = state.board;
+    final isStandalone = board != null;
+    final notifier = isStandalone ? null : ref.read(gameProvider.notifier);
+    final state = isStandalone ? null : ref.watch(gameProvider);
+
+    final effectiveBoard = board ?? state!.board;
+    final effectiveSelected =
+        selected ?? Set<(int, int)>.from(state!.selectedBombTiles);
+    final effectiveOnTap = onTapCell ??
+        (int r, int c) {
+          final tile = effectiveBoard[r][c];
+          if (tile == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Selecione uma peça com valor'),
+                duration: Duration(seconds: 1),
+              ),
+            );
+            return;
+          }
+          notifier!.selectBombTile(r, c);
+        };
 
     return Padding(
       padding: const EdgeInsets.all(GameConstants.tileSpacing),
@@ -21,24 +53,13 @@ class BombGridOverlay extends ConsumerWidget {
         children: List.generate(GameConstants.boardSize, (r) => Expanded(
           child: Row(
             children: List.generate(GameConstants.boardSize, (c) {
-              final isSelected = selected.contains((r, c));
-              final tile = board[r][c];
+              final isSelected = effectiveSelected.contains((r, c));
+              final tile = effectiveBoard[r][c];
               return Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(GameConstants.tileSpacing / 2),
                   child: GestureDetector(
-                    onTap: () {
-                      if (tile == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Selecione uma peça com valor'),
-                            duration: Duration(seconds: 1),
-                          ),
-                        );
-                        return;
-                      }
-                      notifier.selectBombTile(r, c);
-                    },
+                    onTap: () => effectiveOnTap(r, c),
                     child: Container(
                       decoration: BoxDecoration(
                         color: isSelected

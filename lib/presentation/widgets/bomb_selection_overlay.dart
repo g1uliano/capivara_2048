@@ -6,17 +6,29 @@ import '../controllers/game_notifier.dart';
 /// Full-screen dim + label + cancel button.
 /// The dim background is IgnorePointer so taps pass through to BombGridOverlay.
 /// Only the cancel button absorbs pointer events.
+/// When [maxTiles] and [onCancel] are provided, operates in standalone mode (tutorial).
 class BombDimOverlay extends ConsumerWidget {
-  const BombDimOverlay({super.key});
+  // ponytail: optional params — tutorial passes local state, game uses provider default
+  final int? maxTiles;
+  final VoidCallback? onCancel;
+
+  const BombDimOverlay({super.key, this.maxTiles, this.onCancel});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notifier = ref.read(gameProvider.notifier);
-    final state = ref.watch(gameProvider);
-    final mode = state.bombMode;
-    if (mode == null) return const SizedBox.shrink();
+    final isStandalone = maxTiles != null;
+    final notifier = isStandalone ? null : ref.read(gameProvider.notifier);
+    final state = isStandalone ? null : ref.watch(gameProvider);
 
-    final maxTiles = mode == BombMode.bomb2 ? 2 : 3;
+    // In global mode, hide when not in bomb mode.
+    if (!isStandalone) {
+      final mode = state!.bombMode;
+      if (mode == null) return const SizedBox.shrink();
+    }
+
+    final effectiveMaxTiles =
+        maxTiles ?? (state?.bombMode == BombMode.bomb2 ? 2 : 3);
+    final effectiveOnCancel = onCancel ?? notifier!.cancelBomb;
 
     return Stack(
       children: [
@@ -35,7 +47,7 @@ class BombDimOverlay extends ConsumerWidget {
                 padding: const EdgeInsets.only(top: 8),
                 child: Center(
                   child: Text(
-                    'Selecione $maxTiles peças para destruir',
+                    'Selecione $effectiveMaxTiles peças para destruir',
                     style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ),
@@ -53,7 +65,7 @@ class BombDimOverlay extends ConsumerWidget {
               padding: const EdgeInsets.only(bottom: 8),
               child: Center(
                 child: TextButton(
-                  onPressed: notifier.cancelBomb,
+                  onPressed: effectiveOnCancel,
                   child: const Text(
                     'Cancelar',
                     style: TextStyle(color: Colors.white70),
