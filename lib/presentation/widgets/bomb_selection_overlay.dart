@@ -17,6 +17,10 @@ class BombDimOverlay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isStandalone = maxTiles != null;
+    assert(
+      maxTiles == null || onCancel != null,
+      'BombDimOverlay: standalone mode (maxTiles != null) requires onCancel',
+    );
     final notifier = isStandalone ? null : ref.read(gameProvider.notifier);
     final state = isStandalone ? null : ref.watch(gameProvider);
 

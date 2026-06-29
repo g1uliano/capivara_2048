@@ -6,26 +6,28 @@ import '../controllers/game_notifier.dart';
 
 /// Selection grid using the exact same layout as BoardWidget (Column of Rows
 /// with Expanded + same padding values), so cells align pixel-perfectly.
-/// When [board], [selected], [maxTiles] and [onTapCell] are provided,
+/// When [board], [selected] and [onTapCell] are provided,
 /// operates in standalone mode (tutorial). Otherwise reads gameProvider.
 class BombGridOverlay extends ConsumerWidget {
   // ponytail: optional params — tutorial passes local state, game uses provider default
   final List<List<Tile?>>? board;
   final Set<(int, int)>? selected;
-  final int? maxTiles;
   final void Function(int r, int c)? onTapCell;
 
   const BombGridOverlay({
     super.key,
     this.board,
     this.selected,
-    this.maxTiles,
     this.onTapCell,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isStandalone = board != null;
+    assert(
+      board == null || onTapCell != null,
+      'BombGridOverlay: standalone mode (board != null) requires onTapCell',
+    );
     final notifier = isStandalone ? null : ref.read(gameProvider.notifier);
     final state = isStandalone ? null : ref.watch(gameProvider);
 
