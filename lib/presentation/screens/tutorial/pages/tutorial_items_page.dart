@@ -100,6 +100,7 @@ class _TutorialItemsPageState extends State<TutorialItemsPage> {
   }
 
   void _onExplodeComplete() {
+    if (!mounted) return;
     // removeTiles is static
     final newState = GameEngine.removeTiles(_bombState, _bombSelected.toList());
     setState(() {
@@ -116,6 +117,7 @@ class _TutorialItemsPageState extends State<TutorialItemsPage> {
   }
 
   void _onVhsComplete() {
+    if (!mounted) return;
     // undoStack stores most recent at index 0
     final prev = _undoState.undoStack.isNotEmpty
         ? _undoState.undoStack.first
