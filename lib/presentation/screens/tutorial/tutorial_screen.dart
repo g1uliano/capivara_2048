@@ -5,8 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../controllers/tutorial_controller.dart';
 import 'pages/tutorial_welcome_page.dart';
-import 'pages/tutorial_movement_page.dart';
-import 'pages/tutorial_fusion_page.dart';
+import 'pages/tutorial_sandbox_page.dart';
 import 'pages/tutorial_items_page.dart';
 import 'pages/tutorial_finale_page.dart';
 import 'widgets/tutorial_scaffold.dart';
@@ -26,7 +25,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
   bool _page1Done = false;
   bool _page2Done = false;
 
-  static const _totalPages = 5;
+  static const _totalPages = 4;
 
   bool get _canGoNext {
     if (_currentPage == 1) return _page1Done;
@@ -85,9 +84,8 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
         onPageChanged: (i) => setState(() => _currentPage = i),
         children: [
           const TutorialWelcomePage(),
-          TutorialMovementPage(onUserCompleted: _onPage1Done),
-          TutorialFusionPage(onUserCompleted: _onPage2Done),
-          const TutorialItemsPage(),
+          TutorialSandboxPage(onUserCompleted: _onPage1Done),
+          TutorialItemsPage(onUserCompleted: _onPage2Done),
           const TutorialFinalePage(),
         ],
       ),
