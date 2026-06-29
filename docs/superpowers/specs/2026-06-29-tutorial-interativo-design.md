@@ -113,24 +113,53 @@ Tabuleiro renderizado com `BoardWidget(board: estadoLocal.board)`.
 
 ### Página 3 — Ferramentas (demo guiada toca-e-vê)
 
-Reescreve `tutorial_items_page.dart`. Usa engine/estado local próprio.
-"Próximo" travado até a criança tocar nas ferramentas demonstráveis.
+Reescreve `tutorial_items_page.dart`. Usa engine/estado local próprio e
+**reusa os widgets de overlay reais do jogo** para que o visual e o fluxo sejam
+idênticos aos da partida real (requisito do usuário).
+
+**Reuso dos overlays reais.** O `GameNotifier` é acoplado (áudio, persistência
+em prefs, gravação de recordes, sync Firestore, dedução de inventário), então
+dirigir o `gameProvider` real corromperia o jogo salvo do jogador — descartado.
+Em vez disso, o tutorial mantém `GameState`/`GameEngine` locais e reusa só os
+widgets visuais:
+
+- `BombExplosionOverlay` e `VhsRewindOverlay` já são **standalone** (recebem
+  `positions`/`isBomb3`/`isUndo3` + `onComplete`, sem provider) → reuso
+  **verbatim**, são literalmente o efeito da partida real.
+- `BombGridOverlay` e `BombDimOverlay` hoje leem `gameProvider`/`notifier`.
+  Ganham **params opcionais** (`board`, `selected`, `maxTiles`, `onTapCell`,
+  `onCancel`), com default mantendo o comportamento atual de provider — mesmo
+  padrão do `BoardWidget`. O tutorial passa o estado local e usa **os mesmos
+  widgets**, mesmos pixels, mesmo fluxo de seleção.
+
+A única lógica nova é a maquininha de estado local da bomba — espelha
+`enterBombMode`/`selectBombTile`/`confirmBomb` do `GameNotifier` em poucas
+linhas sobre o `GameState` local, **sem** áudio/persistência/sync.
 
 **Bomba**
-- Board montado meio enroscado.
-- *"Encrencou? Toque na bomba 💣"* → toque → um cluster de bichos some
-  (`GameEngine.removeTiles`) com efeito de explosão.
-- Trava até o toque acontecer.
+- Board montado meio enroscado. Botão de bomba do tutorial com a dica
+  *"Encrencou? Toque na bomba 💣"*.
+- Toque na bomba → entra em modo seleção: `BombDimOverlay` ("Selecione N peças
+  para destruir") + `BombGridOverlay` (células tocáveis), idênticos ao jogo.
+- Ao selecionar as N peças → `BombExplosionOverlay` toca → `GameEngine.removeTiles`
+  limpa as células. Mesmo fluxo visual da partida real.
+- Trava até a explosão completar.
 
 **Desfazer**
 - O tutorial faz/mostra uma jogada e então: *"Errou? Toque em desfazer ↩"* →
-  toque restaura o estado anterior via `undoStack`.
+  toque → `VhsRewindOverlay` (efeito VHS real) toca e, ao completar, restaura o
+  estado anterior via `undoStack`.
 - Trava até o toque acontecer.
 
 **Vidas**
 - Mostra o medidor de corações (`LivesIndicator`) + texto curto explicando que
   cada partida custa uma vida e elas se regeneram com o tempo.
 - **Não-interativo** — vidas é um recurso, não um toque no tabuleiro.
+
+> O **disparo** da bomba/desfazer no tutorial é um botão simples do tutorial, não
+> a `InventoryBar` completa (acoplada a `inventoryProvider`/contagens). Tudo que a
+> criança vê **depois** de tocar — dim, grade de seleção, explosão, rewind VHS —
+> são os widgets reais.
 
 ### Páginas 1 e 4 — Bem-vindo e Final
 
@@ -142,8 +171,11 @@ Inalteradas (`tutorial_welcome_page.dart`, `tutorial_finale_page.dart`).
 |------|---------|
 | **Novo** | `presentation/screens/tutorial/pages/tutorial_sandbox_page.dart` (passos A/B/C, engine local) |
 | **Novo** | `presentation/screens/tutorial/widgets/tutorial_board.dart` (swipe + tap, dirige engine local, usa `BoardWidget`) |
-| **Reescrever** | `presentation/screens/tutorial/pages/tutorial_items_page.dart` → demo interativa de ferramentas |
+| **Reescrever** | `presentation/screens/tutorial/pages/tutorial_items_page.dart` → demo interativa de ferramentas (reusa overlays reais) |
 | **Editar (~3 linhas)** | `presentation/widgets/board_widget.dart` → parâmetro `board` opcional |
+| **Editar** | `presentation/widgets/bomb_grid_overlay.dart` → params opcionais (`board`/`selected`/`onTapCell`), default = provider |
+| **Editar** | `presentation/widgets/bomb_selection_overlay.dart` (`BombDimOverlay`) → params opcionais (`maxTiles`/`onCancel`), default = provider |
+| **Reuso verbatim (sem editar)** | `presentation/widgets/bomb_explosion_overlay.dart`, `presentation/widgets/vhs_rewind_overlay.dart` (já standalone) |
 | **Editar** | `presentation/screens/tutorial/tutorial_screen.dart` → lista de páginas (4), `_totalPages`, gating das páginas interativas |
 | **Deletar** | `presentation/screens/tutorial/widgets/tutorial_mini_board.dart` |
 | **Deletar** | `presentation/screens/tutorial/pages/tutorial_movement_page.dart` |
@@ -169,14 +201,13 @@ recebem `totalPages` por parâmetro).
 - **Strings PT-BR hardcoded** nas páginas do tutorial, seguindo o padrão atual
   (as páginas existentes não usam `intl`). Migrar para `intl` fica fora de
   escopo aqui; se desejado, é um passo separado que cobre o tutorial inteiro.
-- **Demo de ferramentas usa interação própria simplificada**, não os overlays
-  reais do jogo (`bomb_selection_overlay`, `vhs_rewind_overlay`, etc.), que
-  estão acoplados ao inventário e a providers globais. Reaproveitar o **visual**
-  da explosão só se o widget de efeito não estiver acoplado a providers; caso
-  contrário, um fade/scale-out simples. (`// ponytail:` no código onde a
-  simplificação vive.)
+- **Disparo das ferramentas é um botão simples do tutorial**, não a `InventoryBar`
+  completa (acoplada a `inventoryProvider`). Os efeitos visíveis (dim, grade de
+  seleção, explosão, rewind VHS) usam os widgets reais. (`// ponytail:` onde o
+  botão de disparo vive.)
 - O tutorial dirige `GameEngine`/`GameState` locais — **não** integra com vidas,
-  inventário, sync ou score reais. É um ambiente isolado só para ensinar.
+  inventário, sync ou score reais. É um ambiente isolado só para ensinar; os
+  overlays reais são reusados só pela camada visual.
 
 ## Tipografia / UI (regras obrigatórias do projeto)
 
