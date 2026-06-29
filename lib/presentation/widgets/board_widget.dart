@@ -26,7 +26,7 @@ class BoardWidget extends ConsumerWidget {
       height: boardSize,
       decoration: BoxDecoration(
         color: const Color(0xFFE8D5B7),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: const BorderRadius.circular(12),
       ),
       padding: const EdgeInsets.all(GameConstants.tileSpacing),
       child: Column(
