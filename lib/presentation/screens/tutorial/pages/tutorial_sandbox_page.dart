@@ -72,7 +72,7 @@ class _TutorialSandboxPageState extends State<TutorialSandboxPage> {
   bool _boardChanged(GameState prev, GameState next) {
     int count(GameState s) =>
         s.board.expand((r) => r).whereType<Tile>().length;
-    return count(next) > count(prev);
+    return next.score > prev.score || count(next) > count(prev);
   }
 
   void _onSwipe(game.Direction dir) {

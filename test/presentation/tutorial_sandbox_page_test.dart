@@ -42,5 +42,43 @@ void main() {
       expect(find.text('Junte dois iguais num só bicho'), findsOneWidget);
       expect(completed, isFalse);
     });
+
+    testWidgets('step B avança para C após merge', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            home: Scaffold(
+              body: TutorialSandboxPage(
+                onUserCompleted: () {},
+                boardSize: 200,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Advance to step B via a right swipe on step A
+      await tester.fling(
+        find.byType(GestureDetector).first,
+        const Offset(200, 0),
+        800,
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 700));
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(find.text('Junte dois iguais num só bicho'), findsOneWidget);
+
+      // Step B: swipe left to merge the two tanajuras (level 1)
+      await tester.fling(
+        find.byType(GestureDetector).first,
+        const Offset(-200, 0),
+        800,
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 700));
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.text('Agora é com você!'), findsOneWidget);
+    });
   });
 }
