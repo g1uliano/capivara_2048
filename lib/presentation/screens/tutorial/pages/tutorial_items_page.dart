@@ -1,6 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+// hide Direction — collides with our game engine's Direction enum
+import 'package:flutter_animate/flutter_animate.dart' hide Direction;
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../data/models/game_state.dart';
@@ -14,6 +16,10 @@ import '../../../widgets/bomb_selection_overlay.dart';
 import '../../../widgets/glass_panel.dart';
 import '../../../widgets/outlined_text.dart';
 import '../../../widgets/vhs_rewind_overlay.dart';
+
+// One tool shown at a time — avoids the long scroll where the undo board was
+// hidden below the fold.
+enum _ToolStep { bomb, undo, lives }
 
 enum _BombPhase { idle, selecting, exploding, done }
 
@@ -29,6 +35,8 @@ class TutorialItemsPage extends StatefulWidget {
 }
 
 class _TutorialItemsPageState extends State<TutorialItemsPage> {
+  _ToolStep _step = _ToolStep.bomb;
+
   _BombPhase _bombPhase = _BombPhase.idle;
   Set<(int, int)> _bombSelected = {};
   late GameState _bombState;
@@ -108,7 +116,11 @@ class _TutorialItemsPageState extends State<TutorialItemsPage> {
       _bombSelected = {};
       _bombPhase = _BombPhase.done;
     });
-    _checkDone();
+    // Let the success message breathe, then reveal the next tool.
+    Future.delayed(const Duration(milliseconds: 1100), () {
+      if (!mounted) return;
+      setState(() => _step = _ToolStep.undo);
+    });
   }
 
   void _onUndoTap() {
@@ -126,13 +138,60 @@ class _TutorialItemsPageState extends State<TutorialItemsPage> {
       _undoState = prev;
       _undoPhase = _UndoPhase.done;
     });
-    _checkDone();
+    Future.delayed(const Duration(milliseconds: 1100), () {
+      if (!mounted) return;
+      setState(() => _step = _ToolStep.lives);
+      widget.onUserCompleted?.call();
+    });
   }
 
-  void _checkDone() {
-    if (_bombPhase == _BombPhase.done && _undoPhase == _UndoPhase.done) {
-      widget.onUserCompleted?.call();
-    }
+  // Animated finger nudging the user toward the action button.
+  Widget _tapHint() {
+    return const Text('👇', style: TextStyle(fontSize: 34))
+        .animate(onPlay: (c) => c.repeat(reverse: true))
+        .moveY(begin: -4, end: 8, duration: 700.ms, curve: Curves.easeInOut);
+  }
+
+  Widget _toolCard({
+    required Widget leading,
+    required String title,
+    required String subtitle,
+  }) {
+    return Card(
+      color: Colors.white.withValues(alpha: 0.88),
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            leading,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.fredoka(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF3E2723),
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.nunito(
+                      fontSize: 13,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildBombSection(double boardSize) {
@@ -142,44 +201,14 @@ class _TutorialItemsPageState extends State<TutorialItemsPage> {
 
     return Column(
       children: [
-        Card(
-          color: Colors.white.withValues(alpha: 0.88),
-          margin: EdgeInsets.zero,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Image.asset(
-                  'assets/images/inventory/bomb_3.webp',
-                  width: 40,
-                  height: 40,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Bomba 💣',
-                        style: GoogleFonts.fredoka(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF3E2723),
-                        ),
-                      ),
-                      Text(
-                        'Apaga peças quando você se enrosca.',
-                        style: GoogleFonts.nunito(
-                          fontSize: 13,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+        _toolCard(
+          leading: Image.asset(
+            'assets/images/inventory/bomb_3.webp',
+            width: 40,
+            height: 40,
           ),
+          title: 'Bomba 💣',
+          subtitle: 'Apaga peças quando você se enrosca.',
         ),
         const SizedBox(height: 8),
         SizedBox(
@@ -220,18 +249,20 @@ class _TutorialItemsPageState extends State<TutorialItemsPage> {
               fontWeight: FontWeight.w600,
             ),
           )
-        else if (_bombPhase == _BombPhase.idle)
+        else if (_bombPhase == _BombPhase.idle) ...[
+          _tapHint(),
+          const SizedBox(height: 4),
           ElevatedButton(
             onPressed: () => setState(() => _bombPhase = _BombPhase.selecting),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange.shade700,
             ),
             child: Text(
-              'Encrencou? Toque na bomba 💣',
+              'Toque aqui pra usar a bomba 💣',
               style: GoogleFonts.fredoka(fontSize: 15, color: Colors.white),
             ),
-          )
-        else if (isSelecting)
+          ),
+        ] else if (isSelecting)
           OutlinedText(
             text: 'Selecione $_bombMaxTiles peças para destruir',
             style: GoogleFonts.fredoka(fontSize: 14),
@@ -246,44 +277,14 @@ class _TutorialItemsPageState extends State<TutorialItemsPage> {
 
     return Column(
       children: [
-        Card(
-          color: Colors.white.withValues(alpha: 0.88),
-          margin: EdgeInsets.zero,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Image.asset(
-                  'assets/images/inventory/undo_1.webp',
-                  width: 40,
-                  height: 40,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Desfazer ↩',
-                        style: GoogleFonts.fredoka(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF3E2723),
-                        ),
-                      ),
-                      Text(
-                        'Volta a última jogada.',
-                        style: GoogleFonts.nunito(
-                          fontSize: 13,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+        _toolCard(
+          leading: Image.asset(
+            'assets/images/inventory/undo_1.webp',
+            width: 40,
+            height: 40,
           ),
+          title: 'Desfazer ↩',
+          subtitle: 'Volta a última jogada.',
         ),
         const SizedBox(height: 8),
         SizedBox(
@@ -309,63 +310,56 @@ class _TutorialItemsPageState extends State<TutorialItemsPage> {
               fontWeight: FontWeight.w600,
             ),
           )
-        else
+        else ...[
+          _tapHint(),
+          const SizedBox(height: 4),
           ElevatedButton(
             onPressed: _undoPhase == _UndoPhase.idle ? _onUndoTap : null,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue.shade700,
             ),
             child: Text(
-              'Errou? Toque em desfazer ↩',
+              'Toque aqui pra desfazer ↩',
               style: GoogleFonts.fredoka(fontSize: 15, color: Colors.white),
             ),
           ),
+        ],
       ],
     );
   }
 
   Widget _buildLivesSection() {
-    return Card(
-      color: Colors.white.withValues(alpha: 0.88),
-      margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            const Icon(Icons.favorite, color: Colors.red, size: 40),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Vidas ❤️',
-                    style: GoogleFonts.fredoka(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF3E2723),
-                    ),
-                  ),
-                  Text(
-                    'Cada partida custa uma vida. Elas se regeneram com o tempo — sem pressa!',
-                    style: GoogleFonts.nunito(
-                      fontSize: 13,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+    return Column(
+      children: [
+        _toolCard(
+          leading: const Icon(Icons.favorite, color: Colors.red, size: 40),
+          title: 'Vidas ❤️',
+          subtitle:
+              'Cada partida custa uma vida. Elas se regeneram com o tempo — sem pressa!',
         ),
-      ),
+        const SizedBox(height: 16),
+        OutlinedText(
+          text: 'Pronto! É só tocar em Próximo →',
+          style: GoogleFonts.fredoka(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final boardSize = screenWidth - 48.0;
+    // Cap the board so one tool + card + button fits without scrolling.
+    final boardSize = min(screenWidth - 48, 300.0);
+
+    final section = switch (_step) {
+      _ToolStep.bomb => _buildBombSection(boardSize),
+      _ToolStep.undo => _buildUndoSection(boardSize),
+      _ToolStep.lives => _buildLivesSection(),
+    };
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -384,11 +378,8 @@ class _TutorialItemsPageState extends State<TutorialItemsPage> {
             ),
           ),
           const SizedBox(height: 20),
-          _buildBombSection(boardSize),
-          const SizedBox(height: 16),
-          _buildUndoSection(boardSize),
-          const SizedBox(height: 16),
-          _buildLivesSection(),
+          // key forces a clean swap (and restarts the finger animation) per step
+          KeyedSubtree(key: ValueKey(_step), child: section),
           const SizedBox(height: 20),
         ],
       ),
