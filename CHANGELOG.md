@@ -6,6 +6,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.44] — 2026-06-30
+
+### Changed
+
+- **Tutorial do desfazer — demo automática da jogada**: ao entrar na tela de desfazer, o tabuleiro mostra a posição boa (canto estratégico) e um 👉 animado desliza pra direita simulando a jogada; após ~1,4s o tabuleiro muda pra posição ruim (peças dispersas) e o botão "Toque aqui pra desfazer" fica disponível — tornando óbvio o QUE está sendo desfeito
+
 ## [1.9.43] — 2026-06-30
 
 ### Fixed

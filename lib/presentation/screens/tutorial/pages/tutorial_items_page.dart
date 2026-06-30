@@ -18,7 +18,7 @@ enum _ToolStep { bomb, undo, lives }
 
 enum _BombPhase { idle, selecting, exploding, done }
 
-enum _UndoPhase { idle, rewinding, done }
+enum _UndoPhase { demo, idle, rewinding, done }
 
 class TutorialItemsPage extends StatefulWidget {
   // ponytail: nullable — tutorial screen passes callback, standalone use works without it
@@ -36,7 +36,7 @@ class _TutorialItemsPageState extends State<TutorialItemsPage> {
   Set<(int, int)> _bombSelected = {};
   late GameState _bombState;
 
-  _UndoPhase _undoPhase = _UndoPhase.idle;
+  _UndoPhase _undoPhase = _UndoPhase.demo;
   late GameState _undoState;
 
   static const _bombMaxTiles = 2;
@@ -151,6 +151,15 @@ class _TutorialItemsPageState extends State<TutorialItemsPage> {
     Future.delayed(const Duration(milliseconds: 1100), () {
       if (!mounted) return;
       setState(() => _step = _ToolStep.undo);
+      _startUndoDemo();
+    });
+  }
+
+  void _startUndoDemo() {
+    // Plays the auto-move (pre→post): show pre board for 1400ms then switch.
+    Future.delayed(const Duration(milliseconds: 1400), () {
+      if (!mounted) return;
+      setState(() => _undoPhase = _UndoPhase.idle);
     });
   }
 
@@ -314,8 +323,13 @@ class _TutorialItemsPageState extends State<TutorialItemsPage> {
   }
 
   Widget _buildUndoSection(double boardSize) {
+    final isDemo = _undoPhase == _UndoPhase.demo;
     final isDone = _undoPhase == _UndoPhase.done;
     final isRewinding = _undoPhase == _UndoPhase.rewinding;
+    // During demo show the PRE board (good position); afterwards show POST (bad).
+    final displayBoard = isDemo && _undoState.undoStack.isNotEmpty
+        ? _undoState.undoStack.first.board
+        : _undoState.board;
 
     return Column(
       children: [
@@ -329,12 +343,44 @@ class _TutorialItemsPageState extends State<TutorialItemsPage> {
           subtitle: 'Volta a última jogada.',
         ),
         const SizedBox(height: 8),
+        if (isDemo) ...[
+          OutlinedText(
+            text: 'Fazendo uma jogada...',
+            style: GoogleFonts.fredoka(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
         SizedBox(
           width: boardSize,
           height: boardSize,
           child: Stack(
             children: [
-              BoardWidget(board: _undoState.board, size: boardSize),
+              BoardWidget(board: displayBoard, size: boardSize),
+              // Auto-swipe animation: 👉 slides right to show the move being made.
+              if (isDemo)
+                Align(
+                  alignment: Alignment.center,
+                  child: IgnorePointer(
+                    child: Opacity(
+                      opacity: 0.85,
+                      child: const Text('👉', style: TextStyle(fontSize: 48))
+                          .animate(onPlay: (c) => c.repeat())
+                          .fadeIn(duration: 200.ms)
+                          .moveX(
+                            begin: -50,
+                            end: 50,
+                            duration: 700.ms,
+                            curve: Curves.easeInOut,
+                          )
+                          .then(delay: 300.ms)
+                          .fadeOut(duration: 200.ms)
+                          .then(delay: 300.ms),
+                    ),
+                  ),
+                ),
               if (isRewinding)
                 VhsRewindOverlay(
                   isUndo3: false,
@@ -352,7 +398,7 @@ class _TutorialItemsPageState extends State<TutorialItemsPage> {
               fontWeight: FontWeight.w600,
             ),
           )
-        else ...[
+        else if (!isDemo) ...[
           _tapHint(),
           const SizedBox(height: 4),
           ElevatedButton(
