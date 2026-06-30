@@ -65,7 +65,7 @@ class TutorialScaffold extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     SizedBox(
-                      width: 100,
+                      width: 120,
                       child: onBack == null
                           ? const SizedBox.shrink()
                           : TextButton(
@@ -86,7 +86,7 @@ class TutorialScaffold extends StatelessWidget {
                       current: currentPage,
                     ),
                     SizedBox(
-                      width: 100,
+                      width: 120,
                       child: TextButton(
                         onPressed: canGoNext ? onNext : null,
                         child: _NextLabel(
