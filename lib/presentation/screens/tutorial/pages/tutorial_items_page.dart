@@ -12,7 +12,6 @@ import '../../../../domain/game_engine/game_engine.dart';
 import '../../../widgets/board_widget.dart';
 import '../../../widgets/bomb_explosion_overlay.dart';
 import '../../../widgets/bomb_grid_overlay.dart';
-import '../../../widgets/bomb_selection_overlay.dart';
 import '../../../widgets/glass_panel.dart';
 import '../../../widgets/outlined_text.dart';
 import '../../../widgets/vhs_rewind_overlay.dart';
@@ -211,26 +210,30 @@ class _TutorialItemsPageState extends State<TutorialItemsPage> {
           subtitle: 'Apaga peças quando você se enrosca.',
         ),
         const SizedBox(height: 8),
+        // Instruction sits ABOVE the board (outlined, readable). Drawing it on
+        // top of the white selection grid would make white text vanish.
+        if (isSelecting) ...[
+          OutlinedText(
+            text: 'Toque em $_bombMaxTiles peças pra destruir',
+            style: GoogleFonts.fredoka(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
         SizedBox(
           width: boardSize,
           height: boardSize,
           child: Stack(
             children: [
               BoardWidget(board: _bombState.board, size: boardSize),
-              if (isSelecting) ...[
-                BombDimOverlay(
-                  maxTiles: _bombMaxTiles,
-                  onCancel: () => setState(() {
-                    _bombPhase = _BombPhase.idle;
-                    _bombSelected = {};
-                  }),
-                ),
+              if (isSelecting)
                 BombGridOverlay(
                   board: _bombState.board,
                   selected: _bombSelected,
                   onTapCell: _onBombTap,
                 ),
-              ],
               if (isExploding)
                 BombExplosionOverlay(
                   positions: _bombSelected.toList(),
@@ -263,9 +266,16 @@ class _TutorialItemsPageState extends State<TutorialItemsPage> {
             ),
           ),
         ] else if (isSelecting)
-          OutlinedText(
-            text: 'Selecione $_bombMaxTiles peças para destruir',
-            style: GoogleFonts.fredoka(fontSize: 14),
+          // Cancel lives BELOW the board, outside the grid, so it stays tappable.
+          TextButton(
+            onPressed: () => setState(() {
+              _bombPhase = _BombPhase.idle;
+              _bombSelected = {};
+            }),
+            child: OutlinedText(
+              text: 'Cancelar',
+              style: GoogleFonts.fredoka(fontSize: 14),
+            ),
           ),
       ],
     );
@@ -352,8 +362,9 @@ class _TutorialItemsPageState extends State<TutorialItemsPage> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    // Cap the board so one tool + card + button fits without scrolling.
-    final boardSize = min(screenWidth - 48, 300.0);
+    // Full content width — same size as the sandbox/game board. The scroll view
+    // is the safety net if a tool needs more vertical room.
+    final boardSize = screenWidth - 48;
 
     final section = switch (_step) {
       _ToolStep.bomb => _buildBombSection(boardSize),
