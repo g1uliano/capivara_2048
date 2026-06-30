@@ -162,6 +162,17 @@ class _TutorialSandboxPageState extends State<TutorialSandboxPage> {
     }
   }
 
+  Widget _swipeHint() {
+    return IgnorePointer(
+      child: Opacity(
+        opacity: 0.85,
+        child: const Text('☝️', style: TextStyle(fontSize: 48))
+            .animate(onPlay: (c) => c.repeat(reverse: true))
+            .moveX(begin: -40, end: 40, duration: 800.ms, curve: Curves.easeInOut),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -196,11 +207,18 @@ class _TutorialSandboxPageState extends State<TutorialSandboxPage> {
             ),
           ),
           const SizedBox(height: 24),
-          TutorialBoard(
-            key: ValueKey(_step),
-            state: _state,
-            onSwipe: _onSwipe,
-            size: widget.boardSize,
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              TutorialBoard(
+                key: ValueKey(_step),
+                state: _state,
+                onSwipe: _onSwipe,
+                size: widget.boardSize,
+              ),
+              if (_step == _SandboxStep.movement && !_stepDone)
+                _swipeHint(),
+            ],
           ),
           const SizedBox(height: 20),
           AnimatedOpacity(

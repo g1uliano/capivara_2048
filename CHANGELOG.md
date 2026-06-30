@@ -6,6 +6,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.42] — 2026-06-30
+
+### Changed
+
+- **Tutorial — animação de dedo deslizando no passo de movimento**: ☝️ animado sobreposto ao tabuleiro no passo "Deslize pra mover tudo", oscilando horizontalmente pra mostrar o gesto esperado; some automaticamente ao primeiro swipe válido
+
 ## [1.9.41] — 2026-06-29
 
 ### Changed
