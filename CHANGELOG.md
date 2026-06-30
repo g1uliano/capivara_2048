@@ -6,6 +6,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.45] — 2026-06-30
+
+### Changed
+
+- **Tutorial — transições manuais**: todas as mudanças de passo dentro do tutorial agora requerem pressionar "Próximo →"; ao completar uma etapa o botão fica animado (texto amarelo + pulso de escala) para chamar a atenção do usuário; removidos os timers automáticos de 700ms (sandbox) e 1100ms (itens) que avançavam sem interação
+- **Tutorial — botão "Próximo" animado**: ao completar qualquer etapa, o botão "Próximo →" muda para texto amarelo com animação de escala pulsante (1,0x → 1,4x) usando `flutter_animate`
+
 ## [1.9.44] — 2026-06-30
 
 ### Changed

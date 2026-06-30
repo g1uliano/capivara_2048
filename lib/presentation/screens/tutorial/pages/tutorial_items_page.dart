@@ -23,7 +23,8 @@ enum _UndoPhase { demo, idle, rewinding, done }
 class TutorialItemsPage extends StatefulWidget {
   // ponytail: nullable — tutorial screen passes callback, standalone use works without it
   final VoidCallback? onUserCompleted;
-  const TutorialItemsPage({super.key, this.onUserCompleted});
+  final void Function({required bool animated, VoidCallback? action})? setNextState;
+  const TutorialItemsPage({super.key, this.onUserCompleted, this.setNextState});
 
   @override
   State<TutorialItemsPage> createState() => _TutorialItemsPageState();
@@ -138,6 +139,29 @@ class _TutorialItemsPageState extends State<TutorialItemsPage> {
     });
   }
 
+  void _toUndo() {
+    widget.setNextState?.call(animated: false, action: null);
+    setState(() {
+      _step = _ToolStep.undo;
+      _undoPhase = _UndoPhase.demo;
+      _undoState = _buildUndoState(); // fresh state in case page is revisited
+    });
+    _startUndoDemo();
+  }
+
+  void _toLives() {
+    widget.setNextState?.call(animated: false, action: null);
+    setState(() => _step = _ToolStep.lives);
+    // Lives is informational — signal Próximo immediately for the finale transition.
+    widget.setNextState?.call(
+      animated: true,
+      action: () {
+        widget.setNextState?.call(animated: false, action: null);
+        widget.onUserCompleted?.call();
+      },
+    );
+  }
+
   void _onExplodeComplete() {
     if (!mounted) return;
     // removeTiles is static
@@ -147,12 +171,8 @@ class _TutorialItemsPageState extends State<TutorialItemsPage> {
       _bombSelected = {};
       _bombPhase = _BombPhase.done;
     });
-    // Let the success message breathe, then reveal the next tool.
-    Future.delayed(const Duration(milliseconds: 1100), () {
-      if (!mounted) return;
-      setState(() => _step = _ToolStep.undo);
-      _startUndoDemo();
-    });
+    // Signal Próximo to reveal the undo tool.
+    widget.setNextState?.call(animated: true, action: _toUndo);
   }
 
   void _startUndoDemo() {
@@ -178,11 +198,8 @@ class _TutorialItemsPageState extends State<TutorialItemsPage> {
       _undoState = prev;
       _undoPhase = _UndoPhase.done;
     });
-    Future.delayed(const Duration(milliseconds: 1100), () {
-      if (!mounted) return;
-      setState(() => _step = _ToolStep.lives);
-      widget.onUserCompleted?.call();
-    });
+    // Signal Próximo to reveal the lives tool.
+    widget.setNextState?.call(animated: true, action: _toLives);
   }
 
   // Animated finger nudging the user toward the action button.

@@ -18,7 +18,14 @@ class TutorialSandboxPage extends StatefulWidget {
   final VoidCallback onUserCompleted;
   // ponytail: boardSize permite injetar tamanho fixo nos testes
   final double? boardSize;
-  const TutorialSandboxPage({super.key, required this.onUserCompleted, this.boardSize});
+  // ponytail: nullable — testes não precisam fornecer setNextState
+  final void Function({required bool animated, VoidCallback? action})? setNextState;
+  const TutorialSandboxPage({
+    super.key,
+    required this.onUserCompleted,
+    this.boardSize,
+    this.setNextState,
+  });
 
   @override
   State<TutorialSandboxPage> createState() => _TutorialSandboxPageState();
@@ -75,6 +82,25 @@ class _TutorialSandboxPageState extends State<TutorialSandboxPage> {
     return next.score > prev.score || count(next) > count(prev);
   }
 
+  void _toStepB() {
+    widget.setNextState?.call(animated: false, action: null);
+    setState(() {
+      _step = _SandboxStep.unite;
+      _stepDone = false;
+      _engine = GameEngine(random: Random(1));
+      _state = _buildStepBState();
+    });
+  }
+
+  void _toStepC() {
+    widget.setNextState?.call(animated: false, action: null);
+    setState(() {
+      _step = _SandboxStep.free;
+      _stepDone = false;
+      _engine = GameEngine();
+    });
+  }
+
   void _onSwipe(game.Direction dir) {
     if (_stepDone && _step != _SandboxStep.free) return;
     final prev = _state;
@@ -86,33 +112,24 @@ class _TutorialSandboxPageState extends State<TutorialSandboxPage> {
     switch (_step) {
       case _SandboxStep.movement:
         setState(() => _stepDone = true);
-        Future.delayed(const Duration(milliseconds: 700), () {
-          if (!mounted) return;
-          setState(() {
-            _step = _SandboxStep.unite;
-            _stepDone = false;
-            _engine = GameEngine(random: Random(1));
-            _state = _buildStepBState();
-          });
-        });
+        widget.setNextState?.call(animated: true, action: _toStepB);
       case _SandboxStep.unite:
         if (next.score > prev.score) {
           setState(() => _stepDone = true);
-          Future.delayed(const Duration(milliseconds: 700), () {
-            if (!mounted) return;
-            setState(() {
-              _step = _SandboxStep.free;
-              _stepDone = false;
-              _engine = GameEngine();
-            });
-          });
+          widget.setNextState?.call(animated: true, action: _toStepC);
         }
       case _SandboxStep.free:
         if (next.score > prev.score) {
           _fusions++;
           if (_fusions >= 2 && !_stepDone) {
             setState(() => _stepDone = true);
-            widget.onUserCompleted();
+            widget.setNextState?.call(
+              animated: true,
+              action: () {
+                widget.setNextState?.call(animated: false, action: null);
+                widget.onUserCompleted();
+              },
+            );
           }
         }
     }

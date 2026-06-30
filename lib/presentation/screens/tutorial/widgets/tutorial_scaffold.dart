@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
@@ -11,6 +12,7 @@ class TutorialScaffold extends StatelessWidget {
   final int currentPage;
   final int totalPages;
   final bool canGoNext;
+  final bool nextAnimated;
   final String nextLabel;
   final VoidCallback? onBack;
   final VoidCallback onNext;
@@ -22,6 +24,7 @@ class TutorialScaffold extends StatelessWidget {
     required this.currentPage,
     required this.totalPages,
     required this.canGoNext,
+    required this.nextAnimated,
     required this.nextLabel,
     required this.onBack,
     required this.onNext,
@@ -86,15 +89,10 @@ class TutorialScaffold extends StatelessWidget {
                       width: 100,
                       child: TextButton(
                         onPressed: canGoNext ? onNext : null,
-                        child: Text(
-                          nextLabel,
-                          style: outlinedWhiteTextStyle(
-                            GoogleFonts.fredoka(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: canGoNext ? Colors.white : Colors.white24,
-                            ),
-                          ),
+                        child: _NextLabel(
+                          label: nextLabel,
+                          animated: nextAnimated,
+                          enabled: canGoNext,
                         ),
                       ),
                     ),
@@ -106,5 +104,43 @@ class TutorialScaffold extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+// Separate StatefulWidget so the animation controller lives independently
+// from TutorialScaffold rebuilds and restarts cleanly when `animated` flips.
+class _NextLabel extends StatelessWidget {
+  final String label;
+  final bool animated;
+  final bool enabled;
+
+  const _NextLabel({
+    required this.label,
+    required this.animated,
+    required this.enabled,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = animated
+        ? Colors.yellow[400]!
+        : (enabled ? Colors.white : Colors.white24);
+    final text = Text(
+      label,
+      style: outlinedWhiteTextStyle(
+        GoogleFonts.fredoka(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
+      ),
+    );
+    if (!animated) return text;
+    return text
+        .animate(
+          key: const ValueKey('next-animated'),
+          onPlay: (c) => c.repeat(reverse: true),
+        )
+        .scaleXY(begin: 1.0, end: 1.4, duration: 500.ms, curve: Curves.easeInOut);
   }
 }

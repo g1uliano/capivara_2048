@@ -4,9 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+// Simulates pressing "Próximo" immediately when the page marks a step done.
+void Function({required bool animated, VoidCallback? action}) _autoNext() {
+  return ({required bool animated, VoidCallback? action}) {
+    if (animated && action != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => action());
+    }
+  };
+}
+
 void main() {
   group('TutorialSandboxPage gating', () {
-    testWidgets('step A avança para B após swipe válido', (tester) async {
+    testWidgets('step A avança para B após swipe válido + Próximo', (tester) async {
       bool completed = false;
       await tester.pumpWidget(
         ProviderScope(
@@ -14,7 +23,8 @@ void main() {
             home: Scaffold(
               body: TutorialSandboxPage(
                 onUserCompleted: () => completed = true,
-                boardSize: 200, // tamanho fixo para evitar overflow no env de teste
+                boardSize: 200,
+                setNextState: _autoNext(),
               ),
             ),
           ),
@@ -33,9 +43,9 @@ void main() {
       );
       await tester.pump();
 
-      // Aguarda timer de transição (700ms)
-      await tester.pump(const Duration(milliseconds: 700));
-      // pump fixo em vez de pumpAndSettle — animação repeat nunca settle
+      // addPostFrameCallback do _autoNext dispara na próxima frame
+      await tester.pump();
+      // pump extra pra animações
       await tester.pump(const Duration(milliseconds: 100));
 
       // Step B deve estar ativo
@@ -43,7 +53,7 @@ void main() {
       expect(completed, isFalse);
     });
 
-    testWidgets('step B avança para C após merge', (tester) async {
+    testWidgets('step B avança para C após merge + Próximo', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -51,6 +61,7 @@ void main() {
               body: TutorialSandboxPage(
                 onUserCompleted: () {},
                 boardSize: 200,
+                setNextState: _autoNext(),
               ),
             ),
           ),
@@ -64,7 +75,7 @@ void main() {
         800,
       );
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 700));
+      await tester.pump(); // addPostFrameCallback
       await tester.pump(const Duration(milliseconds: 100));
       expect(find.text('Junte dois iguais num só bicho'), findsOneWidget);
 
@@ -75,7 +86,7 @@ void main() {
         800,
       );
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 700));
+      await tester.pump(); // addPostFrameCallback
       await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.text('Agora é com você!'), findsOneWidget);
