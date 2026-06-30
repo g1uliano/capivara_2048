@@ -15,6 +15,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
   - **Passo B** — Junte dois iguais num só bicho: duas tanajuras na mesma linha + um bicho diferente; o jogador vê que só os iguais se unem
   - **Passo C** — Agora é com você: jogo livre até 2 uniões; destrava o botão "Próximo"
 - **Ferramentas agora têm demo interativa** (toca-e-vê): bomba ativa o overlay real de seleção de células + explosão; desfazer dispara o efeito VHS real; vidas permanecem como card estático
+- **Ferramentas mostradas uma por vez** (bomba → desfazer → vidas), trocando o conteúdo no lugar — antes ficavam empilhadas e o tabuleiro de desfazer só aparecia rolando a tela
+- **Dedo animado 👇 apontando pro botão** de cada ferramenta, deixando claro onde tocar (antes o usuário tocava no ícone da bomba e nada acontecia)
 - Tutorial passa de 5 para 4 páginas (Bem-vindo → Sandbox → Ferramentas → Final)
 
 ## [1.9.40] — 2026-06-19
