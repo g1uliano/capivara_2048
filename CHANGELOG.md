@@ -6,6 +6,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.43] — 2026-06-30
+
+### Fixed
+
+- **Tutorial da bomba — tabuleiro travado de verdade**: board agora tem todas as 16 células ocupadas, sem nenhum par adjacente igual (game over real); antes tinha só 9 peças com espaços livres, o que não motivava o uso da bomba
+- **Tutorial do desfazer — cenário significativo**: board exibe 8 peças em posição de canto estratégica (antes do movimento ruim) e 9 peças dispersas à direita (depois do movimento ruim); antes usava só 2 peças, o antes/depois era imperceptível e aparecia um tile aleatório que "não existia antes"
+
 ## [1.9.42] — 2026-06-30
 
 ### Changed

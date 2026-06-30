@@ -1,13 +1,9 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-// hide Direction — collides with our game engine's Direction enum
-import 'package:flutter_animate/flutter_animate.dart' hide Direction;
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../data/models/game_state.dart';
 import '../../../../data/models/tile.dart';
-import '../../../../domain/game_engine/direction.dart';
 import '../../../../domain/game_engine/game_engine.dart';
 import '../../../widgets/board_widget.dart';
 import '../../../widgets/bomb_explosion_overlay.dart';
@@ -53,40 +49,76 @@ class _TutorialItemsPageState extends State<TutorialItemsPage> {
   }
 
   GameState _buildBombBoard() {
+    // Full board, no adjacent pair with equal level — literally stuck (game over).
+    // Shows WHY the bomb is useful: no moves left, need to clear space.
     final board = List.generate(4, (_) => List<Tile?>.filled(4, null));
-    board[0][0] = const Tile(id: 'bb1', level: 3, row: 0, col: 0);
-    board[0][2] = const Tile(id: 'bb2', level: 1, row: 0, col: 2);
-    board[0][3] = const Tile(id: 'bb3', level: 5, row: 0, col: 3);
-    board[1][1] = const Tile(id: 'bb4', level: 2, row: 1, col: 1);
-    board[1][3] = const Tile(id: 'bb5', level: 4, row: 1, col: 3);
-    board[2][0] = const Tile(id: 'bb6', level: 6, row: 2, col: 0);
-    board[2][2] = const Tile(id: 'bb7', level: 3, row: 2, col: 2);
-    board[3][1] = const Tile(id: 'bb8', level: 1, row: 3, col: 1);
-    board[3][3] = const Tile(id: 'bb9', level: 2, row: 3, col: 3);
+    board[0][0] = const Tile(id: 'bb00', level: 1, row: 0, col: 0);
+    board[0][1] = const Tile(id: 'bb01', level: 3, row: 0, col: 1);
+    board[0][2] = const Tile(id: 'bb02', level: 2, row: 0, col: 2);
+    board[0][3] = const Tile(id: 'bb03', level: 4, row: 0, col: 3);
+    board[1][0] = const Tile(id: 'bb10', level: 4, row: 1, col: 0);
+    board[1][1] = const Tile(id: 'bb11', level: 2, row: 1, col: 1);
+    board[1][2] = const Tile(id: 'bb12', level: 5, row: 1, col: 2);
+    board[1][3] = const Tile(id: 'bb13', level: 1, row: 1, col: 3);
+    board[2][0] = const Tile(id: 'bb20', level: 2, row: 2, col: 0);
+    board[2][1] = const Tile(id: 'bb21', level: 5, row: 2, col: 1);
+    board[2][2] = const Tile(id: 'bb22', level: 1, row: 2, col: 2);
+    board[2][3] = const Tile(id: 'bb23', level: 3, row: 2, col: 3);
+    board[3][0] = const Tile(id: 'bb30', level: 3, row: 3, col: 0);
+    board[3][1] = const Tile(id: 'bb31', level: 1, row: 3, col: 1);
+    board[3][2] = const Tile(id: 'bb32', level: 4, row: 3, col: 2);
+    board[3][3] = const Tile(id: 'bb33', level: 2, row: 3, col: 3);
     return GameState(
       board: board,
       score: 0,
       highScore: 0,
       isGameOver: false,
       hasWon: false,
-      maxLevel: 6,
+      maxLevel: 5,
     );
   }
 
   GameState _buildUndoState() {
-    final board = List.generate(4, (_) => List<Tile?>.filled(4, null));
-    board[1][0] = const Tile(id: 'ub1', level: 2, row: 1, col: 0);
-    board[1][3] = const Tile(id: 'ub2', level: 2, row: 1, col: 3);
+    // PRE state: classic corner stack — a good strategic position.
+    final preBoard = List.generate(4, (_) => List<Tile?>.filled(4, null));
+    preBoard[0][0] = const Tile(id: 'up00', level: 6, row: 0, col: 0);
+    preBoard[1][0] = const Tile(id: 'up10', level: 5, row: 1, col: 0);
+    preBoard[1][1] = const Tile(id: 'up11', level: 4, row: 1, col: 1);
+    preBoard[2][0] = const Tile(id: 'up20', level: 3, row: 2, col: 0);
+    preBoard[2][1] = const Tile(id: 'up21', level: 2, row: 2, col: 1);
+    preBoard[2][2] = const Tile(id: 'up22', level: 1, row: 2, col: 2);
+    preBoard[3][0] = const Tile(id: 'up30', level: 2, row: 3, col: 0);
+    preBoard[3][1] = const Tile(id: 'up31', level: 1, row: 3, col: 1);
     final pre = GameState(
-      board: board,
+      board: preBoard,
       score: 0,
       highScore: 0,
       isGameOver: false,
       hasWon: false,
-      maxLevel: 2,
+      maxLevel: 6,
     );
-    // Run a move so undoStack has the pre-move state for restoration
-    return GameEngine(random: Random(13)).move(pre, Direction.right);
+
+    // POST state: same tiles scattered to the right after a bad swipe — looks worse.
+    // Shown to the user first; undo restores pre above (via undoStack).
+    final postBoard = List.generate(4, (_) => List<Tile?>.filled(4, null));
+    postBoard[0][3] = const Tile(id: 'uo03', level: 6, row: 0, col: 3);
+    postBoard[1][2] = const Tile(id: 'uo12', level: 5, row: 1, col: 2);
+    postBoard[1][3] = const Tile(id: 'uo13', level: 4, row: 1, col: 3);
+    postBoard[2][1] = const Tile(id: 'uo21', level: 2, row: 2, col: 1);
+    postBoard[2][2] = const Tile(id: 'uo22', level: 3, row: 2, col: 2);
+    postBoard[2][3] = const Tile(id: 'uo23', level: 1, row: 2, col: 3);
+    postBoard[3][1] = const Tile(id: 'uo31', level: 1, row: 3, col: 1);
+    postBoard[3][2] = const Tile(id: 'uo32', level: 2, row: 3, col: 2);
+    postBoard[3][3] = const Tile(id: 'uo33', level: 1, row: 3, col: 3);
+    return GameState(
+      board: postBoard,
+      score: 0,
+      highScore: 0,
+      isGameOver: false,
+      hasWon: false,
+      maxLevel: 6,
+      undoStack: [pre],
+    );
   }
 
   void _onBombTap(int r, int c) {
