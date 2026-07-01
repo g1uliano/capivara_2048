@@ -6,6 +6,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.9.46] — 2026-07-01
+
+### Fixed
+
+- **Ranking pessoal — records não somem mais**: corrigido bug crítico onde o trim por ordem de inserção deletava o maior score após sync com o Firestore (o sync reescrevia o Hive em ordem decrescente, colocando o maior score na key mais baixa, que o trim removia na próxima partida); o `_records` em memória agora é atualizado imediatamente após o sync remoto
+
 ## [1.9.45] — 2026-06-30
 
 ### Changed
