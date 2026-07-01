@@ -14,6 +14,7 @@ import '../../data/models/personal_records.dart';
 import '../../data/models/inventory.dart';
 import '../../data/models/lives_state.dart';
 import '../../data/models/game_record_hive_adapter.dart';
+import '../../data/repositories/game_record_repository.dart';
 import '../../domain/sync/sync_engine.dart';
 import '../../domain/sync/sync_conflict_resolver.dart';
 
@@ -23,8 +24,9 @@ class FirebaseSyncEngine implements SyncEngine {
   static const _personalRecordsKey = 'records';
 
   String? displayName;
+  final GameRecordRepository? gameRecordRepository;
 
-  FirebaseSyncEngine({this.displayName});
+  FirebaseSyncEngine({this.displayName, this.gameRecordRepository});
 
   String? _userId;
   StreamSubscription<DocumentSnapshot>? _profileListener;
@@ -468,5 +470,6 @@ class FirebaseSyncEngine implements SyncEngine {
     for (final r in top20) {
       await box.add(r);
     }
+    await gameRecordRepository?.load();
   }
 }

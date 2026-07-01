@@ -8,6 +8,7 @@ import '../../data/models/inventory.dart';
 import '../../data/models/pending_event.dart';
 import '../../data/models/personal_records.dart';
 import '../../data/repositories/firebase_sync_engine.dart';
+import '../../data/repositories/game_record_repository.dart';
 
 enum SyncStatus { idle, syncing, error }
 
@@ -111,7 +112,9 @@ class FakeSyncEngine implements SyncEngine {
 final syncEngineProvider = Provider<SyncEngine>((ref) {
   const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
   if (flavor == 'prd' || flavor == 'dev') {
-    return FirebaseSyncEngine();
+    return FirebaseSyncEngine(
+      gameRecordRepository: ref.read(gameRecordRepositoryProvider),
+    );
   }
   return FakeSyncEngine();
 });

@@ -5,8 +5,6 @@ import '../models/game_record_hive_adapter.dart';
 
 class GameRecordRepository {
   static const _boxName = 'game_records';
-  static const _maxEntries = 20;
-
   List<GameRecord> _records = [];
 
   List<GameRecord> get all => List.unmodifiable(_records);
@@ -60,12 +58,6 @@ class GameRecordRepository {
     final box = await Hive.openBox<GameRecord>(_boxName);
     await box.add(record);
     _records = box.values.toList();
-    if (_records.length > _maxEntries) {
-      final keys = box.keys.toList();
-      final toRemove = keys.sublist(0, _records.length - _maxEntries);
-      await box.deleteAll(toRemove);
-      _records = box.values.toList();
-    }
   }
 }
 
