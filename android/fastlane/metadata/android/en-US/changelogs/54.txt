@@ -1,0 +1,1 @@
+Fix: personal score records no longer disappear after cloud sync.

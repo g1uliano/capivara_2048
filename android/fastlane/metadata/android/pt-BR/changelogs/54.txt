@@ -1,0 +1,1 @@
+Correção: recordes pessoais de pontuação não somem mais após sincronização com a nuvem.
